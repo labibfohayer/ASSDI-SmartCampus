@@ -1,7 +1,10 @@
 import datetime
+import zoneinfo
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
 from apps.academic.models import (
     Campus,
@@ -15,6 +18,15 @@ from apps.academic.models import (
 )
 from apps.accounts.models import UserRole
 from apps.batches.models import Batch, BatchStatus, TeacherAssignment
+from apps.class_sessions.constants import (
+    SUNDAY,
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    date_to_day_of_week,
+)
+from apps.class_sessions.models import ClassSchedule, ClassSession, SessionStatus
 from apps.students.models import (
     EducationBackground,
     Enrollment,
@@ -350,6 +362,134 @@ class Command(BaseCommand):
 
                 student_credentials.append((student_id, full_name, batch.name, edu_bg, password))
 
+            # 11. Weekly Class Schedules for Batch 42 & Batch 43
+            teachers_by_login = {t.login_id: t for t, _ in teacher_users}
+
+            b42_schedule_defs = [
+                # Sunday: Parallel Islamic Basics (General vs Madrasa) + MS Office + Marketing
+                (SUNDAY, "ISLAMIC-GEN", "teacher_acct", datetime.time(9, 0), datetime.time(11, 0), "Room 101"),
+                (SUNDAY, "ISLAMIC-MAD", "teacher_video", datetime.time(9, 0), datetime.time(11, 0), "Room 102"),
+                (SUNDAY, "MS-OFFICE", "teacher_msoffice", datetime.time(11, 30), datetime.time(13, 30), "Computer Lab 1"),
+                (SUNDAY, "META-MKTG", "teacher_marketing", datetime.time(14, 30), datetime.time(16, 30), "Room 101"),
+                # Monday: Accounting + Graphic Design + English
+                (MONDAY, "ACCT-101", "teacher_acct", datetime.time(9, 0), datetime.time(11, 0), "Room 101"),
+                (MONDAY, "GRAPHIC-DES", "teacher_graphic", datetime.time(11, 30), datetime.time(13, 30), "Computer Lab 2"),
+                (MONDAY, "ENG-LANG", "teacher_msoffice", datetime.time(14, 30), datetime.time(16, 30), "Room 101"),
+                # Tuesday: Parallel Islamic Basics + Admin & Leadership + Video Editing
+                (TUESDAY, "ISLAMIC-GEN", "teacher_acct", datetime.time(9, 0), datetime.time(11, 0), "Room 101"),
+                (TUESDAY, "ISLAMIC-MAD", "teacher_video", datetime.time(9, 0), datetime.time(11, 0), "Room 102"),
+                (TUESDAY, "ADMIN-LEAD", "teacher_admin", datetime.time(11, 30), datetime.time(13, 30), "Room 101"),
+                (TUESDAY, "VIDEO-EDIT", "teacher_video", datetime.time(14, 30), datetime.time(16, 30), "Computer Lab 2"),
+                # Wednesday: Marketing + MS Office + Accounting
+                (WEDNESDAY, "META-MKTG", "teacher_marketing", datetime.time(9, 0), datetime.time(11, 0), "Room 101"),
+                (WEDNESDAY, "MS-OFFICE", "teacher_msoffice", datetime.time(11, 30), datetime.time(13, 30), "Computer Lab 1"),
+                (WEDNESDAY, "ACCT-101", "teacher_acct", datetime.time(14, 30), datetime.time(16, 30), "Room 101"),
+                # Thursday: Graphic Design + Video Editing + Admin & Leadership
+                (THURSDAY, "GRAPHIC-DES", "teacher_graphic", datetime.time(9, 0), datetime.time(11, 0), "Computer Lab 2"),
+                (THURSDAY, "VIDEO-EDIT", "teacher_video", datetime.time(11, 30), datetime.time(13, 30), "Computer Lab 2"),
+                (THURSDAY, "ADMIN-LEAD", "teacher_admin", datetime.time(14, 30), datetime.time(16, 30), "Room 101"),
+            ]
+
+            b43_schedule_defs = [
+                (SUNDAY, "ISLAMIC-GEN", "teacher_acct", datetime.time(16, 45), datetime.time(18, 45), "Room 101"),
+                (SUNDAY, "ISLAMIC-MAD", "teacher_video", datetime.time(16, 45), datetime.time(18, 45), "Room 102"),
+                (SUNDAY, "MS-OFFICE", "teacher_msoffice", datetime.time(19, 0), datetime.time(21, 0), "Computer Lab 1"),
+                (MONDAY, "ACCT-101", "teacher_acct", datetime.time(16, 45), datetime.time(18, 45), "Room 101"),
+                (MONDAY, "GRAPHIC-DES", "teacher_graphic", datetime.time(19, 0), datetime.time(21, 0), "Computer Lab 2"),
+                (TUESDAY, "ADMIN-LEAD", "teacher_admin", datetime.time(16, 45), datetime.time(18, 45), "Room 101"),
+                (TUESDAY, "VIDEO-EDIT", "teacher_video", datetime.time(19, 0), datetime.time(21, 0), "Computer Lab 2"),
+                (WEDNESDAY, "META-MKTG", "teacher_marketing", datetime.time(16, 45), datetime.time(18, 45), "Room 101"),
+                (WEDNESDAY, "MS-OFFICE", "teacher_msoffice", datetime.time(19, 0), datetime.time(21, 0), "Computer Lab 1"),
+                (THURSDAY, "GRAPHIC-DES", "teacher_graphic", datetime.time(16, 45), datetime.time(18, 45), "Computer Lab 2"),
+                (THURSDAY, "ADMIN-LEAD", "teacher_admin", datetime.time(19, 0), datetime.time(21, 0), "Room 101"),
+            ]
+
+            total_schedules_created = 0
+            for batch, sdefs in [(batch42, b42_schedule_defs), (batch43, b43_schedule_defs)]:
+                for dow, scode, t_login, s_time, e_time, room in sdefs:
+                    sub = subjects_map[scode]
+                    t_user = teachers_by_login[t_login]
+                    sched, created = ClassSchedule.objects.get_or_create(
+                        batch=batch,
+                        subject=sub,
+                        teacher_user=t_user,
+                        day_of_week=dow,
+                        start_time=s_time,
+                        defaults={
+                            "end_time": e_time,
+                            "room": room,
+                            "valid_from": batch.start_date,
+                            "valid_to": batch.end_date,
+                            "is_active": True,
+                        },
+                    )
+                    if created:
+                        total_schedules_created += 1
+
+            # 12. Generate Published Class Sessions for Past 5 and Next 5 School Days
+            dhaka_tz = zoneinfo.ZoneInfo("Asia/Dhaka")
+            today_dhaka = timezone.now().astimezone(dhaka_tz).date()
+
+            past_school_days = []
+            curr = today_dhaka - datetime.timedelta(days=1)
+            while len(past_school_days) < 5:
+                if date_to_day_of_week(curr) in [SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY]:
+                    past_school_days.append(curr)
+                curr -= datetime.timedelta(days=1)
+            past_school_days.reverse()
+
+            next_school_days = []
+            curr = today_dhaka
+            while len(next_school_days) < (5 if date_to_day_of_week(today_dhaka) not in [SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY] else 6):
+                if date_to_day_of_week(curr) in [SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY]:
+                    next_school_days.append(curr)
+                curr += datetime.timedelta(days=1)
+
+            target_dates = sorted(list(set(past_school_days + next_school_days)))
+            total_sessions_created = 0
+
+            for target_date in target_dates:
+                dow = date_to_day_of_week(target_date)
+                for batch in [batch42, batch43]:
+                    if target_date < batch.start_date or target_date > batch.end_date:
+                        continue
+
+                    schedules = ClassSchedule.objects.filter(batch=batch, day_of_week=dow, is_active=True)
+                    for sched in schedules:
+                        if ClassSession.objects.filter(
+                            batch=batch,
+                            subject=sched.subject,
+                            session_date=target_date,
+                            start_time=sched.start_time,
+                        ).exists():
+                            continue
+
+                        topics = list(ClassTopic.objects.filter(subject=sched.subject, is_active=True).order_by("id"))
+                        existing_count = ClassSession.objects.filter(
+                            batch=batch,
+                            subject=sched.subject,
+                        ).count()
+                        topic = topics[existing_count % len(topics)] if topics else None
+
+                        now = timezone.now()
+                        ClassSession.objects.create(
+                            batch=batch,
+                            subject=sched.subject,
+                            teacher_user=sched.teacher_user,
+                            topic=topic,
+                            schedule=sched,
+                            session_date=target_date,
+                            start_time=sched.start_time,
+                            end_time=sched.end_time,
+                            audience=sched.subject.audience_type,
+                            status=SessionStatus.PUBLISHED,
+                            published_at=now,
+                            created_by=admin_user,
+                            description=topic.description if topic else "",
+                            learning_objectives=topic.learning_objectives if topic else "",
+                        )
+                        total_sessions_created += 1
+
         # Output Summary & Credentials
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Teacher-to-Subject Mapping in Both Batches ==="))
         for t_user, sub_codes in teacher_users:
@@ -366,4 +506,8 @@ class Command(BaseCommand):
         for student_id, full_name, b_name, edu_bg, pwd in student_credentials[:6]:
             self.stdout.write(f"• {student_id} | {full_name:<28} | {b_name} ({edu_bg:<7}) | password: {pwd}")
         self.stdout.write(f"... and 34 more students created across Batch 42 and Batch 43 (Total 40 students).")
+
+        self.stdout.write(self.style.MIGRATE_HEADING("\n=== Timetable & Session Seeding Summary ==="))
+        self.stdout.write(f"• Total Class Schedules active: {ClassSchedule.objects.count()}")
+        self.stdout.write(f"• Total Published Class Sessions generated: {ClassSession.objects.count()}")
         self.stdout.write(self.style.SUCCESS("\n[SUCCESS] Demo seeding complete! Safe to re-run at any time.\n"))

@@ -180,10 +180,13 @@ erDiagram
         bigint id PK
         bigint batch_id FK
         bigint subject_id FK
-        integer day_of_week "0-6"
+        uuid teacher_user_id FK
+        integer day_of_week "0=Sun..6=Sat"
         time start_time
         time end_time
         varchar room
+        date valid_from "nullable"
+        date valid_to "nullable"
         boolean is_active
     }
 
@@ -191,13 +194,17 @@ erDiagram
         bigint id PK
         bigint batch_id FK
         bigint subject_id FK
-        bigint topic_id FK
+        bigint topic_id FK "nullable"
         uuid teacher_user_id FK
+        bigint schedule_id FK "nullable"
         date session_date
         time start_time
         time end_time
         varchar audience "all|general|madrasa"
-        varchar status "scheduled|in_progress|completed|cancelled"
+        varchar status "draft|published|cancelled"
+        timestamp published_at "nullable"
+        text cancel_reason "nullable"
+        uuid created_by_id FK "nullable"
         timestamp created_at
     }
 
@@ -311,11 +318,23 @@ erDiagram
    ALTER TABLE teacher_assignments 
    ADD CONSTRAINT uq_batch_subject_teacher UNIQUE (batch_id, subject_id, teacher_user_id);
    ```
-6. **Enrollment Uniqueness:**
+6. **Enrollment Uniqueness (Partial Unique Index):**
    ```sql
-   ALTER TABLE enrollments 
-   ADD CONSTRAINT uq_student_batch UNIQUE (student_id, batch_id);
+   CREATE UNIQUE INDEX uq_active_enrollment_per_student 
+   ON enrollments (student_id) WHERE status = 'active';
    ```
+7. **Audience-Aware Batch Overlap Rule:**
+   Two sessions for the same batch cannot overlap in time on the same date UNLESS their audiences do not intersect:
+   - `'all'` intersects with all (`'all'`, `'general'`, `'madrasa'`).
+   - `'general'` and `'madrasa'` do NOT intersect with each other, allowing parallel Islamic Basics classes for General and Madrasa cohorts at the same time.
+8. **Strict Teacher Overlap Invariant:**
+   One teacher cannot be scheduled or assigned to two non-cancelled sessions that overlap in time on the same date, across any batches or audiences.
+9. **Weekday Convention:**
+   Standard ASSDI academic weekday mapping starts on Sunday (Bangladesh academic week):
+   `0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday`.
+   Formula from Python's standard `date.weekday()` (where Monday is 0): `day_of_week = (d.weekday() + 1) % 7`.
+10. **Session Visibility Invariant:**
+    Students and Observers can ONLY see sessions with `status = 'published'` OR `(status = 'cancelled' AND published_at IS NOT NULL)`. Drafts and cancelled sessions that were never published are strictly hidden.
 
 ---
 
@@ -448,25 +467,34 @@ Weekly recurring timetable slot.
 * `id` (BIGINT, PK).
 * `batch_id` (BIGINT, FK -> `batches.id`, ON DELETE CASCADE).
 * `subject_id` (BIGINT, FK -> `subjects.id`, ON DELETE CASCADE).
-* `day_of_week` (SMALLINT, NOT NULL): 0 = Sunday, 1 = Monday, ..., 6 = Saturday.
+* `teacher_user_id` (UUID, FK -> `users.id`, ON DELETE RESTRICT).
+* `day_of_week` (SMALLINT, NOT NULL): 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday.
 * `start_time` (TIME, NOT NULL).
 * `end_time` (TIME, NOT NULL).
-* `room` (VARCHAR(50), NULL).
+* `room` (VARCHAR(50), default "").
+* `valid_from` (DATE, NULL).
+* `valid_to` (DATE, NULL).
 * `is_active` (BOOLEAN, default TRUE).
 
 ### 3.14 `class_sessions`
-A concrete class instance on a specific date.
+A concrete class instance on a specific calendar date.
 * `id` (BIGINT, PK).
 * `batch_id` (BIGINT, FK -> `batches.id`, ON DELETE RESTRICT).
 * `subject_id` (BIGINT, FK -> `subjects.id`, ON DELETE RESTRICT).
-* `topic_id` (BIGINT, FK -> `class_topics.id`, ON DELETE RESTRICT).
+* `topic_id` (BIGINT, FK -> `class_topics.id`, ON DELETE RESTRICT, NULL).
 * `teacher_user_id` (UUID, FK -> `users.id`, ON DELETE RESTRICT).
-* `session_date` (DATE, NOT NULL).
+* `schedule_id` (BIGINT, FK -> `class_schedules.id`, ON DELETE SET NULL, NULL).
+* `session_date` (DATE, NOT NULL, INDEX).
 * `start_time` (TIME, NOT NULL).
 * `end_time` (TIME, NOT NULL).
+* `description` (TEXT, default "").
+* `learning_objectives` (TEXT, default "").
 * `audience` (VARCHAR(20), default `'all'`): `'all'`, `'general'`, `'madrasa'`.
-* `status` (VARCHAR(20), default `'scheduled'`): `'scheduled'`, `'in_progress'`, `'completed'`, `'cancelled'`.
-* `created_at` (TIMESTAMP WITH TIME ZONE, default NOW()).
+* `status` (VARCHAR(20), default `'draft'`): `'draft'`, `'published'`, `'cancelled'`.
+* `published_at` (TIMESTAMP WITH TIME ZONE, NULL): Set upon first publication.
+* `cancel_reason` (TEXT, default ""): Required explanation when session is cancelled.
+* `created_by_id` (UUID, FK -> `users.id`, ON DELETE SET NULL, NULL).
+* `created_at`, `updated_at` (TIMESTAMP WITH TIME ZONE).
 
 ### 3.15 `qr_scan_tokens`
 Time-limited rotating signed tokens for QR attendance.

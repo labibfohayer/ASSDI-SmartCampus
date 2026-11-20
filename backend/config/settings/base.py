@@ -57,6 +57,7 @@ LOCAL_APPS = [
     "apps.academic.apps.AcademicConfig",
     "apps.batches.apps.BatchesConfig",
     "apps.students.apps.StudentsConfig",
+    "apps.class_sessions.apps.ClassSessionsConfig",
     "apps.audit.apps.AuditConfig",
 ]
 
@@ -179,6 +180,9 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "AudienceEnum": "apps.academic.models.SubjectAudience",
+    },
 }
 
 # Custom Configurable Throttling Limits
@@ -188,3 +192,11 @@ THROTTLE_LOGIN_ACCOUNT_FAILED_LIMIT = config(
 THROTTLE_LOGIN_ACCOUNT_LOCK_MINUTES = config(
     "THROTTLE_LOGIN_ACCOUNT_LOCK_MINUTES", default=5, cast=int
 )
+
+# Academic Timetable & Session Generation Settings
+# 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
+SCHOOL_DAYS = [
+    int(d.strip())
+    for d in config("SCHOOL_DAYS", default="0,1,2,3,4").split(",")
+    if d.strip()
+]

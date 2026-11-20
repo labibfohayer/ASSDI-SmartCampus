@@ -16,6 +16,7 @@ from apps.academic.views import (
     SubjectViewSet,
 )
 from apps.batches.views import BatchViewSet, TeacherAssignmentViewSet
+from apps.class_sessions.views import ClassScheduleViewSet, ClassSessionViewSet
 from apps.students.views import StudentViewSet
 
 # REST Framework Router for v1 API
@@ -29,6 +30,8 @@ router.register(r"topics", ClassTopicViewSet, basename="topic")
 router.register(r"batches", BatchViewSet, basename="batch")
 router.register(r"teacher-assignments", TeacherAssignmentViewSet, basename="teacher-assignment")
 router.register(r"students", StudentViewSet, basename="student")
+router.register(r"class-schedules", ClassScheduleViewSet, basename="class-schedule")
+router.register(r"class-sessions", ClassSessionViewSet, basename="class-session")
 
 urlpatterns = [
     # Django Administration

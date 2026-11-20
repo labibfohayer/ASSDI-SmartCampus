@@ -329,47 +329,116 @@
 
 ---
 
-## 7. Class Sessions & Timetables (`/sessions`)
+## 7. Class Schedules & Sessions (`/class-schedules`, `/class-sessions`)
 
-### 7.1 Today's Sessions (Student App & Teacher Dashboard)
-* **GET** `/sessions/today/`
-* **Roles:** `student` (returns today's sessions for student's batch & audience), `teacher` (returns today's sessions assigned to teacher).
+### 7.1 List / Create Weekly Class Schedules
+* **GET** `/api/v1/class-schedules/`
+  * **Roles:** `super_admin`, `coordinator` (own courses), `teacher` (own assigned), `student` (own active batch), `observer`.
+  * **Query Params:** `batch_id`, `subject_id`, `day_of_week`, `teacher_id`.
+* **POST** `/api/v1/class-schedules/`
+  * **Roles:** `super_admin`, `coordinator` (own course).
+  * **Request Body:**
+    ```json
+    {
+      "batch": 42,
+      "subject": 4,
+      "teacher_user": "uuid",
+      "day_of_week": 0,
+      "start_time": "09:00:00",
+      "end_time": "11:00:00",
+      "room": "Room 101",
+      "valid_from": "2026-11-01",
+      "valid_to": "2027-01-31"
+    }
+    ```
+
+### 7.2 Generate Sessions Batch Action
+* **POST** `/api/v1/class-schedules/generate-sessions/`
+* **Roles:** `super_admin`, `coordinator` (own course).
+* **Description:** Generates published `ClassSession` rows from active templates for dates matching `SCHOOL_DAYS` (Sunday=0 to Thursday=4). Idempotent: skips dates where session already exists. Sequentially assigns topics from curriculum.
+* **Request Body:**
+  ```json
+  {
+    "start_date": "2026-11-22",
+    "end_date": "2026-11-28",
+    "batch_id": 42
+  }
+  ```
+* **Success Response (200 OK / 201 Created):**
+  ```json
+  {
+    "created_count": 5,
+    "start_date": "2026-11-22",
+    "end_date": "2026-11-28",
+    "message": "Successfully generated 5 published sessions."
+  }
+  ```
+
+### 7.3 Today's Sessions (Timezone-Aware)
+* **GET** `/api/v1/class-sessions/today/`
+* **Roles:** `student` (returns today's sessions for student's active batch & audience background), `teacher` (assigned sessions), `coordinator` (course sessions), `super_admin`.
+* **Note:** "Today" is strictly computed in `Asia/Dhaka` (`+06:00`), never UTC.
 * **Success Response (200 OK):**
   ```json
   [
     {
       "id": 501,
+      "batch": 42,
+      "batch_name": "SBMC Batch 42",
+      "subject": 4,
       "subject_name": "Meta Marketing",
-      "topic": {
-        "id": 12,
-        "title": "Facebook Pixel Setup",
-        "objectives": "Install base code and standard events."
-      },
-      "teacher_name": "Master Trainer Hasan",
-      "start_time": "10:00:00",
-      "end_time": "12:00:00",
-      "status": "in_progress",
-      "has_submitted_feedback": false,
-      "attendance_status": "Present"
+      "topic": 12,
+      "topic_title": "Facebook Pixel Setup",
+      "teacher_user": "uuid",
+      "teacher_name": "Imran Nazir (Dummy)",
+      "session_date": "2026-11-22",
+      "start_time": "09:00:00",
+      "end_time": "11:00:00",
+      "audience": "all",
+      "status": "published",
+      "published_at": "2026-11-20T10:00:00Z",
+      "cancel_reason": ""
     }
   ]
   ```
 
-### 7.2 Create Class Session
-* **POST** `/sessions/`
-* **Roles:** `super_admin`, `coordinator` (own course), `teacher` (own assigned batch/subject)
+### 7.4 Create Class Session
+* **POST** `/api/v1/class-sessions/`
+* **Roles:** `super_admin`, `coordinator` (own course), `teacher` (self-only: `teacher_user` must be `request.user`).
+* **Constraints Enforced:**
+  - Audience-aware batch overlap (general & madrasa can run in parallel; all intersects with everything).
+  - Strict teacher non-overlap (one teacher cannot be in two overlapping sessions).
+  - Teacher cannot assign another teacher.
+  - End time must be after start time.
 * **Request Body:**
   ```json
   {
-    "batch_id": 42,
-    "subject_id": 4,
-    "topic_id": 12,
-    "session_date": "2026-11-21",
-    "start_time": "10:00:00",
-    "end_time": "12:00:00",
+    "batch": 42,
+    "subject": 4,
+    "teacher_user": "uuid",
+    "topic": 12,
+    "session_date": "2026-11-22",
+    "start_time": "09:00:00",
+    "end_time": "11:00:00",
     "audience": "all"
   }
   ```
+
+### 7.5 Publish Class Session
+* **POST** `/api/v1/class-sessions/{id}/publish/`
+* **Roles:** `super_admin`, `coordinator` (own course), `teacher` (own session).
+* **Description:** Changes status to `published` and sets `published_at` timestamp if null.
+
+### 7.6 Cancel Class Session
+* **POST** `/api/v1/class-sessions/{id}/cancel/`
+* **Roles:** `super_admin`, `coordinator` (own course), `teacher` (own session).
+* **Request Body:**
+  ```json
+  {
+    "cancel_reason": "Emergency institutional holiday."
+  }
+  ```
+* **Description:** Changes status to `cancelled` and records `cancel_reason`. If previously published, session remains visible to students and observers with status `cancelled` and reason. If never published, session is hidden.
 
 ---
 
