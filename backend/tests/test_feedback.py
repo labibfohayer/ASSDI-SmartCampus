@@ -33,6 +33,7 @@ from apps.feedback.constants import (
     rating_to_percentage,
 )
 from apps.feedback.models import HelpRequest, HelpRequestStatus, LearningFeedback
+from apps.feedback.signals import help_request_created, help_request_status_changed
 from apps.students.models import (
     EducationBackground,
     Enrollment,
@@ -1059,3 +1060,72 @@ class TestFeedbackAndHelpRequests:
         api_client.force_authenticate(user=d["coord2_user"])
         res_c2 = api_client.get(f"/api/v1/students/{student.id}/progress/")
         assert res_c2.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_help_request_signals_emitted_on_creation_and_status_changes(
+        self, api_client, feedback_setup_data
+    ):
+        """
+        Verifies that:
+        1. help_request_created is emitted when feedback creates a HelpRequest.
+        2. help_request_status_changed is emitted on start (pending -> in_progress).
+        3. help_request_status_changed is emitted on resolve (in_progress -> resolved).
+        """
+        d = feedback_setup_data
+        session = d["session_past_acct"]
+
+        created_signals = []
+        status_signals = []
+
+        def on_created(sender, **kwargs):
+            created_signals.append(kwargs)
+
+        def on_status_changed(sender, **kwargs):
+            status_signals.append(kwargs)
+
+        help_request_created.connect(on_created)
+        help_request_status_changed.connect(on_status_changed)
+
+        try:
+            # 1. Student submits feedback with needs_help=True -> triggers help_request_created
+            api_client.force_authenticate(user=d["u_s1"])
+            res_fb = api_client.post("/api/v1/feedback/", {
+                "session": session.id,
+                "understanding_rating": 2,
+                "needs_help": True,
+                "student_comment": "Signal verification help message.",
+            })
+            assert res_fb.status_code == status.HTTP_201_CREATED
+            hr_id = res_fb.data["help_request_id"]
+            assert hr_id is not None
+
+            assert len(created_signals) == 1
+            assert created_signals[0]["help_request"].id == hr_id
+            assert created_signals[0]["created_by_user"] == d["u_s1"]
+
+            # 2. Teacher starts help request -> triggers help_request_status_changed (pending -> in_progress)
+            teacher_client = APIClient()
+            teacher_client.force_authenticate(user=d["teacher1_user"])
+            res_start = teacher_client.post(f"/api/v1/help-requests/{hr_id}/start/")
+            assert res_start.status_code == status.HTTP_200_OK
+
+            assert len(status_signals) == 1
+            assert status_signals[0]["help_request"].id == hr_id
+            assert status_signals[0]["old_status"] == HelpRequestStatus.PENDING
+            assert status_signals[0]["new_status"] == HelpRequestStatus.IN_PROGRESS
+            assert status_signals[0]["by_user"] == d["teacher1_user"]
+
+            # 3. Teacher resolves help request -> triggers help_request_status_changed (in_progress -> resolved)
+            res_res = teacher_client.post(f"/api/v1/help-requests/{hr_id}/resolve/", {
+                "teacher_note": "Resolved and verified signal.",
+            })
+            assert res_res.status_code == status.HTTP_200_OK
+
+            assert len(status_signals) == 2
+            assert status_signals[1]["help_request"].id == hr_id
+            assert status_signals[1]["old_status"] == HelpRequestStatus.IN_PROGRESS
+            assert status_signals[1]["new_status"] == HelpRequestStatus.RESOLVED
+            assert status_signals[1]["by_user"] == d["teacher1_user"]
+
+        finally:
+            help_request_created.disconnect(on_created)
+            help_request_status_changed.disconnect(on_status_changed)
