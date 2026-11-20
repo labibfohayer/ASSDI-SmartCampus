@@ -48,20 +48,19 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-### 6. Create Demo Users (Rule 6: Fake data only)
-Populate 1 dummy user per role:
+### 6. Seed Academic & Student Demo Data (Sprint 2)
+Populate SBMC course, departments, subjects, curriculum topics, batches, teachers and 40 students (idempotent, safe to run multiple times):
 ```bash
-python manage.py create_demo_users
+python manage.py seed_demo
 ```
-
-**Credentials Generated:**
-| Role | Login ID | Password | Notes |
-|---|---|---|---|
-| `super_admin` | `admin01` | `AdminPass2026!` | Full system control |
-| `coordinator` | `coord01` | `CoordPass2026!` | Course management |
-| `teacher` | `teacher01` | `TeacherPass2026!` | Batch & class instruction |
-| `student` | `STD-2026-042-001` | `StudentPass2026!` | Enrolled student |
-| `observer` | `observer01` | `ObserverPass2026!` | Read-only reporting |
+This generates:
+- **Course:** Small Business Management Course (SBMC)
+- **Campus:** Kazi Bari Campus (KBC-NB)
+- **Batches:** Batch 42 and Batch 43
+- **Departments & Subjects:** Business Operations & Creative departments with 9 subjects
+- **Teachers:** 6 teachers mapped across all subjects in both batches
+- **Students:** 40 enrolled students with dummy Bengali names and mixed backgrounds (General, Aliya, Qawmi)
+- **Credentials:** Prints all demo login IDs and passwords to console.
 
 ### 7. Run the Development Server
 ```bash

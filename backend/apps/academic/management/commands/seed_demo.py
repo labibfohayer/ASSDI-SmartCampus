@@ -1,0 +1,369 @@
+import datetime
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+from django.db import transaction
+
+from apps.academic.models import (
+    Campus,
+    CampusGender,
+    ClassTopic,
+    CoordinatorCourseAssignment,
+    Course,
+    Department,
+    Subject,
+    SubjectAudience,
+)
+from apps.accounts.models import UserRole
+from apps.batches.models import Batch, BatchStatus, TeacherAssignment
+from apps.students.models import (
+    EducationBackground,
+    Enrollment,
+    EnrollmentStatus,
+    Student,
+    StudentStatus,
+)
+
+User = get_user_model()
+
+
+class Command(BaseCommand):
+    help = (
+        "Seeds demo academic and student data for SBMC course strictly adhering to "
+        "SRS Section 19 and AGENTS.md Rule 6 (Dummy-only data, idempotent)."
+    )
+
+    def handle(self, *args, **options):
+        self.stdout.write(self.style.MIGRATE_HEADING("\n=== Seeding ASSDI Demo Data (Sprint 2) ==="))
+
+        with transaction.atomic():
+            # 1. Campus
+            campus, _ = Campus.objects.get_or_create(
+                code="KBC-NB",
+                defaults={
+                    "name": "Kazi Bari Campus",
+                    "gender_campus": CampusGender.MALE,
+                    "address": "House 14, Road 3, Kazi Bari, North Badda, Dhaka-1212",
+                    "is_active": True,
+                },
+            )
+            self.stdout.write(self.style.SUCCESS(f"[CAMPUS] {campus.name} ({campus.code})"))
+
+            # 2. Course
+            course, _ = Course.objects.get_or_create(
+                code="SBMC",
+                defaults={
+                    "name": "Small Business Management Course (SBMC)",
+                    "description": (
+                        "3-month full-time residential capacity building program "
+                        "for prospective micro and small entrepreneurs."
+                    ),
+                    "duration_months": 3,
+                    "is_active": True,
+                },
+            )
+            self.stdout.write(self.style.SUCCESS(f"[COURSE] {course.name} ({course.code})"))
+
+            # 3. Staff Users
+            # Super Admin
+            admin_user, _ = User.objects.get_or_create(
+                login_id="admin01",
+                defaults={
+                    "full_name": "Rahim Admin (Dummy)",
+                    "role": UserRole.SUPER_ADMIN,
+                    "email": "admin.demo@assdi.local",
+                    "phone": "01700000000",
+                    "is_staff": True,
+                    "is_superuser": True,
+                },
+            )
+            admin_user.set_password("AdminPass2026!")
+            admin_user.save()
+
+            # Coordinator
+            coord_user, _ = User.objects.get_or_create(
+                login_id="coord01",
+                defaults={
+                    "full_name": "Karim Coordinator (Dummy)",
+                    "role": UserRole.COORDINATOR,
+                    "email": "coord.demo@assdi.local",
+                    "phone": "01700000001",
+                    "is_staff": True,
+                },
+            )
+            coord_user.set_password("CoordPass2026!")
+            coord_user.save()
+
+            # Assign Coordinator to SBMC
+            CoordinatorCourseAssignment.objects.get_or_create(
+                user=coord_user,
+                course=course,
+            )
+
+            # Observer
+            observer_user, _ = User.objects.get_or_create(
+                login_id="observer01",
+                defaults={
+                    "full_name": "Tariq Observer (Dummy)",
+                    "role": UserRole.OBSERVER,
+                    "email": "observer.demo@assdi.local",
+                    "phone": "01700000004",
+                },
+            )
+            observer_user.set_password("ObserverPass2026!")
+            observer_user.save()
+
+            # 4. Departments
+            dept_biz, _ = Department.objects.get_or_create(
+                course=course,
+                code="BIZ-OPS",
+                defaults={"name": "Business Operations", "is_active": True},
+            )
+            dept_creative, _ = Department.objects.get_or_create(
+                course=course,
+                code="CREATIVE",
+                defaults={"name": "Creative", "is_active": True},
+            )
+
+            # 5. Subjects
+            subjects_data = [
+                # Business Operations
+                {"name": "Microsoft Office", "code": "MS-OFFICE", "dept": dept_biz, "aud": SubjectAudience.ALL},
+                {"name": "Theoretical and Practical Accounting", "code": "ACCT-101", "dept": dept_biz, "aud": SubjectAudience.ALL},
+                {"name": "Office Administration and Leadership", "code": "ADMIN-LEAD", "dept": dept_biz, "aud": SubjectAudience.ALL},
+                # Creative
+                {"name": "Graphic Design", "code": "GRAPHIC-DES", "dept": dept_creative, "aud": SubjectAudience.ALL},
+                {"name": "Video Editing", "code": "VIDEO-EDIT", "dept": dept_creative, "aud": SubjectAudience.ALL},
+                {"name": "Meta Marketing", "code": "META-MKTG", "dept": dept_creative, "aud": SubjectAudience.ALL},
+                # Common to all
+                {"name": "English Language", "code": "ENG-LANG", "dept": None, "aud": SubjectAudience.ALL},
+                {"name": "Islamic Basics (General)", "code": "ISLAMIC-GEN", "dept": None, "aud": SubjectAudience.GENERAL},
+                {"name": "Islamic Basics (Madrasa)", "code": "ISLAMIC-MAD", "dept": None, "aud": SubjectAudience.MADRASA},
+            ]
+
+            subjects_map = {}
+            for sdata in subjects_data:
+                sub, _ = Subject.objects.get_or_create(
+                    course=course,
+                    code=sdata["code"],
+                    defaults={
+                        "name": sdata["name"],
+                        "department": sdata["dept"],
+                        "audience_type": sdata["aud"],
+                        "is_active": True,
+                    },
+                )
+                subjects_map[sdata["code"]] = sub
+
+            # 6. Curriculum Topics (3-5 per subject)
+            topics_catalog = {
+                "MS-OFFICE": [
+                    ("Advanced Excel Formulas & VLOOKUP", "Master lookup functions, nested IFs and index-match for inventory."),
+                    ("Financial Modeling in Spreadsheets", "Create budget templates and automated cash flow projection models."),
+                    ("Business Proposal Design in Word", "Styles, typography, table of contents and branding headers in MS Word."),
+                    ("Data Presentation in PowerPoint", "Effective pitch deck layout, visual hierarchy and executive summaries."),
+                ],
+                "ACCT-101": [
+                    ("Double-Entry Bookkeeping Principles", "Debit/Credit mechanics, journal entries and ledger balancing."),
+                    ("Practical Ledger & Trial Balance Preparation", "Reconciling daily transactions and verifying trial balances."),
+                    ("Profit & Loss and Balance Sheet Statements", "Drafting annual P&L statements and asset/liability valuations."),
+                    ("Cash Flow Forecasting & Bank Reconciliation", "Managing working capital cycles and daily bank register reconciliation."),
+                ],
+                "ADMIN-LEAD": [
+                    ("Business Communication & Meeting Etiquette", "Drafting formal minutes, professional correspondence and memos."),
+                    ("Team Coordination & Task Delegation", "Setting KPIs, monitoring performance and conflict resolution strategies."),
+                    ("Inventory Management & Vendor Negotiation", "Procurement workflows, supplier evaluation and lead-time controls."),
+                ],
+                "GRAPHIC-DES": [
+                    ("Design Principles & Silhouette Composition", "Contrast, hierarchy, balance and visual focus for brand assets."),
+                    ("Branding & Social Media Banner Creation", "Photoshop canvas management, export settings and aspect ratios."),
+                    ("Packaging & Label Design for Retail Goods", "Vector packaging die-lines, CMYK color spaces and print specs."),
+                    ("Typography & Color Theory for E-commerce", "Font pairing, palette harmonies and consumer psychology in design."),
+                ],
+                "VIDEO-EDIT": [
+                    ("Timeline Assembly & Narrative Cut Pacing", "Importing footage, trimming, multi-track sync and b-roll placement."),
+                    ("Short-Form Reels & Hook Mechanics", "First 3-second retention hooks, pattern interrupts and sound dynamics."),
+                    ("Color Grading & Audio Enhancement", "Teal-and-orange curves, dialogue cleanup, noise suppression and loudness normalization."),
+                ],
+                "META-MKTG": [
+                    ("Meta Business Manager & Asset Verification", "Configuring Business Suite, partner sharing and domain verification."),
+                    ("Facebook Conversion API & Pixel Setup", "Server-side tracking, standard events and browser signal integration."),
+                    ("Lookalike Audiences & Funnel Structuring", "Building custom engagement audiences and 1-3% lookalike segmentation."),
+                    ("Campaign Budget Optimization & A/B Testing", "Advantage+ budget management, creative split testing and ROAS tracking."),
+                ],
+                "ENG-LANG": [
+                    ("Conversational English for Business Networking", "Introductions, value proposition elevator pitch and small talk."),
+                    ("Client Email Etiquette & Inquiry Handling", "Responding to client requests, negotiation and deadline confirmations."),
+                    ("Supplier Negotiation & Price Bidding Dialogues", "Counter-offers, discount terms and delivery agreement phrasing."),
+                ],
+                "ISLAMIC-GEN": [
+                    ("Tahara, Wudu and Salah Fundamentals", "Obligatory purification rules and congregational prayer mechanics."),
+                    ("Halal Earnings & Prohibition of Riba", "Islamic commercial jurisprudence, interest-free trade and fair pricing."),
+                    ("Business Ethics, Honesty and Amanah", "Truthfulness in weights and measures, customer rights and contracts."),
+                ],
+                "ISLAMIC-MAD": [
+                    ("Fiqh al-Mu'amalat: Murabaha & Mudaraba", "Classical transactional contracts, profit-and-loss sharing structures."),
+                    ("Contemporary Financial Instruments Analysis", "Islamic banking products, sukuk and venture financing comparison."),
+                    ("Modern Digital Trade & Cryptocurrencies in Fiqh", "Shariah rulings on digital assets, dropshipping and forward sales."),
+                ],
+            }
+
+            for code, t_list in topics_catalog.items():
+                subject = subjects_map[code]
+                for title, desc in t_list:
+                    ClassTopic.objects.get_or_create(
+                        subject=subject,
+                        title=title,
+                        defaults={
+                            "description": desc,
+                            "learning_objectives": f"Objectives for {title}: theoretical understanding and hands-on case study.",
+                            "is_active": True,
+                        },
+                    )
+
+            # 7. Teachers (6 teachers mapping across 9 subjects)
+            teachers_data = [
+                {"login_id": "teacher_msoffice", "name": "Mahmudul Hasan (Dummy)", "email": "t.msoffice@assdi.local", "phone": "01700000011", "subs": ["MS-OFFICE", "ENG-LANG"]},
+                {"login_id": "teacher_acct", "name": "Abdur Rahman (Dummy)", "email": "t.acct@assdi.local", "phone": "01700000012", "subs": ["ACCT-101", "ISLAMIC-GEN"]},
+                {"login_id": "teacher_admin", "name": "Sharif Ullah (Dummy)", "email": "t.admin@assdi.local", "phone": "01700000013", "subs": ["ADMIN-LEAD"]},
+                {"login_id": "teacher_graphic", "name": "Zubair Ahmed (Dummy)", "email": "t.graphic@assdi.local", "phone": "01700000014", "subs": ["GRAPHIC-DES", "VIDEO-EDIT"]},
+                {"login_id": "teacher_video", "name": "Kawsar Hossain (Dummy)", "email": "t.video@assdi.local", "phone": "01700000015", "subs": ["VIDEO-EDIT", "ISLAMIC-MAD"]},
+                {"login_id": "teacher_marketing", "name": "Imran Nazir (Dummy)", "email": "t.mktg@assdi.local", "phone": "01700000016", "subs": ["META-MKTG"]},
+            ]
+
+            teacher_users = []
+            for tdata in teachers_data:
+                t_user, _ = User.objects.get_or_create(
+                    login_id=tdata["login_id"],
+                    defaults={
+                        "full_name": tdata["name"],
+                        "role": UserRole.TEACHER,
+                        "email": tdata["email"],
+                        "phone": tdata["phone"],
+                    },
+                )
+                t_user.set_password("TeacherPass2026!")
+                t_user.save()
+                teacher_users.append((t_user, tdata["subs"]))
+
+            # 8. Batches (Batch 42 and Batch 43)
+            batch42, _ = Batch.objects.get_or_create(
+                course=course,
+                batch_number=42,
+                defaults={
+                    "campus": campus,
+                    "name": "SBMC Batch 42",
+                    "start_date": datetime.date(2026, 11, 1),
+                    "end_date": datetime.date(2027, 1, 31),
+                    "status": BatchStatus.ACTIVE,
+                },
+            )
+            batch43, _ = Batch.objects.get_or_create(
+                course=course,
+                batch_number=43,
+                defaults={
+                    "campus": campus,
+                    "name": "SBMC Batch 43",
+                    "start_date": datetime.date(2026, 12, 1),
+                    "end_date": datetime.date(2027, 2, 28),
+                    "status": BatchStatus.ACTIVE,
+                },
+            )
+
+            # 9. Teacher Assignments for BOTH batches (Every subject has an assigned teacher)
+            for batch in [batch42, batch43]:
+                for t_user, sub_codes in teacher_users:
+                    for scode in sub_codes:
+                        sub = subjects_map[scode]
+                        TeacherAssignment.objects.get_or_create(
+                            batch=batch,
+                            subject=sub,
+                            teacher_user=t_user,
+                            defaults={"is_primary": True},
+                        )
+
+            # 10. Students (40 Dummy Students: 20 in Batch 42, 20 in Batch 43)
+            bengali_first_names = [
+                "Abdullah", "Mohammad", "Tanvir", "Arif", "Hasan", "Mahmud", "Sabbir", "Nayeem",
+                "Fahim", "Sakib", "Al-Amin", "Ashik", "Mehedi", "Zubair", "Habib", "Shohel",
+                "Kamrul", "Mustafizur", "Nazmul", "Rashed", "Shakil", "Tariqul", "Enamul", "Sayed",
+                "Rezaul", "Mizanur", "Jubayer", "Saiful", "Touhid", "Farhan", "Nasir", "Shahidul",
+                "Munir", "Aminul", "Ibrahim", "Ismail", "Yusuf", "Bilal", "Hamza", "Salman"
+            ]
+            bengali_last_names = [
+                "Hossain", "Ahmed", "Islam", "Rahman", "Karim", "Chowdhury", "Miah", "Sikder",
+                "Khan", "Ali", "Hasan", "Akter", "Ullah", "Alam", "Molla", "Gazi", "Biswas",
+                "Sarker", "Howlader", "Kazi"
+            ]
+            backgrounds = [
+                EducationBackground.GENERAL,
+                EducationBackground.ALIYA,
+                EducationBackground.QAWMI,
+            ]
+
+            student_credentials = []
+
+            for i in range(40):
+                batch = batch42 if i < 20 else batch43
+                seq = (i % 20) + 1
+                b_num = batch.batch_number
+                student_id = f"STD-2026-{b_num:03d}-{seq:03d}"
+                reg_no = f"REG-2026-{b_num:03d}-{seq:03d}"
+                f_name = bengali_first_names[i % len(bengali_first_names)]
+                l_name = bengali_last_names[(i * 3) % len(bengali_last_names)]
+                full_name = f"{f_name} {l_name} (Dummy)"
+                phone = f"01711{i+10000:06d}"
+                edu_bg = backgrounds[i % len(backgrounds)]
+                password = "StudentPass2026!"
+
+                # Create/Update User
+                user, _ = User.objects.get_or_create(
+                    login_id=student_id,
+                    defaults={
+                        "full_name": full_name,
+                        "role": UserRole.STUDENT,
+                        "phone": phone,
+                    },
+                )
+                user.set_password(password)
+                user.is_active = True
+                user.save()
+
+                # Create/Update Student Profile
+                student, _ = Student.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        "student_id_number": student_id,
+                        "registration_no": reg_no,
+                        "education_background": edu_bg,
+                        "campus": campus,
+                        "guardian_phone": f"01811{i+10000:06d}",
+                        "status": StudentStatus.ACTIVE,
+                    },
+                )
+
+                # Create/Update Active Enrollment
+                Enrollment.objects.get_or_create(
+                    student=student,
+                    batch=batch,
+                    defaults={"status": EnrollmentStatus.ACTIVE},
+                )
+
+                student_credentials.append((student_id, full_name, batch.name, edu_bg, password))
+
+        # Output Summary & Credentials
+        self.stdout.write(self.style.MIGRATE_HEADING("\n=== Teacher-to-Subject Mapping in Both Batches ==="))
+        for t_user, sub_codes in teacher_users:
+            subs_str = ", ".join([subjects_map[code].name for code in sub_codes])
+            self.stdout.write(f"• {t_user.full_name} ({t_user.login_id}) teaches: {subs_str}")
+
+        self.stdout.write(self.style.MIGRATE_HEADING("\n=== Staff Demo Login Credentials ==="))
+        self.stdout.write(f"• Super Admin: login_id: admin01          | password: AdminPass2026!")
+        self.stdout.write(f"• Coordinator: login_id: coord01          | password: CoordPass2026!")
+        self.stdout.write(f"• Observer:    login_id: observer01       | password: ObserverPass2026!")
+        self.stdout.write(f"• Teachers:    login_id: teacher_msoffice | password: TeacherPass2026! (and teacher_acct, teacher_admin, etc.)")
+
+        self.stdout.write(self.style.MIGRATE_HEADING("\n=== Sample Enrolled Student Credentials ==="))
+        for student_id, full_name, b_name, edu_bg, pwd in student_credentials[:6]:
+            self.stdout.write(f"• {student_id} | {full_name:<28} | {b_name} ({edu_bg:<7}) | password: {pwd}")
+        self.stdout.write(f"... and 34 more students created across Batch 42 and Batch 43 (Total 40 students).")
+        self.stdout.write(self.style.SUCCESS("\n[SUCCESS] Demo seeding complete! Safe to re-run at any time.\n"))

@@ -155,12 +155,16 @@
 
 ## 3. Academic Structure & Course Management (`/courses`, `/campuses`)
 
-### 3.1 List Courses
+### 3.1 Manage Campuses (`/campuses`)
+* **GET** `/campuses/`: List campuses (Admin/Coordinator/Teacher/Student see all; Observer receives masked address).
+* **POST / PUT / PATCH / DELETE** `/campuses/{id}/`: Admin only.
+
+### 3.2 List Courses (`/courses`)
 * **GET** `/courses/`
 * **Roles:** All Authenticated (Coordinator sees assigned via `coordinator_course_assignments`; Teacher/Student see own enrolled course).
-* **Success Response (200 OK):** List of courses with departments and duration.
+* **Success Response (200 OK):** List of courses with departments, duration and batch count.
 
-### 3.2 Create Course
+### 3.3 Create Course
 * **POST** `/courses/`
 * **Roles:** `super_admin` only
 * **Request Body:**
@@ -173,21 +177,22 @@
   }
   ```
 
-### 3.3 Assign Coordinator to Course
-* **POST** `/courses/{id}/coordinators/`
+### 3.4 Assign Coordinator to Course (`/coordinator-assignments`)
+* **POST** `/coordinator-assignments/`
 * **Roles:** `super_admin` only
-* **Request Body:** `{"user_id": "uuid-of-coordinator"}`
+* **Request Body:** `{"user": "uuid-of-coordinator", "course": 1}`
 * **Success Response (201 Created):** Created entry in `coordinator_course_assignments`.
 
-### 3.4 Manage Departments & Subjects
-* **POST** `/courses/{course_id}/departments/` (Roles: `super_admin`, `coordinator` [own course])
-* **POST** `/courses/{course_id}/subjects/` (Roles: `super_admin`, `coordinator` [own course])
+### 3.5 Manage Departments & Subjects
+* **POST / GET** `/departments/` (Roles: `super_admin`, `coordinator` [scoped to assigned course])
+* **POST / GET** `/subjects/` (Roles: `super_admin`, `coordinator` [scoped to assigned course])
 * **Request Body for Subject:**
   ```json
   {
+    "course": 1,
     "name": "Meta Marketing",
     "code": "MKTG-101",
-    "department_id": 2, // optional, null for common subjects
+    "department": 2, // optional, null for common subjects
     "audience_type": "all" // "all" | "general" | "madrasa"
   }
   ```
@@ -216,7 +221,7 @@
 
 ---
 
-## 5. Batches & Staff Allocations (`/batches`)
+## 5. Batches & Staff Allocations (`/batches`, `/teacher-assignments`)
 
 ### 5.1 Create Batch
 * **POST** `/batches/`
@@ -224,8 +229,8 @@
 * **Request Body:**
   ```json
   {
-    "course_id": 1,
-    "campus_id": 1,
+    "course": 1,
+    "campus": 1,
     "batch_number": 42,
     "name": "SBMC Batch 42",
     "start_date": "2026-11-01",
@@ -233,14 +238,15 @@
   }
   ```
 
-### 5.2 Assign Teacher to Batch & Subject
-* **POST** `/batches/{batch_id}/teachers/`
+### 5.2 Assign Teacher to Batch & Subject (`/teacher-assignments`)
+* **POST** `/teacher-assignments/`
 * **Roles:** `super_admin`, `coordinator` (own course)
 * **Request Body:**
   ```json
   {
-    "subject_id": 4,
-    "teacher_user_id": "uuid-of-teacher",
+    "batch": 1,
+    "subject": 4,
+    "teacher_user": "uuid-of-teacher",
     "is_primary": true
   }
   ```
@@ -250,12 +256,14 @@
 ## 6. Students Management (`/students`)
 
 ### 6.1 List Students
-* **GET** `/students/?batch_id=42&search=Rahim`
+* **GET** `/students/?batch_id=42&search=Rahim&status=active`
 * **Roles:** `super_admin`, `coordinator` (own course), `teacher` (own batches), `observer` (RO)
+* **Observer Privacy Protection:** If requested by `observer`, all sensitive contact details (`guardian_phone`, `phone`, `email`, address) are masked and completely excluded from response JSON.
 
 ### 6.2 Add Single Student
 * **POST** `/students/`
 * **Roles:** `super_admin`, `coordinator` (own course)
+* **Validation:** Enforces `Student.student_id_number == User.login_id` and `student.campus == batch.campus`.
 * **Request Body:**
   ```json
   {
@@ -269,6 +277,23 @@
     "batch_id": 42
   }
   ```
+
+### 6.3 Student Batch Transfer
+* **POST** `/students/{id}/transfer/`
+* **Roles:** `super_admin`, `coordinator` (own course)
+* **Validation:** Validates target batch campus matches student's campus. Updates old enrollment status to `transferred`, creates new active enrollment, and writes an `AuditLog` entry.
+* **Request Body:**
+  ```json
+  {
+    "new_batch_id": 2,
+    "reason": "Batch timing change request"
+  }
+  ```
+
+### 6.4 Student Profile (Self View)
+* **GET** `/students/me/`
+* **Roles:** `student` (own profile only)
+* **Success Response (200 OK):** Student details and active enrollment.
 
 ### 6.3 Bulk Import Students (Excel / CSV)
 * **POST** `/students/bulk-import/`
