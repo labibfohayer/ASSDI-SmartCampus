@@ -221,10 +221,10 @@ erDiagram
         bigint id PK
         bigint session_id FK
         bigint student_id FK
-        varchar status "Present|Absent|Late|Approved_Leave"
-        varchar marked_via "QR|Manual"
-        uuid marked_by_user_id FK "nullable"
-        text correction_reason "nullable"
+        varchar status "present|late|absent|approved_leave"
+        varchar method "qr|manual|auto_absent"
+        uuid marked_by_id FK "nullable"
+        text reason "mandatory on manual"
         timestamp marked_at
         timestamp updated_at
     }
@@ -519,13 +519,14 @@ Daily attendance per student per session.
 * `id` (BIGINT, PK).
 * `session_id` (BIGINT, FK -> `class_sessions.id`, ON DELETE RESTRICT).
 * `student_id` (BIGINT, FK -> `students.id`, ON DELETE RESTRICT).
-* `status` (VARCHAR(20), NOT NULL): `'Present'`, `'Absent'`, `'Late'`, `'Approved_Leave'`.
-* `marked_via` (VARCHAR(20), NOT NULL): `'QR'`, `'Manual'`.
-* `marked_by_user_id` (UUID, FK -> `users.id`, ON DELETE SET NULL, NULL): NULL if student scanned QR.
-* `correction_reason` (TEXT, NULL): Mandatory if changed manually.
+* `status` (VARCHAR(20), NOT NULL): `'present'`, `'late'`, `'absent'`, `'approved_leave'`.
+* `method` (VARCHAR(20), NOT NULL): `'qr'`, `'manual'`, `'auto_absent'`.
+* `marked_by` (UUID, FK -> `users.id`, ON DELETE SET NULL, NULL): NULL if student scanned QR.
+* `reason` (TEXT, default ''): Mandatory explanation when marked or corrected manually.
 * `marked_at` (TIMESTAMP WITH TIME ZONE, default NOW()).
-* `updated_at` (TIMESTAMP WITH TIME ZONE, default NOW()).
-* *Constraint:* `UNIQUE(session_id, student_id)`.
+* `updated_at` (TIMESTAMP WITH TIME ZONE, auto NOW()).
+* *Constraint:* `UNIQUE(session_id, student_id)` (`uq_attendance_session_student`).
+* *Indexes:* `(session_id, status)`, `(student_id, status)`, `(marked_at)`.
 
 ### 3.17 `learning_feedbacks`
 Daily 10–15s student feedback.

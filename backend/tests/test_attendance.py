@@ -874,3 +874,89 @@ class TestAttendanceEngine:
         api_client.force_authenticate(user=data["st1_user"])
         res_st = api_client.get(f"/api/v1/batches/{batch.id}/repeated-absences/")
         assert res_st.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_unassigned_teacher_forbidden_on_qr_token_and_manual_attendance(
+        self, api_client, attendance_setup_data
+    ):
+        """Unassigned teacher gets 403 Forbidden on qr-token and manual attendance."""
+        data = attendance_setup_data
+        session = data["session_today"]
+        unassigned_teacher = data["teacher_unassigned"]
+        api_client.force_authenticate(user=unassigned_teacher)
+
+        # 1. qr-token -> 403 Forbidden
+        res_qr = api_client.post(f"/api/v1/class-sessions/{session.id}/qr-token/")
+        assert res_qr.status_code == status.HTTP_403_FORBIDDEN
+
+        # 2. manual attendance -> 403 Forbidden
+        payload = {
+            "items": [
+                {
+                    "student_id": data["student_gen"].id,
+                    "status": AttendanceStatus.PRESENT,
+                    "reason": "Unassigned teacher attempt.",
+                }
+            ]
+        }
+        res_manual = api_client.post(
+            f"/api/v1/class-sessions/{session.id}/attendance/manual/",
+            payload,
+            format="json",
+        )
+        assert res_manual.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_coordinator_of_another_course_forbidden_on_attendance_endpoints(
+        self, api_client, attendance_setup_data
+    ):
+        """Coordinator of another course gets 403 Forbidden on attendance endpoints."""
+        data = attendance_setup_data
+        session = data["session_today"]
+        batch = data["batch42"]
+        student = data["student_gen"]
+        other_coord = data["coord_other"]
+        api_client.force_authenticate(user=other_coord)
+
+        # 1. qr-token -> 403 Forbidden
+        res_qr = api_client.post(f"/api/v1/class-sessions/{session.id}/qr-token/")
+        assert res_qr.status_code == status.HTTP_403_FORBIDDEN
+
+        # 2. finalize attendance -> 403 Forbidden
+        res_finalize = api_client.post(f"/api/v1/class-sessions/{session.id}/attendance/finalize/")
+        assert res_finalize.status_code == status.HTTP_403_FORBIDDEN
+
+        # 3. manual attendance -> 403 Forbidden
+        payload = {
+            "items": [
+                {
+                    "student_id": student.id,
+                    "status": AttendanceStatus.PRESENT,
+                    "reason": "Other course coordinator attempt.",
+                }
+            ]
+        }
+        res_manual = api_client.post(
+            f"/api/v1/class-sessions/{session.id}/attendance/manual/",
+            payload,
+            format="json",
+        )
+        assert res_manual.status_code == status.HTTP_403_FORBIDDEN
+
+        # 4. session attendance roster -> 403 Forbidden
+        res_roster = api_client.get(f"/api/v1/class-sessions/{session.id}/attendance/")
+        assert res_roster.status_code == status.HTTP_403_FORBIDDEN
+
+        # 5. session attendance summary -> 403 Forbidden
+        res_sess_summary = api_client.get(f"/api/v1/class-sessions/{session.id}/attendance-summary/")
+        assert res_sess_summary.status_code == status.HTTP_403_FORBIDDEN
+
+        # 6. batch attendance summary -> 403 Forbidden
+        res_batch_summary = api_client.get(f"/api/v1/batches/{batch.id}/attendance-summary/")
+        assert res_batch_summary.status_code == status.HTTP_403_FORBIDDEN
+
+        # 7. batch repeated absences -> 403 Forbidden
+        res_repeated = api_client.get(f"/api/v1/batches/{batch.id}/repeated-absences/")
+        assert res_repeated.status_code == status.HTTP_403_FORBIDDEN
+
+        # 8. student attendance summary -> 403 Forbidden
+        res_student_summary = api_client.get(f"/api/v1/students/{student.id}/attendance-summary/")
+        assert res_student_summary.status_code == status.HTTP_403_FORBIDDEN

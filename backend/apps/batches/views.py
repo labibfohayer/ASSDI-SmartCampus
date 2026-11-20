@@ -94,7 +94,11 @@ class BatchViewSet(viewsets.ModelViewSet):
         Allowed for: super_admin, coordinator (assigned course), teacher (assigned batch), observer.
         Forbidden for students (HTTP 403).
         """
-        batch = self.get_object()
+        try:
+            batch = Batch.objects.select_related("course").get(pk=pk)
+        except Batch.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
         user = request.user
         if user.role == UserRole.STUDENT:
             raise PermissionDenied("Students are not permitted to view batch attendance summaries.")
@@ -141,7 +145,11 @@ class BatchViewSet(viewsets.ModelViewSet):
         Allowed for: super_admin, coordinator (assigned course), teacher (assigned batch).
         Observer and student are strictly forbidden (HTTP 403).
         """
-        batch = self.get_object()
+        try:
+            batch = Batch.objects.select_related("course").get(pk=pk)
+        except Batch.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
         user = request.user
         if user.role == UserRole.OBSERVER:
             raise PermissionDenied("Observers are not permitted to view individual student repeated absences.")
