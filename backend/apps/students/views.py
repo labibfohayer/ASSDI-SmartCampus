@@ -1,4 +1,8 @@
+import datetime
+import zoneinfo
 from django.db import transaction
+from django.db.models import Avg
+from django.utils import timezone
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -8,6 +12,8 @@ from apps.accounts.models import UserRole
 from apps.accounts.permissions import IsCoordinator
 from apps.audit.models import AuditLog
 from apps.batches.models import Batch
+from apps.feedback.models import HelpRequest, HelpRequestStatus, LearningFeedback
+from apps.feedback.serializers import StudentProgressSerializer
 from .models import Enrollment, EnrollmentStatus, Student, StudentStatus
 from .serializers import (
     EnrollmentSerializer,
@@ -225,3 +231,103 @@ class StudentViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_200_OK,
         )
+
+    def _compute_student_progress(self, student):
+        dhaka_tz = zoneinfo.ZoneInfo("Asia/Dhaka")
+        now_dhaka = timezone.now().astimezone(dhaka_tz)
+        date_7_days_ago = (now_dhaka - datetime.timedelta(days=7)).date()
+        date_30_days_ago = (now_dhaka - datetime.timedelta(days=30)).date()
+
+        student_feedbacks = LearningFeedback.objects.filter(student=student)
+        total_feedbacks = student_feedbacks.count()
+
+        last_7_days_feedbacks = student_feedbacks.filter(session__session_date__gte=date_7_days_ago)
+        avg_7 = last_7_days_feedbacks.aggregate(avg=Avg("understanding_rating"))["avg"]
+        last_7_days_avg_rating = round(avg_7, 2) if avg_7 is not None else None
+
+        last_30_days_feedbacks = student_feedbacks.filter(session__session_date__gte=date_30_days_ago)
+        avg_30 = last_30_days_feedbacks.aggregate(avg=Avg("understanding_rating"))["avg"]
+        last_30_days_avg_rating = round(avg_30, 2) if avg_30 is not None else None
+
+        student_help_requests = HelpRequest.objects.filter(student=student)
+        total_help_requests = student_help_requests.count()
+        resolved_help_requests = student_help_requests.filter(status=HelpRequestStatus.RESOLVED).count()
+
+        low_rating_feedbacks = student_feedbacks.filter(understanding_rating__lte=2).select_related(
+            "topic", "session", "session__subject"
+        ).order_by("-session__session_date")
+
+        topics_with_low_ratings = []
+        seen_topics = set()
+        for fb in low_rating_feedbacks:
+            if fb.topic and fb.topic.id not in seen_topics:
+                seen_topics.add(fb.topic.id)
+                topics_with_low_ratings.append({
+                    "topic_id": fb.topic.id,
+                    "topic_title": fb.topic.title,
+                    "subject_name": fb.session.subject.name,
+                    "rating": fb.understanding_rating,
+                    "session_date": str(fb.session.session_date),
+                })
+
+        data = {
+            "student_id": student.id,
+            "student_id_number": student.student_id_number,
+            "student_name": student.user.full_name,
+            "total_feedbacks": total_feedbacks,
+            "last_7_days_avg_rating": last_7_days_avg_rating,
+            "last_30_days_avg_rating": last_30_days_avg_rating,
+            "total_help_requests": total_help_requests,
+            "resolved_help_requests": resolved_help_requests,
+            "topics_with_low_ratings": topics_with_low_ratings,
+        }
+        return data
+
+    @action(detail=True, methods=["get"], url_path="progress")
+    def progress(self, request, pk=None):
+        """
+        Individual student learning progress analytics over 7-day and 30-day windows.
+        Strict scoping:
+        - Super admin allowed
+        - Observer is strictly forbidden (HTTP 403)
+        - Student may only view own progress
+        - Teacher only for students with active enrollment in assigned batch
+        - Coordinator only for students with active enrollment in assigned course
+        """
+        user = request.user
+        if user.role == UserRole.OBSERVER:
+            raise PermissionDenied("Observers are not permitted to view individual student progress.")
+
+        try:
+            student = Student.objects.select_related("user").get(pk=pk)
+        except Student.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if user.role == UserRole.STUDENT and student.user != user:
+            raise PermissionDenied("Students can only view their own progress.")
+
+        if user.role == UserRole.TEACHER:
+            student_batches = student.enrollments.filter(status=EnrollmentStatus.ACTIVE).values_list("batch_id", flat=True)
+            if not user.teacher_assignments.filter(batch_id__in=student_batches).exists():
+                raise PermissionDenied("You can only view progress for students in your assigned batches.")
+
+        if user.role == UserRole.COORDINATOR:
+            student_courses = student.enrollments.filter(status=EnrollmentStatus.ACTIVE).values_list("batch__course_id", flat=True)
+            if not user.coordinator_course_assignments.filter(course_id__in=student_courses).exists():
+                raise PermissionDenied("You can only view progress for students in your assigned courses.")
+
+        progress_data = self._compute_student_progress(student)
+        return Response(StudentProgressSerializer(progress_data).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"], url_path="me/progress")
+    def me_progress(self, request):
+        """Self progress view for authenticated student."""
+        user = request.user
+        if user.role != UserRole.STUDENT:
+            raise PermissionDenied("Only students can view self progress.")
+        student = getattr(user, "student_profile", None)
+        if not student:
+            raise PermissionDenied("No student profile found for authenticated user.")
+
+        progress_data = self._compute_student_progress(student)
+        return Response(StudentProgressSerializer(progress_data).data, status=status.HTTP_200_OK)

@@ -1,7 +1,7 @@
 import datetime
 import zoneinfo
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Avg, Q
 from django.utils import timezone
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
@@ -14,6 +14,9 @@ from apps.accounts.models import UserRole
 from apps.accounts.permissions import IsCoordinator
 from apps.audit.models import AuditLog
 from apps.batches.models import TeacherAssignment
+from apps.feedback.constants import ALL_BANDS, get_understanding_band
+from apps.feedback.models import LearningFeedback
+from apps.feedback.serializers import FeedbackSummarySerializer, LearningFeedbackStudentReadSerializer
 from apps.students.models import EducationBackground, EnrollmentStatus, Student
 
 from .constants import date_to_day_of_week
@@ -501,4 +504,104 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
 
         qs = self.get_queryset().filter(session_date=today_dhaka).order_by("start_time")
         serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="feedback-summary")
+    def feedback_summary(self, request, pk=None):
+        """
+        Returns understanding band distribution, average, and pending counts.
+        Audience rule strictly filters eligible students when calculating pending count.
+        Observer receives aggregate metrics only.
+        """
+        try:
+            session = ClassSession.objects.select_related(
+                "batch", "batch__course", "subject", "topic", "teacher_user"
+            ).get(pk=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+
+        if user.role == UserRole.STUDENT:
+            raise PermissionDenied("Students are not permitted to view session feedback summaries.")
+        elif user.role == UserRole.TEACHER and session.teacher_user != user:
+            raise PermissionDenied("You can only view feedback summaries for your own sessions.")
+        elif user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
+                raise PermissionDenied("You can only view summaries for your assigned course(s).")
+
+        # 1. Active enrolled students in batch matching session audience
+        enrolled_qs = Student.objects.filter(
+            enrollments__batch=session.batch,
+            enrollments__status=EnrollmentStatus.ACTIVE,
+            status="active",
+        )
+        if session.audience == SessionAudience.GENERAL:
+            enrolled_qs = enrolled_qs.filter(education_background=EducationBackground.GENERAL)
+        elif session.audience == SessionAudience.MADRASA:
+            enrolled_qs = enrolled_qs.filter(
+                education_background__in=[EducationBackground.ALIYA, EducationBackground.QAWMI]
+            )
+
+        total_enrolled = enrolled_qs.count()
+
+        # 2. Feedbacks submitted by eligible students
+        feedbacks = LearningFeedback.objects.filter(session=session, student__in=enrolled_qs)
+        submitted_count = feedbacks.count()
+        pending_count = max(0, total_enrolled - submitted_count)
+
+        avg_rating_val = feedbacks.aggregate(avg=Avg("understanding_rating"))["avg"]
+        avg_rating = round(avg_rating_val, 2) if avg_rating_val is not None else None
+        avg_pct = round(avg_rating * 20, 2) if avg_rating is not None else None
+        needs_help_count = feedbacks.filter(needs_help=True).count()
+
+        band_counts = {b: 0 for b in ALL_BANDS}
+        for r in range(1, 6):
+            band_counts[get_understanding_band(r)] = feedbacks.filter(understanding_rating=r).count()
+
+        data = {
+            "session_id": session.id,
+            "session_date": session.session_date,
+            "subject_name": session.subject.name,
+            "topic_title": session.topic.title if session.topic else None,
+            "total_enrolled": total_enrolled,
+            "submitted_count": submitted_count,
+            "pending_count": pending_count,
+            "average_rating": avg_rating,
+            "average_percentage": avg_pct,
+            "needs_help_count": needs_help_count,
+            "band_distribution": band_counts,
+        }
+        return Response(FeedbackSummarySerializer(data).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="feedbacks")
+    def feedbacks(self, request, pk=None):
+        """
+        Lists individual feedback submissions for this session.
+        Allowed for teachers (own session), coordinators (own course), super_admin.
+        Observer is strictly forbidden (HTTP 403).
+        """
+        try:
+            session = ClassSession.objects.select_related(
+                "batch", "batch__course", "subject", "topic", "teacher_user"
+            ).get(pk=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+
+        if user.role == UserRole.OBSERVER:
+            raise PermissionDenied("Observers are not permitted to view individual feedback rows.")
+        elif user.role == UserRole.STUDENT:
+            raise PermissionDenied("Students are not permitted to view peer feedback submissions.")
+        elif user.role == UserRole.TEACHER and session.teacher_user != user:
+            raise PermissionDenied("You can only view feedback rows for your own sessions.")
+        elif user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
+                raise PermissionDenied("You can only view feedback for your assigned course(s).")
+
+        feedbacks_qs = LearningFeedback.objects.filter(session=session).select_related(
+            "student", "student__user"
+        ).order_by("-submitted_at")
+        serializer = LearningFeedbackStudentReadSerializer(feedbacks_qs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

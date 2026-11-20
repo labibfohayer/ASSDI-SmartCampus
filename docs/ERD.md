@@ -335,6 +335,15 @@ erDiagram
    Formula from Python's standard `date.weekday()` (where Monday is 0): `day_of_week = (d.weekday() + 1) % 7`.
 10. **Session Visibility Invariant:**
     Students and Observers can ONLY see sessions with `status = 'published'` OR `(status = 'cancelled' AND published_at IS NOT NULL)`. Drafts and cancelled sessions that were never published are strictly hidden.
+11. **Feedback Partial Uniqueness for Offline Idempotency:**
+    ```sql
+    CREATE UNIQUE INDEX uq_learning_feedback_client_sub_id 
+    ON learning_feedbacks (client_submission_id) WHERE client_submission_id IS NOT NULL;
+    ```
+12. **Help Request Forward-Only Lifecycle:**
+    Transitions strictly follow: `pending` -> `in_progress` -> `resolved`. Direct jumps or backwards transitions are blocked. Resolving requires optional `teacher_note`, sets `resolved_at`, records `resolved_by`, and generates an `AuditLog` entry.
+13. **Observer Access Restriction to Aggregates:**
+    Observers are strictly restricted to aggregate analytics (`feedback-summary` and `topics/{id}/understanding/`). Individual feedback rows, help requests, and individual student progress metrics return HTTP 403 Forbidden.
 
 ---
 
@@ -527,8 +536,10 @@ Daily 10–15s student feedback.
 * `understanding_rating` (SMALLINT, NOT NULL): 1 (Poor) to 5 (Full).
 * `needs_help` (BOOLEAN, NOT NULL, default FALSE): Triggers help request if TRUE.
 * `student_comment` (TEXT, NULL): Optional free text.
+* `client_submission_id` (UUID, NULL): Client-generated UUID for offline safe idempotency.
 * `submitted_at` (TIMESTAMP WITH TIME ZONE, default NOW()).
 * *Constraint:* `UNIQUE(session_id, student_id)`.
+* *Constraint:* `UNIQUE(client_submission_id) WHERE client_submission_id IS NOT NULL`.
 
 ### 3.18 `help_requests`
 Teacher assistance requests triggered by feedback or manual student action.

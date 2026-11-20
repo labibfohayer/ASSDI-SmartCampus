@@ -1,9 +1,16 @@
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from rest_framework import filters, status, viewsets
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from apps.accounts.models import UserRole
 from apps.accounts.permissions import IsCoordinator, IsSuperAdmin, IsTeacher
+from apps.batches.models import Batch
+from apps.feedback.constants import ALL_BANDS, get_understanding_band
+from apps.feedback.models import LearningFeedback
+from apps.feedback.serializers import TopicUnderstandingSerializer
 from .models import (
     Campus,
     CoordinatorCourseAssignment,
@@ -227,3 +234,58 @@ class ClassTopicViewSet(viewsets.ModelViewSet):
                 raise PermissionDenied("Coordinators can only create topics for subjects in their assigned course.")
 
         serializer.save(created_by_teacher=user if user.role == UserRole.TEACHER else None)
+
+    @action(detail=True, methods=["get"], url_path="understanding")
+    def understanding(self, request, pk=None):
+        """
+        Aggregate topic understanding metrics for a given batch.
+        Enforces object-level scoping:
+        - Super admin & observer allowed (aggregate view)
+        - Coordinator allowed for courses assigned to them
+        - Teacher allowed only if assigned to this topic's subject in the specified batch
+        - Student receives HTTP 403
+        """
+        topic = self.get_object()
+        user = request.user
+
+        if user.role == UserRole.STUDENT:
+            raise PermissionDenied("Students are not permitted to view aggregate topic understanding.")
+
+        batch_id = request.query_params.get("batch") or request.query_params.get("batch_id")
+        if not batch_id:
+            raise ValidationError({"batch": "Query parameter 'batch' or 'batch_id' is required."})
+
+        batch = get_object_or_404(Batch, pk=batch_id)
+
+        if user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=batch.course).exists():
+                raise PermissionDenied("You can only view topic understanding for your assigned courses.")
+
+        if user.role == UserRole.TEACHER:
+            if not user.teacher_assignments.filter(batch=batch, subject=topic.subject).exists():
+                raise PermissionDenied("You can only view topic understanding for subjects/batches you are assigned to.")
+
+        feedbacks = LearningFeedback.objects.filter(session__batch=batch, topic=topic)
+        total_feedbacks = feedbacks.count()
+
+        avg_val = feedbacks.aggregate(avg=Avg("understanding_rating"))["avg"]
+        avg_rating = round(avg_val, 2) if avg_val is not None else None
+        avg_pct = round(avg_rating * 20, 2) if avg_rating is not None else None
+
+        band_counts = {b: 0 for b in ALL_BANDS}
+        for r in range(1, 6):
+            band_counts[get_understanding_band(r)] = feedbacks.filter(understanding_rating=r).count()
+
+        data = {
+            "topic_id": topic.id,
+            "topic_title": topic.title,
+            "subject_id": topic.subject.id,
+            "subject_name": topic.subject.name,
+            "batch_id": batch.id,
+            "batch_name": batch.name,
+            "total_feedbacks": total_feedbacks,
+            "average_rating": avg_rating,
+            "average_percentage": avg_pct,
+            "band_distribution": band_counts,
+        }
+        return Response(TopicUnderstandingSerializer(data).data, status=status.HTTP_200_OK)

@@ -58,6 +58,7 @@ LOCAL_APPS = [
     "apps.batches.apps.BatchesConfig",
     "apps.students.apps.StudentsConfig",
     "apps.class_sessions.apps.ClassSessionsConfig",
+    "apps.feedback.apps.FeedbackConfig",
     "apps.audit.apps.AuditConfig",
 ]
 
@@ -200,3 +201,6 @@ SCHOOL_DAYS = [
     for d in config("SCHOOL_DAYS", default="0,1,2,3,4").split(",")
     if d.strip()
 ]
+
+# Daily Feedback Submission Settings
+FEEDBACK_WINDOW_HOURS = config("FEEDBACK_WINDOW_HOURS", default=24, cast=int)

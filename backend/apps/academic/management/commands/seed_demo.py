@@ -26,7 +26,8 @@ from apps.class_sessions.constants import (
     THURSDAY,
     date_to_day_of_week,
 )
-from apps.class_sessions.models import ClassSchedule, ClassSession, SessionStatus
+from apps.class_sessions.models import ClassSchedule, ClassSession, SessionAudience, SessionStatus
+from apps.feedback.models import HelpRequest, HelpRequestStatus, LearningFeedback
 from apps.students.models import (
     EducationBackground,
     Enrollment,
@@ -490,6 +491,100 @@ class Command(BaseCommand):
                         )
                         total_sessions_created += 1
 
+            # 13. Seed LearningFeedback and HelpRequests for Past Sessions (Sprint 4)
+            past_sessions = ClassSession.objects.filter(
+                session_date__lt=today_dhaka,
+                status=SessionStatus.PUBLISHED,
+            ).select_related("batch", "subject", "topic", "teacher_user")
+
+            total_feedback_seeded = 0
+            total_help_requests_seeded = 0
+            hr_status_cycle = [HelpRequestStatus.PENDING, HelpRequestStatus.IN_PROGRESS, HelpRequestStatus.RESOLVED]
+            hr_index = 0
+
+            for session in past_sessions:
+                eligible_students = Student.objects.filter(
+                    enrollments__batch=session.batch,
+                    enrollments__status=EnrollmentStatus.ACTIVE,
+                    status=StudentStatus.ACTIVE,
+                )
+                if session.audience == SessionAudience.GENERAL:
+                    eligible_students = eligible_students.filter(education_background=EducationBackground.GENERAL)
+                elif session.audience == SessionAudience.MADRASA:
+                    eligible_students = eligible_students.filter(
+                        education_background__in=[EducationBackground.ALIYA, EducationBackground.QAWMI]
+                    )
+
+                submitted_dt = datetime.datetime.combine(session.session_date, session.end_time, tzinfo=dhaka_tz) + datetime.timedelta(minutes=15)
+
+                for student in eligible_students:
+                    # ~80% of students submit feedback
+                    if (student.id + session.id) % 5 == 0:
+                        continue
+
+                    # Realistic distribution: mostly 4 and 5, some 3, occasionally 1 or 2
+                    mod = (student.id * 7 + session.id * 11) % 10
+                    if mod in [0, 1]:
+                        rating = 5
+                    elif mod in [2, 3, 4, 5]:
+                        rating = 4
+                    elif mod in [6, 7]:
+                        rating = 3
+                    elif mod == 8:
+                        rating = 2
+                    else:
+                        rating = 1
+
+                    needs_help = rating <= 2
+                    student_comment = ""
+                    if needs_help:
+                        student_comment = (
+                            f"Need further clarification on topic '{session.topic.title if session.topic else session.subject.name}'."
+                        )
+                    elif rating == 5:
+                        student_comment = "Alhamdulillah, understood very well."
+
+                    feedback, created = LearningFeedback.objects.get_or_create(
+                        session=session,
+                        student=student,
+                        defaults={
+                            "topic": session.topic,
+                            "understanding_rating": rating,
+                            "needs_help": needs_help,
+                            "student_comment": student_comment,
+                            "submitted_at": submitted_dt,
+                        },
+                    )
+                    if created:
+                        total_feedback_seeded += 1
+
+                    if feedback.needs_help and not hasattr(feedback, "help_request"):
+                        chosen_status = hr_status_cycle[hr_index % len(hr_status_cycle)]
+                        hr_index += 1
+
+                        in_prog_at = submitted_dt + datetime.timedelta(hours=1) if chosen_status != HelpRequestStatus.PENDING else None
+                        res_at = submitted_dt + datetime.timedelta(hours=3) if chosen_status == HelpRequestStatus.RESOLVED else None
+                        res_by = session.teacher_user if chosen_status == HelpRequestStatus.RESOLVED else None
+                        note = "Reviewed problem areas together and provided practice exercise." if chosen_status == HelpRequestStatus.RESOLVED else ""
+
+                        HelpRequest.objects.get_or_create(
+                            feedback=feedback,
+                            defaults={
+                                "student": student,
+                                "teacher_user": session.teacher_user,
+                                "session": session,
+                                "topic": session.topic,
+                                "student_message": student_comment,
+                                "teacher_note": note,
+                                "status": chosen_status,
+                                "created_at": submitted_dt,
+                                "in_progress_at": in_prog_at,
+                                "resolved_at": res_at,
+                                "resolved_by": res_by,
+                            },
+                        )
+                        total_help_requests_seeded += 1
+
         # Output Summary & Credentials
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Teacher-to-Subject Mapping in Both Batches ==="))
         for t_user, sub_codes in teacher_users:
@@ -510,4 +605,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Timetable & Session Seeding Summary ==="))
         self.stdout.write(f"• Total Class Schedules active: {ClassSchedule.objects.count()}")
         self.stdout.write(f"• Total Published Class Sessions generated: {ClassSession.objects.count()}")
+        self.stdout.write(f"• Total LearningFeedback records seeded: {LearningFeedback.objects.count()}")
+        self.stdout.write(f"• Total HelpRequest records seeded: {HelpRequest.objects.count()}")
         self.stdout.write(self.style.SUCCESS("\n[SUCCESS] Demo seeding complete! Safe to re-run at any time.\n"))

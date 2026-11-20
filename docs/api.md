@@ -524,75 +524,154 @@
 
 ---
 
-## 9. Daily Learning Feedback (`/feedback`)
+## 9. Daily Learning Feedback (`/feedback` & `/class-sessions/{id}/...`)
 
 ### 9.1 Submit Daily Feedback (Student Only)
-* **POST** `/sessions/{session_id}/feedback/`
-* **Roles:** `student` (Must be enrolled in session's batch)
-* **Constraint:** Enforces `UNIQUE(session_id, student_id)`.
+* **POST** `/api/v1/feedback/`
+* **Roles:** `student` (Must be actively enrolled in session's batch matching audience)
+* **Constraint:** Enforces `UNIQUE(session, student)`.
 * **Execution Time Target:** 10–15 seconds flow.
+* **Timing Window:** Submissions accepted strictly after `session.end_time` in `Asia/Dhaka` and within `FEEDBACK_WINDOW_HOURS` (24h).
+* **Safe Idempotency:** Duplicate `client_submission_id` from the same student and session safely returns the original record (200 OK). Collisions across students or sessions are rejected (400 Bad Request) without leaking data.
 * **Request Body:**
   ```json
   {
-    "understanding_rating": 4, // 1 to 5
-    "needs_help": true, // If true, auto-generates HelpRequest
-    "student_comment": "Could you please explain the custom conversion event again?" // Optional
+    "session": 501,
+    "understanding_rating": 4, // 1 (Poor/20%) to 5 (Full/100%)
+    "needs_help": true, // If true, atomically creates HelpRequest and copies student_comment into student_message
+    "student_comment": "Could you please explain ledger balance calculation again?",
+    "client_submission_id": "c1f7a4b8-9321-4d92-bb8d-294d12345678" // Optional UUID
   }
   ```
 * **Success Response (201 Created):**
   ```json
   {
-    "success": true,
-    "message": "Feedback submitted successfully.",
-    "help_request_created": true
+    "id": 101,
+    "session": 501,
+    "session_date": "2026-11-20",
+    "subject_name": "Accounting",
+    "topic": 12,
+    "topic_title": "Ledger Posting",
+    "understanding_rating": 4,
+    "percentage": 80,
+    "band": "band_61_80",
+    "needs_help": true,
+    "student_comment": "Could you please explain ledger balance calculation again?",
+    "client_submission_id": "c1f7a4b8-9321-4d92-bb8d-294d12345678",
+    "submitted_at": "2026-11-20T12:15:00+06:00",
+    "help_request_id": 45
   }
   ```
-* **Error Response (409 Conflict):** `{"code": "ALREADY_SUBMITTED", "message": "Feedback already submitted for this class."}`
+* **Duplicate Error (409 Conflict):**
+  ```json
+  {
+    "code": "ALREADY_SUBMITTED",
+    "detail": "Feedback already submitted for this class."
+  }
+  ```
 
-### 9.2 Session Feedback Distribution Summary
-* **GET** `/sessions/{session_id}/feedback/summary/`
-* **Roles:** `super_admin`, `coordinator`, `teacher` (own batch), `observer`
+### 9.2 Student's Own Feedback History
+* **GET** `/api/v1/feedback/mine/`
+* **Roles:** `student`
+* **Success Response (200 OK):** List of student's past feedback submissions with calculated percentages and bands.
+
+### 9.3 Session Feedback Distribution Summary
+* **GET** `/api/v1/class-sessions/{id}/feedback-summary/`
+* **Roles:** `super_admin`, `coordinator` (assigned course), `teacher` (own session), `observer`
+* **Scoping:** Students are forbidden (403). Observers receive aggregate metrics only.
+* **Audience Rule:** `pending_count` is calculated strictly using active enrolled students in the batch whose educational background matches the session's audience.
 * **Success Response (200 OK):**
   ```json
   {
     "session_id": 501,
-    "total_students": 40,
-    "feedback_count": 38,
-    "average_rating": 3.85,
-    "distribution_bands": {
-      "band_81_100_pct": 14, // Rating 5
-      "band_61_80_pct": 15,  // Rating 4
-      "band_41_60_pct": 6,   // Rating 3
-      "band_21_40_pct": 2,   // Rating 2
-      "band_0_20_pct": 1     // Rating 1
-    },
-    "help_requests_count": 5
+    "session_date": "2026-11-20",
+    "subject_name": "Accounting",
+    "topic_title": "Ledger Posting",
+    "total_enrolled": 40,
+    "submitted_count": 35,
+    "pending_count": 5,
+    "average_rating": 4.14,
+    "average_percentage": 82.8,
+    "needs_help_count": 3,
+    "band_distribution": {
+      "band_0_20": 0,
+      "band_21_40": 3,
+      "band_41_60": 5,
+      "band_61_80": 15,
+      "band_81_100": 12
+    }
   }
   ```
+
+### 9.4 Session Individual Feedback Records
+* **GET** `/api/v1/class-sessions/{id}/feedbacks/`
+* **Roles:** `super_admin`, `coordinator` (assigned course), `teacher` (own session)
+* **Privacy Restriction:** `observer` and `student` receive HTTP 403 Forbidden. Contact info is masked.
 
 ---
 
 ## 10. Help Requests Board (`/help-requests`)
 
 ### 10.1 List Help Requests
-* **GET** `/help-requests/?status=Pending&batch_id=42`
-* **Roles:** `super_admin`, `coordinator` (own course), `teacher` (own batches), `student` (own only), `observer`
+* **GET** `/api/v1/help-requests/?status=pending&batch_id=42&subject_id=3`
+* **Roles:** `super_admin`, `coordinator` (own course), `teacher` (assigned requests), `student` (own requests only)
+* **Privacy Restriction:** `observer` receives HTTP 403 Forbidden.
 
-### 10.2 Resolve Help Request
-* **PATCH** `/help-requests/{id}/`
+### 10.2 Help Request Detail
+* **GET** `/api/v1/help-requests/{id}/`
+* **Roles:** `super_admin`, `coordinator` (own course), `teacher` (assigned teacher), `student` (own request only). Observer receives HTTP 403.
+
+### 10.3 Start Help Request
+* **POST** `/api/v1/help-requests/{id}/start/`
 * **Roles:** `teacher` (assigned teacher), `coordinator`, `super_admin`
+* **Lifecycle:** Transitions `pending` -> `in_progress`. Sets `in_progress_at` timestamp.
+
+### 10.4 Resolve Help Request
+* **POST** `/api/v1/help-requests/{id}/resolve/`
+* **Roles:** `teacher` (assigned teacher), `coordinator`, `super_admin`
+* **Lifecycle:** Transitions `in_progress` -> `resolved`. Direct resolution from `pending` without starting is rejected (400 Bad Request).
+* **Audit Trail:** Writes `AuditLog` entry with actor, old and new values.
 * **Request Body:**
   ```json
   {
-    "status": "Resolved", // "In_Progress" | "Resolved"
-    "teacher_note": "Explained one-on-one after practical lab session. Student demonstrated correct setup."
+    "teacher_note": "Reviewed accounting ledger together after class."
   }
   ```
-* **Success Response (200 OK):** Updates status and sends automated notification to student.
 
 ---
 
-## 11. Reports & Analytics (`/reports`)
+## 11. Academic & Student Analytics (`/topics/{id}/understanding/` & `/students/{id}/progress/`)
+
+### 11.1 Topic Understanding Across Batch
+* **GET** `/api/v1/topics/{id}/understanding/?batch={batch_id}`
+* **Roles:** `super_admin`, `coordinator` (assigned course), `teacher` (assigned subject/batch), `observer` (read-only aggregate). `student` receives HTTP 403 Forbidden.
+* **Success Response (200 OK):**
+  ```json
+  {
+    "topic_id": 12,
+    "topic_title": "Ledger Posting",
+    "subject_id": 3,
+    "subject_name": "Accounting",
+    "batch_id": 42,
+    "batch_name": "SBMC Batch 42",
+    "total_feedbacks": 35,
+    "average_rating": 4.14,
+    "average_percentage": 82.8,
+    "band_distribution": {
+      "band_0_20": 0,
+      "band_21_40": 3,
+      "band_41_60": 5,
+      "band_61_80": 15,
+      "band_81_100": 12
+    }
+  }
+  ```
+
+### 11.2 Individual Student Progress Analytics
+* **GET** `/api/v1/students/{id}/progress/` (or `/api/v1/students/me/progress/` for authenticated student)
+* **Roles:** `super_admin`, `coordinator` (assigned course), `teacher` (assigned batch), `student` (own progress only).
+* **Privacy Restriction:** `observer` receives HTTP 403 Forbidden.
+* **Metrics:** 7-day and 30-day windows computed in `Asia/Dhaka`, identifying low understanding topics (`rating <= 2`).
 
 All report endpoints support query parameters `format=json` (default), `format=pdf`, `format=excel`.
 
