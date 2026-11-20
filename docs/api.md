@@ -352,10 +352,32 @@
     }
     ```
 
-### 7.2 Generate Sessions Batch Action
-* **POST** `/api/v1/class-schedules/generate-sessions/`
+### 7.2 Generate Sessions Action (Single Schedule)
+* **POST** `/api/v1/class-schedules/{id}/generate-sessions/`
 * **Roles:** `super_admin`, `coordinator` (own course).
-* **Description:** Generates published `ClassSession` rows from active templates for dates matching `SCHOOL_DAYS` (Sunday=0 to Thursday=4). Idempotent: skips dates where session already exists. Sequentially assigns topics from curriculum.
+* **Description:** Generates published `ClassSession` rows from this specific schedule template for dates matching `SCHOOL_DAYS` (Sunday=0 to Thursday=4). Idempotent: skips dates where session already exists. Sequentially assigns topics from curriculum.
+* **Request Body:**
+  ```json
+  {
+    "start_date": "2026-11-22",
+    "end_date": "2026-11-28"
+  }
+  ```
+* **Success Response (200 OK / 201 Created):**
+  ```json
+  {
+    "created_count": 1,
+    "schedule_id": 12,
+    "start_date": "2026-11-22",
+    "end_date": "2026-11-28",
+    "message": "Successfully generated 1 published sessions for schedule 12."
+  }
+  ```
+
+### 7.3 Generate All Sessions Bulk Action
+* **POST** `/api/v1/class-schedules/generate-all-sessions/`
+* **Roles:** `super_admin`, `coordinator` (own course).
+* **Description:** Bulk generation: generates published `ClassSession` rows across all matching active schedule templates for dates matching `SCHOOL_DAYS`. Idempotent.
 * **Request Body:**
   ```json
   {
@@ -374,7 +396,7 @@
   }
   ```
 
-### 7.3 Today's Sessions (Timezone-Aware)
+### 7.4 Today's Sessions (Timezone-Aware)
 * **GET** `/api/v1/class-sessions/today/`
 * **Roles:** `student` (returns today's sessions for student's active batch & audience background), `teacher` (assigned sessions), `coordinator` (course sessions), `super_admin`.
 * **Note:** "Today" is strictly computed in `Asia/Dhaka` (`+06:00`), never UTC.
@@ -402,7 +424,7 @@
   ]
   ```
 
-### 7.4 Create Class Session
+### 7.5 Create Class Session
 * **POST** `/api/v1/class-sessions/`
 * **Roles:** `super_admin`, `coordinator` (own course), `teacher` (self-only: `teacher_user` must be `request.user`).
 * **Constraints Enforced:**
@@ -424,12 +446,12 @@
   }
   ```
 
-### 7.5 Publish Class Session
+### 7.6 Publish Class Session
 * **POST** `/api/v1/class-sessions/{id}/publish/`
 * **Roles:** `super_admin`, `coordinator` (own course), `teacher` (own session).
 * **Description:** Changes status to `published` and sets `published_at` timestamp if null.
 
-### 7.6 Cancel Class Session
+### 7.7 Cancel Class Session
 * **POST** `/api/v1/class-sessions/{id}/cancel/`
 * **Roles:** `super_admin`, `coordinator` (own course), `teacher` (own session).
 * **Request Body:**

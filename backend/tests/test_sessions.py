@@ -19,6 +19,7 @@ from apps.academic.models import (
     SubjectAudience,
 )
 from apps.accounts.models import UserRole
+from apps.audit.models import AuditLog
 from apps.batches.models import Batch, BatchStatus, TeacherAssignment
 from apps.class_sessions.constants import (
     FRIDAY,
@@ -364,7 +365,7 @@ class TestClassSessionsAndSchedules:
         """
         data = session_setup_data
         # Create schedules for Sunday (0) and Tuesday (2)
-        ClassSchedule.objects.create(
+        sched_sun = ClassSchedule.objects.create(
             batch=data["b42"],
             subject=data["sub_common"],
             teacher_user=data["t1"],
@@ -373,7 +374,7 @@ class TestClassSessionsAndSchedules:
             end_time=datetime.time(12, 0),
             room="Room 101",
         )
-        ClassSchedule.objects.create(
+        sched_tue = ClassSchedule.objects.create(
             batch=data["b42"],
             subject=data["sub_common"],
             teacher_user=data["t1"],
@@ -383,16 +384,25 @@ class TestClassSessionsAndSchedules:
             room="Room 101",
         )
 
-        # Call generate-sessions for fixed week: 2026-11-22 (Sunday) to 2026-11-28 (Saturday)
         api_client.force_authenticate(user=data["coord"])
         payload = {
             "start_date": "2026-11-22",
             "end_date": "2026-11-28",
-            "batch_id": data["b42"].id,
         }
-        res = api_client.post("/api/v1/class-schedules/generate-sessions/", payload, format="json")
-        assert res.status_code == status.HTTP_201_CREATED
-        assert res.data["created_count"] == 2
+
+        # 1. Call per-schedule generate-sessions for Sunday schedule
+        res_sun = api_client.post(
+            f"/api/v1/class-schedules/{sched_sun.id}/generate-sessions/", payload, format="json"
+        )
+        assert res_sun.status_code == status.HTTP_201_CREATED
+        assert res_sun.data["created_count"] == 1
+
+        # 2. Call per-schedule generate-sessions for Tuesday schedule
+        res_tue = api_client.post(
+            f"/api/v1/class-schedules/{sched_tue.id}/generate-sessions/", payload, format="json"
+        )
+        assert res_tue.status_code == status.HTTP_201_CREATED
+        assert res_tue.data["created_count"] == 1
 
         # Verify created dates: 2026-11-22 (Sunday) and 2026-11-24 (Tuesday)
         created_dates = list(
@@ -404,10 +414,20 @@ class TestClassSessionsAndSchedules:
         assert datetime.date(2026, 11, 27) not in created_dates
         assert datetime.date(2026, 11, 28) not in created_dates
 
-        # Idempotency check: run generate-sessions again
-        res2 = api_client.post("/api/v1/class-schedules/generate-sessions/", payload, format="json")
-        assert res2.status_code == status.HTTP_200_OK
-        assert res2.data["created_count"] == 0
+        # Idempotency check 1: run per-schedule generate-sessions again
+        res_sun_repeat = api_client.post(
+            f"/api/v1/class-schedules/{sched_sun.id}/generate-sessions/", payload, format="json"
+        )
+        assert res_sun_repeat.status_code == status.HTTP_200_OK
+        assert res_sun_repeat.data["created_count"] == 0
+
+        # Idempotency check 2: run bulk generate-all-sessions
+        bulk_payload = {**payload, "batch_id": data["b42"].id}
+        res_bulk_repeat = api_client.post(
+            "/api/v1/class-schedules/generate-all-sessions/", bulk_payload, format="json"
+        )
+        assert res_bulk_repeat.status_code == status.HTTP_200_OK
+        assert res_bulk_repeat.data["created_count"] == 0
         assert ClassSession.objects.filter(batch=data["b42"]).count() == 2
 
     def test_timezone_accuracy_for_today_endpoint(self, api_client, session_setup_data):
@@ -640,3 +660,245 @@ class TestClassSessionsAndSchedules:
         ids_mad = [s["id"] for s in res_mad.data["results"]]
         assert s_mad.id in ids_mad
         assert s_gen.id not in ids_mad
+
+    def test_teacher_cannot_create_session_for_unassigned_subject(
+        self, api_client, session_setup_data
+    ):
+        """Teacher cannot create a session for a subject they are not assigned to."""
+        data = session_setup_data
+        # Teacher 1 is NOT assigned to sub_mad in b42
+        api_client.force_authenticate(user=data["t1"])
+        payload = {
+            "batch": data["b42"].id,
+            "subject": data["sub_mad"].id,
+            "session_date": "2026-11-25",
+            "start_time": "14:00:00",
+            "end_time": "16:00:00",
+            "audience": "madrasa",
+        }
+        res = api_client.post("/api/v1/class-sessions/", payload, format="json")
+        assert res.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_400_BAD_REQUEST]
+
+    def test_topic_from_different_subject_is_rejected(self, session_setup_data):
+        """Topic from a different subject is rejected with ValidationError."""
+        data = session_setup_data
+        sess = ClassSession(
+            batch=data["b42"],
+            subject=data["sub_common"],
+            teacher_user=data["t1"],
+            topic=data["top_mad"],  # Belongs to sub_mad, not sub_common!
+            session_date=datetime.date(2026, 11, 25),
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(12, 0),
+            audience=SessionAudience.ALL,
+        )
+        with pytest.raises(ValidationError) as exc:
+            sess.save()
+        assert "topic" in exc.value.message_dict
+
+    def test_end_time_before_start_time_is_rejected(self, session_setup_data):
+        """end_time before or equal to start_time is rejected."""
+        data = session_setup_data
+        sess = ClassSession(
+            batch=data["b42"],
+            subject=data["sub_common"],
+            teacher_user=data["t1"],
+            topic=data["top_common"],
+            session_date=datetime.date(2026, 11, 25),
+            start_time=datetime.time(14, 0),
+            end_time=datetime.time(12, 0),  # earlier than start_time
+            audience=SessionAudience.ALL,
+        )
+        with pytest.raises(ValidationError) as exc:
+            sess.save()
+        assert "end_time" in exc.value.message_dict
+
+    def test_overlapping_sessions_same_batch_same_audience_rejected(self, session_setup_data):
+        """Overlapping sessions for the same batch with same audience are rejected."""
+        data = session_setup_data
+        session_date = datetime.date(2026, 11, 25)
+
+        # 1. First session
+        ClassSession.objects.create(
+            batch=data["b42"],
+            subject=data["sub_common"],
+            teacher_user=data["t1"],
+            topic=data["top_common"],
+            session_date=session_date,
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(12, 0),
+            audience=SessionAudience.ALL,
+            status=SessionStatus.PUBLISHED,
+        )
+
+        # 2. Overlapping session for same batch and same audience (with teacher 2)
+        sess_conflict = ClassSession(
+            batch=data["b42"],
+            subject=data["sub_common"],
+            teacher_user=data["t2"],
+            topic=data["top_common"],
+            session_date=session_date,
+            start_time=datetime.time(11, 0),
+            end_time=datetime.time(13, 0),
+            audience=SessionAudience.ALL,
+            status=SessionStatus.PUBLISHED,
+        )
+        with pytest.raises(ValidationError) as exc:
+            sess_conflict.save()
+        assert "audience" in exc.value.message_dict
+
+    def test_student_of_batch_42_cannot_see_batch_43_sessions(
+        self, api_client, session_setup_data
+    ):
+        """Student enrolled in Batch 42 cannot see Batch 43 sessions."""
+        data = session_setup_data
+        # Session in Batch 43
+        sess_b43 = ClassSession.objects.create(
+            batch=data["b43"],
+            subject=data["sub_common"],
+            teacher_user=data["t1"],
+            topic=data["top_common"],
+            session_date=datetime.date(2026, 12, 5),
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(12, 0),
+            audience=SessionAudience.ALL,
+            status=SessionStatus.PUBLISHED,
+            published_at=timezone.now(),
+        )
+
+        # Student of Batch 42 queries
+        api_client.force_authenticate(user=data["u_std_gen"])
+        res = api_client.get("/api/v1/class-sessions/")
+        assert res.status_code == status.HTTP_200_OK
+        ids = [s["id"] for s in res.data["results"]]
+        assert sess_b43.id not in ids
+
+    def test_editing_published_session_writes_audit_log(
+        self, api_client, session_setup_data
+    ):
+        """Editing a published session writes an AuditLog entry with old and new values."""
+        data = session_setup_data
+        sess = ClassSession.objects.create(
+            batch=data["b42"],
+            subject=data["sub_common"],
+            teacher_user=data["t1"],
+            topic=data["top_common"],
+            session_date=datetime.date(2026, 11, 26),
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(12, 0),
+            audience=SessionAudience.ALL,
+            status=SessionStatus.PUBLISHED,
+            published_at=timezone.now(),
+        )
+
+        api_client.force_authenticate(user=data["coord"])
+        patch_payload = {
+            "start_time": "10:30:00",
+            "end_time": "12:30:00",
+        }
+        res = api_client.patch(f"/api/v1/class-sessions/{sess.id}/", patch_payload, format="json")
+        assert res.status_code == status.HTTP_200_OK
+
+        # Verify AuditLog created
+        log = AuditLog.objects.filter(
+            entity_name="ClassSession",
+            entity_id=str(sess.id),
+            action="UPDATE_PUBLISHED_SESSION",
+        ).first()
+        assert log is not None
+        assert log.actor_user == data["coord"]
+        assert log.old_values["start_time"] == "10:00:00"
+        assert log.new_values["start_time"] == "10:30:00"
+
+    def test_cancelling_without_cancel_reason_is_rejected(
+        self, api_client, session_setup_data
+    ):
+        """Cancelling a session without cancel_reason is rejected with HTTP 400."""
+        data = session_setup_data
+        sess = ClassSession.objects.create(
+            batch=data["b42"],
+            subject=data["sub_common"],
+            teacher_user=data["t1"],
+            topic=data["top_common"],
+            session_date=datetime.date(2026, 11, 26),
+            start_time=datetime.time(14, 0),
+            end_time=datetime.time(16, 0),
+            audience=SessionAudience.ALL,
+            status=SessionStatus.PUBLISHED,
+            published_at=timezone.now(),
+        )
+
+        api_client.force_authenticate(user=data["t1"])
+        res_empty = api_client.post(f"/api/v1/class-sessions/{sess.id}/cancel/", {}, format="json")
+        assert res_empty.status_code == status.HTTP_400_BAD_REQUEST
+
+        res_blank = api_client.post(
+            f"/api/v1/class-sessions/{sess.id}/cancel/", {"cancel_reason": ""}, format="json"
+        )
+        assert res_blank.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_coordinator_cannot_create_or_see_sessions_of_another_course(
+        self, api_client, session_setup_data
+    ):
+        """Coordinator cannot create or see sessions belonging to another course."""
+        data = session_setup_data
+        campus = data["b42"].campus
+
+        # Other course not assigned to data["coord"]
+        other_course = Course.objects.create(
+            name="Graphic Design Bootcamp",
+            code="GDB-OTHER",
+            duration_months=2,
+        )
+        other_sub = Subject.objects.create(
+            course=other_course,
+            name="Photoshop Mastery",
+            code="PS-101",
+        )
+        other_batch = Batch.objects.create(
+            course=other_course,
+            campus=campus,
+            batch_number=1,
+            name="GDB Batch 1",
+            start_date=datetime.date(2026, 11, 1),
+            end_date=datetime.date(2027, 1, 31),
+            status=BatchStatus.ACTIVE,
+        )
+        TeacherAssignment.objects.create(
+            batch=other_batch,
+            subject=other_sub,
+            teacher_user=data["t1"],
+        )
+
+        # Other course session
+        other_sess = ClassSession.objects.create(
+            batch=other_batch,
+            subject=other_sub,
+            teacher_user=data["t1"],
+            session_date=datetime.date(2026, 11, 26),
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(12, 0),
+            status=SessionStatus.PUBLISHED,
+            published_at=timezone.now(),
+        )
+
+        api_client.force_authenticate(user=data["coord"])
+
+        # 1. Coordinator cannot see other course session
+        res_list = api_client.get("/api/v1/class-sessions/")
+        assert res_list.status_code == status.HTTP_200_OK
+        ids = [s["id"] for s in res_list.data["results"]]
+        assert other_sess.id not in ids
+
+        # 2. Coordinator cannot create session for other course
+        create_payload = {
+            "batch": other_batch.id,
+            "subject": other_sub.id,
+            "teacher_user": str(data["t1"].id),
+            "session_date": "2026-11-27",
+            "start_time": "14:00:00",
+            "end_time": "16:00:00",
+            "audience": "all",
+        }
+        res_create = api_client.post("/api/v1/class-sessions/", create_payload, format="json")
+        assert res_create.status_code == status.HTTP_403_FORBIDDEN
