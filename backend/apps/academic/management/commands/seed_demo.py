@@ -17,6 +17,7 @@ from apps.academic.models import (
     SubjectAudience,
 )
 from apps.accounts.models import UserRole
+from apps.attendance.models import AttendanceMethod, AttendanceRecord, AttendanceStatus
 from apps.batches.models import Batch, BatchStatus, TeacherAssignment
 from apps.class_sessions.constants import (
     SUNDAY,
@@ -585,6 +586,103 @@ class Command(BaseCommand):
                         )
                         total_help_requests_seeded += 1
 
+            # 14. Seed Attendance Records for Past Sessions (Sprint 5)
+            # Realistic attendance: mostly present, some late, some leave, some absent
+            # Flag two specific students in Batch 42 for repeated absences:
+            # - STD-2026-042-001: Trailing consecutive absences >= 3
+            # - STD-2026-042-002: Total absences >= 5 (with last session present, so consecutive = 0)
+            total_attendance_seeded = 0
+            for session in past_sessions:
+                eligible_students = Student.objects.filter(
+                    enrollments__batch=session.batch,
+                    enrollments__status=EnrollmentStatus.ACTIVE,
+                    status=StudentStatus.ACTIVE,
+                )
+                if session.audience == SessionAudience.GENERAL:
+                    eligible_students = eligible_students.filter(education_background=EducationBackground.GENERAL)
+                elif session.audience == SessionAudience.MADRASA:
+                    eligible_students = eligible_students.filter(
+                        education_background__in=[EducationBackground.ALIYA, EducationBackground.QAWMI]
+                    )
+
+                session_start_dt = datetime.datetime.combine(session.session_date, session.start_time, tzinfo=dhaka_tz)
+
+                for student in eligible_students:
+                    if student.student_id_number == "STD-2026-042-001":
+                        batch42_past_sessions = list(
+                            past_sessions.filter(batch=session.batch).order_by("session_date", "start_time")
+                        )
+                        s_idx = batch42_past_sessions.index(session) if session in batch42_past_sessions else 0
+                        if s_idx >= max(0, len(batch42_past_sessions) - 3):
+                            att_status = AttendanceStatus.ABSENT
+                            att_method = AttendanceMethod.AUTO_ABSENT
+                            att_marked_by = session.teacher_user
+                            att_reason = "Auto-marked absent upon session attendance finalization."
+                            marked_dt = session_start_dt + datetime.timedelta(minutes=30)
+                        else:
+                            att_status = AttendanceStatus.PRESENT
+                            att_method = AttendanceMethod.QR
+                            att_marked_by = None
+                            att_reason = ""
+                            marked_dt = session_start_dt + datetime.timedelta(minutes=5)
+                    elif student.student_id_number == "STD-2026-042-002":
+                        batch42_past_sessions = list(
+                            past_sessions.filter(batch=session.batch).order_by("session_date", "start_time")
+                        )
+                        s_idx = batch42_past_sessions.index(session) if session in batch42_past_sessions else 0
+                        if s_idx in [1, 3, 5, 7, 9]:
+                            att_status = AttendanceStatus.ABSENT
+                            att_method = AttendanceMethod.AUTO_ABSENT
+                            att_marked_by = session.teacher_user
+                            att_reason = "Auto-marked absent upon session attendance finalization."
+                            marked_dt = session_start_dt + datetime.timedelta(minutes=30)
+                        else:
+                            att_status = AttendanceStatus.PRESENT
+                            att_method = AttendanceMethod.QR
+                            att_marked_by = None
+                            att_reason = ""
+                            marked_dt = session_start_dt + datetime.timedelta(minutes=5)
+                    else:
+                        mod = (student.id * 13 + session.id * 17) % 20
+                        if mod == 0:
+                            att_status = AttendanceStatus.ABSENT
+                            att_method = AttendanceMethod.AUTO_ABSENT
+                            att_marked_by = session.teacher_user
+                            att_reason = "Auto-marked absent upon session attendance finalization."
+                            marked_dt = session_start_dt + datetime.timedelta(minutes=30)
+                        elif mod == 1:
+                            att_status = AttendanceStatus.APPROVED_LEAVE
+                            att_method = AttendanceMethod.MANUAL
+                            att_marked_by = session.teacher_user
+                            att_reason = "Official leave request granted by coordinator."
+                            marked_dt = session_start_dt + datetime.timedelta(hours=2)
+                        elif mod in [2, 3]:
+                            att_status = AttendanceStatus.LATE
+                            att_method = AttendanceMethod.QR
+                            att_marked_by = None
+                            att_reason = ""
+                            marked_dt = session_start_dt + datetime.timedelta(minutes=12)
+                        else:
+                            att_status = AttendanceStatus.PRESENT
+                            att_method = AttendanceMethod.QR
+                            att_marked_by = None
+                            att_reason = ""
+                            marked_dt = session_start_dt + datetime.timedelta(minutes=5)
+
+                    _, created = AttendanceRecord.objects.get_or_create(
+                        session=session,
+                        student=student,
+                        defaults={
+                            "status": att_status,
+                            "method": att_method,
+                            "marked_at": marked_dt,
+                            "marked_by": att_marked_by,
+                            "reason": att_reason,
+                        },
+                    )
+                    if created:
+                        total_attendance_seeded += 1
+
         # Output Summary & Credentials
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Teacher-to-Subject Mapping in Both Batches ==="))
         for t_user, sub_codes in teacher_users:
@@ -607,4 +705,5 @@ class Command(BaseCommand):
         self.stdout.write(f"• Total Published Class Sessions generated: {ClassSession.objects.count()}")
         self.stdout.write(f"• Total LearningFeedback records seeded: {LearningFeedback.objects.count()}")
         self.stdout.write(f"• Total HelpRequest records seeded: {HelpRequest.objects.count()}")
+        self.stdout.write(f"• Total Attendance records seeded: {AttendanceRecord.objects.count()}")
         self.stdout.write(self.style.SUCCESS("\n[SUCCESS] Demo seeding complete! Safe to re-run at any time.\n"))

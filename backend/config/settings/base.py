@@ -59,6 +59,7 @@ LOCAL_APPS = [
     "apps.students.apps.StudentsConfig",
     "apps.class_sessions.apps.ClassSessionsConfig",
     "apps.feedback.apps.FeedbackConfig",
+    "apps.attendance.apps.AttendanceConfig",
     "apps.audit.apps.AuditConfig",
 ]
 
@@ -204,3 +205,11 @@ SCHOOL_DAYS = [
 
 # Daily Feedback Submission Settings
 FEEDBACK_WINDOW_HOURS = config("FEEDBACK_WINDOW_HOURS", default=24, cast=int)
+
+# Attendance Management Engine Settings (Sprint 5)
+QR_TOKEN_VALIDITY_SECONDS = config("QR_TOKEN_VALIDITY_SECONDS", default=45, cast=int)
+QR_WINDOW_MINUTES = config("QR_WINDOW_MINUTES", default=15, cast=int)
+LATE_THRESHOLD_MINUTES = config("LATE_THRESHOLD_MINUTES", default=10, cast=int)
+ATTENDANCE_CORRECTION_WINDOW_HOURS = config("ATTENDANCE_CORRECTION_WINDOW_HOURS", default=48, cast=int)
+REPEATED_ABSENCE_CONSECUTIVE = config("REPEATED_ABSENCE_CONSECUTIVE", default=3, cast=int)
+REPEATED_ABSENCE_TOTAL = config("REPEATED_ABSENCE_TOTAL", default=5, cast=int)

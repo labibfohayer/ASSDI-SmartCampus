@@ -10,8 +10,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from apps.accounts.models import UserRole
 from apps.accounts.permissions import IsCoordinator
+from apps.attendance.constants import calculate_attendance_percentage
+from apps.attendance.models import AttendanceRecord, AttendanceStatus
+from apps.attendance.serializers import StudentAttendanceSummarySerializer
 from apps.audit.models import AuditLog
 from apps.batches.models import Batch
+from apps.class_sessions.models import SessionStatus
 from apps.feedback.models import HelpRequest, HelpRequestStatus, LearningFeedback
 from apps.feedback.serializers import StudentProgressSerializer
 from .models import Enrollment, EnrollmentStatus, Student, StudentStatus
@@ -319,6 +323,8 @@ class StudentViewSet(viewsets.ModelViewSet):
         progress_data = self._compute_student_progress(student)
         return Response(StudentProgressSerializer(progress_data).data, status=status.HTTP_200_OK)
 
+
+
     @action(detail=False, methods=["get"], url_path="me/progress")
     def me_progress(self, request):
         """Self progress view for authenticated student."""
@@ -331,3 +337,79 @@ class StudentViewSet(viewsets.ModelViewSet):
 
         progress_data = self._compute_student_progress(student)
         return Response(StudentProgressSerializer(progress_data).data, status=status.HTTP_200_OK)
+
+    def _compute_student_attendance_summary(self, student):
+        """Computes aggregate attendance counts and percentage across published sessions for a student."""
+        records = AttendanceRecord.objects.filter(
+            student=student,
+            session__status=SessionStatus.PUBLISHED,
+        )
+        total_sessions = records.count()
+        present = records.filter(status=AttendanceStatus.PRESENT).count()
+        late = records.filter(status=AttendanceStatus.LATE).count()
+        absent = records.filter(status=AttendanceStatus.ABSENT).count()
+        approved_leave = records.filter(status=AttendanceStatus.APPROVED_LEAVE).count()
+        pct = calculate_attendance_percentage(present, late, total_sessions, approved_leave)
+
+        return {
+            "student_id": student.id,
+            "student_id_number": student.student_id_number,
+            "student_name": student.user.full_name,
+            "total_sessions": total_sessions,
+            "present": present,
+            "late": late,
+            "absent": absent,
+            "approved_leave": approved_leave,
+            "attendance_percentage": pct,
+        }
+
+    @action(detail=True, methods=["get"], url_path="attendance-summary")
+    def attendance_summary(self, request, pk=None):
+        """
+        Individual student attendance summary across published sessions.
+        Strict scoping:
+        - Super admin allowed
+        - Observer is strictly forbidden (HTTP 403)
+        - Student may only view own attendance summary
+        - Teacher only for students with active enrollment in assigned batch
+        - Coordinator only for students with active enrollment in assigned course
+        """
+        user = request.user
+        if user.role == UserRole.OBSERVER:
+            raise PermissionDenied("Observers are not permitted to view individual student attendance summaries.")
+
+        try:
+            student = Student.objects.select_related("user").get(pk=pk)
+        except Student.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if user.role == UserRole.STUDENT and student.user != user:
+            raise PermissionDenied("Students can only view their own attendance summary.")
+
+        if user.role == UserRole.TEACHER:
+            student_batches = student.enrollments.filter(status=EnrollmentStatus.ACTIVE).values_list("batch_id", flat=True)
+            if not user.teacher_assignments.filter(batch_id__in=student_batches).exists():
+                raise PermissionDenied("You can only view attendance for students in your assigned batches.")
+
+        if user.role == UserRole.COORDINATOR:
+            student_courses = student.enrollments.filter(status=EnrollmentStatus.ACTIVE).values_list("batch__course_id", flat=True)
+            if not user.coordinator_course_assignments.filter(course_id__in=student_courses).exists():
+                raise PermissionDenied("You can only view attendance for students in your assigned courses.")
+
+        summary_data = self._compute_student_attendance_summary(student)
+        return Response(StudentAttendanceSummarySerializer(summary_data).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"], url_path="me/attendance-summary")
+    def me_attendance_summary(self, request):
+        """Self attendance summary view for authenticated student."""
+        user = request.user
+        if user.role != UserRole.STUDENT:
+            raise PermissionDenied("Only students can view self attendance summary.")
+        student = getattr(user, "student_profile", None)
+        if not student:
+            raise PermissionDenied("No student profile found for authenticated user.")
+
+        summary_data = self._compute_student_attendance_summary(student)
+        return Response(StudentAttendanceSummarySerializer(summary_data).data, status=status.HTTP_200_OK)
+
+

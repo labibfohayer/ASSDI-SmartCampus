@@ -464,63 +464,131 @@
 
 ---
 
-## 8. Attendance Management (`/attendance`)
+## 8. Attendance Management (`/api/v1/attendance/` & `/api/v1/class-sessions/{id}/...`)
 
 ### 8.1 Generate Rotating QR Code Token
-* **POST** `/sessions/{session_id}/attendance/qr-token/`
-* **Roles:** `teacher` (assigned to this session), `coordinator`, `super_admin`
+* **POST** `/api/v1/class-sessions/{id}/qr-token/`
+* **Roles:** `super_admin`, `coordinator` (assigned course), `teacher` (assigned session teacher)
+* **Window:** Valid between class `start_time` and `start_time + 15m` in `Asia/Dhaka`.
 * **Success Response (200 OK):**
   ```json
   {
-    "token": "signed_jwt_or_hmac_rotating_string",
-    "expires_at": "2026-11-21T10:00:45Z",
-    "refresh_interval_seconds": 30
+    "qr_token": "signed_timestamped_token_string",
+    "session_id": 101,
+    "expires_in_seconds": 45,
+    "valid_until": "2026-11-21T09:00:45+06:00"
   }
   ```
+* **Guardrails (400 Bad Request):** If session is `draft` or `cancelled`, or if requested before start time or after window has closed.
 
-### 8.2 Scan QR Code (Student App)
-* **POST** `/attendance/scan/`
-* **Roles:** `student`
+### 8.2 Scan QR Code (Student Only)
+* **POST** `/api/v1/attendance/qr-scan/`
+* **Roles:** `student` (actively enrolled in session batch, matching session audience)
 * **Request Body:**
   ```json
   {
-    "qr_token": "signed_jwt_or_hmac_rotating_string"
+    "qr_token": "signed_timestamped_token_string"
   }
   ```
-* **Success Response (200 OK):**
+* **Timing & Status (Asia/Dhaka):**
+  - $\le 10$ minutes from class start: `present`
+  - $10-15$ minutes from class start: `late`
+  - $> 15$ minutes: Rejected (400 Bad Request, "QR attendance window has closed.")
+* **Duplicate Protection:** Returns HTTP 409 Conflict (`{"code": "ALREADY_MARKED"}`).
+* **Success Response (201 Created):**
   ```json
   {
-    "success": true,
-    "status": "Present", // Or "Late" if scanned after on-time limit
-    "scanned_at": "2026-11-21T10:04:12Z"
+    "id": 1,
+    "session": 101,
+    "session_date": "2026-11-21",
+    "subject_name": "Microsoft Office",
+    "student": 25,
+    "student_id_number": "STD-2026-042-001",
+    "student_name": "Abdullah Hossain (Dummy)",
+    "status": "present",
+    "method": "qr",
+    "marked_at": "2026-11-21T09:06:12+06:00",
+    "marked_by": null,
+    "marked_by_name": null,
+    "reason": "",
+    "updated_at": "2026-11-21T09:06:12+06:00"
   }
   ```
-* **Error Response (409 Conflict):** If already recorded for this session.
 
-### 8.3 Manual Attendance Entry (Individual or Bulk)
-* **POST** `/sessions/{session_id}/attendance/manual/`
-* **Roles:** `super_admin`, `coordinator`, `teacher` (own batch)
+### 8.3 Finalize Attendance (Auto-Absent Unscanned Students)
+* **POST** `/api/v1/class-sessions/{id}/attendance/finalize/`
+* **Roles:** `super_admin`, `coordinator` (assigned course), `teacher` (assigned session teacher)
+* **Guardrails (400 Bad Request):**
+  - Rejected if called before QR window has ended (`start_time + 15m`).
+  - Rejected on `draft` or `cancelled` sessions.
+* **Logic:** Finds all actively enrolled students matching session audience without attendance records and creates `absent` records (`method="auto_absent"`). Idempotent.
+* **Success Response (200 OK):** Returns Session Attendance Summary.
+
+### 8.4 Manual Attendance Entry & Corrections (Bulk / Atomic)
+* **POST** `/api/v1/class-sessions/{id}/attendance/manual/`
+* **Roles:** `super_admin`, `coordinator` (assigned course), `teacher` (within 48 hours of session end)
 * **Request Body:**
   ```json
   {
-    "records": [
-      {"student_id": 101, "status": "Present"},
-      {"student_id": 102, "status": "Absent"},
-      {"student_id": 103, "status": "Approved_Leave"}
+    "items": [
+      {
+        "student_id": 25,
+        "status": "present",
+        "reason": "Verified present in classroom physically."
+      },
+      {
+        "student_id": 26,
+        "status": "approved_leave",
+        "reason": "Submitted valid medical slip approved by coordinator."
+      }
     ]
   }
   ```
+* **Guardrails & Audit:**
+  - Validates active enrollment in batch and audience matching (400 if mismatch).
+  - Teacher correction window enforced: 48h from session end time.
+  - Wrapped in `transaction.atomic()`; records `AuditLog` entry per record.
+* **Success Response (200 OK):** List of created/updated attendance records.
 
-### 8.4 Attendance Correction (With Audit Reason)
-* **PATCH** `/attendance/{id}/correct/`
-* **Roles:** `super_admin`, `coordinator`, `teacher` (within 24-hour window)
-* **Request Body:**
-  ```json
-  {
-    "status": "Present",
-    "reason": "Student had network disconnection during QR scan; verified physically."
-  }
-  ```
+### 8.5 Session Attendance Roster & Summary
+* **GET** `/api/v1/class-sessions/{id}/attendance/`: Individual attendance records list with student info.
+  - Allowed: `super_admin`, `coordinator`, `teacher`.
+  - Forbidden: `observer` (403), `student` (403).
+* **GET** `/api/v1/class-sessions/{id}/attendance-summary/`: Aggregate session metrics.
+  - Allowed: `super_admin`, `coordinator`, `teacher`, `observer` (200 OK).
+  - Forbidden: `student` (403).
+  - Formula: $\text{Attendance \%} = \frac{\text{Present} + \text{Late}}{\text{Total Expected} - \text{Approved Leave}} \times 100$
+
+### 8.6 Personal & Student Attendance History
+* **GET** `/api/v1/attendance/mine/`: Authenticated student's own attendance history and aggregate %.
+* **GET** `/api/v1/students/me/attendance-summary/`: Authenticated student's own attendance summary.
+* **GET** `/api/v1/students/{id}/attendance-summary/`: Individual student attendance summary across published sessions.
+  - Allowed: student (self), teacher (assigned batch), coordinator (assigned course), super_admin.
+  - Forbidden: observer (403), peer student (403).
+
+### 8.7 Batch Attendance Summary & Repeated Absences Detection
+* **GET** `/api/v1/batches/{id}/attendance-summary/`: Aggregate attendance metrics for batch across published sessions.
+  - Allowed: super_admin, coordinator, teacher (assigned batch), observer (200 OK).
+  - Forbidden: student (403).
+* **GET** `/api/v1/batches/{id}/repeated-absences/`: Repeated absences detector for enrolled students.
+  - Flagged if trailing consecutive absences $\ge 3$ across published sessions (`present`, `late`, `approved_leave` reset the streak) OR total absences $\ge 5$.
+  - Allowed: super_admin, coordinator, teacher (assigned batch).
+  - Forbidden: observer (403), student (403).
+  - Success Response (200 OK):
+    ```json
+    [
+      {
+        "student_id": 25,
+        "student_id_number": "STD-2026-042-001",
+        "student_name": "Abdullah Hossain (Dummy)",
+        "consecutive_absences": 3,
+        "total_absences": 3,
+        "flagged_reasons": [
+          "Consecutive absences (3) reached or exceeded threshold of 3."
+        ]
+      }
+    ]
+    ```
 
 ---
 

@@ -15,6 +15,7 @@ from apps.academic.views import (
     DepartmentViewSet,
     SubjectViewSet,
 )
+from apps.attendance.views import AttendanceViewSet
 from apps.batches.views import BatchViewSet, TeacherAssignmentViewSet
 from apps.class_sessions.views import ClassScheduleViewSet, ClassSessionViewSet
 from apps.feedback.views import HelpRequestViewSet, LearningFeedbackViewSet
@@ -35,6 +36,7 @@ router.register(r"class-schedules", ClassScheduleViewSet, basename="class-schedu
 router.register(r"class-sessions", ClassSessionViewSet, basename="class-session")
 router.register(r"feedback", LearningFeedbackViewSet, basename="feedback")
 router.register(r"help-requests", HelpRequestViewSet, basename="help-request")
+router.register(r"attendance", AttendanceViewSet, basename="attendance")
 
 urlpatterns = [
     # Django Administration

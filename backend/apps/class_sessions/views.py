@@ -1,6 +1,7 @@
 import datetime
 import zoneinfo
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Avg, Q
 from django.utils import timezone
 from rest_framework import filters, status, viewsets
@@ -12,6 +13,18 @@ from rest_framework.response import Response
 from apps.academic.models import ClassTopic
 from apps.accounts.models import UserRole
 from apps.accounts.permissions import IsCoordinator
+from apps.attendance.constants import (
+    calculate_attendance_percentage,
+    get_attendance_correction_window_hours,
+    get_qr_window_minutes,
+)
+from apps.attendance.models import AttendanceMethod, AttendanceRecord, AttendanceStatus
+from apps.attendance.serializers import (
+    AttendanceRecordSerializer,
+    ManualAttendanceBulkSerializer,
+    SessionAttendanceSummarySerializer,
+)
+from apps.attendance.services import QRCodeService
 from apps.audit.models import AuditLog
 from apps.batches.models import TeacherAssignment
 from apps.feedback.constants import ALL_BANDS, get_understanding_band
@@ -605,3 +618,326 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
         ).order_by("-submitted_at")
         serializer = LearningFeedbackStudentReadSerializer(feedbacks_qs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="qr-token")
+    def qr_token(self, request, pk=None):
+        """
+        Generates rotating cryptographic signed QR token for the session.
+        Allowed for: assigned teacher, coordinator of course, super_admin.
+        Window: start_time to start_time + QR_WINDOW_MINUTES in Asia/Dhaka.
+        """
+        try:
+            session = ClassSession.objects.select_related("batch", "batch__course", "teacher_user").get(pk=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        if user.role == UserRole.TEACHER and session.teacher_user != user:
+            raise PermissionDenied("You can only generate QR tokens for your own sessions.")
+        elif user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
+                raise PermissionDenied("You can only generate QR tokens for your assigned course(s).")
+        elif user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR, UserRole.TEACHER]:
+            raise PermissionDenied("You do not have permission to generate QR tokens.")
+
+        if session.status != SessionStatus.PUBLISHED:
+            raise ValidationError({"detail": "Cannot generate QR token for a draft or cancelled session."})
+
+        dhaka_tz = zoneinfo.ZoneInfo("Asia/Dhaka")
+        now_dhaka = timezone.now().astimezone(dhaka_tz)
+        session_start_dt = datetime.datetime.combine(session.session_date, session.start_time, tzinfo=dhaka_tz)
+        qr_window_mins = get_qr_window_minutes()
+        session_window_end = session_start_dt + datetime.timedelta(minutes=qr_window_mins)
+
+        if now_dhaka < session_start_dt:
+            raise ValidationError({"detail": "QR token can only be generated starting at class start time."})
+        if now_dhaka > session_window_end:
+            raise ValidationError({"detail": "QR token generation window has closed."})
+
+        token_data = QRCodeService.generate_token(session.id)
+        return Response(token_data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="attendance/finalize")
+    def finalize_attendance(self, request, pk=None):
+        """
+        Finalizes attendance for the session by marking all remaining unmarked eligible students as absent (auto_absent).
+        Allowed for: assigned teacher, coordinator of course, super_admin.
+        Guardrails:
+        - Reject draft or cancelled sessions (HTTP 400).
+        - Reject before start_time + QR_WINDOW_MINUTES in Asia/Dhaka (HTTP 400).
+        - Idempotent: repeated calls do not create duplicates.
+        """
+        try:
+            session = ClassSession.objects.select_related("batch", "batch__course", "subject", "teacher_user").get(pk=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        if user.role == UserRole.TEACHER and session.teacher_user != user:
+            raise PermissionDenied("You can only finalize attendance for your own sessions.")
+        elif user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
+                raise PermissionDenied("You can only finalize attendance for your assigned course(s).")
+        elif user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR, UserRole.TEACHER]:
+            raise PermissionDenied("You do not have permission to finalize attendance.")
+
+        if session.status != SessionStatus.PUBLISHED:
+            raise ValidationError({"detail": "Cannot finalize attendance for a draft or cancelled session."})
+
+        dhaka_tz = zoneinfo.ZoneInfo("Asia/Dhaka")
+        now_dhaka = timezone.now().astimezone(dhaka_tz)
+        session_start_dt = datetime.datetime.combine(session.session_date, session.start_time, tzinfo=dhaka_tz)
+        qr_window_mins = get_qr_window_minutes()
+        finalize_allowed_after = session_start_dt + datetime.timedelta(minutes=qr_window_mins)
+
+        if now_dhaka < finalize_allowed_after:
+            raise ValidationError({"detail": "Cannot finalize attendance before the QR window has ended."})
+
+        enrolled_qs = Student.objects.filter(
+            enrollments__batch=session.batch,
+            enrollments__status=EnrollmentStatus.ACTIVE,
+            status="active",
+        )
+        if session.audience == SessionAudience.GENERAL:
+            enrolled_qs = enrolled_qs.filter(education_background=EducationBackground.GENERAL)
+        elif session.audience == SessionAudience.MADRASA:
+            enrolled_qs = enrolled_qs.filter(
+                education_background__in=[EducationBackground.ALIYA, EducationBackground.QAWMI]
+            )
+
+        existing_student_ids = set(
+            AttendanceRecord.objects.filter(session=session).values_list("student_id", flat=True)
+        )
+        unmarked_students = [s for s in enrolled_qs if s.id not in existing_student_ids]
+
+        new_records = [
+            AttendanceRecord(
+                session=session,
+                student=s,
+                status=AttendanceStatus.ABSENT,
+                method=AttendanceMethod.AUTO_ABSENT,
+                marked_at=timezone.now(),
+                marked_by=user,
+                reason="Auto-marked absent upon session attendance finalization.",
+            )
+            for s in unmarked_students
+        ]
+        if new_records:
+            AttendanceRecord.objects.bulk_create(new_records)
+
+        # Return session attendance summary
+        total_expected = enrolled_qs.count()
+        records = AttendanceRecord.objects.filter(session=session)
+        present = records.filter(status=AttendanceStatus.PRESENT).count()
+        late = records.filter(status=AttendanceStatus.LATE).count()
+        absent = records.filter(status=AttendanceStatus.ABSENT).count()
+        approved_leave = records.filter(status=AttendanceStatus.APPROVED_LEAVE).count()
+        pct = calculate_attendance_percentage(present, late, total_expected, approved_leave)
+
+        summary_data = {
+            "session_id": session.id,
+            "session_date": session.session_date,
+            "subject_name": session.subject.name,
+            "total_expected": total_expected,
+            "present": present,
+            "late": late,
+            "absent": absent,
+            "approved_leave": approved_leave,
+            "attendance_percentage": pct,
+        }
+        return Response(SessionAttendanceSummarySerializer(summary_data).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="attendance/manual")
+    def manual_attendance(self, request, pk=None):
+        """
+        Bulk creates or updates attendance records manually with justification reason.
+        Guardrails:
+        - Reject draft or cancelled sessions (HTTP 400).
+        - Teacher correction window: must be within ATTENDANCE_CORRECTION_WINDOW_HOURS (48h) of session end.
+        - Verifies each student has ACTIVE enrollment in session batch and matches session audience (HTTP 400).
+        - Wrapped in transaction.atomic() and writes an AuditLog entry for each record.
+        """
+        try:
+            session = ClassSession.objects.select_related("batch", "batch__course", "subject", "teacher_user").get(pk=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        if user.role == UserRole.TEACHER and session.teacher_user != user:
+            raise PermissionDenied("You can only modify attendance for your own sessions.")
+        elif user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
+                raise PermissionDenied("You can only modify attendance for your assigned course(s).")
+        elif user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR, UserRole.TEACHER]:
+            raise PermissionDenied("You do not have permission to modify attendance.")
+
+        if session.status != SessionStatus.PUBLISHED:
+            raise ValidationError({"detail": "Cannot modify attendance for a draft or cancelled session."})
+
+        # Correction window check for teachers
+        if user.role == UserRole.TEACHER:
+            correction_window_hours = get_attendance_correction_window_hours()
+            dhaka_tz = zoneinfo.ZoneInfo("Asia/Dhaka")
+            now_dhaka = timezone.now().astimezone(dhaka_tz)
+            session_end_dt = datetime.datetime.combine(session.session_date, session.end_time, tzinfo=dhaka_tz)
+            if now_dhaka > session_end_dt + datetime.timedelta(hours=correction_window_hours):
+                raise ValidationError(
+                    {"detail": f"Teachers cannot modify attendance after {correction_window_hours} hours from session end."}
+                )
+
+        serializer = ManualAttendanceBulkSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        items = serializer.validated_data["items"]
+
+        student_ids = [item["student_id"] for item in items]
+        students = {s.id: s for s in Student.objects.filter(id__in=student_ids).select_related("user")}
+
+        for sid in student_ids:
+            if sid not in students:
+                raise ValidationError({"detail": f"Student with ID {sid} does not exist."})
+
+        for sid, s in students.items():
+            if not s.enrollments.filter(batch=session.batch, status=EnrollmentStatus.ACTIVE).exists():
+                raise ValidationError(
+                    {"detail": f"Student {s.student_id_number} does not have an active enrollment in this batch."}
+                )
+            if session.audience == SessionAudience.GENERAL and s.education_background != EducationBackground.GENERAL:
+                raise ValidationError(
+                    {"detail": f"Student {s.student_id_number} does not match the general audience requirement."}
+                )
+            if session.audience == SessionAudience.MADRASA and s.education_background not in [
+                EducationBackground.ALIYA,
+                EducationBackground.QAWMI,
+            ]:
+                raise ValidationError(
+                    {"detail": f"Student {s.student_id_number} does not match the madrasa audience requirement."}
+                )
+
+        updated_records = []
+        with transaction.atomic():
+            for item in items:
+                student = students[item["student_id"]]
+                rec, created = AttendanceRecord.objects.get_or_create(
+                    session=session,
+                    student=student,
+                    defaults={
+                        "status": item["status"],
+                        "method": AttendanceMethod.MANUAL,
+                        "reason": item["reason"],
+                        "marked_by": user,
+                        "marked_at": timezone.now(),
+                    },
+                )
+                old_status = None if created else rec.status
+                old_method = None if created else rec.method
+                if not created:
+                    rec.status = item["status"]
+                    rec.method = AttendanceMethod.MANUAL
+                    rec.reason = item["reason"]
+                    rec.marked_by = user
+                    rec.save()
+
+                AuditLog.objects.create(
+                    actor_user=user if user.is_authenticated else None,
+                    action="CREATE_ATTENDANCE" if created else "UPDATE_ATTENDANCE",
+                    entity_name="AttendanceRecord",
+                    entity_id=str(rec.id),
+                    old_values={
+                        "status": old_status,
+                        "method": old_method,
+                    } if not created else None,
+                    new_values={
+                        "session_id": session.id,
+                        "student_id": student.id,
+                        "student_id_number": student.student_id_number,
+                        "status": rec.status,
+                        "method": rec.method,
+                        "reason": item["reason"],
+                    },
+                    ip_address=request.META.get("REMOTE_ADDR"),
+                )
+                updated_records.append(rec)
+
+        return Response(AttendanceRecordSerializer(updated_records, many=True).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="attendance")
+    def attendance_roster(self, request, pk=None):
+        """
+        Lists individual attendance records for this session.
+        Allowed for teachers (own session), coordinators (own course), super_admin.
+        Observer and student are strictly forbidden (HTTP 403).
+        """
+        try:
+            session = ClassSession.objects.select_related("batch", "batch__course", "teacher_user").get(pk=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        if user.role == UserRole.OBSERVER:
+            raise PermissionDenied("Observers are not permitted to view individual student attendance rosters.")
+        elif user.role == UserRole.STUDENT:
+            raise PermissionDenied("Students are not permitted to view session attendance rosters.")
+        elif user.role == UserRole.TEACHER and session.teacher_user != user:
+            raise PermissionDenied("You can only view attendance rosters for your own sessions.")
+        elif user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
+                raise PermissionDenied("You can only view attendance for your assigned course(s).")
+
+        records = AttendanceRecord.objects.filter(session=session).select_related(
+            "student", "student__user", "session", "session__subject", "marked_by"
+        ).order_by("student__student_id_number")
+        return Response(AttendanceRecordSerializer(records, many=True).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="attendance-summary")
+    def attendance_summary(self, request, pk=None):
+        """
+        Aggregated attendance statistics for this session.
+        Allowed for teachers (own session), coordinators (own course), super_admin, observer.
+        Student is strictly forbidden (HTTP 403).
+        """
+        try:
+            session = ClassSession.objects.select_related("batch", "batch__course", "subject", "teacher_user").get(pk=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        if user.role == UserRole.STUDENT:
+            raise PermissionDenied("Students are not permitted to view session attendance summaries.")
+        elif user.role == UserRole.TEACHER and session.teacher_user != user:
+            raise PermissionDenied("You can only view attendance summaries for your own sessions.")
+        elif user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
+                raise PermissionDenied("You can only view summaries for your assigned course(s).")
+
+        enrolled_qs = Student.objects.filter(
+            enrollments__batch=session.batch,
+            enrollments__status=EnrollmentStatus.ACTIVE,
+            status="active",
+        )
+        if session.audience == SessionAudience.GENERAL:
+            enrolled_qs = enrolled_qs.filter(education_background=EducationBackground.GENERAL)
+        elif session.audience == SessionAudience.MADRASA:
+            enrolled_qs = enrolled_qs.filter(
+                education_background__in=[EducationBackground.ALIYA, EducationBackground.QAWMI]
+            )
+
+        total_expected = enrolled_qs.count()
+        records = AttendanceRecord.objects.filter(session=session)
+        present = records.filter(status=AttendanceStatus.PRESENT).count()
+        late = records.filter(status=AttendanceStatus.LATE).count()
+        absent = records.filter(status=AttendanceStatus.ABSENT).count()
+        approved_leave = records.filter(status=AttendanceStatus.APPROVED_LEAVE).count()
+        pct = calculate_attendance_percentage(present, late, total_expected, approved_leave)
+
+        data = {
+            "session_id": session.id,
+            "session_date": session.session_date,
+            "subject_name": session.subject.name,
+            "total_expected": total_expected,
+            "present": present,
+            "late": late,
+            "absent": absent,
+            "approved_leave": approved_leave,
+            "attendance_percentage": pct,
+        }
+        return Response(SessionAttendanceSummarySerializer(data).data, status=status.HTTP_200_OK)
