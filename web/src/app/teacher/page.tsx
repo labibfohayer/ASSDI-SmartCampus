@@ -102,14 +102,19 @@ export default function TeacherOverviewPage() {
     toast.success(isBangla ? 'ড্যাশবোর্ড রিফ্রেশ করা হয়েছে' : 'Dashboard refreshed');
   };
 
-  // Format today's date in Dhaka
-  const todayFormatted = new Intl.DateTimeFormat(isBangla ? 'bn-BD' : 'en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'Asia/Dhaka',
-  }).format(new Date());
+  // Format today's date safely on client mount
+  const [todayFormatted, setTodayFormatted] = useState('');
+  useEffect(() => {
+    setTodayFormatted(
+      new Intl.DateTimeFormat(isBangla ? 'bn-BD' : 'en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'Asia/Dhaka',
+      }).format(new Date())
+    );
+  }, [isBangla]);
 
   return (
     <div className="space-y-6">
