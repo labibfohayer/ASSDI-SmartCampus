@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const refreshToken = getRefreshToken();
       if (refreshToken) {
-        await api.post('/api/v1/accounts/logout/', { refresh: refreshToken }).catch(() => {});
+        await api.post('/api/v1/auth/logout/', { refresh: refreshToken }).catch(() => {});
       }
     } finally {
       clearAuthSession();

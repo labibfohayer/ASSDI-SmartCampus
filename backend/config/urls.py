@@ -49,6 +49,7 @@ urlpatterns = [
 
     # Auth Endpoints
     path("api/v1/auth/", include("apps.accounts.urls")),
+    path("api/v1/accounts/", include("apps.accounts.urls")),
 
     # Analytics & Reports Endpoints
     path("api/v1/", include("apps.reports.urls")),

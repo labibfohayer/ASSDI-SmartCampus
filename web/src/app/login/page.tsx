@@ -49,7 +49,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await api.post('/api/v1/accounts/login/', {
+      const response = await api.post('/api/v1/auth/login/', {
         login_id: cleanId,
         password: cleanPass,
       });

@@ -48,6 +48,8 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login/') &&
+      !originalRequest.url?.includes('/auth/refresh/') &&
       !originalRequest.url?.includes('/accounts/login/') &&
       !originalRequest.url?.includes('/accounts/refresh/')
     ) {
@@ -78,7 +80,7 @@ api.interceptors.response.use(
       }
 
       try {
-        const refreshResponse = await axios.post(`${API_BASE}/api/v1/accounts/refresh/`, {
+        const refreshResponse = await axios.post(`${API_BASE}/api/v1/auth/refresh/`, {
           refresh: refreshToken,
         });
 
