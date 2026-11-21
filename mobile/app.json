@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "ASSDI Student",
+    "slug": "assdi-student",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "assdi",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "org.assdi.student",
+      "permissions": [
+        "CAMERA"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#1B4D3E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow ASSDI Student to access your camera to scan class attendance QR codes."
+        }
+      ]
+    ]
+  }
+}
