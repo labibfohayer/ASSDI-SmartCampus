@@ -13,7 +13,6 @@ import {
   AlertCircle,
   BookOpen,
   ArrowRight,
-  Sparkles,
   RefreshCw,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -119,11 +118,11 @@ export default function TeacherOverviewPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner / Welcome Bar */}
-      <div className="bg-gradient-to-r from-[#1B4D3E] to-[#2D6A4F] rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-[#1B4D3E] border border-emerald-900 rounded-2xl p-6 sm:p-7 text-white shadow-xs relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-md rounded-full text-xs font-semibold text-emerald-100 mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-xs font-semibold text-emerald-100 mb-2">
+              <BookOpen className="w-3.5 h-3.5 text-emerald-300" />
               <span>{t('brand.course')}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">

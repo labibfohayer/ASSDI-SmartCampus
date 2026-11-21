@@ -307,10 +307,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         if user.role == UserRole.OBSERVER:
             raise PermissionDenied("Observers are not permitted to view individual student progress.")
 
-        try:
-            student = Student.objects.select_related("user").get(pk=pk)
-        except Student.DoesNotExist:
-            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        if str(pk).lower() == "me":
+            student = getattr(user, "student_profile", None)
+            if not student:
+                return Response({"detail": "No student profile found for authenticated user."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            try:
+                student = Student.objects.select_related("user").get(pk=pk)
+            except (Student.DoesNotExist, ValueError):
+                return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
         if user.role == UserRole.STUDENT and student.user != user:
             raise PermissionDenied("Students can only view their own progress.")
@@ -383,10 +388,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         if user.role == UserRole.OBSERVER:
             raise PermissionDenied("Observers are not permitted to view individual student attendance summaries.")
 
-        try:
-            student = Student.objects.select_related("user").get(pk=pk)
-        except Student.DoesNotExist:
-            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        if str(pk).lower() == "me":
+            student = getattr(user, "student_profile", None)
+            if not student:
+                return Response({"detail": "No student profile found for authenticated user."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            try:
+                student = Student.objects.select_related("user").get(pk=pk)
+            except (Student.DoesNotExist, ValueError):
+                return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
         if user.role == UserRole.STUDENT and student.user != user:
             raise PermissionDenied("Students can only view their own attendance summary.")

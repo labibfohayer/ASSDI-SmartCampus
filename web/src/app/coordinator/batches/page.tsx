@@ -8,7 +8,6 @@ import {
   GraduationCap,
   Star,
   CheckSquare,
-  Sparkles,
   ArrowRight,
   UserCheck,
   BookOpen,

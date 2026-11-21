@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { User, Lock, Eye, EyeOff, LogIn, ShieldAlert, Sparkles, CheckCircle2 } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, LogIn, ShieldAlert, BookOpen, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -149,7 +149,7 @@ export default function LoginPage() {
               {t('brand.systemTitle')}
             </p>
             <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-semibold">
-              <Sparkles className="w-3 h-3 text-emerald-600" />
+              <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
               <span>{t('brand.course')}</span>
             </div>
           </div>

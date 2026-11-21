@@ -11,7 +11,6 @@ import {
   Eye,
   CheckCircle2,
   Calendar,
-  Sparkles,
   ArrowRight,
   ShieldAlert,
 } from 'lucide-react';

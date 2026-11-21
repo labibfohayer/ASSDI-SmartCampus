@@ -11,7 +11,6 @@ import {
   UserCheck,
   CheckCircle2,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';

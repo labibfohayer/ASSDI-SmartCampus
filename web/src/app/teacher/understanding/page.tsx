@@ -17,7 +17,7 @@ import {
   Star,
   Users,
   MessageSquare,
-  Sparkles,
+  BookOpen,
   Clock,
   HelpCircle,
   CheckCircle2,
@@ -217,7 +217,7 @@ export default function TopicUnderstandingPage() {
         {/* Average Percentage */}
         <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-            <Sparkles className="w-6 h-6" />
+            <BookOpen className="w-6 h-6" />
           </div>
           <div>
             <p className="text-xs text-gray-500 font-medium">{isBangla ? 'বোঝাপড়ার হার' : 'Understanding %'}</p>

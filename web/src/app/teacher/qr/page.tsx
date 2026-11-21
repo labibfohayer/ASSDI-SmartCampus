@@ -12,7 +12,6 @@ import {
   Users,
   CheckCircle2,
   AlertTriangle,
-  Sparkles,
   ArrowLeft,
 } from 'lucide-react';
 import Link from 'next/link';

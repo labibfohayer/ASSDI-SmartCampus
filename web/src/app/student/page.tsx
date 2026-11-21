@@ -9,7 +9,6 @@ import {
   AlertCircle,
   HelpCircle,
   Star,
-  Sparkles,
   BookOpen,
   Send,
   RefreshCw,
@@ -113,6 +112,18 @@ export default function StudentPortalPage() {
 
   useEffect(() => {
     loadStudentData();
+    const handleUrlTab = () => {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab === 'attendance' || tab === 'help' || tab === 'today') {
+          setActiveTab(tab as any);
+        }
+      }
+    };
+    handleUrlTab();
+    window.addEventListener('popstate', handleUrlTab);
+    return () => window.removeEventListener('popstate', handleUrlTab);
   }, []);
 
   const loadStudentData = async () => {

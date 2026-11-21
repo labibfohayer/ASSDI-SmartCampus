@@ -19,7 +19,6 @@ import {
   GraduationCap,
   Calendar,
   CheckSquare,
-  Sparkles,
   HelpCircle,
   AlertTriangle,
   ArrowRight,
@@ -28,6 +27,8 @@ import {
   Clock,
   Eye,
   FileText,
+  BarChart3,
+  BookOpen,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -151,11 +152,11 @@ export default function CoordinatorDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner / Hero Header */}
-      <div className="bg-gradient-to-r from-[#12382C] via-[#1B4D3E] to-[#2D6A4F] rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-[#1B4D3E] border border-emerald-900 rounded-2xl p-6 sm:p-7 text-white shadow-xs relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-md rounded-full text-xs font-semibold text-emerald-100 mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-xs font-semibold text-emerald-100 mb-2">
+              <BarChart3 className="w-3.5 h-3.5 text-emerald-300" />
               <span>{t('brand.course')}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -289,7 +290,7 @@ export default function CoordinatorDashboardPage() {
         {/* Learning Progress */}
         <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-            <Sparkles className="w-6 h-6" />
+            <BookOpen className="w-6 h-6" />
           </div>
           <div>
             <p className="text-xs text-gray-500 font-medium">{isBangla ? 'সার্বিক লার্নিং প্রগ্রেস' : 'Learning Progress'}</p>
