@@ -1,7 +1,12 @@
 import datetime
+import io
 import zoneinfo
+import openpyxl
+from openpyxl.styles import Alignment, Font, PatternFill
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Avg
+from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
@@ -40,7 +45,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     ordering_fields = ["student_id_number", "created_at"]
 
     def get_permissions(self):
-        if self.action in ["create", "destroy", "transfer"]:
+        if self.action in ["create", "destroy", "transfer", "bulk_import", "import_template"]:
             return [IsCoordinator()]
         return [IsAuthenticated()]
 
@@ -399,17 +404,238 @@ class StudentViewSet(viewsets.ModelViewSet):
         summary_data = self._compute_student_attendance_summary(student)
         return Response(StudentAttendanceSummarySerializer(summary_data).data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=["get"], url_path="me/attendance-summary")
-    def me_attendance_summary(self, request):
-        """Self attendance summary view for authenticated student."""
-        user = request.user
-        if user.role != UserRole.STUDENT:
-            raise PermissionDenied("Only students can view self attendance summary.")
-        student = getattr(user, "student_profile", None)
-        if not student:
-            raise PermissionDenied("No student profile found for authenticated user.")
+    @action(detail=False, methods=["get"], url_path="import-template")
+    def import_template(self, request):
+        """Generates a downloadable sample Excel template for bulk student import."""
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Students"
 
-        summary_data = self._compute_student_attendance_summary(student)
-        return Response(StudentAttendanceSummarySerializer(summary_data).data, status=status.HTTP_200_OK)
+        headers = [
+            "student_id_number",
+            "registration_no",
+            "full_name",
+            "phone",
+            "guardian_phone",
+            "education_background",
+            "password",
+        ]
+        ws.append(headers)
+
+        header_fill = PatternFill(start_color="1B4D3E", end_color="1B4D3E", fill_type="solid")
+        header_font = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
+        for col_idx in range(1, len(headers) + 1):
+            cell = ws.cell(row=1, column=col_idx)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        sample_rows = [
+            [
+                "STD-2026-042-051",
+                "REG-2026-042-051",
+                "Tariqul Islam (Sample)",
+                "01711000001",
+                "01811000001",
+                "General",
+                "StudentPass2026!",
+            ],
+            [
+                "STD-2026-042-052",
+                "REG-2026-042-052",
+                "Mahmudul Hasan (Sample)",
+                "01711000002",
+                "01811000002",
+                "Aliya",
+                "StudentPass2026!",
+            ],
+            [
+                "STD-2026-042-053",
+                "REG-2026-042-053",
+                "Zubair Ahmed (Sample)",
+                "01711000003",
+                "01811000003",
+                "Qawmi",
+                "StudentPass2026!",
+            ],
+        ]
+        for row_data in sample_rows:
+            ws.append(row_data)
+
+        for col in ws.columns:
+            max_len = max(len(str(cell.value or "")) for cell in col)
+            col_letter = col[0].column_letter
+            ws.column_dimensions[col_letter].width = max(max_len + 4, 15)
+
+        buf = io.BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+
+        response = HttpResponse(
+            buf.getvalue(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = 'attachment; filename="assdi_student_import_template.xlsx"'
+        return response
+
+    @action(detail=False, methods=["post"], url_path="bulk-import")
+    def bulk_import(self, request):
+        """
+        Bulk import students from Excel file (.xlsx) into a target batch.
+        Enforces unique IDs, campus consistency, and atomic creation per row.
+        """
+        user = request.user
+        if user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR]:
+            raise PermissionDenied("Only super admins and coordinators can bulk import students.")
+
+        file_obj = request.FILES.get("file")
+        if not file_obj:
+            raise ValidationError({"file": "An Excel file (.xlsx) is required."})
+
+        batch_id = request.data.get("batch_id")
+        if not batch_id:
+            raise ValidationError({"batch_id": "Target batch ID is required."})
+
+        try:
+            batch = Batch.objects.select_related("course", "campus").get(pk=batch_id)
+        except Batch.DoesNotExist:
+            raise ValidationError({"batch_id": "Selected batch does not exist."})
+
+        if user.role == UserRole.COORDINATOR:
+            if not user.coordinator_course_assignments.filter(course=batch.course).exists():
+                raise PermissionDenied("You can only import students into batches of your assigned course.")
+
+        try:
+            wb = openpyxl.load_workbook(file_obj, data_only=True)
+            ws = wb.active
+        except Exception as exc:
+            raise ValidationError({"file": f"Invalid or unreadable Excel file: {str(exc)}"})
+
+        rows = list(ws.iter_rows(values_only=True))
+        if not rows or len(rows) < 2:
+            return Response(
+                {
+                    "success": False,
+                    "message": "The uploaded sheet is empty or contains only headers.",
+                    "total_rows": 0,
+                    "created_count": 0,
+                    "errors": [],
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        headers = [str(cell).strip().lower() if cell is not None else "" for cell in rows[0]]
+
+        def get_col_val(row, col_name, default=""):
+            if col_name in headers:
+                idx = headers.index(col_name)
+                if idx < len(row) and row[idx] is not None:
+                    return str(row[idx]).strip()
+            return default
+
+        created_students = []
+        errors = []
+        User = get_user_model()
+
+        for row_idx, row in enumerate(rows[1:], start=2):
+            if not any(row):
+                continue
+
+            sid = get_col_val(row, "student_id_number")
+            reg = get_col_val(row, "registration_no")
+            name = get_col_val(row, "full_name")
+            phone = get_col_val(row, "phone", "")
+            guardian_phone = get_col_val(row, "guardian_phone", "")
+            edu_bg = get_col_val(row, "education_background", "General")
+            password = get_col_val(row, "password", "StudentPass2026!")
+
+            if edu_bg not in ["General", "Aliya", "Qawmi"]:
+                edu_map = {"general": "General", "aliya": "Aliya", "qawmi": "Qawmi"}
+                edu_bg = edu_map.get(edu_bg.lower(), "General")
+
+            if not sid:
+                errors.append({"row": row_idx, "student_id": sid, "error": "Missing student_id_number"})
+                continue
+            if not reg:
+                errors.append({"row": row_idx, "student_id": sid, "error": "Missing registration_no"})
+                continue
+            if not name:
+                errors.append({"row": row_idx, "student_id": sid, "error": "Missing full_name"})
+                continue
+
+            if User.objects.filter(login_id__iexact=sid).exists():
+                errors.append({"row": row_idx, "student_id": sid, "error": f"Login ID '{sid}' already exists"})
+                continue
+
+            if Student.objects.filter(student_id_number__iexact=sid).exists():
+                errors.append({"row": row_idx, "student_id": sid, "error": f"Student ID '{sid}' already exists"})
+                continue
+
+            if Student.objects.filter(registration_no__iexact=reg).exists():
+                errors.append({"row": row_idx, "student_id": sid, "error": f"Registration number '{reg}' already exists"})
+                continue
+
+            try:
+                with transaction.atomic():
+                    new_user = User.objects.create_user(
+                        login_id=sid,
+                        password=password,
+                        full_name=name,
+                        role=UserRole.STUDENT,
+                        phone=phone,
+                    )
+                    student_obj = Student.objects.create(
+                        user=new_user,
+                        student_id_number=sid,
+                        registration_no=reg,
+                        education_background=edu_bg,
+                        campus=batch.campus,
+                        guardian_phone=guardian_phone,
+                        status=StudentStatus.ACTIVE,
+                    )
+                    Enrollment.objects.create(
+                        student=student_obj,
+                        batch=batch,
+                        status=EnrollmentStatus.ACTIVE,
+                    )
+                    created_students.append({
+                        "id": student_obj.id,
+                        "student_id_number": sid,
+                        "full_name": name,
+                    })
+            except Exception as e:
+                errors.append({"row": row_idx, "student_id": sid, "error": str(e)})
+
+        AuditLog.objects.create(
+            actor_user=request.user,
+            action="STUDENT_BULK_IMPORT",
+            entity_name="Student",
+            entity_id=str(batch.id),
+            old_values=None,
+            new_values={
+                "batch_id": batch.id,
+                "batch_name": batch.name,
+                "created_count": len(created_students),
+                "error_count": len(errors),
+            },
+            ip_address=request.META.get("REMOTE_ADDR"),
+        )
+
+        return Response(
+            {
+                "success": True,
+                "batch_name": batch.name,
+                "total_rows_processed": len(rows) - 1,
+                "created_count": len(created_students),
+                "error_count": len(errors),
+                "created_students": created_students,
+                "errors": errors,
+            },
+            status=status.HTTP_201_CREATED if created_students else status.HTTP_200_OK,
+        )
+
+
+
+
 
 

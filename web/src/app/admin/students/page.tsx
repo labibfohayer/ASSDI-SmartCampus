@@ -13,9 +13,15 @@ import {
   Mail,
   ShieldCheck,
   CheckCircle2,
+  FileSpreadsheet,
+  Download,
+  UploadCloud,
+  AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
+import { getAccessToken } from '@/lib/auth';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface StudentItem {
@@ -67,6 +73,14 @@ export default function AdminStudentsPage() {
     batch_id: '',
     campus_id: '1',
   });
+
+  // Bulk import modal state
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [bulkFile, setBulkFile] = useState<File | null>(null);
+  const [bulkBatchId, setBulkBatchId] = useState<string>('');
+  const [importing, setImporting] = useState(false);
+  const [downloadingTemplate, setDownloadingTemplate] = useState(false);
+  const [importResult, setImportResult] = useState<any>(null);
 
   const fetchStudents = async () => {
     try {
@@ -142,6 +156,78 @@ export default function AdminStudentsPage() {
     }
   };
 
+  const handleDownloadTemplate = async () => {
+    setDownloadingTemplate(true);
+    try {
+      const token = getAccessToken();
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+      const response = await fetch(`${baseUrl}/api/v1/students/import-template/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'assdi_student_import_template.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success(isBangla ? 'টেমপ্লেট ডাউনলোড সফল হয়েছে' : 'Template downloaded');
+    } catch (err) {
+      toast.error(isBangla ? 'টেমপ্লেট ডাউনলোড ব্যর্থ হয়েছে' : 'Failed to download template');
+    } finally {
+      setDownloadingTemplate(false);
+    }
+  };
+
+  const handleBulkImportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bulkFile) {
+      toast.error(isBangla ? 'দয়া করে একটি এক্সেল ফাইল সিলেক্ট করুন' : 'Please select an Excel file');
+      return;
+    }
+    if (!bulkBatchId) {
+      toast.error(isBangla ? 'দয়া করে টার্গেট ব্যাচ নির্বাচন করুন' : 'Please select target batch');
+      return;
+    }
+
+    setImporting(true);
+    setImportResult(null);
+
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', bulkFile);
+      formDataUpload.append('batch_id', bulkBatchId);
+
+      const res = await api.post('/api/v1/students/bulk-import/', formDataUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setImportResult(res.data);
+      if (res.data?.created_count > 0) {
+        toast.success(
+          isBangla
+            ? `সফলভাবে ${res.data.created_count} জন শিক্ষার্থী অন্তর্ভুক্ত হয়েছে!`
+            : `Successfully imported ${res.data.created_count} students!`
+        );
+        fetchStudents();
+      } else {
+        toast.error(isBangla ? 'কোনো শিক্ষার্থী যুক্ত করা যায়নি' : 'No students were imported');
+      }
+    } catch (err: any) {
+      const msg = err.response?.data?.file?.[0] || err.response?.data?.message || 'Bulk import failed';
+      toast.error(msg);
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const filteredStudents = students.filter((st) => {
     const matchesSearch =
       st.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -177,13 +263,27 @@ export default function AdminStudentsPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2.5 bg-[#1B4D3E] hover:bg-[#153E32] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>{isBangla ? 'নতুন শিক্ষার্থী ভর্তি' : 'Enroll New Student'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setShowBulkModal(true);
+              setImportResult(null);
+              setBulkFile(null);
+            }}
+            className="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-700" />
+            <span>{isBangla ? 'এক্সেল বাল্ক ইমপোর্ট' : 'Excel Bulk Import'}</span>
+          </button>
+
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2.5 bg-[#1B4D3E] hover:bg-[#153E32] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>{isBangla ? 'নতুন শিক্ষার্থী ভর্তি' : 'Enroll New Student'}</span>
+          </button>
+        </div>
       </div>
 
       {/* Roster Table Card */}
@@ -459,6 +559,199 @@ export default function AdminStudentsPage() {
                   className="px-5 py-2 bg-[#1B4D3E] hover:bg-[#153E32] text-white font-bold rounded-xl shadow-xs transition"
                 >
                   {submitting ? (isBangla ? 'নিবন্ধন হচ্ছে...' : 'Saving...') : (isBangla ? 'ভর্তি সম্পন্ন করুন' : 'Confirm Enrollment')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Import Modal */}
+      {showBulkModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center">
+                  <FileSpreadsheet className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-sm">
+                    {isBangla ? 'শিক্ষার্থী বাল্ক ইমপোর্ট (এক্সেল আপলোড)' : 'Bulk Import Students via Excel'}
+                  </h3>
+                  <p className="text-[11px] text-gray-500">
+                    {isBangla
+                      ? 'এক্সেল শিট দিয়ে এক ক্লিকে বহু শিক্ষার্থীর ভর্তি সম্পন্ন করুন'
+                      : 'Enroll multiple students at once using an Excel spreadsheet'}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowBulkModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Step 1: Template Download Banner */}
+            <div className="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 mb-4">
+              <div>
+                <p className="text-xs font-bold text-emerald-900">
+                  {isBangla ? '১. নমুনা এক্সেল টেমপ্লেট' : '1. Sample Excel Template'}
+                </p>
+                <p className="text-[11px] text-emerald-700 mt-0.5">
+                  {isBangla
+                    ? 'ফরম্যাট অনুযায়ী তথ্য পূরণের জন্য টেমপ্লেট ডাউনলোড করুন'
+                    : 'Download pre-formatted Excel template with headers and dummy rows'}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleDownloadTemplate}
+                disabled={downloadingTemplate}
+                className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-2xs transition flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50"
+              >
+                {downloadingTemplate ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Download className="w-3.5 h-3.5" />
+                )}
+                <span>{isBangla ? 'টেমপ্লেট' : 'Download'}</span>
+              </button>
+            </div>
+
+            {/* Results Display if Import Completed */}
+            {importResult && (
+              <div className="mb-4 space-y-3">
+                <div
+                  className={`p-3.5 rounded-2xl border text-xs ${
+                    importResult.created_count > 0
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                      : 'bg-rose-50 border-rose-200 text-rose-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 font-bold mb-1">
+                    {importResult.created_count > 0 ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-rose-600" />
+                    )}
+                    <span>
+                      {isBangla
+                        ? `ব্যাচ "${importResult.batch_name}": ${importResult.created_count} জন শিক্ষার্থী সফলভাবে ভর্তি হয়েছে!`
+                        : `Batch "${importResult.batch_name}": ${importResult.created_count} students enrolled!`}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-600">
+                    {isBangla
+                      ? `মোট প্রসেস করা সারি: ${importResult.total_rows_processed} | ত্রুটি / স্কিপ: ${importResult.error_count}`
+                      : `Total rows processed: ${importResult.total_rows_processed} | Errors / Skipped: ${importResult.error_count}`}
+                  </p>
+                </div>
+
+                {importResult.errors?.length > 0 && (
+                  <div className="max-h-40 overflow-y-auto rounded-xl border border-rose-200 bg-rose-50/50 p-2 text-[11px]">
+                    <p className="font-bold text-rose-800 mb-1">
+                      {isBangla ? 'যেসব সারি স্কিপ হয়েছে:' : 'Skipped rows:'}
+                    </p>
+                    <ul className="space-y-1 text-rose-700">
+                      {importResult.errors.map((errItem: any, idx: number) => (
+                        <li key={idx} className="flex items-start gap-1">
+                          <span className="font-mono font-bold">[{isBangla ? 'সারি' : 'Row'} {errItem.row}]:</span>
+                          <span>{errItem.error}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Upload Form */}
+            <form onSubmit={handleBulkImportSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  {isBangla ? '২. ভর্তি করার টার্গেট ব্যাচ (বাধ্যতামূলক):' : '2. Target Enrollment Batch (Required):'}
+                </label>
+                <select
+                  required
+                  value={bulkBatchId}
+                  onChange={(e) => setBulkBatchId(e.target.value)}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium"
+                >
+                  <option value="">{isBangla ? '-- ব্যাচ নির্বাচন করুন --' : '-- Select Batch --'}</option>
+                  {batches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name} (Batch #{b.batch_number})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  {isBangla ? '৩. এক্সেল ফাইল আপলোড (.xlsx):' : '3. Upload Filled Excel File (.xlsx):'}
+                </label>
+                <div className="border-2 border-dashed border-gray-200 hover:border-emerald-500 rounded-2xl p-5 text-center transition-colors bg-gray-50/60">
+                  <input
+                    type="file"
+                    id="excel_file_input"
+                    accept=".xlsx, .xls"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setBulkFile(e.target.files[0]);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <label htmlFor="excel_file_input" className="cursor-pointer block">
+                    <UploadCloud className="w-8 h-8 text-emerald-700 mx-auto mb-2" />
+                    {bulkFile ? (
+                      <div>
+                        <p className="text-xs font-bold text-emerald-800">{bulkFile.name}</p>
+                        <p className="text-[10px] text-gray-500 mt-0.5">
+                          {(bulkFile.size / 1024).toFixed(1)} KB • {isBangla ? 'ফাইল সিলেক্ট করা হয়েছে' : 'File selected'}
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-700">
+                          {isBangla ? 'ফাইল সিলেক্ট করতে এখানে ক্লিক করুন' : 'Click to select Excel file'}
+                        </p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">.XLSX or .XLS format</p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowBulkModal(false)}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl cursor-pointer"
+                >
+                  {isBangla ? 'বন্ধ করুন' : 'Close'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={importing || !bulkFile || !bulkBatchId}
+                  className="px-5 py-2 bg-[#1B4D3E] hover:bg-[#153E32] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {importing ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>{isBangla ? 'ইমপোর্ট হচ্ছে...' : 'Importing...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <UploadCloud className="w-3.5 h-3.5" />
+                      <span>{isBangla ? 'ইমপোর্ট শুরু করুন' : 'Start Import'}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
