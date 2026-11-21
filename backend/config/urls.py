@@ -50,6 +50,9 @@ urlpatterns = [
     # Auth Endpoints
     path("api/v1/auth/", include("apps.accounts.urls")),
 
+    # Analytics & Reports Endpoints
+    path("api/v1/", include("apps.reports.urls")),
+
     # Core Academic & Student Endpoints
     path("api/v1/", include(router.urls)),
 ]

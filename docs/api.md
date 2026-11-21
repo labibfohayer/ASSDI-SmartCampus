@@ -741,9 +741,104 @@
 * **Privacy Restriction:** `observer` receives HTTP 403 Forbidden.
 * **Metrics:** 7-day and 30-day windows computed in `Asia/Dhaka`, identifying low understanding topics (`rating <= 2`).
 
-All report endpoints support query parameters `format=json` (default), `format=pdf`, `format=excel`.
+---
 
-* **GET** `/reports/daily-attendance/?date=2026-11-21&batch_id=42`
-* **GET** `/reports/topic-understanding/?topic_id=12` (Cross-batch comparison across batches 42, 43, 44)
-* **GET** `/reports/repeated-absences/?threshold=3` (Flags students with 3+ consecutive or 5+ total absences)
-* **GET** `/reports/teacher-performance/?teacher_id=uuid` (Average feedback score, help resolution time)
+## 12. Coordinator Dashboard Analytics & 9 SRS Reports (`/api/v1/analytics/` & `/api/v1/reports/`)
+
+All dashboard and report endpoints support query parameters `export=json` (default), `export=pdf`, and `export=xlsx` (or `format=...` synonym).
+Exporting to PDF (`Content-Type: application/pdf`) or Excel (`Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`) automatically logs an immutable record in `report_logs` and an audit trail in `audit_logs`.
+
+### 12.1 Coordinator & Management Analytics Dashboard
+* **GET** `/api/v1/analytics/coordinator-dashboard/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses only, 403 on unassigned), `observer` (200 OK aggregate KPIs only, student personal contact info stripped, count-only for alerts). `teacher` and `student` receive HTTP 403 Forbidden.
+* **Filters:** `course`, `batch`, `teacher`, `date_from`, `date_to`, `topic`, `attendance_status`, `help_request_status`, `export=pdf|xlsx`.
+* **Success Response (200 OK):**
+  ```json
+  {
+    "total_students": 120,
+    "total_active_batches": 4,
+    "total_teachers": 8,
+    "todays_classes": 3,
+    "overall_attendance_percentage": 92.4,
+    "overall_learning_progress": {
+      "average_rating": 4.25,
+      "average_percentage": 85.0
+    },
+    "total_help_requests": 14,
+    "pending_help_requests": 2,
+    "batch_wise_performance": [
+      {
+        "batch_id": 42,
+        "batch_name": "SBMC Batch 42",
+        "batch_number": 42,
+        "course_name": "Small Business Management",
+        "student_count": 35,
+        "attendance_percentage": 94.1,
+        "average_rating": 4.3,
+        "average_percentage": 86.0,
+        "pending_help_requests": 1
+      }
+    ],
+    "teacher_wise_performance": [
+      {
+        "teacher_id": "uuid",
+        "teacher_name": "Ustadh Abdullah",
+        "login_id": "TCH-001",
+        "classes_conducted": 18,
+        "average_rating": 4.5,
+        "average_percentage": 90.0,
+        "help_requests_count": 5,
+        "resolved_help_requests_count": 5
+      }
+    ],
+    "repeated_absence_count": 2,
+    "repeated_absences": [],
+    "students_requiring_attention_count": 3,
+    "students_requiring_attention": []
+  }
+  ```
+
+### 12.2 Daily Attendance Report
+* **GET** `/api/v1/reports/daily-attendance/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `teacher` (assigned batches), `observer` (read-only aggregate).
+* **Filters:** `date` (defaults to today in `Asia/Dhaka`), `batch`, `course`, `export=pdf|xlsx`.
+
+### 12.3 Daily Learning Progress Report
+* **GET** `/api/v1/reports/daily-learning-progress/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `teacher` (assigned batches), `observer` (read-only aggregate).
+* **Filters:** `date` (defaults to today in `Asia/Dhaka`), `batch`, `course`, `export=pdf|xlsx`.
+
+### 12.4 Weekly Progress Report
+* **GET** `/api/v1/reports/weekly-progress/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `teacher` (assigned batches), `observer` (read-only aggregate).
+* **Filters:** `week_start` (YYYY-MM-DD), `week_end` (YYYY-MM-DD), `batch`, `course`, `export=pdf|xlsx`.
+
+### 12.5 Monthly Student Performance Report (Individual)
+* **GET** `/api/v1/reports/monthly-student-performance/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `teacher` (assigned batches). `observer` and `student` receive HTTP 403 Forbidden.
+* **Filters:** `year`, `month`, `batch`, `student`, `export=pdf|xlsx`.
+
+### 12.6 Batch-Wise Performance Report
+* **GET** `/api/v1/reports/batch-wise-performance/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `teacher` (assigned batches), `observer` (read-only aggregate).
+* **Filters:** `course`, `batch`, `date_from`, `date_to`, `export=pdf|xlsx`.
+
+### 12.7 Topic-Wise Understanding Report
+* **GET** `/api/v1/reports/topic-wise-understanding/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `teacher` (assigned subjects/batches), `observer` (read-only aggregate).
+* **Filters:** `subject`, `topic`, `batch`, `course`, `export=pdf|xlsx`.
+
+### 12.8 Teacher-Wise Performance Report (Supervisory)
+* **GET** `/api/v1/reports/teacher-wise/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `observer` (read-only aggregate). `teacher` and `student` receive HTTP 403 Forbidden.
+* **Filters:** `course`, `teacher`, `date_from`, `date_to`, `export=pdf|xlsx`.
+
+### 12.9 Student Help Requests Report (Individual)
+* **GET** `/api/v1/reports/student-help-requests/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `teacher` (assigned batches/subjects). `observer` and `student` receive HTTP 403 Forbidden.
+* **Filters:** `status`, `batch`, `teacher`, `topic`, `date_from`, `date_to`, `export=pdf|xlsx`.
+
+### 12.10 Repeated Absences Report (Individual)
+* **GET** `/api/v1/reports/repeated-absences/`
+* **Roles:** `super_admin`, `coordinator` (assigned courses), `teacher` (assigned batches). `observer` and `student` receive HTTP 403 Forbidden.
+* **Filters:** `batch`, `course`, `threshold_consecutive`, `threshold_total`, `export=pdf|xlsx`.

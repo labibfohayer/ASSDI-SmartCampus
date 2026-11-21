@@ -278,30 +278,30 @@ def feedback_setup_data(db):
         created_by=admin_user,
     )
 
-    # Session 2: Today morning, 10:00 - 11:30 (Islamic General, audience GENERAL, published)
+    # Session 2: Today morning, past session (Islamic General, audience GENERAL, published)
     session_past_isl_gen = ClassSession.objects.create(
         batch=batch42,
         subject=sub_islamic_gen,
         teacher_user=teacher1_user,
         topic=topic_isl_gen,
         session_date=today_dhaka,
-        start_time=datetime.time(10, 0),
-        end_time=datetime.time(11, 30),
+        start_time=datetime.time(6, 0),
+        end_time=datetime.time(7, 30),
         audience=SessionAudience.GENERAL,
         status=SessionStatus.PUBLISHED,
         published_at=timezone.now(),
         created_by=admin_user,
     )
 
-    # Session 3: Today morning, 10:00 - 11:30 (Islamic Madrasa, audience MADRASA, published)
+    # Session 3: Today morning, parallel past session (Islamic Madrasa, audience MADRASA, published)
     session_past_isl_mad = ClassSession.objects.create(
         batch=batch42,
         subject=sub_islamic_mad,
         teacher_user=teacher2_user,
         topic=topic_isl_mad,
         session_date=today_dhaka,
-        start_time=datetime.time(10, 0),
-        end_time=datetime.time(11, 30),
+        start_time=datetime.time(6, 0),
+        end_time=datetime.time(7, 30),
         audience=SessionAudience.MADRASA,
         status=SessionStatus.PUBLISHED,
         published_at=timezone.now(),

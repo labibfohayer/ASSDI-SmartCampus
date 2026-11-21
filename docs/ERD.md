@@ -290,6 +290,15 @@ erDiagram
         varchar ip_address "nullable"
         timestamp created_at
     }
+
+    REPORT_LOGS {
+        bigint id PK
+        varchar report_type "daily_attendance|daily_learning_progress|weekly_progress|monthly_student_performance|batch_wise_performance|topic_wise_understanding|teacher_wise|student_help_requests|repeated_absences|coordinator_dashboard"
+        varchar export_format "json|pdf|xlsx"
+        jsonb filters_json
+        uuid generated_by_user_id FK "nullable"
+        timestamp generated_at
+    }
 ```
 
 ---
