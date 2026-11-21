@@ -24,6 +24,8 @@ export default function CoordinatorAtRiskPage() {
   const { user } = useAuth();
   const { t, d, isBangla } = useLanguage();
   const isObserver = user?.role === 'observer';
+  const safeFixed = (val: any, fallback = '0.0') =>
+    typeof val === 'number' && !isNaN(val) ? val.toFixed(1) : fallback;
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -208,11 +210,11 @@ export default function CoordinatorAtRiskPage() {
                       <td className="py-3 px-4">
                         {st.average_rating && st.average_rating <= 2.0 ? (
                           <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">
-                            ⭐ {d(st.average_rating.toFixed(1))} / ৫
+                            ⭐ {d(safeFixed(st.average_rating))} / ৫
                           </span>
                         ) : (
                           <span className="text-gray-600">
-                            {st.average_rating ? `⭐ ${d(st.average_rating.toFixed(1))}` : '-'}
+                            {st.average_rating ? `⭐ ${d(safeFixed(st.average_rating))}` : '-'}
                           </span>
                         )}
                       </td>

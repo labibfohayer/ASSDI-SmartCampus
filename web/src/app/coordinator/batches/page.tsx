@@ -19,6 +19,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function CoordinatorBatchesPage() {
   const { t, d, isBangla } = useLanguage();
+  const safeFixed = (val: any, fallback = '0.0') =>
+    typeof val === 'number' && !isNaN(val) ? val.toFixed(1) : fallback;
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -92,14 +94,14 @@ export default function CoordinatorBatchesPage() {
                   <div className="bg-emerald-50 p-3 rounded-xl">
                     <p className="text-emerald-700 font-medium">{isBangla ? 'উপস্থিতির হার' : 'Attendance'}</p>
                     <h4 className="text-base font-bold text-emerald-800 mt-0.5">
-                      {d(b.attendance_percentage.toFixed(1))}%
+                      {d(safeFixed(b.attendance_percentage))}%
                     </h4>
                   </div>
 
                   <div className="bg-amber-50 p-3 rounded-xl">
                     <p className="text-amber-700 font-medium">{isBangla ? 'লার্নিং প্রগ্রেস' : 'Learning'}</p>
                     <h4 className="text-base font-bold text-amber-800 mt-0.5">
-                      {d(b.learning_percentage.toFixed(1))}%
+                      {d(safeFixed(b.learning_percentage))}%
                     </h4>
                   </div>
 
@@ -107,7 +109,7 @@ export default function CoordinatorBatchesPage() {
                     <p className="text-purple-700 font-medium">{isBangla ? 'গড় রেটিং' : 'Rating'}</p>
                     <h4 className="text-base font-bold text-purple-800 mt-0.5 flex items-center gap-1">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500 inline" />
-                      <span>{d(b.average_rating ? b.average_rating.toFixed(1) : '0.0')}</span>
+                      <span>{d(safeFixed(b.average_rating))}</span>
                     </h4>
                   </div>
                 </div>
@@ -160,13 +162,13 @@ export default function CoordinatorBatchesPage() {
                     {d(tItem.sessions_taken)} {isBangla ? 'টি' : ''}
                   </td>
                   <td className="py-3 px-4 font-bold text-emerald-800">
-                    {d(tItem.attendance_percentage.toFixed(1))}%
+                    {d(safeFixed(tItem.attendance_percentage))}%
                   </td>
                   <td className="py-3 px-4 font-bold text-amber-700">
-                    {d(tItem.learning_percentage.toFixed(1))}%
+                    {d(safeFixed(tItem.learning_percentage))}%
                   </td>
                   <td className="py-3 px-4 text-gray-900 font-semibold">
-                    ⭐ {d(tItem.average_rating ? tItem.average_rating.toFixed(1) : '0.0')} / ৫
+                    ⭐ {d(safeFixed(tItem.average_rating))} / ৫
                   </td>
                 </tr>
               ))}

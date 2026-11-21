@@ -90,6 +90,9 @@ export default function CoordinatorDashboardPage() {
   const { t, d, isBangla } = useLanguage();
   const isObserver = user?.role === 'observer';
 
+  const safeFixed = (val: any, fallback = '0.0') =>
+    typeof val === 'number' && !isNaN(val) ? val.toFixed(1) : fallback;
+
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -278,7 +281,7 @@ export default function CoordinatorDashboardPage() {
           <div>
             <p className="text-xs text-gray-500 font-medium">{isBangla ? 'সামগ্রিক উপস্থিতি' : 'Overall Attendance'}</p>
             <h3 className="text-2xl font-bold text-blue-800 mt-0.5">
-              {d(data?.overall_attendance_percentage ? data.overall_attendance_percentage.toFixed(1) : '0.0')}%
+              {d(safeFixed(data?.overall_attendance_percentage))}%
             </h3>
           </div>
         </div>
@@ -291,9 +294,9 @@ export default function CoordinatorDashboardPage() {
           <div>
             <p className="text-xs text-gray-500 font-medium">{isBangla ? 'সার্বিক লার্নিং প্রগ্রেস' : 'Learning Progress'}</p>
             <h3 className="text-2xl font-bold text-amber-700 mt-0.5">
-              {d(data?.overall_learning_progress?.average_percentage ? data.overall_learning_progress.average_percentage.toFixed(1) : '0.0')}%
+              {d(safeFixed(data?.overall_learning_progress?.average_percentage))}%
               <span className="text-xs font-normal text-gray-400 ml-1">
-                ({d(data?.overall_learning_progress?.average_rating ? data.overall_learning_progress.average_rating.toFixed(1) : '0.0')} / ৫)
+                ({d(safeFixed(data?.overall_learning_progress?.average_rating))} / ৫)
               </span>
             </h3>
           </div>
@@ -430,13 +433,13 @@ export default function CoordinatorDashboardPage() {
                       <td className="py-3 px-4 font-bold text-gray-900">{b.batch_name}</td>
                       <td className="py-3 px-4 text-gray-600">{d(b.student_count)} জন</td>
                       <td className="py-3 px-4 font-bold text-emerald-800">
-                        {d(b.attendance_percentage.toFixed(1))}%
+                        {d(safeFixed(b.attendance_percentage))}%
                       </td>
                       <td className="py-3 px-4 font-bold text-amber-700">
-                        {d(b.learning_percentage.toFixed(1))}%
+                        {d(safeFixed(b.learning_percentage))}%
                       </td>
                       <td className="py-3 px-4 text-gray-800">
-                        ⭐ {d(b.average_rating ? b.average_rating.toFixed(1) : '0.0')}
+                        ⭐ {d(safeFixed(b.average_rating))}
                       </td>
                     </tr>
                   ))}
@@ -519,7 +522,7 @@ export default function CoordinatorDashboardPage() {
                         )}
                         {st.average_rating && st.average_rating <= 2.0 && (
                           <span className="text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded text-[10px]">
-                            ⭐ {d(st.average_rating.toFixed(1))}
+                            ⭐ {d(safeFixed(st.average_rating))}
                           </span>
                         )}
                       </div>
