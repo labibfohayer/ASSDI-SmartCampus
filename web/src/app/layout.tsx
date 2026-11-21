@@ -15,10 +15,6 @@ const hindSiliguri = Hind_Siliguri({
 export const metadata: Metadata = {
   title: 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট | ASSDI',
   description: 'শিক্ষার্থী লার্নিং প্রগ্রেস, ফিডব্যাক ও ম্যানেজমেন্ট সিস্টেম - স্মল বিজনেস ম্যানেজমেন্ট কোর্স (SBMC)',
-  icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
-  },
 };
 
 export default function RootLayout({
@@ -28,6 +24,52 @@ export default function RootLayout({
 }) {
   return (
     <html lang="bn" suppressHydrationWarning className={`${hindSiliguri.variable} h-full antialiased`}>
+      <head>
+        <link rel="icon" type="image/png" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        {/* Strip browser extension injected attributes to prevent React hydration errors */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const stripBadAttrs = function(node) {
+                    if (node && node.nodeType === 1) {
+                      ['bis_skin_checked', 'bis_register'].forEach(function(attr) {
+                        if (node.hasAttribute(attr)) node.removeAttribute(attr);
+                      });
+                      Array.from(node.attributes || []).forEach(function(a) {
+                        if (a && a.name && (a.name.startsWith('__processed_') || a.name.startsWith('bis_'))) {
+                          node.removeAttribute(a.name);
+                        }
+                      });
+                    }
+                  };
+                  const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(m) {
+                      if (m.type === 'attributes') stripBadAttrs(m.target);
+                      if (m.type === 'childList') {
+                        m.addedNodes.forEach(function(n) {
+                          stripBadAttrs(n);
+                          if (n.querySelectorAll) {
+                            n.querySelectorAll('*').forEach(stripBadAttrs);
+                          }
+                        });
+                      }
+                    });
+                  });
+                  observer.observe(document.documentElement, {
+                    attributes: true,
+                    childList: true,
+                    subtree: true,
+                    attributeFilter: ['bis_skin_checked', 'bis_register']
+                  });
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-[#F8FAF9] text-gray-900">
         <LanguageProvider>
           <AuthProvider>
