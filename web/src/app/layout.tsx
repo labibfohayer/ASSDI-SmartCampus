@@ -27,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="bn" className={`${hindSiliguri.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans bg-[#F8FAF9] text-gray-900">
+    <html lang="bn" suppressHydrationWarning className={`${hindSiliguri.variable} h-full antialiased`}>
+      <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-[#F8FAF9] text-gray-900">
         <LanguageProvider>
           <AuthProvider>
             {children}
