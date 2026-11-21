@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { clearAuthSession, getAccessToken, getRefreshToken, setAccessToken } from './auth';
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
 const api = axios.create({
   baseURL: API_BASE,
