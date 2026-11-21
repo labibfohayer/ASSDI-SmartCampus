@@ -27,10 +27,12 @@ import {
   ArrowLeft,
   Globe,
   Clock,
+  Megaphone,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
+import NotificationBell from '@/components/notifications/NotificationBell';
 
 export interface NavItem {
   href: string;
@@ -91,6 +93,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelEn: 'Class Sessions & Routine',
                 icon: Calendar,
               },
+              {
+                href: '/announcements',
+                labelBn: 'নোটিশ ও অ্যানাউন্সমেন্ট',
+                labelEn: 'Notice Board',
+                icon: Megaphone,
+              },
             ],
           },
           {
@@ -137,6 +145,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelBn: 'ঝুঁকিপূর্ণ শিক্ষার্থী ট্র্যাকিং',
                 labelEn: 'At-Risk Students',
                 icon: AlertTriangle,
+              },
+              {
+                href: '/announcements',
+                labelBn: 'নোটিশ ও অ্যানাউন্সমেন্ট',
+                labelEn: 'Notice Board',
+                icon: Megaphone,
               },
             ],
           },
@@ -190,6 +204,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelEn: 'Topic Understanding Analytics',
                 icon: BarChart3,
               },
+              {
+                href: '/announcements',
+                labelBn: 'নোটিশ বোর্ড',
+                labelEn: 'Notice Board',
+                icon: Megaphone,
+              },
             ],
           },
           {
@@ -235,6 +255,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelBn: 'শিক্ষকের সমাধান ও উত্তর',
                 labelEn: 'Teacher Help & Replies',
                 icon: HelpCircle,
+              },
+              {
+                href: '/announcements',
+                labelBn: 'প্রাতিষ্ঠানিক নোটিশ বোর্ড',
+                labelEn: 'Notice Board',
+                icon: Megaphone,
               },
             ],
           },
@@ -537,6 +563,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 })}
               </span>
             </div>
+
+            {/* Notification Bell */}
+            <NotificationBell />
 
             <div className="sm:hidden">
               <LanguageSwitcher />
