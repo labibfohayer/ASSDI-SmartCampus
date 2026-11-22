@@ -214,27 +214,32 @@ export default function ManualAttendancePage() {
   return (
     <div className="space-y-6">
       {/* Top Header & Session Selector */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-emerald-100 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <CheckSquare className="w-6 h-6 text-emerald-700" />
-            <span>{isBangla ? 'ম্যানুয়াল হাজিরা ও সংশোধন শীট' : 'Manual Attendance & Correction'}</span>
+      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
+            <CheckSquare className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>{isBangla ? 'হাজিরা কারেকশন উইন্ডো (৪৮ ঘণ্টা)' : '48h Correction Window'}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+            {isBangla ? 'ম্যানুয়াল হাজিরা ও সংশোধন শীট' : 'Manual Attendance & Correction'}
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
             {isBangla
               ? 'ক্লাস চলাকালীন কিউআর স্ক্যান না করা শিক্ষার্থীদের ম্যানুয়াল হাজিরা দিন অথবা ৪৮ ঘণ্টার মধ্যে সংশোধন করুন।'
               : 'Manually mark or correct attendance within the 48-hour post-session window.'}
           </p>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap relative z-10">
           <select
             value={selectedSessionId || ''}
             onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-            className="px-3.5 py-2.5 bg-gray-50 border border-emerald-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            className="px-3.5 py-2.5 bg-[#061C16] border border-emerald-900/80 rounded-xl text-xs font-semibold text-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
           >
             {sessions.map((s) => (
-              <option key={s.id} value={s.id}>
+              <option key={s.id} value={s.id} className="bg-slate-900 text-white">
                 {s.subject_name || `Session #${s.id}`} - {d(s.session_date)} ({d(s.start_time.slice(0, 5))})
               </option>
             ))}
@@ -243,53 +248,53 @@ export default function ManualAttendancePage() {
           <button
             onClick={handleFinalizeAttendance}
             disabled={finalizing || loading}
-            className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-3.5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
           >
             <Clock className="w-3.5 h-3.5" />
-            <span>{isBangla ? 'হাজিরা ফাইনাল করুন' : 'Finalize Roster'}</span>
+            <span>{isBangla ? 'হাজিরা ফাইনাল' : 'Finalize Roster'}</span>
           </button>
 
           <button
             onClick={handleSaveAttendance}
             disabled={saving || loading}
-            className="px-4 py-2.5 bg-[#1B4D3E] hover:bg-[#153E32] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] text-xs font-extrabold rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
           >
-            <Save className="w-3.5 h-3.5" />
+            <Save className="w-3.5 h-3.5 text-[#0B2A21]" />
             <span>{saving ? (isBangla ? 'সংরক্ষণ হচ্ছে...' : 'Saving...') : (isBangla ? 'সংরক্ষণ করুন' : 'Save Changes')}</span>
           </button>
         </div>
       </div>
 
-      {/* Attendance Stats Cards */}
+      {/* Attendance Bento Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="bg-white p-4 rounded-xl border border-gray-200 text-center">
-          <p className="text-[11px] text-gray-500 font-medium">{isBangla ? 'মোট শিক্ষার্থী' : 'Total Students'}</p>
-          <h3 className="text-xl font-bold text-gray-900 mt-0.5">{d(totalEnrolled)}</h3>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs text-center">
+          <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{isBangla ? 'মোট শিক্ষার্থী' : 'Enrolled'}</p>
+          <h3 className="text-xl font-extrabold text-slate-900 mt-1">{d(totalEnrolled)}</h3>
         </div>
 
-        <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200 text-center">
-          <p className="text-[11px] text-emerald-700 font-medium">{isBangla ? 'উপস্থিত' : 'Present'}</p>
-          <h3 className="text-xl font-bold text-emerald-800 mt-0.5">{d(presentCount)}</h3>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 border-t-2 border-t-emerald-600 shadow-xs text-center">
+          <p className="text-[11px] text-emerald-800 font-bold uppercase tracking-wider">{isBangla ? 'উপস্থিত' : 'Present'}</p>
+          <h3 className="text-xl font-extrabold text-emerald-700 mt-1">{d(presentCount)}</h3>
         </div>
 
-        <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 text-center">
-          <p className="text-[11px] text-amber-700 font-medium">{isBangla ? 'দেরিতে উপস্থিত' : 'Late'}</p>
-          <h3 className="text-xl font-bold text-amber-800 mt-0.5">{d(lateCount)}</h3>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 border-t-2 border-t-amber-500 shadow-xs text-center">
+          <p className="text-[11px] text-amber-800 font-bold uppercase tracking-wider">{isBangla ? 'দেরিতে উপস্থিত' : 'Late'}</p>
+          <h3 className="text-xl font-extrabold text-amber-600 mt-1">{d(lateCount)}</h3>
         </div>
 
-        <div className="bg-red-50 p-4 rounded-xl border border-red-200 text-center">
-          <p className="text-[11px] text-red-700 font-medium">{isBangla ? 'অনুপস্থিত' : 'Absent'}</p>
-          <h3 className="text-xl font-bold text-red-800 mt-0.5">{d(absentCount)}</h3>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 border-t-2 border-t-red-500 shadow-xs text-center">
+          <p className="text-[11px] text-red-800 font-bold uppercase tracking-wider">{isBangla ? 'অনুপস্থিত' : 'Absent'}</p>
+          <h3 className="text-xl font-extrabold text-red-600 mt-1">{d(absentCount)}</h3>
         </div>
 
-        <div className="bg-blue-50 p-4 rounded-xl border border-blue-200 text-center">
-          <p className="text-[11px] text-blue-700 font-medium">{isBangla ? 'ছুটি মঞ্জুর' : 'Approved Leave'}</p>
-          <h3 className="text-xl font-bold text-blue-800 mt-0.5">{d(leaveCount)}</h3>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 border-t-2 border-t-blue-500 shadow-xs text-center">
+          <p className="text-[11px] text-blue-800 font-bold uppercase tracking-wider">{isBangla ? 'ছুটি মঞ্জুর' : 'Leave'}</p>
+          <h3 className="text-xl font-extrabold text-blue-700 mt-1">{d(leaveCount)}</h3>
         </div>
 
-        <div className="bg-purple-50 p-4 rounded-xl border border-purple-200 text-center">
-          <p className="text-[11px] text-purple-700 font-medium">{isBangla ? 'উপস্থিতির হার' : 'Attendance %'}</p>
-          <h3 className="text-xl font-black text-purple-800 mt-0.5">{d(attendancePercentage)}%</h3>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 border-t-2 border-t-[#0B2A21] shadow-xs text-center">
+          <p className="text-[11px] text-[#0B2A21] font-bold uppercase tracking-wider">{isBangla ? 'উপস্থিতির হার' : 'Attendance'}</p>
+          <h3 className="text-xl font-extrabold text-[#0B2A21] mt-1">{d(attendancePercentage)}%</h3>
         </div>
       </div>
 

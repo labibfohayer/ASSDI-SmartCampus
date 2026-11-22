@@ -182,16 +182,21 @@ export default function AnnouncementsPage() {
     <DashboardShell role={(user?.role as any) || 'student'}>
       <div className="space-y-6">
         {/* Top Header Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-[#1B4D3E] flex items-center justify-center shrink-0">
+        <div className="bg-[#0B2A21] rounded-2xl border border-[#071F18] p-6 sm:p-7 shadow-md relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-white">
+          <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
+          <div className="flex items-center gap-3.5 relative z-10">
+            <div className="w-12 h-12 rounded-2xl bg-[#061C16] border border-emerald-900/80 text-[#C5A059] flex items-center justify-center shrink-0 shadow-inner">
               <Megaphone className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C5A059]/15 border border-[#C5A059]/35 text-[11px] font-semibold text-[#E5C378] mb-1">
+                <span>{isBangla ? 'অফিসিয়াল কমিউনিকেশন হাব' : 'Institutional Communications'}</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
                 {isBangla ? 'প্রাতিষ্ঠানিক নোটিশ বোর্ড' : 'Institutional Notice Board'}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+              <p className="text-xs sm:text-sm text-emerald-100/80 font-normal mt-0.5">
                 {isBangla
                   ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটের সকল আনুষ্ঠানিক ঘোষণা ও নোটিশ'
                   : 'Official notices and announcements of ASSDI'}
@@ -199,21 +204,21 @@ export default function AnnouncementsPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          <div className="flex items-center gap-2.5 self-start sm:self-auto relative z-10">
             <button
               onClick={fetchAnnouncements}
-              className="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
+              className="p-2.5 rounded-xl bg-[#061C16] border border-emerald-900/80 hover:bg-[#07241C] text-emerald-100 transition-colors cursor-pointer active:scale-95 shadow-xs"
               title={isBangla ? 'রিফ্রেশ' : 'Refresh'}
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#C5A059]' : ''}`} />
             </button>
 
             {canPublish && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#1B4D3E] hover:bg-[#153e32] text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] rounded-xl text-xs sm:text-sm font-extrabold shadow-md transition-colors cursor-pointer active:scale-95"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 text-[#0B2A21]" />
                 <span>{isBangla ? 'নতুন নোটিশ দিন' : 'Publish Notice'}</span>
               </button>
             )}
@@ -233,8 +238,8 @@ export default function AnnouncementsPage() {
               onClick={() => setFilterScope(tab.id)}
               className={`px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 filterScope === tab.id
-                  ? 'bg-[#1B4D3E] text-white shadow-2xs'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-[#0B2A21] text-white shadow-xs border border-[#071F18]'
+                  : 'bg-white border border-slate-200/90 text-slate-600 hover:bg-slate-50'
               }`}
             >
               {isBangla ? tab.labelBn : tab.labelEn}

@@ -351,7 +351,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAF9] flex flex-col md:flex-row text-slate-800 font-sans">
+    <div className="min-h-screen bg-[#F4F6F5] flex flex-col md:flex-row text-slate-800 font-sans">
       {/* Mobile Backdrop */}
       {mobileSidebarOpen && (
         <div
@@ -362,18 +362,18 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
       {/* LEFT SIDEBAR (সিরিয়াল বাই সিরিয়াল উল্লম্ব মেনুবার) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 lg:w-72 bg-white border-r border-slate-200/90 flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 lg:w-72 bg-[#0B2A21] border-r border-[#071F18] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
           mobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Top: Institute Brand & Identity */}
         <div>
-          <div className="p-5 border-b border-slate-100 flex items-start justify-between">
+          <div className="p-5 border-b border-emerald-950/80 flex items-start justify-between">
             <Link
               href={role === 'super_admin' ? '/admin' : role === 'teacher' ? '/teacher' : role === 'student' ? '/student' : '/coordinator'}
               className="flex items-center gap-3 group"
             >
-              <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200/80 p-1.5 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+              <div className="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-md border border-emerald-500/30 group-hover:scale-105 transition-transform">
                 <Image
                   src="/logo.png"
                   alt="ASSDI Logo"
@@ -383,15 +383,15 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 />
               </div>
               <div className="min-w-0">
-                <h1 className="font-extrabold text-slate-900 text-xs sm:text-sm tracking-tight leading-snug line-clamp-1">
+                <h1 className="font-extrabold text-white text-xs sm:text-sm tracking-tight leading-snug line-clamp-1">
                   {t('brand.name')}
                 </h1>
-                <p className="text-[11px] text-emerald-800 font-semibold line-clamp-1">
+                <p className="text-[11px] text-emerald-300/90 font-medium line-clamp-1">
                   {t('brand.course')}
                 </p>
                 <div className="mt-1">
                   <span
-                    className={`inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider ${roleBadge.color}`}
+                    className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-emerald-950 text-emerald-200 border border-emerald-700/60"
                   >
                     {roleBadge.label}
                   </span>
@@ -401,7 +401,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
             <button
               onClick={() => setMobileSidebarOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 md:hidden cursor-pointer"
+              className="p-1 rounded-lg text-emerald-400 hover:text-white md:hidden cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -412,7 +412,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             {navSections.map((sec, secIdx) => (
               <div key={secIdx} className="space-y-1">
                 {(sec.titleBn || sec.titleEn) && (
-                  <p className="px-3 text-[10px] font-extrabold uppercase text-slate-400 tracking-wider mb-2">
+                  <p className="px-3 text-[10px] font-bold uppercase text-emerald-400/70 tracking-widest mb-2">
                     {isBangla ? sec.titleBn : sec.titleEn}
                   </p>
                 )}
@@ -429,14 +429,14 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                           onClick={() => setMobileSidebarOpen(false)}
                           className={`flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                             active
-                              ? 'bg-[#1B4D3E] text-white shadow-xs font-bold'
-                              : 'text-slate-700 hover:text-[#1B4D3E] hover:bg-emerald-50/70'
+                              ? 'bg-[#164E3D] text-white shadow-sm ring-1 ring-emerald-400/40 font-bold'
+                              : 'text-emerald-100/75 hover:text-white hover:bg-white/10'
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <Icon
                               className={`w-4 h-4 shrink-0 ${
-                                active ? 'text-white' : 'text-slate-500 group-hover:text-[#1B4D3E]'
+                                active ? 'text-emerald-300' : 'text-emerald-400/80 group-hover:text-white'
                               }`}
                             />
                             <span className="truncate">
@@ -448,8 +448,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                             <span
                               className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                                 active
-                                  ? 'bg-emerald-800 text-white'
-                                  : 'bg-emerald-100 text-emerald-800'
+                                  ? 'bg-emerald-900 text-emerald-200 border border-emerald-600/50'
+                                  : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
                               }`}
                             >
                               {item.badge}
@@ -465,7 +465,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
             {/* If in Reports Hub, show quick back to user dashboard */}
             {role === 'reports' && (
-              <div className="pt-2 border-t border-slate-100">
+              <div className="pt-2 border-t border-emerald-950/80">
                 <Link
                   href={
                     user?.role === 'super_admin'
@@ -476,9 +476,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                       ? '/student'
                       : '/coordinator'
                   }
-                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-emerald-200 hover:bg-white/10 transition-colors"
                 >
-                  <ArrowLeft className="w-4 h-4 text-slate-500" />
+                  <ArrowLeft className="w-4 h-4 text-emerald-400" />
                   <span>{isBangla ? 'ড্যাশবোর্ডে ফিরে যান' : 'Back to Dashboard'}</span>
                 </Link>
               </div>
@@ -487,18 +487,18 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         </div>
 
         {/* Bottom: User Card, Language Toggle & Logout */}
-        <div className="p-3 border-t border-slate-100 bg-slate-50/70 space-y-2">
+        <div className="p-3 border-t border-[#071F18] bg-[#061C16] space-y-2">
           {/* User info snippet */}
-          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-[#0B2A21] border border-emerald-900/80 shadow-xs">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-emerald-100 text-[#1B4D3E] flex items-center justify-center text-xs font-bold shrink-0">
+              <div className="w-8 h-8 rounded-full bg-emerald-800 text-emerald-100 border border-emerald-600/40 flex items-center justify-center text-xs font-bold shrink-0">
                 {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
               </div>
               <div className="min-w-0 text-left">
-                <p className="font-bold text-xs text-slate-900 truncate">
+                <p className="font-bold text-xs text-white truncate">
                   {user?.full_name || 'Staff User'}
                 </p>
-                <p className="text-[10px] font-mono text-slate-500 truncate">
+                <p className="text-[10px] font-mono text-emerald-300/80 truncate">
                   {user?.login_id || 'user'}
                 </p>
               </div>
@@ -507,7 +507,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             <button
               onClick={handleLogout}
               title={isBangla ? 'লগআউট' : 'Logout'}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+              className="p-1.5 rounded-lg text-emerald-400/80 hover:text-rose-400 hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -515,8 +515,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
           {/* Language Switcher Bar */}
           <div className="flex items-center justify-between px-2 pt-1">
-            <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-[11px] font-semibold text-emerald-200/70 flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-emerald-400/70" />
               <span>{isBangla ? 'ভাষা / Language' : 'Language'}</span>
             </span>
             <LanguageSwitcher />

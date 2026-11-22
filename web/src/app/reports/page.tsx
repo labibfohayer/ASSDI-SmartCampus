@@ -349,16 +349,18 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-emerald-100 shadow-xs">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 mb-2">
-            <FileText className="w-3.5 h-3.5 text-emerald-700" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C5A059]/15 border border-[#C5A059]/35 text-xs font-semibold text-[#E5C378] mb-2.5">
+            <FileText className="w-3.5 h-3.5 text-[#C5A059]" />
             {isBangla ? 'অফিসিয়াল এসআরএস রিপোর্টিং সিস্টেম' : 'Official SRS Reporting Engine'}
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             {isBangla ? '৯টি এসআরএস রিপোর্টস হাব' : 'SRS Reports Hub'}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1.5 max-w-2xl">
             {isBangla
               ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটের প্রাতিষ্ঠানিক ৯টি এসআরএস রিপোর্ট প্রিভিউ ও এক ক্লিকে পিডিএফ / এক্সেল এক্সপোর্ট।'
               : 'Live on-screen previews and 1-click official PDF / Excel exports for all 9 SRS reports.'}
@@ -366,11 +368,11 @@ export default function ReportsPage() {
         </div>
 
         {/* 1-Click Export Buttons */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 relative z-10">
           <button
             onClick={() => handleDownload('pdf')}
             disabled={exportingFormat !== null || loading}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white text-xs font-semibold rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {exportingFormat === 'pdf' ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
@@ -383,12 +385,12 @@ export default function ReportsPage() {
           <button
             onClick={() => handleDownload('xlsx')}
             disabled={exportingFormat !== null || loading}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] text-xs font-extrabold rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {exportingFormat === 'xlsx' ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
+              <RefreshCw className="w-4 h-4 animate-spin text-[#0B2A21]" />
             ) : (
-              <FileSpreadsheet className="w-4 h-4" />
+              <FileSpreadsheet className="w-4 h-4 text-[#0B2A21]" />
             )}
             <span>{isBangla ? 'এক্সেল ডাউনলোড' : 'Export Excel'}</span>
           </button>
@@ -407,13 +409,13 @@ export default function ReportsPage() {
               onClick={() => setActiveReportKey(r.key)}
               className={`text-left p-4 rounded-2xl border transition-all flex items-start gap-3.5 cursor-pointer ${
                 isActive
-                  ? 'bg-emerald-800 text-white border-emerald-900 shadow-md ring-2 ring-emerald-600/30'
-                  : 'bg-white hover:bg-emerald-50/50 border-gray-100 hover:border-emerald-200 text-gray-800 shadow-xs'
+                  ? 'bg-[#0B2A21] text-white border-[#071F18] shadow-md ring-2 ring-[#C5A059]/50'
+                  : 'bg-white hover:bg-slate-50 border-slate-200/90 hover:border-[#0B2A21]/30 text-slate-800 shadow-xs'
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  isActive ? 'bg-emerald-700/80 text-white' : 'bg-emerald-50 text-emerald-800'
+                  isActive ? 'bg-[#164E3D] text-[#E5C378]' : 'bg-emerald-50 text-[#0B2A21] border border-emerald-100'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -423,26 +425,26 @@ export default function ReportsPage() {
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       isActive
-                        ? 'bg-emerald-700 text-emerald-100'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'bg-[#C5A059]/20 text-[#E5C378] border border-[#C5A059]/40'
+                        : 'bg-slate-100 text-slate-600 border border-slate-200/60'
                     }`}
                   >
                     {isBangla ? r.badgeBn : r.badgeEn}
                   </span>
                   {isActive && (
-                    <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-[#C5A059] animate-pulse" />
                   )}
                 </div>
                 <h3
-                  className={`text-xs font-bold truncate leading-snug ${
-                    isActive ? 'text-white' : 'text-gray-900'
+                  className={`text-xs font-extrabold truncate leading-snug ${
+                    isActive ? 'text-white' : 'text-slate-900'
                   }`}
                 >
                   {isBangla ? r.titleBn : r.titleEn}
                 </h3>
                 <p
                   className={`text-[11px] line-clamp-1 mt-0.5 ${
-                    isActive ? 'text-emerald-100' : 'text-gray-500'
+                    isActive ? 'text-emerald-100/80' : 'text-slate-500'
                   }`}
                 >
                   {isBangla ? r.descBn : r.descEn}
@@ -454,17 +456,17 @@ export default function ReportsPage() {
       </div>
 
       {/* Dynamic Filter Controls Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0B2A21] border border-emerald-100 flex items-center justify-center shrink-0">
               <ActiveIcon className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-gray-900">
+              <h2 className="text-sm font-extrabold text-slate-900">
                 {isBangla ? currentReport.titleBn : currentReport.titleEn}
               </h2>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-slate-500">
                 {isBangla ? currentReport.descBn : currentReport.descEn}
               </p>
             </div>
@@ -474,9 +476,9 @@ export default function ReportsPage() {
             <button
               onClick={loadReportData}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl shadow-xs transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer active:scale-95"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#C5A059]' : ''}`} />
               <span>{isBangla ? 'রিপোর্ট রিফ্রেশ' : 'Run Report'}</span>
             </button>
           </div>

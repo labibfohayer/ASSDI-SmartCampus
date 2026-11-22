@@ -251,39 +251,41 @@ export default function AdminSessionsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-emerald-100 shadow-xs">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 mb-2">
-            <Calendar className="w-3.5 h-3.5 text-emerald-700" />
-            {isBangla ? 'সেশন ও সময়সূচি নিয়ন্ত্রণ' : 'Session & Timetable Management'}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C5A059]/15 border border-[#C5A059]/35 text-xs font-semibold text-[#E5C378] mb-2.5">
+            <Calendar className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>{isBangla ? 'সেশন ও সময়সূচি নিয়ন্ত্রণ' : 'Session & Timetable Management'}</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             {isBangla ? 'ক্লাস সেশন ও রুটিন তালিকা' : 'Class Sessions & Timetable'}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
             {isBangla
               ? 'দৈনিক ও সাপ্তাহিক ক্লাস সূচি, ড্রাফট সেশন পাবলিশ এবং বাতিল কার্যক্রম পরিচালনা করুন।'
               : 'Manage daily/weekly schedules, publish draft sessions, or handle class cancellations.'}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 relative z-10">
           <button
             onClick={() => {
               setShowGenerateModal(true);
               setGenerateResult(null);
             }}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-xs transition-all active:scale-95"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] text-xs font-extrabold rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
           >
-            <Play className="w-4 h-4 fill-white" />
-            {isBangla ? 'শিডিউল থেকে সেশন তৈরি' : 'Auto-Generate Sessions'}
+            <Play className="w-4 h-4 fill-[#0B2A21] text-[#0B2A21]" />
+            <span>{isBangla ? 'শিডিউল থেকে সেশন তৈরি' : 'Auto-Generate Sessions'}</span>
           </button>
           <button
             onClick={fetchInitialData}
             title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
-            className="p-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+            className="p-2.5 rounded-xl bg-[#061C16] border border-emerald-900/80 text-emerald-100 hover:bg-[#07241C] transition-colors cursor-pointer active:scale-95 shadow-xs"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#C5A059]' : ''}`} />
           </button>
         </div>
       </div>

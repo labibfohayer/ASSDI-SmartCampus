@@ -126,49 +126,54 @@ export default function TeacherHelpRequestsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-emerald-100 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <HelpCircle className="w-6 h-6 text-amber-600" />
-            <span>{isBangla ? 'শিক্ষার্থী হেল্প রিকোয়েস্ট বোর্ড' : 'Student Help Requests Board'}</span>
+      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
+            <HelpCircle className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>{isBangla ? 'শিক্ষার্থী সাপোর্ট ডেস্ক' : 'Student Support Desk'}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+            {isBangla ? 'শিক্ষার্থী হেল্প রিকোয়েস্ট বোর্ড' : 'Student Help Requests Board'}
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
             {isBangla
               ? 'ক্লাস শেষে শিক্ষার্থীরা যেসব প্রশ্ন বা সমস্যার সমাধান চেয়ে অনুরোধ জানিয়েছে তা তদারকি করুন।'
               : 'Review and resolve questions/requests submitted by students during daily feedback.'}
           </p>
         </div>
 
-        {/* Tab Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl">
+        {/* Tab Filter Segmented Controls */}
+        <div className="flex items-center gap-1 bg-[#061C16] border border-emerald-900/80 p-1.5 rounded-xl relative z-10">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-              activeTab === 'all' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500 hover:text-gray-800'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              activeTab === 'all' ? 'bg-[#0B2A21] text-white border border-[#C5A059]/40 shadow-xs' : 'text-slate-400 hover:text-white'
             }`}
           >
             {isBangla ? 'সকল' : 'All'} ({d(requests.length)})
           </button>
           <button
             onClick={() => setActiveTab('pending')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-              activeTab === 'pending' ? 'bg-amber-500 text-white shadow-xs' : 'text-amber-700 hover:bg-amber-100/60'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              activeTab === 'pending' ? 'bg-amber-600 text-white shadow-xs' : 'text-amber-400/80 hover:text-amber-300'
             }`}
           >
             {isBangla ? 'অমীমাংসিত' : 'Pending'} ({d(pendingList.length)})
           </button>
           <button
             onClick={() => setActiveTab('in_progress')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-              activeTab === 'in_progress' ? 'bg-blue-600 text-white shadow-xs' : 'text-blue-700 hover:bg-blue-100/60'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              activeTab === 'in_progress' ? 'bg-blue-600 text-white shadow-xs' : 'text-blue-400/80 hover:text-blue-300'
             }`}
           >
             {isBangla ? 'চলমান' : 'In Progress'} ({d(inProgressList.length)})
           </button>
           <button
             onClick={() => setActiveTab('resolved')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-              activeTab === 'resolved' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-700 hover:bg-emerald-100/60'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              activeTab === 'resolved' ? 'bg-emerald-700 text-white shadow-xs' : 'text-emerald-400/80 hover:text-emerald-300'
             }`}
           >
             {isBangla ? 'সমাধানকৃত' : 'Resolved'} ({d(resolvedList.length)})

@@ -227,61 +227,72 @@ export default function StudentPortalPage() {
   return (
     <div className="space-y-6">
       {/* Student Profile Hero Card */}
-      <div className="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-xs border-t-4 border-t-[#1B4D3E]">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-emerald-50 border border-emerald-200 text-[#1B4D3E] flex items-center justify-center font-bold text-lg shrink-0">
-              <GraduationCap className="w-7 h-7 text-[#1B4D3E]" />
+      <div className="bg-[#0B2A21] rounded-2xl border border-emerald-900 shadow-md p-6 sm:p-7 text-white relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="w-16 h-16 rounded-2xl bg-[#164E3D] border-2 border-[#C5A059]/70 text-white flex items-center justify-center font-bold text-2xl shadow-inner shrink-0">
+              <GraduationCap className="w-8 h-8 text-emerald-200" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#164E3D] border border-emerald-600/50 text-emerald-200">
                   {profile?.current_batch_name || 'SBMC Batch 42'}
                 </span>
-                <span className="text-xs font-mono font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                <span className="text-xs font-mono font-bold bg-[#071F18] text-[#C5A059] px-2.5 py-0.5 rounded-md border border-[#C5A059]/40">
                   {profile?.student_id_number || 'STD-2026-042-001'}
                 </span>
+                <span className="text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/30 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  {isBangla ? 'নিয়মিত শিক্ষার্থী' : 'Active Student'}
+                </span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-2 tracking-tight">
                 {profile?.full_name || 'Abdullah Student'}
               </h1>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 mt-1 font-medium">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-emerald-200/90 mt-1.5 font-medium">
                 <span className="flex items-center gap-1.5">
-                  <Building className="w-3.5 h-3.5 text-slate-400" />
+                  <Building className="w-3.5 h-3.5 text-emerald-400" />
                   {profile?.campus_name || 'Kazi Bari Campus'}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
                   {isBangla ? 'ব্যাকগ্রাউন্ড:' : 'Background:'} {profile?.education_background || 'General'}
                 </span>
               </div>
             </div>
           </div>
 
-          <button
-            onClick={loadStudentData}
-            title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
-            className="self-start md:self-center px-3.5 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors flex items-center gap-2 text-xs font-semibold cursor-pointer shadow-2xs"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
-            <span>{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh'}</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={loadStudentData}
+              title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
+              className="px-4 py-2 rounded-xl bg-[#164E3D] hover:bg-[#1D634E] text-white border border-emerald-500/40 transition-colors flex items-center gap-2 text-xs font-bold cursor-pointer shadow-xs"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-200 ${loading ? 'animate-spin' : ''}`} />
+              <span>{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh Data'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Attendance & Learning Metric Cards */}
+      {/* Attendance & Learning Metric Cards (Bento Style) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Attendance Rate */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-2xs">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
-          </span>
-          <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-3xl font-extrabold text-[#1B4D3E]">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2 mt-3">
+            <span className="text-3xl font-black text-[#0B2A21]">
               {safeFixed(attSummary?.attendance_percentage)}%
             </span>
           </div>
-          <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3 overflow-hidden">
+          <div className="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 (attSummary?.attendance_percentage || 0) < 75
@@ -291,98 +302,118 @@ export default function StudentPortalPage() {
               style={{ width: `${Math.min(attSummary?.attendance_percentage || 0, 100)}%` }}
             />
           </div>
+          <p className="text-[11px] font-semibold text-emerald-700 mt-2 flex items-center gap-1">
+            {(attSummary?.attendance_percentage || 0) >= 80
+              ? isBangla ? 'সন্তোষজনক ও নিয়মিত উপস্থিতি' : 'Satisfactory attendance'
+              : isBangla ? 'উপস্থিতির হার বৃদ্ধি করা প্রয়োজন' : 'Needs improvement'}
+          </p>
         </div>
 
         {/* Present Days */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-2xs">
-          <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-            {isBangla ? 'উপস্থিত দিন' : 'Present Sessions'}
-          </span>
-          <p className="text-3xl font-extrabold text-emerald-800 mt-2">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              {isBangla ? 'উপস্থিত সেশন' : 'Present Sessions'}
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-100">
+              <UserCheck className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-3xl font-black text-slate-900 mt-3">
             {attSummary?.present || 0}{' '}
-            <span className="text-sm font-normal text-slate-500">
+            <span className="text-sm font-semibold text-slate-400">
               / {attSummary?.total_sessions || 0}
             </span>
           </p>
-          <p className="text-xs text-slate-600 mt-2 flex items-center gap-1">
+          <p className="text-[11px] text-slate-500 mt-3 flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            {isBangla ? 'ক্লাসে উপস্থিত ছিলেন' : 'Attended successfully'}
+            {isBangla ? 'সফলভাবে ক্লাসে সম্পন্ন' : 'Attended successfully'}
           </p>
         </div>
 
         {/* Absent Days */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-2xs">
-          <span className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
-            {isBangla ? 'অনুপস্থিতি' : 'Absences'}
-          </span>
-          <p className="text-3xl font-extrabold text-rose-700 mt-2">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              {isBangla ? 'অনুপস্থিতি' : 'Absences'}
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100">
+              <AlertCircle className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-3xl font-black text-rose-700 mt-3">
             {attSummary?.absent || 0}{' '}
-            <span className="text-sm font-normal text-slate-500">
-              {isBangla ? 'দিন' : 'days'}
+            <span className="text-sm font-semibold text-slate-400">
+              {isBangla ? 'সেশন' : 'sessions'}
             </span>
           </p>
-          <p className="text-xs text-rose-600 mt-2 flex items-center gap-1">
+          <p className="text-[11px] text-rose-600 mt-3 flex items-center gap-1 font-medium">
             <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
             {(attSummary?.absent || 0) >= 3
               ? isBangla ? 'সতর্কবার্তা: অনুপস্থিতি বেশি' : 'Warning: High absences'
-              : isBangla ? 'স্বাভাবিক উপস্থিতি' : 'Normal range'}
+              : isBangla ? 'স্বাভাবিক সীমার মধ্যে' : 'Normal range'}
           </p>
         </div>
 
         {/* Help Requests */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-2xs">
-          <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
-            {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
-          </span>
-          <p className="text-3xl font-extrabold text-blue-800 mt-2">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+              <HelpCircle className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-3xl font-black text-blue-800 mt-3">
             {helpRequests.length}
           </p>
-          <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
-            <HelpCircle className="w-3.5 h-3.5 text-blue-500" />
+          <p className="text-[11px] text-blue-600 mt-3 flex items-center gap-1 font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
             {helpRequests.filter((h) => h.status === 'resolved').length}{' '}
             {isBangla ? 'টি সমাধান হয়েছে' : 'resolved'}
           </p>
         </div>
       </div>
 
-      {/* Tabs Switcher */}
-      <div className="flex items-center gap-2 border-b border-slate-200">
+      {/* Modern Segmented Tabs Bar */}
+      <div className="bg-slate-200/70 p-1.5 rounded-xl inline-flex gap-1.5 border border-slate-200 max-w-full overflow-x-auto">
         <button
           onClick={() => setActiveTab('today')}
-          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'today'
-              ? 'border-[#1B4D3E] text-[#1B4D3E]'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'bg-white text-[#0B2A21] shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
           }`}
         >
-          <Calendar className="w-4 h-4" />
-          {isBangla ? 'আজকের ক্লাস ও পাঠ মূল্যায়ন' : "Today's Classes & Feedback"}
+          <Calendar className="w-4 h-4 text-[#0B2A21]" />
+          <span>{isBangla ? 'আজকের ক্লাস ও মূল্যায়ন' : "Today's Classes & Feedback"}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'attendance'
-              ? 'border-[#1B4D3E] text-[#1B4D3E]'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'bg-white text-[#0B2A21] shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
           }`}
         >
-          <CheckCircle2 className="w-4 h-4" />
-          {isBangla ? 'উপস্থিতির হিস্ট্রি' : 'Attendance Log'}
+          <CheckCircle2 className="w-4 h-4 text-[#0B2A21]" />
+          <span>{isBangla ? 'উপস্থিতির হিস্ট্রি লগ' : 'Attendance Log'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('help')}
-          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'help'
-              ? 'border-[#1B4D3E] text-[#1B4D3E]'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'bg-white text-[#0B2A21] shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
           }`}
         >
-          <HelpCircle className="w-4 h-4" />
-          {isBangla ? 'শিক্ষকের সহায়তা ও উত্তর' : 'Teacher Help Requests'}
+          <HelpCircle className="w-4 h-4 text-[#0B2A21]" />
+          <span>{isBangla ? 'শিক্ষকের সহায়তা ও উত্তর' : 'Teacher Help Requests'}</span>
           {helpRequests.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 text-blue-800 font-bold">
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-800 font-bold">
               {helpRequests.length}
             </span>
           )}
@@ -409,34 +440,36 @@ export default function StudentPortalPage() {
               return (
                 <div
                   key={s.id}
-                  className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs hover:border-emerald-200 transition-all flex flex-col justify-between gap-4"
+                  className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between gap-4 relative overflow-hidden pl-6"
                 >
+                  <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#0B2A21]" />
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-100">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-[#0B2A21] border border-emerald-200">
                         {s.subject_name}
                       </span>
-                      <span className="text-xs text-gray-500 flex items-center gap-1 font-mono">
-                        <Clock className="w-3 h-3 text-emerald-600" />
+                      <span className="text-xs text-slate-500 flex items-center gap-1 font-mono font-medium">
+                        <Clock className="w-3.5 h-3.5 text-emerald-600" />
                         {s.start_time?.slice(0, 5)} - {s.end_time?.slice(0, 5)}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-gray-900 text-sm">
+                    <h3 className="font-bold text-slate-900 text-sm">
                       {s.topic_title || (isBangla ? 'সাধারণ ক্লাস সেশন' : 'General Session')}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       {isBangla ? 'তারিখ:' : 'Date:'} {s.session_date} • {isBangla ? 'শিক্ষক:' : 'Faculty:'}{' '}
-                      <strong>{s.teacher_name}</strong>
+                      <strong className="text-slate-700">{s.teacher_name}</strong>
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                     {given ? (
-                      <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         <span>
-                          {isBangla ? 'ফিডব্যাক জমা হয়েছে' : 'Feedback Given'} (⭐{' '}
+                          {isBangla ? 'ফিডব্যাক সম্পন্ন' : 'Feedback Given'} (
+                          <Star className="w-3 h-3 fill-amber-400 text-amber-500 inline mx-0.5" />
                           {pastFeedback?.understanding_rating}/5)
                         </span>
                       </div>
@@ -448,14 +481,14 @@ export default function StudentPortalPage() {
                           setFeedbackNeedsHelp(false);
                           setFeedbackComment('');
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl shadow-xs transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-[#0B2A21] hover:bg-[#134E3E] text-white rounded-lg shadow-xs transition-colors cursor-pointer"
                       >
                         <Star className="w-3.5 h-3.5 fill-white" />
                         {isBangla ? 'ফিডব্যাক দিন' : 'Rate Class'}
                       </button>
                     )}
 
-                    <span className="text-[11px] text-gray-400 capitalize">
+                    <span className="text-[11px] text-slate-400 font-medium capitalize">
                       {s.audience === 'all'
                         ? isBangla ? 'সকলের জন্য' : 'All Students'
                         : `${s.audience} module`}

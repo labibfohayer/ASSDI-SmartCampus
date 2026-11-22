@@ -118,19 +118,22 @@ export default function TeacherOverviewPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner / Welcome Bar */}
-      <div className="bg-[#1B4D3E] border border-emerald-900 rounded-2xl p-6 sm:p-7 text-white shadow-xs relative overflow-hidden">
+      <div className="bg-[#0B2A21] border border-[#071F18] rounded-2xl p-6 sm:p-7 text-white shadow-md relative overflow-hidden">
+        {/* Subtle decorative architectural grid lines */}
+        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-xs font-semibold text-emerald-100 mb-2">
-              <BookOpen className="w-3.5 h-3.5 text-emerald-300" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
+              <BookOpen className="w-3.5 h-3.5 text-[#C5A059]" />
               <span>{t('brand.course')}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               {isBangla ? 'আস-সালামু আলাইকুম,' : 'Welcome,'}{' '}
               {user?.full_name || user?.login_id}
             </h1>
-            <p className="text-emerald-100/90 text-sm mt-1 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-emerald-300" />
+            <p className="text-emerald-100/80 text-sm mt-1.5 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#C5A059]" />
               <span>{todayFormatted} (ঢাকা সময়)</span>
             </p>
           </div>
@@ -139,86 +142,98 @@ export default function TeacherOverviewPage() {
             <button
               onClick={handleManualRefresh}
               disabled={refreshing}
-              className="px-3.5 py-2 bg-emerald-800/80 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold border border-emerald-700/80 flex items-center gap-2 transition cursor-pointer"
+              className="px-3.5 py-2.5 bg-[#061C16] hover:bg-[#07241C] text-emerald-100 rounded-xl text-xs font-semibold border border-emerald-900/80 flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#C5A059]' : ''}`} />
               <span>{isBangla ? 'রিফ্রেশ' : 'Refresh'}</span>
             </button>
             <Link
               href="/teacher/qr"
-              className="px-4 py-2 bg-white hover:bg-slate-100 text-[#1B4D3E] font-bold rounded-lg text-xs shadow-xs flex items-center gap-2 transition cursor-pointer"
+              className="px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] font-bold rounded-xl text-xs shadow-md flex items-center gap-2 transition cursor-pointer active:scale-95"
             >
-              <QrCode className="w-4 h-4 text-[#1B4D3E]" />
+              <QrCode className="w-4 h-4 text-[#0B2A21]" />
               <span>{isBangla ? 'লাইভ কিউআর খুলুন' : 'Open Live QR'}</span>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* KPI Stats Cards */}
+      {/* KPI Stats Bento Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Today's Classes */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-            <Calendar className="w-6 h-6" />
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-[#0B2A21]/30 transition-all duration-200 shadow-xs group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {isBangla ? 'আজকের ক্লাস' : "Today's Schedule"}
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Calendar className="w-4 h-4" />
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">
-              {isBangla ? 'আজকের নির্ধারিত ক্লাস' : "Today's Sessions"}
-            </p>
-            <h3 className="text-2xl font-bold text-gray-900 mt-0.5">
-              {d(todaySessions.length)} {isBangla ? 'টি' : ''}
-            </h3>
-          </div>
+          <h3 className="text-2xl font-extrabold text-slate-900">
+            {d(todaySessions.length)} <span className="text-sm font-semibold text-slate-500">{isBangla ? 'টি সেশন' : 'Sessions'}</span>
+          </h3>
+          <p className="text-[11px] text-emerald-700 font-semibold mt-1 flex items-center gap-1">
+            <span>●</span> {isBangla ? 'রুটিন অনুযায়ী নির্ধারিত' : 'As per timetable'}
+          </p>
         </div>
 
         {/* Pending Help Requests */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-            pendingRequests.length > 0 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-700'
-          }`}>
-            <HelpCircle className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">
-              {isBangla ? 'অমীমাংসিত হেল্প রিকোয়েস্ট' : 'Pending Help Requests'}
-            </p>
-            <h3 className={`text-2xl font-bold mt-0.5 ${
-              pendingRequests.length > 0 ? 'text-amber-600' : 'text-gray-900'
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-amber-300/60 transition-all duration-200 shadow-xs group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Pending Help'}
+            </span>
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border group-hover:scale-105 transition-transform ${
+              pendingRequests.length > 0
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : 'bg-emerald-50 text-emerald-700 border-emerald-100'
             }`}>
-              {d(pendingRequests.length)} {isBangla ? 'টি' : ''}
-            </h3>
+              <HelpCircle className="w-4 h-4" />
+            </div>
           </div>
+          <h3 className={`text-2xl font-extrabold ${pendingRequests.length > 0 ? 'text-amber-700' : 'text-slate-900'}`}>
+            {d(pendingRequests.length)} <span className="text-sm font-semibold text-slate-500">{isBangla ? 'টি অমীমাংসিত' : 'Pending'}</span>
+          </h3>
+          <p className="text-[11px] text-slate-500 font-medium mt-1">
+            {pendingRequests.length > 0 ? (isBangla ? 'দ্রুত সমাধান প্রয়োজন' : 'Action needed') : (isBangla ? 'সবকিছু আপ-টু-ডেট' : 'All resolved')}
+          </p>
         </div>
 
         {/* Live QR Status */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
-            <QrCode className="w-6 h-6" />
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-blue-300/60 transition-all duration-200 shadow-xs group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {isBangla ? 'কিউআর রোটেশন' : 'QR Token Engine'}
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <QrCode className="w-4 h-4" />
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">
-              {isBangla ? 'কিউআর রোটেশন উইন্ডো' : 'QR Token Rotation'}
-            </p>
-            <h3 className="text-sm font-bold text-gray-800 mt-1">
-              {isBangla ? 'প্রতি ৪৫ সেকেন্ডে রোটেট' : 'Every 45s Rotation'}
-            </h3>
-          </div>
+          <h3 className="text-base font-extrabold text-slate-900">
+            {isBangla ? '৪৫ সেকেন্ডে অটো-রিফ্রেশ' : '45s Auto-Rotation'}
+          </h3>
+          <p className="text-[11px] text-blue-700 font-semibold mt-1">
+            {isBangla ? 'জাল হাজিরা প্রতিরোধী টোকেন' : 'Anti-Proxy Protected'}
+          </p>
         </div>
 
         {/* 48h Correction Window */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center shrink-0">
-            <CheckSquare className="w-6 h-6" />
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-purple-300/60 transition-all duration-200 shadow-xs group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {isBangla ? 'কারেকশন উইন্ডো' : 'Correction Rule'}
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <CheckSquare className="w-4 h-4" />
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">
-              {isBangla ? 'হাজিরা কারেকশন সীমা' : 'Correction Window'}
-            </p>
-            <h3 className="text-sm font-bold text-purple-800 mt-1">
-              {isBangla ? 'ক্লাস শেষের ৪৮ ঘণ্টা' : '48 Hours Post-Class'}
-            </h3>
-          </div>
+          <h3 className="text-base font-extrabold text-slate-900">
+            {isBangla ? '৪৮ ঘণ্টা নির্ধারিত সীমা' : '48 Hours Limit'}
+          </h3>
+          <p className="text-[11px] text-purple-700 font-semibold mt-1">
+            {isBangla ? 'ক্লাস শেষ হওয়ার পর থেকে' : 'Post-session deadline'}
+          </p>
         </div>
       </div>
 
@@ -271,12 +286,12 @@ export default function TeacherOverviewPage() {
               {todaySessions.map((session) => (
                 <div
                   key={session.id}
-                  className="bg-white p-5 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition shadow-xs space-y-4"
+                  className="bg-white p-5 rounded-2xl border border-slate-200/80 border-l-4 border-l-[#0B2A21] hover:shadow-md transition-all duration-200 space-y-4"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-100 pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-base text-gray-900">
+                        <span className="font-extrabold text-base text-slate-900">
                           {session.subject_name || `Subject #${session.subject}`}
                         </span>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
@@ -284,25 +299,25 @@ export default function TeacherOverviewPage() {
                             ? 'bg-blue-50 text-blue-700 border border-blue-200'
                             : session.audience === 'madrasa'
                             ? 'bg-purple-50 text-purple-700 border border-purple-200'
-                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-emerald-50 text-[#0B2A21] border border-emerald-200'
                         }`}>
                           {session.audience === 'general' ? 'General' : session.audience === 'madrasa' ? 'Madrasa' : 'Combined (All)'}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600 mt-0.5 font-medium">
-                        {session.topic_title || isBangla ? 'টপিক নির্ধারিত হয়নি' : 'No Topic Assigned'}
+                      <p className="text-xs text-slate-600 mt-1 font-medium">
+                        {session.topic_title || (isBangla ? 'টপিক নির্ধারিত হয়নি' : 'No Topic Assigned')}
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-lg">
-                        <Clock className="w-3.5 h-3.5" />
+                      <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B2A21] bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-lg">
+                        <Clock className="w-3.5 h-3.5 text-[#C5A059]" />
                         <span>
                           {d(session.start_time.slice(0, 5))} - {d(session.end_time.slice(0, 5))}
                         </span>
                       </div>
                       {session.room && (
-                        <p className="text-[11px] text-gray-400 mt-0.5">
+                        <p className="text-[11px] text-slate-400 mt-0.5">
                           {session.room}
                         </p>
                       )}
@@ -313,15 +328,15 @@ export default function TeacherOverviewPage() {
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     <Link
                       href={`/teacher/qr?sessionId=${session.id}`}
-                      className="px-3.5 py-2 bg-[#1B4D3E] hover:bg-[#153E32] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition shadow-xs"
+                      className="px-3.5 py-2 bg-[#0B2A21] hover:bg-[#164E3D] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
                     >
-                      <QrCode className="w-3.5 h-3.5" />
+                      <QrCode className="w-3.5 h-3.5 text-[#C5A059]" />
                       <span>{isBangla ? 'লাইভ কিউআর প্রজেক্টর' : 'Live QR Projector'}</span>
                     </Link>
 
                     <Link
                       href={`/teacher/attendance?sessionId=${session.id}`}
-                      className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition"
+                      className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
                     >
                       <CheckSquare className="w-3.5 h-3.5 text-emerald-700" />
                       <span>{isBangla ? 'ম্যানুয়াল হাজিরা ও কারেকশন' : 'Manual Attendance'}</span>
@@ -329,7 +344,7 @@ export default function TeacherOverviewPage() {
 
                     <Link
                       href={`/teacher/understanding?sessionId=${session.id}${session.topic ? `&topicId=${session.topic}` : ''}`}
-                      className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition ml-auto"
+                      className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition ml-auto cursor-pointer active:scale-95"
                     >
                       <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
                       <span>{isBangla ? 'ফিডব্যাক ও বোঝাপড়া' : 'Feedback & Understanding'}</span>
@@ -359,16 +374,16 @@ export default function TeacherOverviewPage() {
             </Link>
           </div>
 
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3 shadow-xs">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 space-y-3 shadow-xs">
             {pendingRequests.length === 0 ? (
               <div className="text-center py-8 space-y-2">
-                <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                <div className="w-10 h-10 bg-emerald-50 text-emerald-800 rounded-full flex items-center justify-center mx-auto border border-emerald-100">
                   <CheckSquare className="w-5 h-5" />
                 </div>
-                <p className="text-xs font-bold text-gray-700">
+                <p className="text-xs font-bold text-slate-800">
                   {isBangla ? 'কোনো অমীমাংসিত হেল্প রিকোয়েস্ট নেই' : 'No Pending Help Requests'}
                 </p>
-                <p className="text-[11px] text-gray-400">
+                <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
                   {isBangla
                     ? 'শিক্ষার্থীদের কোনো সমস্যা বা প্রশ্ন জমা হলে এখানে দেখা যাবে।'
                     : 'New questions or requests from students will appear here.'}
@@ -379,24 +394,24 @@ export default function TeacherOverviewPage() {
                 {pendingRequests.slice(0, 5).map((req) => (
                   <div
                     key={req.id}
-                    className="p-3 bg-amber-50/60 border border-amber-200/80 rounded-xl space-y-1.5 hover:bg-amber-50 transition"
+                    className="p-3 bg-amber-50/50 border border-amber-200/70 rounded-xl space-y-1.5 hover:bg-amber-50 transition"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-gray-900">
+                      <span className="text-xs font-bold text-slate-900">
                         {req.student_name || req.student_id_number || `Student #${req.student}`}
                       </span>
-                      <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded">
+                      <span className="px-2 py-0.5 bg-amber-100 text-amber-900 text-[10px] font-bold rounded-full">
                         {isBangla ? 'অমীমাংসিত' : 'Pending'}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-700 line-clamp-2 italic">
+                    <p className="text-xs text-slate-700 line-clamp-2 italic">
                       "{req.student_comment}"
                     </p>
-                    <div className="flex items-center justify-between text-[11px] text-gray-400 pt-1">
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
                       <span>{req.topic_title || req.subject_name || 'SBMC'}</span>
                       <Link
                         href={`/teacher/help-requests?highlight=${req.id}`}
-                        className="text-emerald-800 font-semibold hover:underline"
+                        className="text-[#0B2A21] font-bold hover:underline"
                       >
                         {isBangla ? 'সমাধান দিন' : 'Resolve'}
                       </Link>

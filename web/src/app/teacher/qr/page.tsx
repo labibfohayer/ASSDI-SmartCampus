@@ -201,11 +201,11 @@ export default function LiveQrProjectorPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-              <QrCode className="w-6 h-6 text-[#1B4D3E] dark:text-emerald-300" />
+            <h1 className="text-xl sm:text-2xl font-extrabold flex items-center gap-2">
+              <QrCode className="w-6 h-6 text-[#0B2A21] dark:text-[#C5A059]" />
               <span>{isBangla ? 'ক্লাসরুম লাইভ কিউআর প্রজেক্টর' : 'Live Classroom QR Projector'}</span>
             </h1>
-            <p className="text-xs opacity-80">
+            <p className="text-xs opacity-80 mt-0.5">
               {isBangla
                 ? 'বড় স্ক্রিন বা প্রজেক্টরে প্রদর্শন করুন; প্রতি ৪৫ সেকেন্ডে টোকেন স্বয়ংক্রিয়ভাবে পরিবর্তিত হয়।'
                 : 'Project onto classroom screen. Token rotates securely every 45 seconds.'}
@@ -218,7 +218,7 @@ export default function LiveQrProjectorPage() {
           <select
             value={selectedSessionId || ''}
             onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-            className="px-3.5 py-2 bg-white dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-700 rounded-xl text-xs font-semibold text-gray-900 dark:text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="px-3.5 py-2.5 bg-slate-50 dark:bg-emerald-950/80 border border-slate-200 dark:border-emerald-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
           >
             {sessions.map((s) => (
               <option key={s.id} value={s.id}>
@@ -230,16 +230,16 @@ export default function LiveQrProjectorPage() {
           {/* Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
-            className="px-4 py-2 bg-[#1B4D3E] hover:bg-[#153E32] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+            className="px-4 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition shadow-sm cursor-pointer active:scale-95"
           >
             {isFullscreen ? (
               <>
-                <Minimize2 className="w-4 h-4" />
+                <Minimize2 className="w-4 h-4 text-[#C5A059]" />
                 <span>{isBangla ? 'ফুলস্ক্রিন বন্ধ' : 'Exit Fullscreen'}</span>
               </>
             ) : (
               <>
-                <Maximize2 className="w-4 h-4" />
+                <Maximize2 className="w-4 h-4 text-[#C5A059]" />
                 <span>{isBangla ? 'ফুলস্ক্রিন প্রজেক্টর' : 'Projector Mode'}</span>
               </>
             )}

@@ -41,16 +41,23 @@ export default function CoordinatorBatchesPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-emerald-100 shadow-xs">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Layers className="w-6 h-6 text-emerald-700" />
-          <span>{isBangla ? 'ব্যাচ ও শিক্ষক বিশ্লেষণ' : 'Batches & Faculty Performance'}</span>
-        </h1>
-        <p className="text-xs text-gray-500 mt-1">
-          {isBangla
-            ? 'সক্রিয় ব্যাচসমূহের উপস্থিতি, লার্নিং আউটকাম এবং শিক্ষকদের পারফরম্যান্স রেটিং পর্যালোচনা করুন।'
-            : 'Review batch progress metrics and faculty effectiveness ratings.'}
-        </p>
+      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
+            <Layers className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>{isBangla ? 'ব্যাচ ও শিক্ষক বিশ্লেষণ' : 'Batch & Faculty Analytics'}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+            {isBangla ? 'সক্রিয় ব্যাচ ও শিক্ষক পারফরম্যান্স ড্যাশবোর্ড' : 'Batches & Faculty Performance'}
+          </h1>
+          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
+            {isBangla
+              ? 'সক্রিয় ব্যাচসমূহের উপস্থিতি, লার্নিং আউটকাম এবং শিক্ষকদের পারফরম্যান্স রেটিং পর্যালোচনা করুন।'
+              : 'Review batch progress metrics and faculty effectiveness ratings.'}
+          </p>
+        </div>
       </div>
 
       {/* Batches Cards Grid */}

@@ -171,27 +171,32 @@ export default function TopicUnderstandingPage() {
   return (
     <div className="space-y-6">
       {/* Top Header & Session Selector */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-emerald-100 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-emerald-700" />
-            <span>{isBangla ? 'টপিক বোঝাপড়া ও ফিডব্যাক অ্যানালিটিক্স' : 'Topic Understanding & Feedback'}</span>
+      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
+            <BarChart3 className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>{isBangla ? 'লার্নিং আউটকাম অ্যানালিটিক্স' : 'Learning Outcomes'}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+            {isBangla ? 'টপিক বোঝাপড়া ও ফিডব্যাক অ্যানালিটিক্স' : 'Topic Understanding & Feedback'}
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
             {isBangla
               ? 'শিক্ষার্থীদের জমা দেওয়া ১০-১৫ সেকেন্ডের রেটিং ও লার্নিং ব্যান্ডের গ্রাফিকাল বিশ্লেষণ।'
               : 'Analyze understanding band distributions and student feedback for this session.'}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative z-10">
           <select
             value={selectedSessionId || ''}
             onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-            className="px-3.5 py-2.5 bg-gray-50 border border-emerald-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            className="px-3.5 py-2.5 bg-[#061C16] border border-emerald-900/80 rounded-xl text-xs font-semibold text-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
           >
             {sessions.map((s) => (
-              <option key={s.id} value={s.id}>
+              <option key={s.id} value={s.id} className="bg-slate-900 text-white">
                 {s.subject_name || `Session #${s.id}`} - {s.topic_title || d(s.session_date)}
               </option>
             ))}
@@ -199,58 +204,70 @@ export default function TopicUnderstandingPage() {
         </div>
       </div>
 
-      {/* Summary KPI Cards */}
+      {/* Summary Bento KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Average Rating */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
-            <Star className="w-6 h-6 fill-amber-400 text-amber-500" />
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-amber-300/60 transition-all duration-200 shadow-xs group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {isBangla ? 'গড় রেটিং' : 'Average Rating'}
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-500 border border-amber-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Star className="w-4 h-4 fill-[#C5A059] text-[#C5A059]" />
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">{isBangla ? 'গড় রেটিং' : 'Average Rating'}</p>
-            <h3 className="text-2xl font-black text-gray-900 mt-0.5">
-              {d(summary?.average_rating ? summary.average_rating.toFixed(1) : '0.0')} / {d(5)}
-            </h3>
-          </div>
+          <h3 className="text-2xl font-extrabold text-slate-900">
+            {d(summary?.average_rating ? summary.average_rating.toFixed(1) : '0.0')} <span className="text-sm font-semibold text-slate-400">/ {d(5)}</span>
+          </h3>
+          <p className="text-[11px] text-amber-700 font-semibold mt-1">● {isBangla ? '৫-তারকা স্কেলে রেটিং' : '5-star evaluation'}</p>
         </div>
 
         {/* Average Percentage */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-            <BookOpen className="w-6 h-6" />
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-[#0B2A21]/30 transition-all duration-200 shadow-xs group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {isBangla ? 'অনুধাবন শতাংশ' : 'Comprehension'}
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0B2A21] border border-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-4 h-4 text-[#0B2A21]" />
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">{isBangla ? 'বোঝাপড়ার হার' : 'Understanding %'}</p>
-            <h3 className="text-2xl font-black text-emerald-800 mt-0.5">
-              {d(summary?.average_percentage ? summary.average_percentage.toFixed(1) : '0.0')}%
-            </h3>
-          </div>
+          <h3 className="text-2xl font-extrabold text-slate-900">
+            {d(summary?.average_percentage ? summary.average_percentage.toFixed(1) : '0.0')}%
+          </h3>
+          <p className="text-[11px] text-emerald-700 font-semibold mt-1">● {isBangla ? 'ব্যান্ড অনুযায়ী অনুধাবন' : 'Overall comprehension'}</p>
         </div>
 
         {/* Total Submitted */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
-            <Users className="w-6 h-6" />
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-blue-300/60 transition-all duration-200 shadow-xs group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {isBangla ? 'প্রাপ্ত ফিডব্যাক' : 'Submitted Feedbacks'}
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Users className="w-4 h-4" />
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">{isBangla ? 'প্রাপ্ত ফিডব্যাক' : 'Submitted Feedbacks'}</p>
-            <h3 className="text-2xl font-bold text-gray-900 mt-0.5">
-              {d(summary?.total_submitted || 0)} {isBangla ? 'জন' : ''}
-            </h3>
-          </div>
+          <h3 className="text-2xl font-extrabold text-slate-900">
+            {d(summary?.total_submitted || 0)} <span className="text-sm font-semibold text-slate-500">{isBangla ? 'জন' : ''}</span>
+          </h3>
+          <p className="text-[11px] text-blue-700 font-semibold mt-1">● {isBangla ? '১০-১৫ সেকেন্ডের রেটিং' : 'Instant 10-15s ratings'}</p>
         </div>
 
         {/* Pending Feedbacks */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center shrink-0">
-            <Clock className="w-6 h-6" />
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-purple-300/60 transition-all duration-200 shadow-xs group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {isBangla ? 'বাকি ফিডব্যাক' : 'Pending Feedbacks'}
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Clock className="w-4 h-4" />
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">{isBangla ? 'বাকি ফিডব্যাক' : 'Pending Feedbacks'}</p>
-            <h3 className="text-2xl font-bold text-purple-800 mt-0.5">
-              {d(summary?.pending_feedbacks || 0)} {isBangla ? 'জন' : ''}
-            </h3>
-          </div>
+          <h3 className="text-2xl font-extrabold text-slate-900">
+            {d(summary?.pending_feedbacks || 0)} <span className="text-sm font-semibold text-slate-500">{isBangla ? 'জন' : ''}</span>
+          </h3>
+          <p className="text-[11px] text-purple-700 font-semibold mt-1">● {isBangla ? 'অপেক্ষমাণ শিক্ষার্থী' : 'Awaiting responses'}</p>
         </div>
       </div>
 

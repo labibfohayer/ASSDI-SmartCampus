@@ -114,13 +114,18 @@ export default function AdminCoursesPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-emerald-100 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Layers className="w-6 h-6 text-emerald-700" />
-            <span>{isBangla ? 'কোর্স, ব্যাচ ও কারিকুলাম প্রশাসন' : 'Courses, Batches & Curriculum'}</span>
+      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
+            <Layers className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>{isBangla ? 'একাডেমিক কারিকুলাম কন্ট্রোল' : 'Curriculum Governance'}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+            {isBangla ? 'কোর্স, ব্যাচ ও কারিকুলাম প্রশাসন' : 'Courses, Batches & Curriculum'}
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
             {isBangla
               ? 'ইনস্টিটিউটের কোর্স কারিকুলাম, সক্রিয় ব্যাচ এবং শিক্ষক নিয়োগের সেন্ট্রাল কনফিগারেশন।'
               : 'Configure institute courses, active academic batches, and teacher assignments.'}
@@ -129,9 +134,9 @@ export default function AdminCoursesPage() {
 
         <button
           onClick={() => setShowBatchModal(true)}
-          className="px-4 py-2.5 bg-[#1B4D3E] hover:bg-[#153E32] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+          className="px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] text-xs font-extrabold rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer relative z-10 active:scale-95"
         >
-          <PlusCircle className="w-4 h-4" />
+          <PlusCircle className="w-4 h-4 text-[#0B2A21]" />
           <span>{isBangla ? 'নতুন ব্যাচ তৈরি করুন' : 'Create New Batch'}</span>
         </button>
       </div>
