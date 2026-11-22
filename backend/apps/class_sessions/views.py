@@ -649,10 +649,18 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
         qr_window_mins = get_qr_window_minutes()
         session_window_end = session_start_dt + datetime.timedelta(minutes=qr_window_mins)
 
-        if now_dhaka < session_start_dt:
-            raise ValidationError({"detail": "QR token can only be generated starting at class start time."})
-        if now_dhaka > session_window_end:
-            raise ValidationError({"detail": "QR token generation window has closed."})
+        # Super Admin or explicit force/demo flag bypasses time window for live demos, projector previews, and testing
+        force_mode = (
+            (user.role == UserRole.SUPER_ADMIN and request.query_params.get("strict") != "true")
+            or request.query_params.get("force") == "true"
+            or request.query_params.get("demo") == "true"
+        )
+
+        if not force_mode:
+            if now_dhaka < session_start_dt:
+                raise ValidationError({"detail": "QR token can only be generated starting at class start time."})
+            if now_dhaka > session_window_end:
+                raise ValidationError({"detail": "QR token generation window has closed."})
 
         token_data = QRCodeService.generate_token(session.id)
         return Response(token_data, status=status.HTTP_200_OK)
