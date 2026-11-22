@@ -387,3 +387,38 @@ class TestAcademicStructureAndRBAC:
             format="multipart",
         )
         assert res.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_student_id_card_access_and_rbac(self, api_client, academic_setup):
+        """Verify student ID card endpoint data and RBAC enforcement."""
+        super_admin, _ = User.objects.get_or_create(
+            login_id="super_admin_test_idcard",
+            defaults={"full_name": "Super Admin Test", "role": UserRole.SUPER_ADMIN},
+        )
+        u_std1 = User.objects.get(login_id="STD-42-001")
+        std1 = Student.objects.get(student_id_number="STD-42-001")
+
+        # 1. Super admin can view ID card
+        api_client.force_authenticate(user=super_admin)
+        res = api_client.get(f"/api/v1/students/{std1.id}/id-card/")
+        assert res.status_code == status.HTTP_200_OK
+        assert res.data["student_id_number"] == "STD-42-001"
+        assert res.data["full_name"] == "Student One"
+        assert "ASSDI:VERIFY:STD-42-001" in res.data["verification_payload"]
+
+        # 2. Student can view own ID card via 'me'
+        api_client.force_authenticate(user=u_std1)
+        res_me = api_client.get("/api/v1/students/me/id-card/")
+        assert res_me.status_code == status.HTTP_200_OK
+        assert res_me.data["student_id_number"] == "STD-42-001"
+
+        # 3. Create another student and verify they CANNOT view std1's ID card
+        u_std2 = User.objects.create_user(
+            login_id="STD-43-999", full_name="Student Two", role=UserRole.STUDENT, password="Pass!"
+        )
+        api_client.force_authenticate(user=u_std2)
+        res_forbidden = api_client.get(f"/api/v1/students/{std1.id}/id-card/")
+        assert res_forbidden.status_code == status.HTTP_403_FORBIDDEN
+
+        # Clean up
+        u_std2.delete()
+        super_admin.delete()

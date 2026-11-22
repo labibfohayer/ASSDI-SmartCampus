@@ -22,12 +22,14 @@ import {
   UserX,
   Ban,
   ShieldAlert,
+  CreditCard,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import MultiFormatExportDropdown from '@/components/common/MultiFormatExportDropdown';
+import StudentIdCardModal from '@/components/student/StudentIdCardModal';
 
 interface StudentItem {
   id: number;
@@ -100,6 +102,7 @@ export default function AdminStudentsPage() {
     batch_id: '',
   });
   const [updating, setUpdating] = useState(false);
+  const [selectedStudentForIdCard, setSelectedStudentForIdCard] = useState<StudentItem | null>(null);
 
   const openEditModal = (st: StudentItem) => {
     setEditingStudent(st);
@@ -518,14 +521,24 @@ export default function AdminStudentsPage() {
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <button
-                        onClick={() => openEditModal(st)}
-                        className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0B2A21] hover:text-[#E5C378] text-slate-700 text-xs font-bold transition flex items-center gap-1.5 ml-auto cursor-pointer shadow-2xs active:scale-95"
-                        title={isBangla ? 'শিক্ষার্থীর তথ্য ও স্ট্যাটাস সম্পাদনা করুন' : 'Edit Student'}
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>{isBangla ? 'সম্পাদনা' : 'Edit'}</span>
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => setSelectedStudentForIdCard(st)}
+                          className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#0B2A21] text-emerald-800 hover:text-[#E5C378] border border-emerald-200 hover:border-[#0B2A21] text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
+                          title={isBangla ? 'ডিজিটাল আইডি কার্ড ও এডমিট কার্ড দেখুন' : 'View ID Card & Admit Card'}
+                        >
+                          <CreditCard className="w-3.5 h-3.5 text-[#C5A059]" />
+                          <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
+                        </button>
+                        <button
+                          onClick={() => openEditModal(st)}
+                          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0B2A21] hover:text-[#E5C378] text-slate-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                          title={isBangla ? 'শিক্ষার্থীর তথ্য ও স্ট্যাটাস সম্পাদনা করুন' : 'Edit Student'}
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>{isBangla ? 'সম্পাদনা' : 'Edit'}</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -1211,6 +1224,26 @@ export default function AdminStudentsPage() {
             </form>
           </div>
         </div>
+      )}
+      {/* Student ID Card and Admit Card Modal */}
+      {selectedStudentForIdCard && (
+        <StudentIdCardModal
+          isOpen={!!selectedStudentForIdCard}
+          onClose={() => setSelectedStudentForIdCard(null)}
+          studentId={selectedStudentForIdCard.id}
+          initialData={{
+            student_id: selectedStudentForIdCard.id,
+            student_id_number: selectedStudentForIdCard.student_id_number,
+            registration_no: selectedStudentForIdCard.registration_no,
+            full_name: selectedStudentForIdCard.full_name,
+            phone: selectedStudentForIdCard.phone,
+            guardian_phone: selectedStudentForIdCard.guardian_phone,
+            education_background: selectedStudentForIdCard.education_background,
+            status: selectedStudentForIdCard.status,
+            batch_name: selectedStudentForIdCard.current_batch_name,
+            campus_name: selectedStudentForIdCard.campus_name,
+          }}
+        />
       )}
     </div>
   );

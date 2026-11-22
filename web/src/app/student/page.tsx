@@ -19,8 +19,10 @@ import {
   ChevronRight,
   X,
   QrCode,
+  CreditCard,
 } from 'lucide-react';
 import WebQRScannerModal from '@/components/student/WebQRScannerModal';
+import StudentIdCardModal from '@/components/student/StudentIdCardModal';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -112,6 +114,7 @@ export default function StudentPortalPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help'>('today');
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [idCardOpen, setIdCardOpen] = useState(false);
 
   // Feedback modal / card
   const [selectedSessionForFeedback, setSelectedSessionForFeedback] = useState<ClassSessionItem | null>(null);
@@ -466,7 +469,15 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => setIdCardOpen(true)}
+              className="px-4 py-2 rounded-xl bg-[#061C16] hover:bg-[#08261e] text-[#E5C378] border border-[#C5A059]/40 font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-95"
+              title={isBangla ? 'ডিজিটাল আইডি কার্ড ও এডমিট কার্ড' : 'Digital ID & Admit Card'}
+            >
+              <CreditCard className="w-4 h-4 text-[#C5A059]" />
+              <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
+            </button>
             <button
               onClick={() => setScannerOpen(true)}
               className="px-4 py-2 rounded-xl bg-[#C5A059] hover:bg-[#B38F48] text-[#061C16] font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-md hover:shadow-lg active:scale-95"
@@ -1103,6 +1114,26 @@ export default function StudentPortalPage() {
         isOpen={scannerOpen}
         onClose={() => setScannerOpen(false)}
         onSuccess={loadStudentData}
+      />
+
+      {/* Student Digital ID Card and Admit Card Modal */}
+      <StudentIdCardModal
+        isOpen={idCardOpen}
+        onClose={() => setIdCardOpen(false)}
+        studentId={profile?.id || 'me'}
+        initialData={
+          profile
+            ? {
+                student_id: profile.id,
+                student_id_number: profile.student_id_number,
+                registration_no: profile.registration_no,
+                full_name: profile.full_name,
+                campus_name: profile.campus_name,
+                batch_name: profile.current_batch_name,
+                education_background: profile.education_background,
+              }
+            : null
+        }
       />
     </div>
   );
