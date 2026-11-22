@@ -178,26 +178,34 @@ export default function LiveQrProjectorPage() {
       ref={containerRef}
       className={`transition-all duration-300 ${
         isFullscreen
-          ? 'bg-gradient-to-br from-[#0c241d] via-[#1B4D3E] to-[#12382C] text-white p-6 sm:p-12 flex flex-col justify-between h-screen w-screen overflow-hidden'
+          ? 'bg-[#1B4D3E] text-white p-6 sm:p-12 flex flex-col justify-between h-screen w-screen overflow-hidden'
           : 'space-y-6'
       }`}
     >
       {/* Top Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white/10 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-emerald-100/40">
+      <div
+        className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-xl border ${
+          isFullscreen
+            ? 'bg-emerald-950/40 border-emerald-700/60 text-white'
+            : 'bg-white border-slate-200/90 shadow-2xs text-slate-900'
+        }`}
+      >
         <div className="flex items-center gap-3">
           <Link
             href="/teacher"
-            className="p-2 bg-white/20 hover:bg-white/30 rounded-xl transition text-white"
+            className={`p-2 rounded-lg transition ${
+              isFullscreen ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+            }`}
             title={isBangla ? 'ড্যাশবোর্ডে ফিরুন' : 'Back to Dashboard'}
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
-              <QrCode className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
+            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <QrCode className="w-6 h-6 text-[#1B4D3E] dark:text-emerald-300" />
               <span>{isBangla ? 'ক্লাসরুম লাইভ কিউআর প্রজেক্টর' : 'Live Classroom QR Projector'}</span>
             </h1>
-            <p className="text-xs text-gray-500 dark:text-emerald-100">
+            <p className="text-xs opacity-80">
               {isBangla
                 ? 'বড় স্ক্রিন বা প্রজেক্টরে প্রদর্শন করুন; প্রতি ৪৫ সেকেন্ডে টোকেন স্বয়ংক্রিয়ভাবে পরিবর্তিত হয়।'
                 : 'Project onto classroom screen. Token rotates securely every 45 seconds.'}

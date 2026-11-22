@@ -17,6 +17,7 @@ import {
   UserCheck,
   ChevronRight,
   BookOpen,
+  Info,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -569,8 +570,8 @@ export default function AdminSessionsPage() {
 
       {/* Cancel Session Modal */}
       {cancellingSession && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-100">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 border-t-4 border-t-rose-600">
             <div className="flex items-center gap-3 text-rose-600 mb-3">
               <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center">
                 <AlertCircle className="w-5 h-5" />
@@ -629,8 +630,8 @@ export default function AdminSessionsPage() {
 
       {/* Auto-Generate Sessions Modal */}
       {showGenerateModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-gray-100">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 border-t-4 border-t-[#1B4D3E]">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
@@ -708,10 +709,13 @@ export default function AdminSessionsPage() {
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-blue-800 text-[11px] leading-relaxed">
-                💡 {isBangla
-                  ? 'এই প্রক্রিয়াটি স্বয়ংক্রিয়ভাবে শুধুমাত্র ক্লাস দিবসে (রবি-বৃহস্পতি) সক্রিয় রুটিন অনুযায়ী সেশন তৈরি করবে এবং পূর্বে প্রস্তুতকৃত কোনো সেশনের পুনরাবৃত্তি করবে না।'
-                  : 'This process automatically generates sessions for school days according to active weekly schedules without duplicating existing sessions.'}
+              <div className="p-3 rounded-lg bg-blue-50/80 border border-blue-200/80 text-blue-900 text-xs leading-relaxed flex items-start gap-2">
+                <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                <span>
+                  {isBangla
+                    ? 'এই প্রক্রিয়াটি স্বয়ংক্রিয়ভাবে শুধুমাত্র ক্লাস দিবসে (রবি-বৃহস্পতি) সক্রিয় রুটিন অনুযায়ী সেশন তৈরি করবে এবং পূর্বে প্রস্তুতকৃত কোনো সেশনের পুনরাবৃত্তি করবে না।'
+                    : 'This process automatically generates sessions for school days according to active weekly schedules without duplicating existing sessions.'}
+                </span>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">

@@ -190,8 +190,9 @@ export default function CoordinatorAtRiskPage() {
                       </td>
                       <td className="py-3 px-4">
                         {st.consecutive_absences >= 3 ? (
-                          <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-800 font-bold text-[10px]">
-                            ⚠️ {d(st.consecutive_absences)} {isBangla ? 'দিন' : 'days'}
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-red-50 text-red-700 border border-red-200 font-bold text-[10px]">
+                            <AlertTriangle className="w-3 h-3 text-red-600 shrink-0 mr-1" />
+                            {d(st.consecutive_absences)} {isBangla ? 'দিন' : 'days'}
                           </span>
                         ) : (
                           <span className="text-gray-500 font-mono">{d(st.consecutive_absences)}</span>
@@ -199,8 +200,9 @@ export default function CoordinatorAtRiskPage() {
                       </td>
                       <td className="py-3 px-4">
                         {st.total_absences >= 5 ? (
-                          <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-800 font-bold text-[10px]">
-                            ⚠️ {d(st.total_absences)} {isBangla ? 'দিন' : 'days'}
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-red-50 text-red-700 border border-red-200 font-bold text-[10px]">
+                            <AlertTriangle className="w-3 h-3 text-red-600 shrink-0 mr-1" />
+                            {d(st.total_absences)} {isBangla ? 'দিন' : 'days'}
                           </span>
                         ) : (
                           <span className="text-gray-500 font-mono">{d(st.total_absences)}</span>

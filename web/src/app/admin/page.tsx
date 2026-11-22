@@ -141,7 +141,7 @@ export default function AdminOverviewPage() {
               href="http://localhost:8001/api/docs/"
               target="_blank"
               rel="noreferrer"
-              className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition backdrop-blur-md"
+              className="px-3.5 py-2 bg-emerald-800/80 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold border border-emerald-700/80 flex items-center gap-1.5 transition cursor-pointer"
             >
               <span>{isBangla ? 'ওপেনএপিআই ডক্স (Swagger)' : 'API Docs (Swagger)'}</span>
               <ExternalLink className="w-3.5 h-3.5" />

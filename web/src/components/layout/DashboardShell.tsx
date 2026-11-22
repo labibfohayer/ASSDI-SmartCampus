@@ -356,7 +356,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
       {mobileSidebarOpen && (
         <div
           onClick={() => setMobileSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden"
+          className="fixed inset-0 z-40 bg-black/60 md:hidden"
         />
       )}
 
@@ -373,7 +373,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               href={role === 'super_admin' ? '/admin' : role === 'teacher' ? '/teacher' : role === 'student' ? '/student' : '/coordinator'}
               className="flex items-center gap-3 group"
             >
-              <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200/80 p-1.5 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+              <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200/80 p-1.5 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                 <Image
                   src="/logo.png"
                   alt="ASSDI Logo"
@@ -527,7 +527,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
       {/* RIGHT MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 md:pl-64 lg:pl-72">
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-2xs">
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-2xs">
           {/* Left: Mobile Toggle & Page Context */}
           <div className="flex items-center gap-3">
             <button

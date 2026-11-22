@@ -227,33 +227,31 @@ export default function StudentPortalPage() {
   return (
     <div className="space-y-6">
       {/* Student Profile Hero Card */}
-      <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl p-6 text-white shadow-md relative overflow-hidden">
-        <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-emerald-700/20 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+      <div className="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-xs border-t-4 border-t-[#1B4D3E]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center text-2xl font-bold shadow-inner">
-              🎓
+            <div className="w-14 h-14 rounded-xl bg-emerald-50 border border-emerald-200 text-[#1B4D3E] flex items-center justify-center font-bold text-lg shrink-0">
+              <GraduationCap className="w-7 h-7 text-[#1B4D3E]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-600/60 border border-emerald-400/30 text-emerald-100">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800">
                   {profile?.current_batch_name || 'SBMC Batch 42'}
                 </span>
-                <span className="text-[11px] font-mono bg-white/15 px-2 py-0.5 rounded text-white/90">
+                <span className="text-xs font-mono font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
                   {profile?.student_id_number || 'STD-2026-042-001'}
                 </span>
               </div>
-              <h1 className="text-2xl font-bold mt-1 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
                 {profile?.full_name || 'Abdullah Student'}
               </h1>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-emerald-200 mt-1 font-medium">
-                <span className="flex items-center gap-1">
-                  <Building className="w-3.5 h-3.5" />
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 mt-1 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <Building className="w-3.5 h-3.5 text-slate-400" />
                   {profile?.campus_name || 'Kazi Bari Campus'}
                 </span>
-                <span className="flex items-center gap-1">
-                  <BookOpen className="w-3.5 h-3.5" />
+                <span className="flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-slate-400" />
                   {isBangla ? 'ব্যাকগ্রাউন্ড:' : 'Background:'} {profile?.education_background || 'General'}
                 </span>
               </div>
@@ -263,10 +261,10 @@ export default function StudentPortalPage() {
           <button
             onClick={loadStudentData}
             title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
-            className="self-start md:self-center p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors flex items-center gap-2 text-xs font-semibold"
+            className="self-start md:self-center px-3.5 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors flex items-center gap-2 text-xs font-semibold cursor-pointer shadow-2xs"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">{isBangla ? 'রিফ্রেশ' : 'Refresh'}</span>
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
+            <span>{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh'}</span>
           </button>
         </div>
       </div>
@@ -274,16 +272,16 @@ export default function StudentPortalPage() {
       {/* Attendance & Learning Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Attendance Rate */}
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-2xs">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
           </span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-3xl font-extrabold text-emerald-800">
+            <span className="text-3xl font-extrabold text-[#1B4D3E]">
               {safeFixed(attSummary?.attendance_percentage)}%
             </span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-1.5 mt-3 overflow-hidden">
+          <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 (attSummary?.attendance_percentage || 0) < 75
@@ -296,30 +294,30 @@ export default function StudentPortalPage() {
         </div>
 
         {/* Present Days */}
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs">
+        <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-2xs">
           <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
             {isBangla ? 'উপস্থিত দিন' : 'Present Sessions'}
           </span>
           <p className="text-3xl font-extrabold text-emerald-800 mt-2">
             {attSummary?.present || 0}{' '}
-            <span className="text-sm font-normal text-gray-500">
+            <span className="text-sm font-normal text-slate-500">
               / {attSummary?.total_sessions || 0}
             </span>
           </p>
-          <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+          <p className="text-xs text-slate-600 mt-2 flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
             {isBangla ? 'ক্লাসে উপস্থিত ছিলেন' : 'Attended successfully'}
           </p>
         </div>
 
         {/* Absent Days */}
-        <div className="bg-white p-5 rounded-2xl border border-rose-100 shadow-xs">
+        <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-2xs">
           <span className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
             {isBangla ? 'অনুপস্থিতি' : 'Absences'}
           </span>
-          <p className="text-3xl font-extrabold text-rose-800 mt-2">
+          <p className="text-3xl font-extrabold text-rose-700 mt-2">
             {attSummary?.absent || 0}{' '}
-            <span className="text-sm font-normal text-gray-500">
+            <span className="text-sm font-normal text-slate-500">
               {isBangla ? 'দিন' : 'days'}
             </span>
           </p>
@@ -332,7 +330,7 @@ export default function StudentPortalPage() {
         </div>
 
         {/* Help Requests */}
-        <div className="bg-white p-5 rounded-2xl border border-blue-100 shadow-xs">
+        <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-2xs">
           <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
             {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
           </span>
@@ -348,13 +346,13 @@ export default function StudentPortalPage() {
       </div>
 
       {/* Tabs Switcher */}
-      <div className="flex items-center gap-2 border-b border-gray-200">
+      <div className="flex items-center gap-2 border-b border-slate-200">
         <button
           onClick={() => setActiveTab('today')}
-          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 ${
+          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 cursor-pointer ${
             activeTab === 'today'
-              ? 'border-emerald-700 text-emerald-800'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
+              ? 'border-[#1B4D3E] text-[#1B4D3E]'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <Calendar className="w-4 h-4" />
@@ -363,10 +361,10 @@ export default function StudentPortalPage() {
 
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 ${
+          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 cursor-pointer ${
             activeTab === 'attendance'
-              ? 'border-emerald-700 text-emerald-800'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
+              ? 'border-[#1B4D3E] text-[#1B4D3E]'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <CheckCircle2 className="w-4 h-4" />
@@ -375,10 +373,10 @@ export default function StudentPortalPage() {
 
         <button
           onClick={() => setActiveTab('help')}
-          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 ${
+          className={`pb-3 px-4 text-xs font-bold transition-colors border-b-2 flex items-center gap-2 cursor-pointer ${
             activeTab === 'help'
-              ? 'border-emerald-700 text-emerald-800'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
+              ? 'border-[#1B4D3E] text-[#1B4D3E]'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <HelpCircle className="w-4 h-4" />
@@ -635,18 +633,18 @@ export default function StudentPortalPage() {
 
       {/* Quick Feedback Submission Modal (10-15s submittable) */}
       {selectedSessionForFeedback && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 border-t-4 border-t-[#1B4D3E]">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 text-[#1B4D3E] flex items-center justify-center">
                   <Star className="w-5 h-5 fill-emerald-600 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-sm">
+                  <h3 className="font-bold text-slate-900 text-sm">
                     {isBangla ? 'ক্লাস ফিডব্যাক ও মূল্যায়ন' : 'Class Understanding Feedback'}
                   </h3>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-[11px] text-slate-500 font-medium">
                     {selectedSessionForFeedback.subject_name} • {selectedSessionForFeedback.session_date}
                   </p>
                 </div>
@@ -654,9 +652,9 @@ export default function StudentPortalPage() {
 
               <button
                 onClick={() => setSelectedSessionForFeedback(null)}
-                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg text-lg font-bold cursor-pointer"
               >
-                ×
+                ✕
               </button>
             </div>
 
@@ -669,35 +667,35 @@ export default function StudentPortalPage() {
               <form onSubmit={handleFeedbackSubmit} className="space-y-4">
                 {/* 5-Star Rating Buttons */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs font-semibold text-slate-700 mb-2">
                     {isBangla
                       ? 'আজকের পাঠ আপনি কেমন বুঝতে পেরেছেন?'
                       : 'How well did you understand this topic?'}
                   </label>
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center justify-between gap-1.5">
                     {[1, 2, 3, 4, 5].map((starVal) => (
                       <button
                         key={starVal}
                         type="button"
                         onClick={() => setFeedbackRating(starVal)}
-                        className={`flex-1 py-3 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${
+                        className={`flex-1 py-2.5 rounded-lg flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
                           feedbackRating >= starVal
-                            ? 'bg-amber-50 border-2 border-amber-400 text-amber-700 shadow-2xs'
-                            : 'bg-gray-50 border border-gray-200 text-gray-400 hover:bg-gray-100'
+                            ? 'bg-amber-50 border-2 border-amber-500 text-amber-800 shadow-2xs'
+                            : 'bg-slate-50 border border-slate-200 text-slate-400 hover:bg-slate-100'
                         }`}
                       >
                         <Star
-                          className={`w-6 h-6 ${
+                          className={`w-5 h-5 ${
                             feedbackRating >= starVal
                               ? 'fill-amber-400 text-amber-400'
-                              : 'text-gray-300'
+                              : 'text-slate-300'
                           }`}
                         />
-                        <span className="text-[10px] font-bold">{starVal}</span>
+                        <span className="text-[11px] font-bold">{starVal}</span>
                       </button>
                     ))}
                   </div>
-                  <p className="text-center text-xs font-bold text-emerald-800 mt-2">
+                  <p className="text-center text-xs font-bold text-[#1B4D3E] mt-2">
                     {isBangla
                       ? ratingDescriptions[feedbackRating]?.bn
                       : ratingDescriptions[feedbackRating]?.en}
@@ -705,21 +703,21 @@ export default function StudentPortalPage() {
                 </div>
 
                 {/* Need Help Checkbox */}
-                <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/80">
+                <div className="bg-emerald-50/60 p-3 rounded-lg border border-emerald-200">
                   <label className="flex items-start gap-2.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={feedbackNeedsHelp}
                       onChange={(e) => setFeedbackNeedsHelp(e.target.checked)}
-                      className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
+                      className="mt-0.5 rounded text-[#1B4D3E] focus:ring-[#1B4D3E] w-4 h-4 cursor-pointer"
                     />
                     <div>
-                      <span className="text-xs font-bold text-amber-900 block">
+                      <span className="text-xs font-bold text-slate-900 block">
                         {isBangla
                           ? 'আমার এই বিষয়ে শিক্ষকের ব্যক্তিগত সহায়তা প্রয়োজন'
                           : 'I need personal help/clarification from the teacher'}
                       </span>
-                      <span className="text-[11px] text-amber-800 mt-0.5 block">
+                      <span className="text-[11px] text-slate-600 mt-0.5 block">
                         {isBangla
                           ? 'এটি টিক দিলে শিক্ষক আপনার জন্য একটি হেল্প রিকোয়েস্ট পাবেন।'
                           : 'Checking this opens an actionable help ticket for your teacher.'}
@@ -730,7 +728,7 @@ export default function StudentPortalPage() {
 
                 {/* Optional Comment / Question */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
                     {feedbackNeedsHelp
                       ? isBangla
                         ? 'আপনার সুনির্দিষ্ট প্রশ্ন বা সমস্যা লিখুন (বাধ্যতামূলক):'
@@ -753,23 +751,23 @@ export default function StudentPortalPage() {
                         ? 'আলহামদুলিল্লাহ ভালো ক্লাস হয়েছে...'
                         : 'Overall good session...'
                     }
-                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    className="w-full px-3 py-2 text-xs bg-slate-50/50 border border-slate-300 rounded-lg focus:bg-white focus:outline-none focus:border-[#1B4D3E] focus:ring-1 focus:ring-[#1B4D3E]"
                   />
                 </div>
 
                 {/* Submit & Cancel Buttons */}
-                <div className="flex items-center justify-end gap-2 pt-2">
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                   <button
                     type="button"
                     onClick={() => setSelectedSessionForFeedback(null)}
-                    className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                    className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                   >
                     {isBangla ? 'বাতিল' : 'Cancel'}
                   </button>
                   <button
                     type="submit"
                     disabled={submittingFeedback}
-                    className="px-5 py-2 text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl shadow-xs transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                    className="px-5 py-2 text-xs font-semibold bg-[#1B4D3E] hover:bg-[#153E32] active:bg-[#102E25] text-white rounded-lg shadow-xs transition-colors flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                   >
                     {submittingFeedback ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />

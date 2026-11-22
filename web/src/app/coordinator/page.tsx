@@ -169,14 +169,14 @@ export default function CoordinatorDashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => {
                 setRefreshing(true);
                 fetchDashboardData();
               }}
               disabled={refreshing}
-              className="px-4 py-2.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white rounded-xl text-xs font-semibold backdrop-blur-md flex items-center gap-2 transition cursor-pointer"
+              className="px-3.5 py-2 bg-emerald-800/80 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold border border-emerald-700/80 flex items-center gap-2 transition cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
               <span>{isBangla ? 'রিফ্রেশ' : 'Refresh'}</span>
@@ -184,7 +184,7 @@ export default function CoordinatorDashboardPage() {
 
             <Link
               href="/reports"
-              className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold rounded-xl text-xs shadow-md flex items-center gap-2 transition cursor-pointer"
+              className="px-4 py-2 bg-white hover:bg-slate-100 text-[#1B4D3E] font-bold rounded-lg text-xs shadow-xs flex items-center gap-2 transition cursor-pointer"
             >
               <FileText className="w-4 h-4" />
               <span>{isBangla ? 'রিপোর্ট হাব ও এক্সপোর্ট' : 'SRS Reports Hub'}</span>
