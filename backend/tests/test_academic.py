@@ -309,3 +309,81 @@ class TestAcademicStructureAndRBAC:
         assert Course.objects.count() == course_count
         assert Batch.objects.count() == batch_count
         assert Student.objects.count() == student_count
+
+    def test_student_import_template_excel_and_csv(self, api_client, academic_setup):
+        """Test downloading Excel and CSV student import templates."""
+        super_admin, _ = User.objects.get_or_create(
+            login_id="super_admin_test",
+            defaults={"full_name": "Super Admin Test", "role": UserRole.SUPER_ADMIN},
+        )
+        api_client.force_authenticate(user=super_admin)
+
+        # 1. Excel template
+        res_xlsx = api_client.get("/api/v1/students/import-template/")
+        assert res_xlsx.status_code == status.HTTP_200_OK
+        assert "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" in res_xlsx.get("Content-Type")
+
+        # 2. CSV template
+        res_csv = api_client.get("/api/v1/students/import-template/?template_format=csv")
+        assert res_csv.status_code == status.HTTP_200_OK
+        assert "text/csv" in res_csv.get("Content-Type")
+        csv_text = res_csv.content.decode("utf-8-sig")
+        assert "student_id_number,registration_no,full_name" in csv_text
+
+    def test_student_bulk_import_csv(self, api_client, academic_setup):
+        """Test bulk importing students into a batch via CSV."""
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        super_admin, _ = User.objects.get_or_create(
+            login_id="super_admin_test",
+            defaults={"full_name": "Super Admin Test", "role": UserRole.SUPER_ADMIN},
+        )
+        api_client.force_authenticate(user=super_admin)
+        batch = Batch.objects.first()
+
+        csv_content = (
+            "student_id_number,registration_no,full_name,phone,guardian_phone,education_background,password\n"
+            "STD-TEST-001,REG-TEST-001,Test Student One,01799000001,01899000001,General,TestPass2026!\n"
+            "STD-TEST-002,REG-TEST-002,Test Student Two,01799000002,01899000002,Aliya,TestPass2026!\n"
+        )
+        uploaded_file = SimpleUploadedFile(
+            "students.csv", csv_content.encode("utf-8-sig"), content_type="text/csv"
+        )
+
+        res = api_client.post(
+            "/api/v1/students/bulk-import/",
+            {"file": uploaded_file, "batch_id": batch.id},
+            format="multipart",
+        )
+        assert res.status_code == status.HTTP_201_CREATED
+        assert res.data["created_count"] == 2
+        assert res.data["error_count"] == 0
+
+        # Verify students and enrollments in DB
+        s1 = Student.objects.get(student_id_number="STD-TEST-001")
+        assert s1.user.full_name == "Test Student One"
+        assert s1.education_background == EducationBackground.GENERAL
+        assert s1.enrollments.filter(batch=batch, status=EnrollmentStatus.ACTIVE).exists()
+
+        s2 = Student.objects.get(student_id_number="STD-TEST-002")
+        assert s2.user.full_name == "Test Student Two"
+        assert s2.education_background == EducationBackground.ALIYA
+
+        # Clean up
+        User.objects.filter(login_id__in=["STD-TEST-001", "STD-TEST-002", "super_admin_test"]).delete()
+
+    def test_student_bulk_import_unauthorized_for_students(self, api_client, academic_setup):
+        """Verify normal students cannot bulk import."""
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        student_user = User.objects.filter(role=UserRole.STUDENT).first()
+        api_client.force_authenticate(user=student_user)
+        batch = Batch.objects.first()
+
+        uploaded = SimpleUploadedFile("test.csv", b"dummy content", content_type="text/csv")
+        res = api_client.post(
+            "/api/v1/students/bulk-import/",
+            {"file": uploaded, "batch_id": batch.id},
+            format="multipart",
+        )
+        assert res.status_code == status.HTTP_403_FORBIDDEN

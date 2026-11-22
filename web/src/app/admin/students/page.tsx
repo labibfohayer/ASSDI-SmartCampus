@@ -237,12 +237,15 @@ export default function AdminStudentsPage() {
     }
   };
 
-  const handleDownloadTemplate = async () => {
+  const handleDownloadTemplate = async (templateFormat: 'xlsx' | 'csv' = 'xlsx') => {
     setDownloadingTemplate(true);
     try {
       const token = getAccessToken();
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
-      const response = await fetch(`${baseUrl}/api/v1/students/import-template/`, {
+      const endpoint = templateFormat === 'csv'
+        ? `${baseUrl}/api/v1/students/import-template/?template_format=csv`
+        : `${baseUrl}/api/v1/students/import-template/`;
+      const response = await fetch(endpoint, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -252,12 +255,18 @@ export default function AdminStudentsPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'assdi_student_import_template.xlsx';
+      a.download = templateFormat === 'csv'
+        ? 'assdi_student_import_template.csv'
+        : 'assdi_student_import_template.xlsx';
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-      toast.success(isBangla ? 'টেমপ্লেট ডাউনলোড সফল হয়েছে' : 'Template downloaded');
+      toast.success(
+        isBangla
+          ? `${templateFormat.toUpperCase()} টেমপ্লেট ডাউনলোড সফল হয়েছে`
+          : `${templateFormat.toUpperCase()} template downloaded`
+      );
     } catch (err) {
       toast.error(isBangla ? 'টেমপ্লেট ডাউনলোড ব্যর্থ হয়েছে' : 'Failed to download template');
     } finally {
@@ -365,7 +374,7 @@ export default function AdminStudentsPage() {
             className="px-3.5 py-2.5 bg-[#061C16] hover:bg-[#07241C] text-emerald-100 border border-emerald-900/80 text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer active:scale-95"
           >
             <FileSpreadsheet className="w-4 h-4 text-[#C5A059]" />
-            <span>{isBangla ? 'এক্সেল বাল্ক ইমপোর্ট' : 'Excel Bulk Import'}</span>
+            <span>{isBangla ? 'বাল্ক ইমপোর্ট (এক্সেল/সিএসভি)' : 'Bulk Import (Excel/CSV)'}</span>
           </button>
 
           <button
@@ -716,71 +725,117 @@ export default function AdminStudentsPage() {
             </div>
 
             {/* Step 1: Template Download Banner */}
-            <div className="p-4 bg-emerald-50/60 border border-emerald-200/80 rounded-2xl flex items-center justify-between gap-3 mb-4">
+            <div className="p-4 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <p className="text-xs font-bold text-[#0B2A21]">
-                  {isBangla ? '১. নমুনা এক্সেল টেমপ্লেট' : '1. Sample Excel Template'}
+                <p className="text-xs font-bold text-[#0B2A21] flex items-center gap-1.5">
+                  <FileSpreadsheet className="w-4 h-4 text-[#C5A059]" />
+                  <span>{isBangla ? '১. নমুনা টেমপ্লেট ডাউনলোড করুন' : '1. Download Sample Template'}</span>
                 </p>
                 <p className="text-[11px] text-emerald-800/80 mt-0.5">
                   {isBangla
-                    ? 'ফরম্যাট অনুযায়ী তথ্য পূরণের জন্য টেমপ্লেট ডাউনলোড করুন'
-                    : 'Download pre-formatted Excel template with headers and dummy rows'}
+                    ? 'ফরম্যাট অনুযায়ী তথ্য পূরণের জন্য এক্সেল বা সিএসভি টেমপ্লেট সংগ্রহ করুন'
+                    : 'Download pre-formatted Excel or CSV template with required headers'}
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={handleDownloadTemplate}
-                disabled={downloadingTemplate}
-                className="px-3.5 py-2 bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50 active:scale-95"
-              >
-                {downloadingTemplate ? (
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
-                ) : (
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadTemplate('xlsx')}
+                  disabled={downloadingTemplate}
+                  className="px-3 py-1.5 bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
+                  title="Download .XLSX"
+                >
                   <Download className="w-3.5 h-3.5 text-[#C5A059]" />
-                )}
-                <span>{isBangla ? 'টেমপ্লেট' : 'Download'}</span>
-              </button>
+                  <span>{isBangla ? 'এক্সেল (.xlsx)' : 'Excel (.xlsx)'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDownloadTemplate('csv')}
+                  disabled={downloadingTemplate}
+                  className="px-3 py-1.5 bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
+                  title="Download .CSV"
+                >
+                  <Download className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>{isBangla ? 'সিএসভি (.csv)' : 'CSV (.csv)'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Results Display if Import Completed */}
             {importResult && (
               <div className="mb-4 space-y-3">
                 <div
-                  className={`p-3.5 rounded-2xl border text-xs ${
+                  className={`p-4 rounded-2xl border text-xs ${
                     importResult.created_count > 0
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                       : 'bg-rose-50 border-rose-200 text-rose-900'
                   }`}
                 >
-                  <div className="flex items-center gap-2 font-bold mb-1">
-                    {importResult.created_count > 0 ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-rose-600" />
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <div className="flex items-center gap-2 font-bold">
+                      {importResult.created_count > 0 ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      ) : (
+                        <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                      )}
+                      <span>
+                        {isBangla
+                          ? `ব্যাচ "${importResult.batch_name}": ${importResult.created_count} জন শিক্ষার্থী সফলভাবে ভর্তি হয়েছে!`
+                          : `Batch "${importResult.batch_name}": ${importResult.created_count} students enrolled!`}
+                      </span>
+                    </div>
+
+                    {importResult.created_count > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedBatch(bulkBatchId);
+                          setShowBulkModal(false);
+                        }}
+                        className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold rounded-lg transition shrink-0 cursor-pointer"
+                      >
+                        {isBangla ? 'তালিকায় দেখুন →' : 'View in List →'}
+                      </button>
                     )}
-                    <span>
-                      {isBangla
-                        ? `ব্যাচ "${importResult.batch_name}": ${importResult.created_count} জন শিক্ষার্থী সফলভাবে ভর্তি হয়েছে!`
-                        : `Batch "${importResult.batch_name}": ${importResult.created_count} students enrolled!`}
-                    </span>
                   </div>
+
                   <p className="text-[11px] text-gray-600">
                     {isBangla
-                      ? `মোট প্রসেস করা সারি: ${importResult.total_rows_processed} | ত্রুটি / স্কিপ: ${importResult.error_count}`
-                      : `Total rows processed: ${importResult.total_rows_processed} | Errors / Skipped: ${importResult.error_count}`}
+                      ? `মোট প্রসেস করা সারি: ${importResult.total_rows_processed} | সফল: ${importResult.created_count} | ত্রুটি / স্কিপ: ${importResult.error_count}`
+                      : `Total rows processed: ${importResult.total_rows_processed} | Success: ${importResult.created_count} | Errors / Skipped: ${importResult.error_count}`}
                   </p>
+
+                  {importResult.created_students?.length > 0 && (
+                    <div className="mt-2.5 pt-2 border-t border-emerald-200/80">
+                      <p className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 mb-1.5">
+                        {isBangla ? 'নতুন ভর্তি হওয়া শিক্ষার্থীগণ:' : 'Newly Enrolled Students:'}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                        {importResult.created_students.map((st: any) => (
+                          <span
+                            key={st.id || st.student_id_number}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-emerald-300 text-emerald-900 rounded-md text-[10px] font-semibold shadow-2xs"
+                          >
+                            <span>{st.full_name}</span>
+                            <span className="font-mono text-emerald-600">({st.student_id_number})</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {importResult.errors?.length > 0 && (
-                  <div className="max-h-40 overflow-y-auto rounded-xl border border-rose-200 bg-rose-50/50 p-2 text-[11px]">
-                    <p className="font-bold text-rose-800 mb-1">
-                      {isBangla ? 'যেসব সারি স্কিপ হয়েছে:' : 'Skipped rows:'}
+                  <div className="max-h-40 overflow-y-auto rounded-xl border border-rose-200 bg-rose-50/70 p-3 text-[11px]">
+                    <p className="font-bold text-rose-800 mb-1 flex items-center gap-1">
+                      <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                      <span>{isBangla ? 'যেসব সারি স্কিপ হয়েছে:' : 'Skipped rows:'}</span>
                     </p>
                     <ul className="space-y-1 text-rose-700">
                       {importResult.errors.map((errItem: any, idx: number) => (
                         <li key={idx} className="flex items-start gap-1">
-                          <span className="font-mono font-bold">[{isBangla ? 'সারি' : 'Row'} {errItem.row}]:</span>
+                          <span className="font-mono font-bold shrink-0">[{isBangla ? 'সারি' : 'Row'} {errItem.row}]:</span>
                           <span>{errItem.error}</span>
                         </li>
                       ))}
@@ -813,13 +868,22 @@ export default function AdminStudentsPage() {
 
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">
-                  {isBangla ? '৩. এক্সেল ফাইল আপলোড (.xlsx):' : '3. Upload Filled Excel File (.xlsx):'}
+                  {isBangla ? '৩. এক্সেল বা সিএসভি ফাইল আপলোড (.xlsx, .csv):' : '3. Upload Filled Excel / CSV File (.xlsx, .csv):'}
                 </label>
-                <div className="border-2 border-dashed border-gray-200 hover:border-emerald-500 rounded-2xl p-5 text-center transition-colors bg-gray-50/60">
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                      setBulkFile(e.dataTransfer.files[0]);
+                    }
+                  }}
+                  className="border-2 border-dashed border-gray-200 hover:border-emerald-500 rounded-2xl p-5 text-center transition-colors bg-gray-50/60"
+                >
                   <input
                     type="file"
                     id="excel_file_input"
-                    accept=".xlsx, .xls"
+                    accept=".xlsx, .xls, .csv"
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         setBulkFile(e.target.files[0]);
@@ -827,24 +891,35 @@ export default function AdminStudentsPage() {
                     }}
                     className="hidden"
                   />
-                  <label htmlFor="excel_file_input" className="cursor-pointer block">
-                    <UploadCloud className="w-8 h-8 text-emerald-700 mx-auto mb-2" />
-                    {bulkFile ? (
-                      <div>
-                        <p className="text-xs font-bold text-emerald-800">{bulkFile.name}</p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">
-                          {(bulkFile.size / 1024).toFixed(1)} KB • {isBangla ? 'ফাইল সিলেক্ট করা হয়েছে' : 'File selected'}
-                        </p>
+                  {bulkFile ? (
+                    <div className="flex flex-col items-center gap-1.5">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                        <FileSpreadsheet className="w-5 h-5 text-emerald-700" />
                       </div>
-                    ) : (
+                      <p className="text-xs font-bold text-emerald-900">{bulkFile.name}</p>
+                      <p className="text-[10px] text-gray-500">
+                        {(bulkFile.size / 1024).toFixed(1)} KB • {isBangla ? 'ফাইল রেডি' : 'Ready to import'}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setBulkFile(null)}
+                        className="mt-1 text-[11px] text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        <X className="w-3 h-3" />
+                        <span>{isBangla ? 'ফাইল বাতিল করুন' : 'Remove File'}</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <label htmlFor="excel_file_input" className="cursor-pointer block">
+                      <UploadCloud className="w-8 h-8 text-emerald-700 mx-auto mb-2" />
                       <div>
                         <p className="text-xs font-semibold text-gray-700">
-                          {isBangla ? 'ফাইল সিলেক্ট করতে এখানে ক্লিক করুন' : 'Click to select Excel file'}
+                          {isBangla ? 'ফাইল সিলেক্ট করতে এখানে ক্লিক করুন অথবা ড্র্যাগ করুন' : 'Click to select or drag and drop file'}
                         </p>
-                        <p className="text-[10px] text-gray-400 mt-0.5">.XLSX or .XLS format</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">.XLSX, .XLS or .CSV format</p>
                       </div>
-                    )}
-                  </label>
+                    </label>
+                  )}
                 </div>
               </div>
 
@@ -859,7 +934,7 @@ export default function AdminStudentsPage() {
                 <button
                   type="submit"
                   disabled={importing || !bulkFile || !bulkBatchId}
-                  className="px-5 py-2 bg-[#1B4D3E] hover:bg-[#153E32] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] text-xs font-bold rounded-xl border border-[#C5A059]/40 shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
                 >
                   {importing ? (
                     <>

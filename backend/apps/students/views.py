@@ -477,6 +477,24 @@ class StudentViewSet(viewsets.ModelViewSet):
             col_letter = col[0].column_letter
             ws.column_dimensions[col_letter].width = max(max_len + 4, 15)
 
+        format_param = (
+            request.query_params.get("template_format")
+            or request.query_params.get("type")
+            or request.query_params.get("export_format")
+            or "xlsx"
+        ).lower()
+        if format_param == "csv":
+            import csv
+            out = io.StringIO()
+            out.write("\ufeff")  # UTF-8 BOM for Excel compatibility
+            writer = csv.writer(out)
+            writer.writerow(headers)
+            for r in sample_rows:
+                writer.writerow(r)
+            response = HttpResponse(out.getvalue(), content_type="text/csv; charset=utf-8")
+            response["Content-Disposition"] = 'attachment; filename="assdi_student_import_template.csv"'
+            return response
+
         buf = io.BytesIO()
         wb.save(buf)
         buf.seek(0)
@@ -491,7 +509,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"], url_path="bulk-import")
     def bulk_import(self, request):
         """
-        Bulk import students from Excel file (.xlsx) into a target batch.
+        Bulk import students from Excel file (.xlsx) or CSV file (.csv) into a target batch.
         Enforces unique IDs, campus consistency, and atomic creation per row.
         """
         user = request.user
@@ -500,7 +518,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
         file_obj = request.FILES.get("file")
         if not file_obj:
-            raise ValidationError({"file": "An Excel file (.xlsx) is required."})
+            raise ValidationError({"file": "An Excel (.xlsx) or CSV (.csv) file is required."})
 
         batch_id = request.data.get("batch_id")
         if not batch_id:
@@ -515,13 +533,24 @@ class StudentViewSet(viewsets.ModelViewSet):
             if not user.coordinator_course_assignments.filter(course=batch.course).exists():
                 raise PermissionDenied("You can only import students into batches of your assigned course.")
 
-        try:
-            wb = openpyxl.load_workbook(file_obj, data_only=True)
-            ws = wb.active
-        except Exception as exc:
-            raise ValidationError({"file": f"Invalid or unreadable Excel file: {str(exc)}"})
-
-        rows = list(ws.iter_rows(values_only=True))
+        file_name = getattr(file_obj, "name", "").lower()
+        rows = []
+        if file_name.endswith(".csv") or getattr(file_obj, "content_type", "") in ["text/csv", "application/vnd.ms-excel"]:
+            try:
+                import csv
+                raw = file_obj.read()
+                text = raw.decode("utf-8-sig", errors="replace")
+                reader = csv.reader(io.StringIO(text))
+                rows = [list(r) for r in reader]
+            except Exception as exc:
+                raise ValidationError({"file": f"Invalid or unreadable CSV file: {str(exc)}"})
+        else:
+            try:
+                wb = openpyxl.load_workbook(file_obj, data_only=True)
+                ws = wb.active
+                rows = list(ws.iter_rows(values_only=True))
+            except Exception as exc:
+                raise ValidationError({"file": f"Invalid or unreadable Excel file: {str(exc)}"})
         if not rows or len(rows) < 2:
             return Response(
                 {
