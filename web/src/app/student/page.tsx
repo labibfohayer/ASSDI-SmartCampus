@@ -141,12 +141,17 @@ export default function StudentPortalPage() {
 
   useEffect(() => {
     loadStudentData();
-    const handleUrlTab = () => {
+    const handleUrlTab = (customHref?: string) => {
       if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
+        const search = customHref && customHref.includes('?')
+          ? customHref.split('?')[1]
+          : window.location.search;
+        const params = new URLSearchParams(search);
         const tab = params.get('tab');
         if (tab === 'attendance' || tab === 'help' || tab === 'today' || tab === 'materials') {
           setActiveTab(tab as any);
+        } else if (!tab && !params.get('scan')) {
+          setActiveTab('today');
         }
         if (params.get('scan') === 'true') {
           setScannerOpen(true);
@@ -154,9 +159,28 @@ export default function StudentPortalPage() {
       }
     };
     handleUrlTab();
-    window.addEventListener('popstate', handleUrlTab);
-    return () => window.removeEventListener('popstate', handleUrlTab);
+
+    const onTabNav = (e: any) => {
+      const href = e.detail?.href || '';
+      handleUrlTab(href);
+    };
+
+    window.addEventListener('popstate', () => handleUrlTab());
+    window.addEventListener('assdi-tab-navigate', onTabNav);
+    return () => {
+      window.removeEventListener('popstate', () => handleUrlTab());
+      window.removeEventListener('assdi-tab-navigate', onTabNav);
+    };
   }, [user]);
+
+  const handleTabChange = (tab: 'today' | 'attendance' | 'help' | 'materials') => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      const href = tab === 'today' ? '/student' : `/student?tab=${tab}`;
+      window.history.pushState(null, '', href);
+      window.dispatchEvent(new CustomEvent('assdi-nav-change', { detail: { href } }));
+    }
+  };
 
   const loadStudentData = async () => {
     const currentUser = user || getUser();
@@ -564,7 +588,7 @@ export default function StudentPortalPage() {
       {/* Modern Segmented Tabs Bar */}
       <div className="bg-slate-200/70 p-1.5 rounded-xl inline-flex gap-1.5 border border-slate-200 max-w-full overflow-x-auto">
         <button
-          onClick={() => setActiveTab('today')}
+          onClick={() => handleTabChange('today')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'today'
               ? 'bg-white text-[#0B2A21] shadow-xs'
@@ -576,7 +600,7 @@ export default function StudentPortalPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('attendance')}
+          onClick={() => handleTabChange('attendance')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'attendance'
               ? 'bg-white text-[#0B2A21] shadow-xs'
@@ -588,7 +612,7 @@ export default function StudentPortalPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('help')}
+          onClick={() => handleTabChange('help')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'help'
               ? 'bg-white text-[#0B2A21] shadow-xs'
@@ -605,7 +629,7 @@ export default function StudentPortalPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('materials')}
+          onClick={() => handleTabChange('materials')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'materials'
               ? 'bg-white text-[#0B2A21] shadow-xs'

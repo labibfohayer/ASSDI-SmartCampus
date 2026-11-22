@@ -142,6 +142,46 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [menuManagerOpen, setMenuManagerOpen] = useState(false);
   const [adminMenus, setAdminMenus] = useState<CustomNavItem[]>(DEFAULT_ADMIN_MENUS);
+  const [currentSearch, setCurrentSearch] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCurrentSearch(window.location.search);
+      const updateSearch = (e?: any) => {
+        if (e?.detail?.href && e.detail.href.includes('?')) {
+          const [, query] = e.detail.href.split('?');
+          setCurrentSearch('?' + query);
+        } else if (e?.detail?.href && !e.detail.href.includes('?')) {
+          setCurrentSearch('');
+        } else {
+          setCurrentSearch(window.location.search);
+        }
+      };
+      window.addEventListener('popstate', updateSearch);
+      window.addEventListener('assdi-nav-change', updateSearch);
+      return () => {
+        window.removeEventListener('popstate', updateSearch);
+        window.removeEventListener('assdi-nav-change', updateSearch);
+      };
+    }
+  }, [pathname]);
+
+  const handleNavClick = (href: string) => {
+    setMobileSidebarOpen(false);
+    if (typeof window !== 'undefined') {
+      if (href.includes('?')) {
+        const [, query] = href.split('?');
+        setCurrentSearch('?' + query);
+      } else {
+        setCurrentSearch('');
+      }
+      if (pathname === '/student' && href.startsWith('/student')) {
+        window.history.pushState(null, '', href);
+      }
+      window.dispatchEvent(new CustomEvent('assdi-tab-navigate', { detail: { href } }));
+      window.dispatchEvent(new CustomEvent('assdi-nav-change', { detail: { href } }));
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -432,12 +472,19 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   };
 
   const isLinkActive = (href: string) => {
-    if (typeof window !== 'undefined' && href.includes('?')) {
-      const currentFullUrl = pathname + window.location.search;
+    if (href.includes('?')) {
+      const currentFullUrl = pathname + currentSearch;
       if (currentFullUrl === href) return true;
-      if (href === '/student' && !window.location.search) return true;
+      const [base, query] = href.split('?');
+      if (pathname === base && currentSearch.includes(query)) return true;
+      return false;
     }
-    if (pathname === href) return true;
+    if (pathname === href) {
+      if (href === '/student' && currentSearch) {
+        return false;
+      }
+      return true;
+    }
     if (
       href !== '/admin' &&
       href !== '/coordinator' &&
@@ -539,7 +586,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          onClick={() => setMobileSidebarOpen(false)}
+                          onClick={() => handleNavClick(item.href)}
                           className={`relative flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-[0.98] ${
                             active
                               ? 'bg-[#164E3D] text-white shadow-sm ring-1 ring-emerald-400/40 font-bold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:bg-[#C5A059] before:rounded-r'
