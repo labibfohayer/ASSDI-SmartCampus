@@ -239,6 +239,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelEn: "Today's Schedule & Feedback",
                 icon: Calendar,
               },
+              {
+                href: '/student?scan=true',
+                labelBn: 'কিউআর দিয়ে উপস্থিতি',
+                labelEn: 'Scan Attendance QR',
+                icon: QrCode,
+              },
             ],
           },
           {

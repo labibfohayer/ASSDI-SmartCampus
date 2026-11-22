@@ -18,7 +18,9 @@ import {
   MessageSquare,
   ChevronRight,
   X,
+  QrCode,
 } from 'lucide-react';
+import WebQRScannerModal from '@/components/student/WebQRScannerModal';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -45,6 +47,7 @@ interface AttendanceSummary {
 
 interface AttendanceRecord {
   id: number;
+  session?: number;
   session_date: string;
   subject_name: string;
   status: 'present' | 'late' | 'absent' | 'approved_leave';
@@ -102,6 +105,7 @@ export default function StudentPortalPage() {
   const [helpRequests, setHelpRequests] = useState<HelpRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help'>('today');
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   // Feedback modal / card
   const [selectedSessionForFeedback, setSelectedSessionForFeedback] = useState<ClassSessionItem | null>(null);
@@ -119,6 +123,9 @@ export default function StudentPortalPage() {
         const tab = params.get('tab');
         if (tab === 'attendance' || tab === 'help' || tab === 'today') {
           setActiveTab(tab as any);
+        }
+        if (params.get('scan') === 'true') {
+          setScannerOpen(true);
         }
       }
     };
@@ -225,6 +232,11 @@ export default function StudentPortalPage() {
     return feedbacks.some((fb) => fb.session === sessionId);
   };
 
+  // Check if student attendance is recorded for a session
+  const hasAttended = (sessionId: number) => {
+    return attRecords.some((rec) => rec.session === sessionId);
+  };
+
   return (
     <div className="space-y-6">
       {/* Student Profile Hero Card */}
@@ -263,7 +275,15 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => setScannerOpen(true)}
+              className="px-4 py-2 rounded-xl bg-[#C5A059] hover:bg-[#B38F48] text-[#061C16] font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-md hover:shadow-lg active:scale-95"
+              title={isBangla ? 'ক্যামেরা দিয়ে কিউআর স্ক্যান করুন' : 'Scan Attendance QR'}
+            >
+              <QrCode className="w-4 h-4 text-[#061C16]" />
+              <span>{isBangla ? 'কিউআর দিয়ে উপস্থিতি' : 'Scan Attendance QR'}</span>
+            </button>
             <button
               onClick={loadStudentData}
               title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
@@ -464,30 +484,48 @@ export default function StudentPortalPage() {
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    {given ? (
-                      <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>
-                          {isBangla ? 'ফিডব্যাক সম্পন্ন' : 'Feedback Given'} (
-                          <Star className="w-3 h-3 fill-amber-400 text-amber-500 inline mx-0.5" />
-                          {pastFeedback?.understanding_rating}/5)
-                        </span>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setSelectedSessionForFeedback(s);
-                          setFeedbackRating(5);
-                          setFeedbackNeedsHelp(false);
-                          setFeedbackComment('');
-                        }}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-[#0B2A21] hover:bg-[#134E3E] text-white rounded-lg shadow-xs transition-colors cursor-pointer"
-                      >
-                        <Star className="w-3.5 h-3.5 fill-white" />
-                        {isBangla ? 'ফিডব্যাক দিন' : 'Rate Class'}
-                      </button>
-                    )}
+                  <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {hasAttended(s.id) ? (
+                        <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{isBangla ? 'উপস্থিতি গৃহীত' : 'Attended'}</span>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setScannerOpen(true)}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-md transition-colors cursor-pointer"
+                          title={isBangla ? 'কিউআর স্ক্যান করে উপস্থিতি দিন' : 'Scan attendance'}
+                        >
+                          <QrCode className="w-3.5 h-3.5 text-amber-700" />
+                          <span>{isBangla ? 'উপস্থিতি স্ক্যান' : 'Scan QR'}</span>
+                        </button>
+                      )}
+
+                      {given ? (
+                        <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>
+                            {isBangla ? 'ফিডব্যাক সম্পন্ন' : 'Feedback Given'} (
+                            <Star className="w-3 h-3 fill-amber-400 text-amber-500 inline mx-0.5" />
+                            {pastFeedback?.understanding_rating}/5)
+                          </span>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setSelectedSessionForFeedback(s);
+                            setFeedbackRating(5);
+                            setFeedbackNeedsHelp(false);
+                            setFeedbackComment('');
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold bg-[#0B2A21] hover:bg-[#134E3E] text-white rounded-md shadow-xs transition-colors cursor-pointer"
+                        >
+                          <Star className="w-3.5 h-3.5 fill-white" />
+                          <span>{isBangla ? 'ফিডব্যাক দিন' : 'Rate Class'}</span>
+                        </button>
+                      )}
+                    </div>
 
                     <span className="text-[11px] text-slate-400 font-medium capitalize">
                       {s.audience === 'all'
@@ -816,6 +854,13 @@ export default function StudentPortalPage() {
           </div>
         </div>
       )}
+
+      {/* Browser Live QR Code Attendance Scanner Modal */}
+      <WebQRScannerModal
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onSuccess={loadStudentData}
+      />
     </div>
   );
 }
