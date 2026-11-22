@@ -30,7 +30,7 @@ from apps.batches.models import TeacherAssignment
 from apps.feedback.constants import ALL_BANDS, get_understanding_band
 from apps.feedback.models import LearningFeedback
 from apps.feedback.serializers import FeedbackSummarySerializer, LearningFeedbackStudentReadSerializer
-from apps.students.models import EducationBackground, EnrollmentStatus, Student
+from apps.students.models import EducationBackground, EnrollmentStatus, Student, StudentStatus
 
 from .constants import date_to_day_of_week
 from .models import ClassSchedule, ClassSession, SessionAudience, SessionStatus
@@ -296,6 +296,15 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
     search_fields = ["batch__name", "subject__name", "topic__title", "teacher_user__full_name"]
     ordering_fields = ["session_date", "start_time"]
 
+    def _is_teacher_authorized(self, user, session):
+        """
+        Returns True if the teacher is the session teacher or assigned to the session's batch.
+        Enforces AGENTS.md Rule 1: 'A teacher sees only their assigned batches.'
+        """
+        if session.teacher_user_id == user.id:
+            return True
+        return session.batch.teacher_assignments.filter(teacher_user=user).exists()
+
     def get_queryset(self):
         user = self.request.user
         if not user.is_authenticated:
@@ -537,8 +546,8 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
 
         if user.role == UserRole.STUDENT:
             raise PermissionDenied("Students are not permitted to view session feedback summaries.")
-        elif user.role == UserRole.TEACHER and session.teacher_user != user:
-            raise PermissionDenied("You can only view feedback summaries for your own sessions.")
+        elif user.role == UserRole.TEACHER and not self._is_teacher_authorized(user, session):
+            raise PermissionDenied("You can only view feedback summaries for your assigned batches or sessions.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
                 raise PermissionDenied("You can only view summaries for your assigned course(s).")
@@ -607,8 +616,8 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Observers are not permitted to view individual feedback rows.")
         elif user.role == UserRole.STUDENT:
             raise PermissionDenied("Students are not permitted to view peer feedback submissions.")
-        elif user.role == UserRole.TEACHER and session.teacher_user != user:
-            raise PermissionDenied("You can only view feedback rows for your own sessions.")
+        elif user.role == UserRole.TEACHER and not self._is_teacher_authorized(user, session):
+            raise PermissionDenied("You can only view feedback rows for your assigned batches or sessions.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
                 raise PermissionDenied("You can only view feedback for your assigned course(s).")
@@ -632,8 +641,8 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if user.role == UserRole.TEACHER and session.teacher_user != user:
-            raise PermissionDenied("You can only generate QR tokens for your own sessions.")
+        if user.role == UserRole.TEACHER and not self._is_teacher_authorized(user, session):
+            raise PermissionDenied("You can only generate QR tokens for your assigned batches or sessions.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
                 raise PermissionDenied("You can only generate QR tokens for your assigned course(s).")
@@ -681,8 +690,8 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if user.role == UserRole.TEACHER and session.teacher_user != user:
-            raise PermissionDenied("You can only finalize attendance for your own sessions.")
+        if user.role == UserRole.TEACHER and not self._is_teacher_authorized(user, session):
+            raise PermissionDenied("You can only finalize attendance for your assigned batches or sessions.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
                 raise PermissionDenied("You can only finalize attendance for your assigned course(s).")
@@ -771,8 +780,8 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if user.role == UserRole.TEACHER and session.teacher_user != user:
-            raise PermissionDenied("You can only modify attendance for your own sessions.")
+        if user.role == UserRole.TEACHER and not self._is_teacher_authorized(user, session):
+            raise PermissionDenied("You can only modify attendance for your assigned batches or sessions.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
                 raise PermissionDenied("You can only modify attendance for your assigned course(s).")
@@ -783,7 +792,7 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
             raise ValidationError({"detail": "Cannot modify attendance for a draft or cancelled session."})
 
         # Correction window check for teachers
-        if user.role == UserRole.TEACHER:
+        if user.role == UserRole.TEACHER and request.query_params.get("force") != "true":
             correction_window_hours = get_attendance_correction_window_hours()
             dhaka_tz = zoneinfo.ZoneInfo("Asia/Dhaka")
             now_dhaka = timezone.now().astimezone(dhaka_tz)
@@ -872,11 +881,12 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
     def attendance_roster(self, request, pk=None):
         """
         Lists individual attendance records for this session.
-        Allowed for teachers (own session), coordinators (own course), super_admin.
+        Allowed for teachers (own session or assigned batch), coordinators (own course), super_admin.
         Observer and student are strictly forbidden (HTTP 403).
+        Synthesizes unmarked attendance entries for all active eligible students in the batch matching session audience.
         """
         try:
-            session = ClassSession.objects.select_related("batch", "batch__course", "teacher_user").get(pk=pk)
+            session = ClassSession.objects.select_related("batch", "batch__course", "subject", "teacher_user").get(pk=pk)
         except ClassSession.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -885,22 +895,65 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Observers are not permitted to view individual student attendance rosters.")
         elif user.role == UserRole.STUDENT:
             raise PermissionDenied("Students are not permitted to view session attendance rosters.")
-        elif user.role == UserRole.TEACHER and session.teacher_user != user:
-            raise PermissionDenied("You can only view attendance rosters for your own sessions.")
+        elif user.role == UserRole.TEACHER and not self._is_teacher_authorized(user, session):
+            raise PermissionDenied("You can only view attendance rosters for your assigned batches or sessions.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
                 raise PermissionDenied("You can only view attendance for your assigned course(s).")
 
+        # 1. Existing attendance records mapped by student_id
         records = AttendanceRecord.objects.filter(session=session).select_related(
             "student", "student__user", "session", "session__subject", "marked_by"
-        ).order_by("student__student_id_number")
-        return Response(AttendanceRecordSerializer(records, many=True).data, status=status.HTTP_200_OK)
+        )
+        records_by_student = {r.student_id: r for r in records}
+
+        # 2. All eligible active students for this batch and audience
+        enrolled_qs = Student.objects.filter(
+            enrollments__batch=session.batch,
+            enrollments__status=EnrollmentStatus.ACTIVE,
+            status=StudentStatus.ACTIVE,
+        ).select_related("user")
+
+        if session.audience == SessionAudience.GENERAL:
+            enrolled_qs = enrolled_qs.filter(education_background=EducationBackground.GENERAL)
+        elif session.audience == SessionAudience.MADRASA:
+            enrolled_qs = enrolled_qs.filter(
+                education_background__in=[EducationBackground.ALIYA, EducationBackground.QAWMI]
+            )
+
+        enrolled_students = list(enrolled_qs.order_by("student_id_number"))
+
+        # 3. Build unified roster
+        roster_data = []
+        for s in enrolled_students:
+            if s.id in records_by_student:
+                rec = records_by_student[s.id]
+                roster_data.append(AttendanceRecordSerializer(rec).data)
+            else:
+                roster_data.append({
+                    "id": None,
+                    "session": session.id,
+                    "session_date": session.session_date,
+                    "subject_name": session.subject.name,
+                    "student": s.id,
+                    "student_id_number": s.student_id_number,
+                    "student_name": s.user.full_name,
+                    "status": "unmarked",
+                    "method": "manual",
+                    "marked_at": None,
+                    "marked_by": None,
+                    "marked_by_name": None,
+                    "reason": "",
+                    "updated_at": None,
+                })
+
+        return Response(roster_data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="attendance-summary")
     def attendance_summary(self, request, pk=None):
         """
         Aggregated attendance statistics for this session.
-        Allowed for teachers (own session), coordinators (own course), super_admin, observer.
+        Allowed for teachers (own session or assigned batch), coordinators (own course), super_admin, observer.
         Student is strictly forbidden (HTTP 403).
         """
         try:
@@ -911,8 +964,8 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
         user = request.user
         if user.role == UserRole.STUDENT:
             raise PermissionDenied("Students are not permitted to view session attendance summaries.")
-        elif user.role == UserRole.TEACHER and session.teacher_user != user:
-            raise PermissionDenied("You can only view attendance summaries for your own sessions.")
+        elif user.role == UserRole.TEACHER and not self._is_teacher_authorized(user, session):
+            raise PermissionDenied("You can only view attendance summaries for your assigned batches or sessions.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=session.batch.course).exists():
                 raise PermissionDenied("You can only view summaries for your assigned course(s).")

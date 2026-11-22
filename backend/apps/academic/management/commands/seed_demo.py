@@ -277,11 +277,13 @@ class Command(BaseCommand):
                 defaults={
                     "campus": campus,
                     "name": "SBMC Batch 43",
-                    "start_date": datetime.date(2026, 12, 1),
+                    "start_date": datetime.date(2026, 11, 1),
                     "end_date": datetime.date(2027, 2, 28),
                     "status": BatchStatus.ACTIVE,
                 },
             )
+            batch43.start_date = datetime.date(2026, 11, 1)
+            batch43.save()
 
             # 9. Teacher Assignments for BOTH batches (Every subject has an assigned teacher)
             for batch in [batch42, batch43]:

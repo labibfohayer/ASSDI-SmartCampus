@@ -146,6 +146,11 @@ export default function ManualAttendancePage() {
     setSaving(true);
     try {
       const payload = {
+        items: changed.map((item) => ({
+          student_id: item.student_id,
+          status: item.status,
+          reason: item.reason || (isBangla ? 'শিক্ষক কর্তৃক ম্যানুয়াল সংশোধন' : 'Manual teacher correction'),
+        })),
         updates: changed.map((item) => ({
           student_id: item.student_id,
           status: item.status,
@@ -153,7 +158,7 @@ export default function ManualAttendancePage() {
         })),
       };
 
-      await api.post(`/api/v1/class-sessions/${selectedSessionId}/attendance/manual/`, payload);
+      await api.post(`/api/v1/class-sessions/${selectedSessionId}/attendance/manual/?force=true`, payload);
       toast.success(isBangla ? 'হাজিরা সফলভাবে সংরক্ষিত হয়েছে!' : 'Attendance updated successfully!');
       fetchAttendanceRoster();
     } catch (err: any) {

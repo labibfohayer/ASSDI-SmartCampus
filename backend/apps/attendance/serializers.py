@@ -72,10 +72,25 @@ class ManualAttendanceItemSerializer(serializers.Serializer):
 class ManualAttendanceBulkSerializer(serializers.Serializer):
     items = serializers.ListField(
         child=ManualAttendanceItemSerializer(),
-        allow_empty=False,
-        required=True,
+        allow_empty=True,
+        required=False,
+        default=list,
         help_text="List of attendance records to create or correct manually.",
     )
+    updates = serializers.ListField(
+        child=ManualAttendanceItemSerializer(),
+        allow_empty=True,
+        required=False,
+        default=list,
+        help_text="Alias for items.",
+    )
+
+    def validate(self, attrs):
+        items = attrs.get("items") or attrs.get("updates") or []
+        if not items:
+            raise serializers.ValidationError("At least one attendance record update is required.")
+        attrs["items"] = items
+        return attrs
 
 
 class SessionAttendanceSummarySerializer(serializers.Serializer):
