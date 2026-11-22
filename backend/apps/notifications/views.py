@@ -71,6 +71,28 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
             status=status.HTTP_200_OK,
         )
 
+    @action(detail=True, methods=["delete", "post"], url_path="delete")
+    def delete_notification(self, request, pk=None):
+        try:
+            notification = Notification.objects.get(pk=pk, recipient=request.user)
+        except Notification.DoesNotExist:
+            return Response({"detail": "Notification not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        notification.delete()
+        return Response({"success": True, "detail": "Notification deleted."}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"], url_path="clear-all-read")
+    def clear_all_read(self, request):
+        deleted_count, _ = Notification.objects.filter(
+            recipient=request.user,
+            is_read=True,
+        ).delete()
+
+        return Response(
+            {"success": True, "cleared_count": deleted_count},
+            status=status.HTTP_200_OK,
+        )
+
     @action(detail=False, methods=["post", "delete"], url_path="device-token")
     def device_token(self, request):
         if request.method == "POST":

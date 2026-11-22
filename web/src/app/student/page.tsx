@@ -228,6 +228,10 @@ export default function StudentPortalPage() {
       setFeedbacks(Array.isArray(fbRes.data) ? fbRes.data : []);
       setHelpRequests(Array.isArray(helpRes.data) ? helpRes.data : helpRes.data?.results || []);
 
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('notification-refresh'));
+      }
+
       setTimeout(() => {
         setSelectedSessionForFeedback(null);
         setFeedbackComment('');

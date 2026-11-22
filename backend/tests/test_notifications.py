@@ -183,6 +183,17 @@ class TestNotificationsEngine:
         res_count3 = api_client.get("/api/v1/notifications/unread-count/")
         assert res_count3.data["unread_count"] == 0
 
+        # Delete single notification
+        res_del = api_client.delete(f"/api/v1/notifications/{n1.id}/delete/")
+        assert res_del.status_code == status.HTTP_200_OK
+        assert not Notification.objects.filter(id=n1.id).exists()
+
+        # Clear all read notifications
+        res_clear = api_client.post("/api/v1/notifications/clear-all-read/")
+        assert res_clear.status_code == status.HTTP_200_OK
+        assert res_clear.data["cleared_count"] == 1  # n2 was read
+        assert not Notification.objects.filter(id=n2.id).exists()
+
     def test_signal_help_request_created_notifies_teacher(self, api_client, notifications_setup_data):
         """When student creates a help request, teacher receives notification via signal."""
         data = notifications_setup_data

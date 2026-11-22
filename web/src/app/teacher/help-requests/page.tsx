@@ -73,6 +73,9 @@ export default function TeacherHelpRequestsPage() {
     try {
       await api.post(`/api/v1/help-requests/${requestId}/start/`);
       toast.success(isBangla ? 'সহায়তা প্রদান শুরু করা হয়েছে!' : 'Marked as In-Progress');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('notification-refresh'));
+      }
       fetchHelpRequests();
     } catch (err: any) {
       toast.error(err.response?.data?.error?.message || 'Failed to start');
@@ -101,6 +104,9 @@ export default function TeacherHelpRequestsPage() {
         teacher_notes: teacherNotes.trim(),
       });
       toast.success(isBangla ? 'রিকোয়েস্ট সফলভাবে সমাধান হিসেবে চিহ্নিত হয়েছে!' : 'Resolved successfully!');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('notification-refresh'));
+      }
       setResolvingItem(null);
       fetchHelpRequests();
     } catch (err: any) {
