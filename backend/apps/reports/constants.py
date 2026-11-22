@@ -18,6 +18,9 @@ class ExportFormat(models.TextChoices):
     JSON = "json", "JSON"
     PDF = "pdf", "PDF"
     XLSX = "xlsx", "Excel (.xlsx)"
+    DOCX = "docx", "Word Document (.docx)"
+    PPTX = "pptx", "PowerPoint Presentation (.pptx)"
+    CSV = "csv", "CSV Spreadsheet (.csv)"
 
 
 REPORT_NAMES = {

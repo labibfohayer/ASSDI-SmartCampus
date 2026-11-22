@@ -26,6 +26,7 @@ import {
 import api from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 import { useLanguage } from '@/contexts/LanguageContext';
+import MultiFormatExportDropdown from '@/components/common/MultiFormatExportDropdown';
 
 type ReportKey =
   | 'daily-attendance'
@@ -367,32 +368,26 @@ export default function ReportsPage() {
           </p>
         </div>
 
-        {/* 1-Click Export Buttons */}
-        <div className="flex items-center gap-2.5 relative z-10">
+        {/* Multi-Format Export Options */}
+        <div className="flex flex-wrap items-center gap-2.5 relative z-10">
+          <MultiFormatExportDropdown
+            endpoint={currentReport.endpoint}
+            queryParams={buildQueryParams()}
+            baseFilename={currentReport.filename}
+            disabled={loading}
+          />
+
           <button
             onClick={() => handleDownload('pdf')}
             disabled={exportingFormat !== null || loading}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-rose-700/90 hover:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {exportingFormat === 'pdf' ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
             ) : (
               <Download className="w-4 h-4" />
             )}
-            <span>{isBangla ? 'পিডিএফ ডাউনলোড' : 'Export PDF'}</span>
-          </button>
-
-          <button
-            onClick={() => handleDownload('xlsx')}
-            disabled={exportingFormat !== null || loading}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] text-xs font-extrabold rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-          >
-            {exportingFormat === 'xlsx' ? (
-              <RefreshCw className="w-4 h-4 animate-spin text-[#0B2A21]" />
-            ) : (
-              <FileSpreadsheet className="w-4 h-4 text-[#0B2A21]" />
-            )}
-            <span>{isBangla ? 'এক্সেল ডাউনলোড' : 'Export Excel'}</span>
+            <span>{isBangla ? 'কুইক পিডিএফ' : 'Quick PDF'}</span>
           </button>
         </div>
       </div>

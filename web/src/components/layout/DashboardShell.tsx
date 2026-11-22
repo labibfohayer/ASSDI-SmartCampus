@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -29,11 +29,91 @@ import {
   Clock,
   Megaphone,
   ChevronRight,
+  Settings,
+  Bookmark,
+  Archive,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import NotificationBell from '@/components/notifications/NotificationBell';
+import AdminMenuManagerModal, {
+  CustomNavItem,
+  AVAILABLE_ICONS,
+} from '@/components/admin/AdminMenuManagerModal';
+
+const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
+  {
+    id: 'overview',
+    href: '/admin',
+    labelBn: 'অ্যাডমিন ওভারভিউ',
+    labelEn: 'System Overview',
+    iconName: 'ShieldCheck',
+    section: 'main',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
+    id: 'students',
+    href: '/admin/students',
+    labelBn: 'শিক্ষার্থী ও ভর্তি',
+    labelEn: 'Student Directory',
+    iconName: 'Users',
+    section: 'main',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
+    id: 'courses',
+    href: '/admin/courses',
+    labelBn: 'কোর্স ও ব্যাচসমূহ',
+    labelEn: 'Courses & Batches',
+    iconName: 'Layers',
+    section: 'main',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
+    id: 'sessions',
+    href: '/admin/sessions',
+    labelBn: 'ক্লাস সেশন ও রুটিন',
+    labelEn: 'Class Sessions & Routine',
+    iconName: 'Calendar',
+    section: 'main',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
+    id: 'announcements',
+    href: '/announcements',
+    labelBn: 'নোটিশ ও অ্যানাউন্সমেন্ট',
+    labelEn: 'Notice Board',
+    iconName: 'Megaphone',
+    section: 'main',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
+    id: 'coordinator_analytics',
+    href: '/coordinator',
+    labelBn: 'কো-অর্ডিনেটর ড্যাশবোর্ড',
+    labelEn: 'Coordinator Dashboard',
+    iconName: 'BarChart3',
+    section: 'analytics',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
+    id: 'reports_hub',
+    href: '/reports',
+    labelBn: '৯টি এসআরএস রিপোর্টস হাব',
+    labelEn: '9 SRS Reports Hub',
+    iconName: 'FileText',
+    section: 'analytics',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+];
 
 export interface NavItem {
   href: string;
@@ -60,67 +140,75 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const { isBangla, t } = useLanguage();
   const pathname = usePathname();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [menuManagerOpen, setMenuManagerOpen] = useState(false);
+  const [adminMenus, setAdminMenus] = useState<CustomNavItem[]>(DEFAULT_ADMIN_MENUS);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('assdi_admin_nav_menus_v1');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAdminMenus(parsed);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load custom admin menus:', e);
+      }
+    }
+  }, []);
+
+  const handleSaveAdminMenus = (updated: CustomNavItem[]) => {
+    setAdminMenus(updated);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('assdi_admin_nav_menus_v1', JSON.stringify(updated));
+    }
+  };
+
+  const handleResetAdminMenus = () => {
+    setAdminMenus(DEFAULT_ADMIN_MENUS);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('assdi_admin_nav_menus_v1');
+    }
+  };
 
   // Pre-configured role-specific navigation menus (Serial-by-serial vertical list)
   const getNavSections = (): NavSection[] => {
     switch (role) {
-      case 'super_admin':
+      case 'super_admin': {
+        const activeOnly = adminMenus.filter((m) => !m.isArchived);
+        const mainItems = activeOnly
+          .filter((m) => m.section === 'main')
+          .map((m) => ({
+            href: m.href,
+            labelBn: m.labelBn,
+            labelEn: m.labelEn,
+            icon: AVAILABLE_ICONS[m.iconName] || Bookmark,
+          }));
+
+        const analyticsItems = activeOnly
+          .filter((m) => m.section === 'analytics')
+          .map((m) => ({
+            href: m.href,
+            labelBn: m.labelBn,
+            labelEn: m.labelEn,
+            icon: AVAILABLE_ICONS[m.iconName] || Bookmark,
+          }));
+
         return [
           {
             titleBn: 'প্রধান অ্যাডমিন মেনু',
             titleEn: 'Main Admin Menu',
-            items: [
-              {
-                href: '/admin',
-                labelBn: 'অ্যাডমিন ওভারভিউ',
-                labelEn: 'System Overview',
-                icon: ShieldCheck,
-              },
-              {
-                href: '/admin/students',
-                labelBn: 'শিক্ষার্থী ও ভর্তি',
-                labelEn: 'Student Directory',
-                icon: Users,
-              },
-              {
-                href: '/admin/courses',
-                labelBn: 'কোর্স ও ব্যাচসমূহ',
-                labelEn: 'Courses & Batches',
-                icon: Layers,
-              },
-              {
-                href: '/admin/sessions',
-                labelBn: 'ক্লাস সেশন ও রুটিন',
-                labelEn: 'Class Sessions & Routine',
-                icon: Calendar,
-              },
-              {
-                href: '/announcements',
-                labelBn: 'নোটিশ ও অ্যানাউন্সমেন্ট',
-                labelEn: 'Notice Board',
-                icon: Megaphone,
-              },
-            ],
+            items: mainItems,
           },
           {
             titleBn: 'অ্যানালিটিক্স ও রিপোর্টস',
             titleEn: 'Analytics & Reports',
-            items: [
-              {
-                href: '/coordinator',
-                labelBn: 'কো-অর্ডিনেটর ড্যাশবোর্ড',
-                labelEn: 'Coordinator Dashboard',
-                icon: BarChart3,
-              },
-              {
-                href: '/reports',
-                labelBn: '৯টি এসআরএস রিপোর্টস হাব',
-                labelEn: '9 SRS Reports Hub',
-                icon: FileText,
-              },
-            ],
+            items: analyticsItems,
           },
         ];
+      }
 
       case 'coordinator':
       case 'observer':
@@ -502,6 +590,27 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 </Link>
               </div>
             )}
+
+            {/* Super Admin Navigation Customizer Button */}
+            {role === 'super_admin' && (
+              <div className="pt-2 border-t border-emerald-950/80">
+                <button
+                  type="button"
+                  onClick={() => setMenuManagerOpen(true)}
+                  className="w-full py-2.5 px-3 rounded-xl bg-[#164E3D] hover:bg-[#1E6650] text-[#E5C378] border border-[#C5A059]/40 text-xs font-bold transition flex items-center justify-between shadow-xs cursor-pointer active:scale-98"
+                >
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-[#C5A059]" />
+                    <span>{isBangla ? 'মেনু এডিটর ও আর্কাইভ' : 'Menu & Archive Control'}</span>
+                  </div>
+                  {adminMenus.some((m) => m.isArchived) && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-amber-500/20 text-amber-300 font-extrabold border border-amber-500/30">
+                      {adminMenus.filter((m) => m.isArchived).length} {isBangla ? 'হাইড' : 'hidden'}
+                    </span>
+                  )}
+                </button>
+              </div>
+            )}
           </nav>
         </div>
 
@@ -613,6 +722,17 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           <p>© 2026 আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট (ASSDI) • ঢাকা, বাংলাদেশ</p>
         </footer>
       </div>
+
+      {/* Super Admin Navigation Customizer Modal */}
+      {role === 'super_admin' && (
+        <AdminMenuManagerModal
+          isOpen={menuManagerOpen}
+          onClose={() => setMenuManagerOpen(false)}
+          menus={adminMenus}
+          onSaveMenus={handleSaveAdminMenus}
+          onResetDefaults={handleResetAdminMenus}
+        />
+      )}
     </div>
   );
 }

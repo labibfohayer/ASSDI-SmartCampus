@@ -27,6 +27,7 @@ import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 import { useLanguage } from '@/contexts/LanguageContext';
+import MultiFormatExportDropdown from '@/components/common/MultiFormatExportDropdown';
 
 interface StudentItem {
   id: number;
@@ -349,6 +350,12 @@ export default function AdminStudentsPage() {
         </div>
 
         <div className="flex items-center gap-2.5 relative z-10 flex-wrap">
+          <MultiFormatExportDropdown
+            endpoint="reports/monthly-student-performance/"
+            queryParams={{ year: new Date().getFullYear(), month: new Date().getMonth() + 1 }}
+            baseFilename="student_roster_performance_report"
+          />
+
           <button
             onClick={() => {
               setShowBulkModal(true);

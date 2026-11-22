@@ -27,12 +27,15 @@ from apps.reports.serializers import (
 from apps.reports.services.dashboard_service import CoordinatorDashboardService
 from apps.reports.services.excel_service import ExcelExportService
 from apps.reports.services.pdf_service import PDFExportService
+from apps.reports.services.docx_service import WordExportService
+from apps.reports.services.pptx_service import PowerPointExportService
+from apps.reports.services.csv_service import CSVExportService
 from apps.reports.services.report_service import ReportService
 
 
 def handle_export_or_json(request, report_type: str, data: Dict[str, Any], filename_prefix: str) -> HttpResponse:
     """
-    Handles PDF/XLSX file downloads or returns JSON response.
+    Handles PDF, DOCX, PPTX, XLSX, and CSV file downloads or returns JSON response.
     Writes ReportLog and AuditLog records upon file export.
     """
     export_format = (
@@ -41,7 +44,15 @@ def handle_export_or_json(request, report_type: str, data: Dict[str, Any], filen
     user_name = request.user.full_name if request.user.is_authenticated else "Staff"
     filters = dict(request.query_params.items())
 
-    if export_format in [ExportFormat.PDF, ExportFormat.XLSX]:
+    valid_export_formats = [
+        ExportFormat.PDF,
+        ExportFormat.XLSX,
+        ExportFormat.DOCX,
+        ExportFormat.PPTX,
+        ExportFormat.CSV,
+    ]
+
+    if export_format in valid_export_formats:
         # 1. Create ReportLog entry
         ReportLog.objects.create(
             report_type=report_type,
@@ -80,6 +91,30 @@ def handle_export_or_json(request, report_type: str, data: Dict[str, Any], filen
                 content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
             response["Content-Disposition"] = f'attachment; filename="{filename_prefix}_{ts}.xlsx"'
+            return response
+
+        elif export_format == ExportFormat.DOCX:
+            docx_buf = WordExportService.generate_docx(report_type, data, user_name, filters)
+            response = HttpResponse(
+                docx_buf.getvalue(),
+                content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            )
+            response["Content-Disposition"] = f'attachment; filename="{filename_prefix}_{ts}.docx"'
+            return response
+
+        elif export_format == ExportFormat.PPTX:
+            pptx_buf = PowerPointExportService.generate_pptx(report_type, data, user_name, filters)
+            response = HttpResponse(
+                pptx_buf.getvalue(),
+                content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            )
+            response["Content-Disposition"] = f'attachment; filename="{filename_prefix}_{ts}.pptx"'
+            return response
+
+        elif export_format == ExportFormat.CSV:
+            csv_buf = CSVExportService.generate_csv(report_type, data, user_name, filters)
+            response = HttpResponse(csv_buf.getvalue(), content_type="text/csv; charset=utf-8")
+            response["Content-Disposition"] = f'attachment; filename="{filename_prefix}_{ts}.csv"'
             return response
 
     return Response(data, status=status.HTTP_200_OK)
