@@ -6,17 +6,14 @@ import {
   Printer,
   RotateCcw,
   ShieldCheck,
-  GraduationCap,
-  Download,
   CheckCircle2,
   Phone,
   MapPin,
-  Calendar,
-  Sparkles,
+  Globe,
   FileText,
   CreditCard,
   QrCode,
-  Building,
+  Download,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
@@ -48,6 +45,11 @@ export interface StudentIdCardData {
   institution_tagline?: string;
   institution_address?: string;
   institution_contact?: string;
+  motto?: string;
+  govt_reg?: string;
+  website?: string;
+  photo_url?: string;
+  signature_url?: string;
 }
 
 interface StudentIdCardModalProps {
@@ -57,6 +59,44 @@ interface StudentIdCardModalProps {
   initialData?: Partial<StudentIdCardData> | null;
 }
 
+// Fine SVG guilloche wavy security border pattern matching authentic institutional PVC cards
+const GuillocheBorder = () => (
+  <svg
+    className="absolute inset-0 w-full h-full pointer-events-none opacity-40 z-0"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+    viewBox="0 0 310 490"
+  >
+    <defs>
+      <linearGradient id="guillocheTealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#10B981" />
+        <stop offset="50%" stopColor="#0D9488" />
+        <stop offset="100%" stopColor="#059669" />
+      </linearGradient>
+    </defs>
+    {/* Left vertical sinusoidal waves */}
+    <path d="M 0 0 C 18 80, -2 160, 10 245 C 22 330, 2 410, 6 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="1" />
+    <path d="M 3 0 C 21 80, 1 160, 13 245 C 25 330, 5 410, 9 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.8" />
+    <path d="M 6 0 C 24 80, 4 160, 16 245 C 28 330, 8 410, 12 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.8" />
+    <path d="M 9 0 C 27 80, 7 160, 19 245 C 31 330, 11 410, 15 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.7" />
+    <path d="M 12 0 C 30 80, 10 160, 22 245 C 34 330, 14 410, 18 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.6" />
+    <path d="M 15 0 C 33 80, 13 160, 25 245 C 37 330, 17 410, 21 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.5" />
+    
+    {/* Right vertical sinusoidal waves */}
+    <path d="M 310 0 C 292 80, 312 160, 300 245 C 288 330, 308 410, 304 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="1" />
+    <path d="M 307 0 C 289 80, 309 160, 297 245 C 285 330, 305 410, 301 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.8" />
+    <path d="M 304 0 C 286 80, 306 160, 294 245 C 282 330, 302 410, 298 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.8" />
+    <path d="M 301 0 C 283 80, 303 160, 291 245 C 279 330, 299 410, 295 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.7" />
+    <path d="M 298 0 C 280 80, 300 160, 288 245 C 276 330, 296 410, 292 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.6" />
+    <path d="M 295 0 C 277 80, 297 160, 285 245 C 273 330, 293 410, 289 490" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.5" />
+
+    {/* Bottom undulating waves */}
+    <path d="M 0 482 Q 77 468, 155 484 T 310 480" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.9" />
+    <path d="M 0 485 Q 77 471, 155 487 T 310 483" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.7" />
+    <path d="M 0 488 Q 77 474, 155 490 T 310 486" fill="none" stroke="url(#guillocheTealGrad)" strokeWidth="0.5" />
+  </svg>
+);
+
 export default function StudentIdCardModal({
   isOpen,
   onClose,
@@ -65,6 +105,7 @@ export default function StudentIdCardModal({
 }: StudentIdCardModalProps) {
   const { isBangla } = useLanguage();
   const [activeSide, setActiveSide] = useState<'front' | 'back'>('front');
+  const [showBothSides, setShowBothSides] = useState<boolean>(false);
   const [activeDocType, setActiveDocType] = useState<'id_card' | 'admit_card'>('id_card');
   const [loading, setLoading] = useState<boolean>(false);
   const [cardData, setCardData] = useState<StudentIdCardData | null>(null);
@@ -83,37 +124,39 @@ export default function StudentIdCardModal({
         }
       } catch (err: any) {
         console.warn('Failed to fetch official ID card endpoint, using fallback initial data:', err);
-        // Fallback to provided initialData or default mockup
         if (initialData && initialData.student_id_number) {
           setCardData({
             student_id: Number(initialData.student_id) || 1,
-            student_id_number: initialData.student_id_number,
+            student_id_number: initialData.student_id_number || '4138',
             registration_no: initialData.registration_no || 'REG-2026-042-001',
-            full_name: initialData.full_name || 'Abdullah Student',
-            phone: initialData.phone || '01700000001',
-            guardian_phone: initialData.guardian_phone || '01800000001',
+            full_name: initialData.full_name || 'Labib Fohayer',
+            phone: initialData.phone || '+880 1700-000001',
+            guardian_phone: initialData.guardian_phone || '+880 1800-000001',
             education_background: initialData.education_background || 'General',
             status: initialData.status || 'active',
-            course_name: initialData.course_name || 'Small Business Management Course (SBMC)',
+            course_name: initialData.course_name || 'Small Business Management Course',
             course_code: initialData.course_code || 'SBMC',
             batch_name: initialData.batch_name || 'SBMC Batch 42',
             batch_number: initialData.batch_number || 42,
             campus_name: initialData.campus_name || 'Kazi Bari Campus',
-            campus_address: initialData.campus_address || 'North Badda, Dhaka',
+            campus_address: initialData.campus_address || 'Kazi Bari, Satarkul, North Badda, Dhaka-1212',
             blood_group: initialData.blood_group || 'A+',
             session_year: initialData.session_year || '2026-2027',
-            issue_date: initialData.issue_date || '15 Nov 2026',
-            expiry_date: initialData.expiry_date || '15 Nov 2027',
+            issue_date: initialData.issue_date || '16-08-2026',
+            expiry_date: initialData.expiry_date || '15-11-2026',
             verification_payload:
               initialData.verification_payload ||
-              `ASSDI:VERIFY:${initialData.student_id_number}:ACTIVE`,
+              `ASSDI:VERIFY:${initialData.student_id_number || '4138'}:ACTIVE`,
             institution_name_bn: 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট',
             institution_name_en: 'As-Sunnah Skill Development Institute',
-            institution_tagline:
-              'দক্ষ মানবসম্পদ গঠনে আস-সুন্নাহ ফাউন্ডেশনের একটি কল্যাণমূলক উদ্যোগ',
-            institution_address:
-              'আস-সুন্নাহ কমপ্লেক্স, প্লট-৭৯, ব্লক-ডি, ইস্টার্ন হাউজিং, আফতাবনগর, ঢাকা-১২১২',
-            institution_contact: '+880 9612-224444 | support@assdi.org',
+            institution_tagline: 'দক্ষ মানবসম্পদ গঠনে আস-সুন্নাহ ফাউন্ডেশনের একটি কল্যাণমূলক উদ্যোগ',
+            institution_address: 'Kazi Bari, Satarkul, North Badda, Dhaka-1212',
+            institution_contact: '+880 9649-222255 | +880 1409-979967',
+            motto: 'EFFICIENCY · HONESTY · PROSPERITY',
+            govt_reg: 'Govt. Reg. #STP-DHA-000877',
+            website: 'skill.assunnahfoundation.org',
+            photo_url: '/student-sample.jpg',
+            signature_url: '/signature-transparent.png',
           });
         }
       } finally {
@@ -126,31 +169,36 @@ export default function StudentIdCardModal({
 
   if (!isOpen) return null;
 
-  const data = cardData || {
+  const data: StudentIdCardData = cardData || {
     student_id: 1,
-    student_id_number: 'STD-2026-042-001',
+    student_id_number: '4138',
     registration_no: 'REG-2026-042-001',
-    full_name: 'আব্দুল্লাহ (Abdullah Student)',
-    phone: '01700000001',
-    guardian_phone: '01800000001',
+    full_name: 'LABIB FOHAYER',
+    phone: '+880 1700-000001',
+    guardian_phone: '+880 1800-000001',
     education_background: 'General',
     status: 'active',
-    course_name: 'Small Business Management Course (SBMC)',
+    course_name: 'Small Business Management Course',
     course_code: 'SBMC',
     batch_name: 'SBMC Batch 42',
     batch_number: 42,
     campus_name: 'Kazi Bari Campus',
-    campus_address: 'North Badda, Dhaka',
+    campus_address: 'Kazi Bari, Satarkul, North Badda, Dhaka-1212',
     blood_group: 'A+',
     session_year: '2026-2027',
-    issue_date: '15 Nov 2026',
-    expiry_date: '15 Nov 2027',
-    verification_payload: 'ASSDI:VERIFY:STD-2026-042-001:ACTIVE',
+    issue_date: '16-08-2026',
+    expiry_date: '15-11-2026',
+    verification_payload: 'ASSDI:VERIFY:4138:ACTIVE',
     institution_name_bn: 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট',
     institution_name_en: 'As-Sunnah Skill Development Institute',
     institution_tagline: 'দক্ষ মানবসম্পদ গঠনে আস-সুন্নাহ ফাউন্ডেশনের একটি কল্যাণমূলক উদ্যোগ',
-    institution_address: 'আস-সুন্নাহ কমপ্লেক্স, উত্তর বাড্ডা, ঢাকা-১২১২',
-    institution_contact: '+880 9612-224444 | support@assdi.org',
+    institution_address: 'Kazi Bari, Satarkul, North Badda, Dhaka-1212',
+    institution_contact: '+880 9649-222255 | +880 1409-979967',
+    motto: 'EFFICIENCY · HONESTY · PROSPERITY',
+    govt_reg: 'Govt. Reg. #STP-DHA-000877',
+    website: 'skill.assunnahfoundation.org',
+    photo_url: '/student-sample.jpg',
+    signature_url: '/signature-transparent.png',
   };
 
   const handlePrint = () => {
@@ -158,21 +206,21 @@ export default function StudentIdCardModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
         
         {/* Modal Top Control Bar */}
-        <div className="bg-[#0B2A21] px-5 sm:px-6 py-4 flex items-center justify-between border-b border-[#071F18] text-white">
+        <div className="bg-[#0B2A21] px-5 sm:px-6 py-3.5 flex items-center justify-between border-b border-[#071F18] text-white">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center text-[#E5C378]">
-              <CreditCard className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-white/10 border border-[#C5A059]/40 flex items-center justify-center p-1">
+              <img src="/logo.png" alt="As-Sunnah" className="w-full h-full object-contain" />
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-extrabold tracking-tight">
-                {isBangla ? 'প্রাতিষ্ঠানিক ডিজিটাল ডকুমেন্টস' : 'Institutional Digital Credentials'}
+                {isBangla ? 'আস-সুন্নাহ প্রাতিষ্ঠানিক ডিজিটাল ডকুমেন্টস' : 'As-Sunnah Institutional Credentials'}
               </h2>
-              <p className="text-[11px] text-emerald-200/80">
-                {data.full_name} • <span className="font-mono text-[#E5C378]">{data.student_id_number}</span>
+              <p className="text-[11px] text-emerald-200/90 font-medium">
+                {data.full_name} • <span className="font-mono text-[#E5C378] font-bold">ID: {data.student_id_number}</span>
               </p>
             </div>
           </div>
@@ -186,7 +234,7 @@ export default function StudentIdCardModal({
         </div>
 
         {/* Document Type Switcher (ID Card vs Admit Card) */}
-        <div className="px-5 pt-4 pb-2 flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 bg-gray-50/70">
+        <div className="px-5 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 bg-gray-50/80">
           <div className="inline-flex p-1 bg-white border border-gray-200 rounded-xl shadow-2xs">
             <button
               type="button"
@@ -198,7 +246,7 @@ export default function StudentIdCardModal({
               }`}
             >
               <CreditCard className="w-3.5 h-3.5" />
-              <span>{isBangla ? 'ডিজিটাল আইডি কার্ড' : 'Student ID Card'}</span>
+              <span>{isBangla ? 'আস-সুন্নাহ আইডি কার্ড' : 'As-Sunnah ID Card'}</span>
             </button>
             <button
               type="button"
@@ -210,30 +258,47 @@ export default function StudentIdCardModal({
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>{isBangla ? 'পরীক্ষার এডমিট কার্ড' : 'Exam Admit Card'}</span>
+              <span>{isBangla ? 'পরীক্ষার প্রবেশপত্র (Admit Card)' : 'Exam Admit Card'}</span>
             </button>
           </div>
 
           <div className="flex items-center gap-2">
             {activeDocType === 'id_card' && (
-              <button
-                type="button"
-                onClick={() => setActiveSide(activeSide === 'front' ? 'back' : 'front')}
-                className="px-3 py-1.5 bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-emerald-700" />
-                <span>
-                  {activeSide === 'front'
-                    ? (isBangla ? 'কার্ড উল্টান (পিছনের পাশ)' : 'Flip to Back')
-                    : (isBangla ? 'কার্ড উল্টান (সামনের পাশ)' : 'Flip to Front')}
-                </span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowBothSides(!showBothSides)}
+                  className={`px-3 py-1.5 border rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 ${
+                    showBothSides
+                      ? 'bg-emerald-800 text-white border-emerald-900'
+                      : 'bg-white text-emerald-900 border-emerald-300 hover:bg-emerald-50'
+                  }`}
+                >
+                  <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{isBangla ? 'উভয় পাশ দেখুন' : 'View Both Sides'}</span>
+                </button>
+
+                {!showBothSides && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveSide(activeSide === 'front' ? 'back' : 'front')}
+                    className="px-3 py-1.5 bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>
+                      {activeSide === 'front'
+                        ? (isBangla ? 'কার্ড উল্টান (পিছনের পাশ)' : 'Flip to Back')
+                        : (isBangla ? 'কার্ড উল্টান (সামনের পাশ)' : 'Flip to Front')}
+                    </span>
+                  </button>
+                )}
+              </>
             )}
 
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3.5 py-1.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] rounded-xl text-xs font-extrabold shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+              className="px-4 py-1.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] rounded-xl text-xs font-extrabold shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
             >
               <Printer className="w-3.5 h-3.5 text-[#0B2A21]" />
               <span>{isBangla ? 'প্রিন্ট করুন' : 'Print'}</span>
@@ -242,287 +307,306 @@ export default function StudentIdCardModal({
         </div>
 
         {/* Content Body */}
-        <div className="p-5 sm:p-7 flex flex-col items-center justify-center bg-slate-100/70" ref={printRef}>
+        <div className="p-4 sm:p-7 flex flex-col items-center justify-center bg-slate-100 min-h-[560px]" ref={printRef}>
           
           {/* ============================================================== */}
-          {/* VIEW 1: STUDENT ID CARD (CR80 PHYSICAL CARD RATIO) */}
+          {/* VIEW 1: AUTHENTIC AS-SUNNAH STUDENT ID CARD (VERTICAL CR80)   */}
           {/* ============================================================== */}
           {activeDocType === 'id_card' && (
             <div className="w-full flex flex-col items-center">
               
-              {/* CARD CONTAINER (FRONT) */}
-              {activeSide === 'front' && (
-                <div
-                  id="assdi-id-card-front"
-                  className="w-full max-w-[420px] rounded-2xl bg-gradient-to-br from-[#071F18] via-[#0B2A21] to-[#04140F] border-2 border-[#C5A059] shadow-2xl p-5 text-white relative overflow-hidden transition-all duration-300"
-                >
-                  {/* Subtle Geometric Texture Overlay */}
-                  <div className="absolute inset-0 bg-[radial-gradient(#C5A059_1px,transparent_1px)] [background-size:18px_18px] opacity-10 pointer-events-none" />
-                  
-                  {/* Watermark Logo Seal in Background */}
-                  <div className="absolute -right-8 -bottom-8 w-44 h-44 rounded-full bg-[#C5A059]/5 border border-[#C5A059]/10 pointer-events-none flex items-center justify-center">
-                    <GraduationCap className="w-28 h-28 text-[#C5A059]/10" />
-                  </div>
+              <div className={`flex flex-wrap items-center justify-center gap-6 ${showBothSides ? 'flex-row' : ''}`}>
+                
+                {/* ----------------- FRONT SIDE ----------------- */}
+                {(showBothSides || activeSide === 'front') && (
+                  <div
+                    id="assdi-id-card-front"
+                    className="w-[310px] h-[490px] rounded-2xl bg-white border border-slate-300 shadow-2xl p-2 relative overflow-hidden flex flex-col justify-between shrink-0 transition-all select-none"
+                  >
+                    {/* SVG Guilloche Security Wave Borders */}
+                    <GuillocheBorder />
 
-                  {/* Header */}
-                  <div className="relative z-10 text-center pb-2.5 border-b border-[#C5A059]/30">
-                    <div className="flex items-center justify-center gap-2 mb-0.5">
-                      <div className="w-6 h-6 rounded-lg bg-[#C5A059] text-[#0B2A21] flex items-center justify-center shadow-xs">
-                        <GraduationCap className="w-3.5 h-3.5" />
-                      </div>
-                      <h3 className="text-xs sm:text-[13px] font-black tracking-tight text-[#F8ECC9]">
-                        {data.institution_name_bn}
-                      </h3>
-                    </div>
-                    <p className="text-[7.5px] font-bold uppercase tracking-widest text-emerald-300/80">
-                      {data.institution_name_en}
-                    </p>
-
-                    <div className="mt-1.5 inline-block">
-                      <span className="px-2.5 py-0.5 bg-[#C5A059] text-[#071F18] text-[8.5px] font-black uppercase tracking-wider rounded-full shadow-2xs">
-                        STUDENT IDENTITY CARD • শিক্ষার্থী পরিচয়পত্র
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Body Content */}
-                  <div className="relative z-10 pt-3.5 pb-2 flex items-center gap-4">
-                    
-                    {/* Left: Avatar / Photo */}
-                    <div className="flex flex-col items-center shrink-0">
-                      <div className="w-20 h-24 rounded-xl bg-gradient-to-b from-[#134436] to-[#082019] border-2 border-[#C5A059] p-1 flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
-                        <div className="w-12 h-12 rounded-full bg-[#0B2A21] border border-[#C5A059]/60 flex items-center justify-center text-[#E5C378]">
-                          <GraduationCap className="w-6 h-6" />
-                        </div>
-                        <span className="text-[8px] font-extrabold text-[#E5C378] mt-1 uppercase tracking-wider">
-                          ASSDI
-                        </span>
-
-                        {/* Verified Ribbon */}
-                        <div className="absolute top-1 right-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 fill-[#0B2A21]" />
-                        </div>
-                      </div>
-
-                      <div className="mt-1 text-center">
-                        <span className="px-1.5 py-0.5 bg-emerald-950/80 border border-emerald-500/40 rounded text-[8px] font-bold text-emerald-300">
-                          Blood: {data.blood_group || 'A+'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Right: Student Information Details */}
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div>
-                        <p className="text-sm font-extrabold text-white truncate leading-tight">
-                          {data.full_name}
-                        </p>
-                        <p className="text-[10px] text-emerald-300/90 font-medium">
-                          {isBangla ? 'শিক্ষার্থী' : 'Registered Student'} ({data.education_background})
-                        </p>
-                      </div>
-
-                      <div className="pt-1 space-y-0.5 text-[10px]">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-emerald-400/80 font-bold w-12">{isBangla ? 'আইডি নং:' : 'ID No:'}</span>
-                          <span className="font-mono font-black text-[#E5C378] tracking-wider text-[11px]">
-                            {data.student_id_number}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-emerald-400/80 font-bold w-12">{isBangla ? 'রেজিস্ট্রেশন:' : 'Reg No:'}</span>
-                          <span className="font-mono text-gray-200">{data.registration_no}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-emerald-400/80 font-bold w-12">{isBangla ? 'কোর্স:' : 'Course:'}</span>
-                          <span className="text-gray-100 font-semibold truncate">{data.course_name}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-emerald-400/80 font-bold w-12">{isBangla ? 'ব্যাচ:' : 'Batch:'}</span>
-                          <span className="text-emerald-200 font-bold">{data.batch_name}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-emerald-400/80 font-bold w-12">{isBangla ? 'ক্যাম্পাস:' : 'Campus:'}</span>
-                          <span className="text-gray-300 truncate">{data.campus_name}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Bottom Footer with QR and Signature */}
-                  <div className="relative z-10 pt-2 border-t border-[#C5A059]/30 flex items-end justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1 bg-white rounded-lg shadow-xs">
-                        <QRCodeSVG
-                          value={data.verification_payload}
-                          size={46}
-                          level="M"
-                        />
-                      </div>
-                      <div>
-                        <p className="text-[7.5px] font-extrabold text-[#E5C378] uppercase tracking-wider">
-                          VERIFIED CREDENTIAL
-                        </p>
-                        <p className="text-[7px] text-gray-300">
-                          {isBangla ? 'স্ক্যান করে সত্যতা যাচাই করুন' : 'Scan to verify active status'}
-                        </p>
-                        <p className="text-[7.5px] font-mono text-emerald-400 mt-0.5">
-                          {isBangla ? 'মেয়াদ:' : 'Validity:'} {data.session_year}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="text-right flex flex-col items-end">
-                      <div className="w-20 border-b border-[#C5A059]/80 pb-0.5 mb-0.5 text-center">
-                        <span className="font-serif italic text-[8.5px] text-[#F4E5BE]">As-Sunnah</span>
-                      </div>
-                      <p className="text-[7.5px] font-bold text-gray-300">
-                        {isBangla ? 'অনুমোদিত স্বাক্ষর' : 'Authorized Seal'}
+                    {/* Top Sky-Blue Motto Banner */}
+                    <div className="relative z-10 w-full bg-[#E0F2FE] border-b border-[#BAE6FD] py-1 text-center rounded-t-lg">
+                      <p className="text-[8.5px] font-black uppercase tracking-[0.16em] text-[#0369A1]">
+                        {data.motto || 'EFFICIENCY · HONESTY · PROSPERITY'}
                       </p>
                     </div>
-                  </div>
-                </div>
-              )}
 
-              {/* CARD CONTAINER (BACK) */}
-              {activeSide === 'back' && (
-                <div
-                  id="assdi-id-card-back"
-                  className="w-full max-w-[420px] rounded-2xl bg-gradient-to-br from-[#071F18] via-[#0B2A21] to-[#04140F] border-2 border-[#C5A059] shadow-2xl p-5 text-white relative overflow-hidden transition-all duration-300 flex flex-col justify-between"
-                >
-                  <div className="absolute inset-0 bg-[radial-gradient(#C5A059_1px,transparent_1px)] [background-size:18px_18px] opacity-10 pointer-events-none" />
-                  
-                  <div className="relative z-10">
-                    <div className="text-center pb-2 border-b border-[#C5A059]/30">
-                      <h4 className="text-[11px] font-black text-[#E5C378] uppercase tracking-wider">
-                        {isBangla ? 'জরুরি নির্দেশনা ও নিয়মাবলী' : 'Terms & Campus Regulations'}
+                    {/* Header Logo & Title */}
+                    <div className="relative z-10 text-center pt-2">
+                      <img
+                        src="/logo.png"
+                        alt="As-Sunnah Logo"
+                        className="w-12 h-12 object-contain mx-auto drop-shadow-2xs"
+                      />
+                      <h4 className="text-[12.5px] font-bold text-[#15803D] tracking-tight mt-1">
+                        Student ID Card
                       </h4>
                     </div>
 
-                    <ul className="mt-2.5 space-y-1.5 text-[8.5px] text-emerald-100/90 leading-relaxed list-disc list-inside">
-                      <li>
-                        {isBangla
-                          ? 'এই কার্ডটি আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটের সম্পত্তি।'
-                          : 'This card is the exclusive property of ASSDI and must be carried at all times.'}
-                      </li>
-                      <li>
-                        {isBangla
-                          ? 'ক্যাম্পাসে ও ক্লাসরুমে প্রবেশের সময় কার্ডটি দৃশ্যমানভাবে প্রদর্শন করতে হবে।'
-                          : 'Must be presented upon entering campus, sessions, and examination halls.'}
-                      </li>
-                      <li>
-                        {isBangla
-                          ? 'কার্ডটি সম্পূর্ণ অহস্তান্তরযোগ্য। অন্য কারো কার্ড ব্যবহার শাস্তিযোগ্য অপরাধ।'
-                          : 'Strictly non-transferable. Misuse or forgery constitutes institutional offense.'}
-                      </li>
-                      <li>
-                        {isBangla
-                          ? 'কার্ড হারিয়ে গেলে অবিলম্বে ইনস্টিটিউট অফিসে যোগাযোগ করার অনুরোধ করা হলো।'
-                          : 'If found, please return to institute office or call the emergency helpline.'}
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="relative z-10 mt-3 pt-2.5 border-t border-[#C5A059]/30 text-center">
-                    <p className="text-[8.5px] font-bold text-white">
-                      {data.institution_name_bn}
-                    </p>
-                    <p className="text-[7.5px] text-emerald-200/80 mt-0.5">
-                      {data.institution_address || 'আস-সুন্নাহ কমপ্লেক্স, আফতাবনগর, ঢাকা-১২১২'}
-                    </p>
-                    <p className="text-[7.5px] font-mono text-[#E5C378] mt-0.5">
-                      হটলাইন: {data.institution_contact || '+৮৮০ ৯৬১২-২২৪৪৪৪'}
-                    </p>
-
-                    {/* Simulated barcode */}
-                    <div className="mt-2 pt-1 border-t border-emerald-900/60 flex flex-col items-center">
-                      <div className="h-6 w-48 bg-white/90 p-0.5 rounded flex items-center justify-center gap-0.5">
-                        {Array.from({ length: 38 }).map((_, i) => (
-                          <div
-                            key={i}
-                            className={`h-full ${i % 3 === 0 ? 'w-1 bg-black' : i % 2 === 0 ? 'w-0.5 bg-black' : 'w-1.5 bg-transparent'}`}
-                          />
-                        ))}
+                    {/* Student Portrait Photo */}
+                    <div className="relative z-10 my-1 flex justify-center">
+                      <div className="w-[114px] h-[138px] rounded-xl border-2 border-[#84CC16] p-0.5 shadow-2xs overflow-hidden bg-emerald-50/50">
+                        <img
+                          src={data.photo_url || '/student-sample.jpg'}
+                          alt={data.full_name}
+                          className="w-full h-full object-cover rounded-[9px]"
+                          onError={(e) => {
+                            // Fallback if image fails to load
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
                       </div>
-                      <span className="font-mono text-[8px] text-emerald-300 mt-0.5">
-                        *{data.student_id_number}*
+                    </div>
+
+                    {/* Student Full Name */}
+                    <div className="relative z-10 text-center px-3">
+                      <h3 className="font-extrabold text-[#14532D] text-[15px] uppercase tracking-wide truncate leading-tight">
+                        {data.full_name}
+                      </h3>
+                    </div>
+
+                    {/* Information Block (Left-aligned with clean aligned colons) */}
+                    <div className="relative z-10 px-6 pb-4 pt-1">
+                      <div className="space-y-1 text-[11px] leading-tight">
+                        <div className="grid grid-cols-[82px_8px_1fr] items-center">
+                          <span className="font-semibold text-slate-700">ID Number</span>
+                          <span className="font-bold text-slate-900">:</span>
+                          <span className="font-bold text-slate-900">{data.student_id_number}</span>
+                        </div>
+                        <div className="grid grid-cols-[82px_8px_1fr] items-center">
+                          <span className="font-semibold text-slate-700">Blood Group</span>
+                          <span className="font-bold text-slate-900">:</span>
+                          <span className="font-bold text-slate-900">{data.blood_group || 'A+'}</span>
+                        </div>
+                        <div className="grid grid-cols-[82px_8px_1fr] items-center">
+                          <span className="font-semibold text-slate-700">Issue Date</span>
+                          <span className="font-bold text-slate-900">:</span>
+                          <span className="font-bold text-slate-900">{data.issue_date}</span>
+                        </div>
+                        <div className="grid grid-cols-[82px_8px_1fr] items-center">
+                          <span className="font-semibold text-slate-700">Expiry Date</span>
+                          <span className="font-bold text-slate-900">:</span>
+                          <span className="font-bold text-slate-900">{data.expiry_date}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+
+                {/* ----------------- BACK SIDE ----------------- */}
+                {(showBothSides || activeSide === 'back') && (
+                  <div
+                    id="assdi-id-card-back"
+                    className="w-[310px] h-[490px] rounded-2xl bg-white border border-slate-300 shadow-2xl p-2 relative overflow-hidden flex flex-col justify-between shrink-0 transition-all select-none"
+                  >
+                    {/* SVG Guilloche Security Wave Borders */}
+                    <GuillocheBorder />
+
+                    {/* Top Branding Section */}
+                    <div className="relative z-10 text-center pt-2">
+                      <img
+                        src="/logo.png"
+                        alt="As-Sunnah Logo"
+                        className="w-11 h-11 object-contain mx-auto drop-shadow-2xs"
+                      />
+                      <h4 className="text-[13px] font-black text-[#14532D] tracking-wide uppercase leading-none mt-1.5">
+                        AS-SUNNAH
+                      </h4>
+                      <p className="text-[9.5px] font-black text-[#65A30D] tracking-wider uppercase leading-tight mt-0.5">
+                        SKILL DEVELOPMENT INSTITUTE
+                      </p>
+                      <p className="text-[8.5px] text-slate-500 font-medium leading-none mt-0.5">
+                        {data.govt_reg || 'Govt. Reg. #STP-DHA-000877'}
+                      </p>
+                    </div>
+
+                    {/* Course Title */}
+                    <div className="relative z-10 text-center px-2 my-1">
+                      <h5 className="text-[11px] font-extrabold text-[#15803D] uppercase tracking-tight leading-snug">
+                        {data.course_name}
+                      </h5>
+                    </div>
+
+                    {/* Property Ownership Notice */}
+                    <div className="relative z-10 text-center px-4 space-y-0.5 text-slate-700 text-[9px] leading-tight">
+                      <p>This card is a property of</p>
+                      <p className="font-bold text-slate-900 text-[9.5px] uppercase">
+                        AS-SUNNAH SKILL DEVELOPMENT INSTITUTE
+                      </p>
+                      <p>and designated to the issued student</p>
+                      <p>till his training period.</p>
+                    </div>
+
+                    {/* Authorized Signature */}
+                    <div className="relative z-10 flex flex-col items-center justify-center my-1">
+                      <img
+                        src={data.signature_url || '/signature-transparent.png'}
+                        alt="Authorized Signature"
+                        className="h-8 object-contain mb-0.5"
+                      />
+                      <div className="w-40 h-[1.5px] bg-[#009688]"></div>
+                      <span className="text-[9px] font-semibold text-slate-600 mt-0.5">
+                        Authorized Signature
                       </span>
                     </div>
+
+                    {/* Return Information Box */}
+                    <div className="relative z-10 text-center px-3 pb-3 pt-1">
+                      <p className="text-[9.5px] font-bold text-[#E11D48] leading-tight">
+                        If Found please return to:
+                      </p>
+                      
+                      {/* 3 Green Icons */}
+                      <div className="flex items-center justify-center gap-2.5 my-1.5">
+                        <div className="w-4 h-4 rounded-full bg-[#009688] text-white flex items-center justify-center shadow-2xs">
+                          <MapPin className="w-2.5 h-2.5" />
+                        </div>
+                        <div className="w-4 h-4 rounded-full bg-[#009688] text-white flex items-center justify-center shadow-2xs">
+                          <Phone className="w-2.5 h-2.5" />
+                        </div>
+                        <div className="w-4 h-4 rounded-full bg-[#009688] text-white flex items-center justify-center shadow-2xs">
+                          <Globe className="w-2.5 h-2.5" />
+                        </div>
+                      </div>
+
+                      <p className="text-[8px] text-slate-700 font-medium leading-tight">
+                        {data.institution_address || 'Kazi Bari, Satarkul, North Badda, Dhaka-1212'}
+                      </p>
+                      <p className="text-[8px] text-slate-700 font-medium leading-tight mt-0.5">
+                        Phone : {data.institution_contact || '+880 9649-222255 | +880 1409-979967'}
+                      </p>
+                      <p className="text-[8.5px] text-slate-800 font-bold leading-tight mt-0.5">
+                        {data.website || 'skill.assunnahfoundation.org'}
+                      </p>
+                    </div>
+
+                    {/* Micro QR Verification in Corner */}
+                    <div className="absolute bottom-2 right-2 p-0.5 bg-white rounded border border-slate-200 shadow-2xs">
+                      <QRCodeSVG value={data.verification_payload} size={28} level="L" />
+                    </div>
+
                   </div>
-                </div>
-              )}
+                )}
+
+              </div>
+
             </div>
           )}
 
           {/* ============================================================== */}
-          {/* VIEW 2: EXAM ADMIT CARD (A4 PREVIEW) */}
+          {/* VIEW 2: AS-SUNNAH EXAM ADMIT CARD (A4 PREVIEW & PRINT)         */}
           {/* ============================================================== */}
           {activeDocType === 'admit_card' && (
             <div
               id="assdi-admit-card"
-              className="w-full max-w-xl bg-white border-2 border-slate-300 rounded-2xl shadow-xl p-6 sm:p-8 text-slate-900 print:border-none print:shadow-none"
+              className="w-full max-w-2xl bg-white border-2 border-slate-300 rounded-2xl shadow-xl overflow-hidden text-slate-900 print:border-none print:shadow-none"
             >
-              {/* Admit Header */}
-              <div className="text-center pb-4 border-b-2 border-[#0B2A21]">
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <div className="w-8 h-8 rounded-xl bg-[#0B2A21] text-[#E5C378] flex items-center justify-center">
-                    <GraduationCap className="w-5 h-5" />
-                  </div>
-                  <h2 className="text-lg sm:text-xl font-black text-[#0B2A21] tracking-tight">
-                    {data.institution_name_bn}
-                  </h2>
-                </div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-600">
-                  {data.institution_name_en}
+              {/* Top Sky-Blue Motto Banner (Matching ID card) */}
+              <div className="bg-[#E0F2FE] border-b border-[#BAE6FD] py-1 px-4 text-center">
+                <p className="text-[9.5px] font-black uppercase tracking-[0.2em] text-[#0369A1]">
+                  {data.motto || 'EFFICIENCY · HONESTY · PROSPERITY'}
                 </p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  {data.institution_address || 'আফতাবনগর, ঢাকা-১২১২'}
-                </p>
+              </div>
 
-                <div className="mt-3 inline-block">
-                  <span className="px-4 py-1 bg-[#0B2A21] text-[#E5C378] text-xs font-black rounded-full uppercase tracking-wider">
+              {/* Institutional Header */}
+              <div className="p-5 sm:p-6 text-center border-b-2 border-[#14532D]">
+                <div className="flex flex-col items-center justify-center">
+                  <img
+                    src="/logo.png"
+                    alt="As-Sunnah Logo"
+                    className="w-14 h-14 object-contain mb-1.5 drop-shadow-2xs"
+                  />
+                  <h2 className="text-xl sm:text-2xl font-black text-[#14532D] tracking-wide uppercase leading-tight">
+                    AS-SUNNAH
+                  </h2>
+                  <p className="text-xs sm:text-sm font-black text-[#65A30D] tracking-wider uppercase leading-tight mt-0.5">
+                    SKILL DEVELOPMENT INSTITUTE
+                  </p>
+                  <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                    {data.govt_reg || 'Govt. Reg. #STP-DHA-000877'} • {data.institution_address || 'Kazi Bari, Satarkul, North Badda, Dhaka-1212'}
+                  </p>
+                </div>
+
+                <div className="mt-3.5 inline-block">
+                  <span className="px-5 py-1.5 bg-[#0B2A21] text-[#E5C378] text-xs font-black rounded-full uppercase tracking-wider shadow-xs border border-[#C5A059]/40">
                     FINAL EXAMINATION ADMIT CARD • পরীক্ষার প্রবেশপত্র
                   </span>
                 </div>
               </div>
 
-              {/* Student Identification Table */}
-              <div className="py-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs border-b border-slate-200">
-                <div className="space-y-1.5">
-                  <p>
-                    <span className="font-bold text-slate-600 w-28 inline-block">{isBangla ? 'শিক্ষার্থীর নাম:' : 'Candidate Name:'}</span>
-                    <strong className="text-slate-900">{data.full_name}</strong>
-                  </p>
-                  <p>
-                    <span className="font-bold text-slate-600 w-28 inline-block">{isBangla ? 'শিক্ষার্থী আইডি:' : 'Student ID:'}</span>
-                    <strong className="font-mono text-[#0B2A21] text-sm">{data.student_id_number}</strong>
-                  </p>
-                  <p>
-                    <span className="font-bold text-slate-600 w-28 inline-block">{isBangla ? 'রেজিস্ট্রেশন নং:' : 'Registration No:'}</span>
-                    <strong className="font-mono text-slate-700">{data.registration_no}</strong>
+              {/* Student & Course Details */}
+              <div className="p-5 sm:p-6 border-b border-slate-200">
+                <div className="text-center mb-4">
+                  <h3 className="text-sm font-extrabold text-[#15803D] uppercase tracking-wide">
+                    {data.course_name}
+                  </h3>
+                  <p className="text-xs font-bold text-slate-600">
+                    Session: {data.session_year} • Batch: {data.batch_name}
                   </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <p>
-                    <span className="font-bold text-slate-600 w-24 inline-block">{isBangla ? 'কোর্সের নাম:' : 'Course:'}</span>
-                    <strong className="text-slate-900">{data.course_name}</strong>
-                  </p>
-                  <p>
-                    <span className="font-bold text-slate-600 w-24 inline-block">{isBangla ? 'ব্যাচ ও শাখা:' : 'Batch:'}</span>
-                    <strong className="text-emerald-800">{data.batch_name}</strong>
-                  </p>
-                  <p>
-                    <span className="font-bold text-slate-600 w-24 inline-block">{isBangla ? 'পরীক্ষা কেন্দ্র:' : 'Exam Center:'}</span>
-                    <strong className="text-slate-800">{data.campus_name}</strong>
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_130px] gap-4 items-center">
+                  
+                  {/* Left: Info Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                    <div>
+                      <span className="text-slate-500 font-medium block">{isBangla ? 'শিক্ষার্থীর নাম:' : 'Candidate Name:'}</span>
+                      <strong className="text-slate-900 font-extrabold text-sm uppercase">{data.full_name}</strong>
+                    </div>
+
+                    <div>
+                      <span className="text-slate-500 font-medium block">{isBangla ? 'শিক্ষার্থী আইডি নং:' : 'Student ID Number:'}</span>
+                      <strong className="font-mono text-[#14532D] font-extrabold text-base">{data.student_id_number}</strong>
+                    </div>
+
+                    <div>
+                      <span className="text-slate-500 font-medium block">{isBangla ? 'রেজিস্ট্রেশন নম্বর:' : 'Registration No:'}</span>
+                      <strong className="font-mono text-slate-800">{data.registration_no}</strong>
+                    </div>
+
+                    <div>
+                      <span className="text-slate-500 font-medium block">{isBangla ? 'রক্তের গ্রুপ:' : 'Blood Group:'}</span>
+                      <strong className="text-slate-800">{data.blood_group || 'A+'}</strong>
+                    </div>
+
+                    <div>
+                      <span className="text-slate-500 font-medium block">{isBangla ? 'পরীক্ষা কেন্দ্র:' : 'Exam Center:'}</span>
+                      <strong className="text-slate-800">{data.campus_name}</strong>
+                    </div>
+
+                    <div>
+                      <span className="text-slate-500 font-medium block">{isBangla ? 'ইস্যুর তারিখ:' : 'Issue Date:'}</span>
+                      <strong className="text-slate-800">{data.issue_date}</strong>
+                    </div>
+                  </div>
+
+                  {/* Right: Student Portrait Photo with Lime Green Border & Verified QR */}
+                  <div className="flex flex-col items-center justify-center gap-1.5 shrink-0">
+                    <div className="w-[100px] h-[120px] rounded-xl border-2 border-[#84CC16] p-0.5 shadow-2xs overflow-hidden bg-emerald-50/50">
+                      <img
+                        src={data.photo_url || '/student-sample.jpg'}
+                        alt={data.full_name}
+                        className="w-full h-full object-cover rounded-[9px]"
+                      />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <QRCodeSVG value={data.verification_payload} size={28} level="L" />
+                      <span className="text-[8px] font-bold text-emerald-800 uppercase tracking-tighter">
+                        Verified
+                      </span>
+                    </div>
+                  </div>
+
                 </div>
               </div>
 
-              {/* Subjects Table */}
-              <div className="py-4">
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
-                  {isBangla ? 'পরীক্ষার বিষয়সূচি (Examination Subjects)' : 'Registered Subjects'}
+              {/* Registered Examination Subjects Schedule Table */}
+              <div className="p-5 sm:p-6 border-b border-slate-200">
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2.5">
+                  {isBangla ? 'পরীক্ষার বিষয়সূচি ও সিডিউল (Subject Schedule)' : 'Registered Subject Schedule'}
                 </h4>
                 <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
                   <thead className="bg-[#0B2A21] text-white">
@@ -530,51 +614,68 @@ export default function StudentIdCardModal({
                       <th className="p-2 font-bold">#</th>
                       <th className="p-2 font-bold">{isBangla ? 'বিষয় কোড' : 'Code'}</th>
                       <th className="p-2 font-bold">{isBangla ? 'বিষয়ের নাম' : 'Subject'}</th>
-                      <th className="p-2 font-bold text-center">{isBangla ? 'শিক্ষক স্বাক্ষর' : 'Sign'}</th>
+                      <th className="p-2 font-bold">{isBangla ? 'তারিখ ও সময়' : 'Date & Time'}</th>
+                      <th className="p-2 font-bold text-center">{isBangla ? 'শিক্ষক স্বাক্ষর' : 'Signature'}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     <tr className="bg-white">
                       <td className="p-2 font-mono">01</td>
-                      <td className="p-2 font-mono font-bold text-[#0B2A21]">ACCT-101</td>
+                      <td className="p-2 font-mono font-bold text-[#14532D]">ACCT-101</td>
                       <td className="p-2 font-medium">Accounting & Financial Records</td>
-                      <td className="p-2 text-center text-slate-400">________</td>
+                      <td className="p-2 font-mono text-slate-600">15 Dec 2026, 10:00 AM</td>
+                      <td className="p-2 text-center text-slate-300">__________</td>
                     </tr>
                     <tr className="bg-slate-50/50">
                       <td className="p-2 font-mono">02</td>
-                      <td className="p-2 font-mono font-bold text-[#0B2A21]">META-MKTG</td>
+                      <td className="p-2 font-mono font-bold text-[#14532D]">META-MKTG</td>
                       <td className="p-2 font-medium">Meta & Digital Marketing</td>
-                      <td className="p-2 text-center text-slate-400">________</td>
+                      <td className="p-2 font-mono text-slate-600">17 Dec 2026, 10:00 AM</td>
+                      <td className="p-2 text-center text-slate-300">__________</td>
                     </tr>
                     <tr className="bg-white">
                       <td className="p-2 font-mono">03</td>
-                      <td className="p-2 font-mono font-bold text-[#0B2A21]">ISLAMIC-GEN</td>
+                      <td className="p-2 font-mono font-bold text-[#14532D]">ISLAMIC-GEN</td>
                       <td className="p-2 font-medium">Islamic Business Ethics & Principles</td>
-                      <td className="p-2 text-center text-slate-400">________</td>
+                      <td className="p-2 font-mono text-slate-600">19 Dec 2026, 10:00 AM</td>
+                      <td className="p-2 text-center text-slate-300">__________</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              {/* Rules and Signatures */}
-              <div className="pt-3 border-t border-slate-200 flex items-end justify-between gap-4">
-                <div className="flex items-center gap-2">
-                  <QRCodeSVG value={data.verification_payload} size={50} level="M" />
-                  <p className="text-[10px] text-slate-500 leading-tight">
-                    {isBangla
-                      ? 'ডিজিটাল সত্যায়িত এডমিট কার্ড। পরীক্ষায় প্রবেশের জন্য সাথে আনা আবশ্যক।'
-                      : 'Digitally verified admit credential. Mandatory for examination entry.'}
+              {/* Instructions and Signatures */}
+              <div className="p-5 sm:p-6 bg-slate-50/70 grid grid-cols-1 sm:grid-cols-[1fr_200px] gap-4 items-end">
+                <div className="space-y-1 text-[10px] text-slate-600">
+                  <p className="font-bold text-slate-800 uppercase tracking-wider">
+                    {isBangla ? 'পরীক্ষার্থীদের জন্য জরুরি নির্দেশনা:' : 'General Instructions:'}
                   </p>
+                  <ul className="list-disc list-inside space-y-0.5 leading-relaxed">
+                    <li>{isBangla ? 'পরীক্ষার হলে এই প্রবেশপত্র ও মূল আইডি কার্ড সঙ্গে আনা বাধ্যতামূলক।' : 'Admit Card and Student ID Card are mandatory for exam hall entry.'}</li>
+                    <li>{isBangla ? 'পরীক্ষা শুরুর ন্যূনতম ১৫ মিনিট পূর্বে নিজ নিজ আসনে উপস্থিত হতে হবে।' : 'Arrive at the examination center at least 15 minutes before exam start.'}</li>
+                    <li>{isBangla ? 'মোবাইল ফোন বা কোনো অননুমোদিত ডিজিটাল ডিভাইস হলে নেওয়া সম্পূর্ণ নিষিদ্ধ।' : 'Mobile phones and unauthorized devices are strictly prohibited.'}</li>
+                  </ul>
                 </div>
 
-                <div className="text-center">
-                  <div className="w-32 border-b border-slate-700 pb-0.5 mb-1 font-serif italic text-xs text-slate-800">
-                    Academic Controller
-                  </div>
-                  <p className="text-[10px] font-bold text-slate-600">
-                    {isBangla ? 'পরীক্ষা নিয়ন্ত্রক' : 'Controller of Examinations'}
+                <div className="flex flex-col items-center text-center">
+                  <img
+                    src={data.signature_url || '/signature-transparent.png'}
+                    alt="Authorized Signature"
+                    className="h-8 object-contain mb-0.5"
+                  />
+                  <div className="w-36 h-[1.5px] bg-[#009688]"></div>
+                  <p className="text-[10px] font-bold text-slate-800 mt-0.5">
+                    Authorized Signature
+                  </p>
+                  <p className="text-[8.5px] text-slate-500 font-medium">
+                    Controller of Examinations
                   </p>
                 </div>
+              </div>
+
+              {/* Bottom Footer */}
+              <div className="px-6 py-2 bg-slate-100 border-t border-slate-200 text-center text-[9px] text-slate-500">
+                <span>{data.institution_address} • Hotline: {data.institution_contact} • {data.website}</span>
               </div>
             </div>
           )}
@@ -585,7 +686,7 @@ export default function StudentIdCardModal({
         <div className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
           <span className="flex items-center gap-1.5 text-emerald-800 font-semibold">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>{isBangla ? 'অফিসিয়ালি ভেরিফাইড প্রাতিষ্ঠানিক সনদ' : 'Institutionally Verified ID Card'}</span>
+            <span>{isBangla ? 'অফিসিয়ালি ভেরিফাইড আস-সুন্নাহ সনদ' : 'Officially Verified As-Sunnah Credential'}</span>
           </span>
 
           <button
@@ -599,7 +700,7 @@ export default function StudentIdCardModal({
 
       </div>
 
-      {/* Embedded Print CSS Rules */}
+      {/* Embedded Print CSS Rules for Standard CR80 and A4 Output */}
       <style jsx global>{`
         @media print {
           body * {
@@ -614,7 +715,13 @@ export default function StudentIdCardModal({
             visibility: visible;
           }
           #assdi-id-card-front,
-          #assdi-id-card-back,
+          #assdi-id-card-back {
+            position: relative !important;
+            display: inline-block !important;
+            margin: 15px !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           #assdi-admit-card {
             position: fixed;
             left: 50%;
