@@ -1,15 +1,29 @@
 import type { Metadata, Viewport } from 'next';
-import { Hind_Siliguri } from 'next/font/google';
+import { Noto_Serif_Bengali, Hind_Siliguri, Amiri } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Toaster } from 'react-hot-toast';
 import { PwaInstaller } from '@/components/pwa/PwaInstaller';
 
+const notoSerifBengali = Noto_Serif_Bengali({
+  weight: ['400', '600', '700', '800'],
+  subsets: ['bengali', 'latin'],
+  variable: '--font-noto-serif-bengali',
+  display: 'swap',
+});
+
 const hindSiliguri = Hind_Siliguri({
   weight: ['300', '400', '500', '600', '700'],
   subsets: ['bengali', 'latin'],
   variable: '--font-hind-siliguri',
+  display: 'swap',
+});
+
+const amiri = Amiri({
+  weight: ['400', '700'],
+  subsets: ['arabic', 'latin'],
+  variable: '--font-amiri',
   display: 'swap',
 });
 
@@ -25,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#1B4D3E',
+  themeColor: '#0f766e',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -37,11 +51,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="bn" suppressHydrationWarning className={`${hindSiliguri.variable} h-full antialiased`}>
+    <html
+      lang="bn"
+      suppressHydrationWarning
+      className={`${notoSerifBengali.variable} ${hindSiliguri.variable} ${amiri.variable} h-full antialiased`}
+    >
       <head>
         <link rel="icon" type="image/png" href="/logo.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#0f766e" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="ASSDI Portal" />
@@ -89,7 +108,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-[#F8FAF9] text-gray-900">
+      <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-[#F8FAFC] text-[#0F172A]">
         <LanguageProvider>
           <AuthProvider>
             {children}
@@ -99,10 +118,12 @@ export default function RootLayout({
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: '#1B4D3E',
+                  background: '#0F766E',
                   color: '#ffffff',
                   fontSize: '14px',
-                  fontFamily: 'var(--font-hind-siliguri), sans-serif',
+                  fontFamily: 'var(--font-noto-serif-bengali), var(--font-hind-siliguri), sans-serif',
+                  borderRadius: '12px',
+                  boxShadow: '0 16px 32px -20px rgba(15, 118, 110, 0.9)',
                 },
               }}
             />

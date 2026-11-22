@@ -1,52 +1,243 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-hind-siliguri), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-bangla: var(--font-hind-siliguri), sans-serif;
+  --font-serif: var(--font-noto-serif-bengali), Georgia, Cambria, serif;
+  --font-sans: var(--font-hind-siliguri), var(--font-noto-serif-bengali), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-bangla: var(--font-noto-serif-bengali), var(--font-hind-siliguri), sans-serif;
+  --font-arabic: var(--font-amiri), serif;
 
-  --color-brand-royal: #0B2A21;
-  --color-brand-royal-hover: #164E3D;
-  --color-brand-primary: #1B4D3E;
-  --color-brand-primary-hover: #153E32;
-  --color-brand-dark: #061C16;
-  --color-brand-light: #2D6A4F;
-  --color-brand-accent: #10B981;
-  --color-brand-gold: #C5A059;
-  --color-brand-gold-light: #E5C378;
-  --color-brand-surface: #F4F6F5;
+  /* Primary Brand Teal Palette from madrasatussunnah.org */
+  --color-brand-primary: #0F766E;
+  --color-brand-primary-hover: #115E59;
+  --color-brand-teal-2: #0D9488;
+  --color-brand-teal-3: #14B8A6;
+  --color-brand-teal-soft: #F0FDFA;
+  --color-brand-teal-line: #CCFBF1;
+  --color-brand-teal-pill: #99F6E4;
+
+  /* Institutional Islamic Gold & Accents */
+  --color-brand-gold: #C1982E;
+  --color-brand-gold-hover: #A17E24;
+  --color-brand-green-dome: #00A14A;
+  --color-brand-ocean: #016C90;
+  --color-brand-cyan: #067A85;
+
+  /* Deep Midnight App Shell & Footer Colors */
+  --color-brand-navy-dark: #0A1420;
+  --color-brand-navy-start: #0B1A2B;
+  --color-brand-navy-panel: #122036;
+  --color-brand-royal: #0B1A2B;
+  --color-brand-royal-hover: #122036;
+
+  /* Neutrals & Surfaces */
+  --color-surface-white: #FFFFFF;
+  --color-surface-tint: #F8FAFC;
+  --color-surface-soft: #F1F5F9;
+  --color-border-line: #E2E8F0;
+
+  /* Ink & Typography */
+  --color-ink-primary: #0F172A;
+  --color-ink-body: #334155;
+  --color-ink-muted: #475569;
+  --color-ink-subtle: #94A3B8;
+
+  /* Semantic Statuses */
+  --color-status-success-bg: #F0FDF4;
+  --color-status-success-border: #86EFAC;
+  --color-status-success-text: #166534;
+  --color-status-success-accent: #15803D;
+
+  --color-status-warning-bg: #FFFBEB;
+  --color-status-warning-border: #FCD34D;
+  --color-status-warning-text: #92400E;
+  --color-status-warning-accent: #D97706;
+
+  --color-status-danger-bg: #FEF2F2;
+  --color-status-danger-border: #F87171;
+  --color-status-danger-text: #991B1B;
+  --color-status-danger-accent: #DC2626;
+
+  --color-status-info-bg: #F0FDFA;
+  --color-status-info-border: #CCFBF1;
+  --color-status-info-text: #0F766E;
+  --color-status-info-accent: #0D9488;
+
+  /* 5-Color Chart Palette */
+  --color-chart-1: #0F766E;
+  --color-chart-2: #14B8A6;
+  --color-chart-3: #C1982E;
+  --color-chart-4: #16A34A;
+  --color-chart-5: #016C90;
 }
 
 :root {
-  --background: #F4F6F5;
+  --background: #F8FAFC;
   --foreground: #0F172A;
+  --hm-teal: #0F766E;
+  --hm-teal-hover: #115E59;
+  --hm-teal-2: #0D9488;
+  --hm-teal-3: #14B8A6;
+  --hm-teal-soft: #F0FDFA;
+  --hm-teal-line: #CCFBF1;
+  --hm-teal-pill: #99F6E4;
+  --hm-gold: #C1982E;
+  --hm-bg: #F8FAFC;
+  --hm-line: #E2E8F0;
+  --hm-ink: #0F172A;
+  --hm-muted: #475569;
+  --hm-body: #334155;
+  --hm-subtle: #94A3B8;
+
+  /* Chart Colors for Recharts */
+  --chart-1: #0F766E;
+  --chart-2: #14B8A6;
+  --chart-3: #C1982E;
+  --chart-4: #16A34A;
+  --chart-5: #016C90;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-hind-siliguri), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-noto-serif-bengali), var(--font-hind-siliguri), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Luxury custom highlight selection */
-::selection {
-  background-color: #0B2A21;
-  color: #E5C378;
+/* Headings with Noto Serif Bengali */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-noto-serif-bengali), serif;
+  color: #0F172A;
+  letter-spacing: -0.01em;
 }
 
-/* Custom scrollbar with refined institutional styling */
+/* Strict Bangla typography invariants */
+:lang(bn), [lang="bn"], .font-bangla {
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+/* Selection highlight in Deep Teal & Gold */
+::selection {
+  background-color: #0F766E;
+  color: #FFFFFF;
+}
+
+/* Institutional refined scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #E2E8F0;
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #94A3B8;
-  border-radius: 4px;
+  background: #CBD5E1;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748B;
+  background: #94A3B8;
+}
+
+/* Madrasat-us-Sunnah Institutional Component Classes */
+.hm-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 18px 45px -34px rgba(15, 23, 42, 0.45);
+}
+
+.hm-card-tint {
+  background: #F0FDFA;
+  border: 1px solid #CCFBF1;
+  border-radius: 16px;
+}
+
+.hm-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #0F766E;
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 10px 20px;
+  box-shadow: 0 16px 32px -20px rgba(15, 118, 110, 0.9);
+  transition: all 0.18s ease-in-out;
+  cursor: pointer;
+}
+.hm-btn-primary:hover {
+  background-color: #115E59;
+  transform: translateY(-1px);
+}
+.hm-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.hm-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #FFFFFF;
+  color: #0F172A;
+  font-weight: 600;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 10px 18px;
+  transition: all 0.18s ease-in-out;
+  cursor: pointer;
+}
+.hm-btn-secondary:hover {
+  background-color: #F8FAFC;
+  border-color: #99F6E4;
+  color: #0F766E;
+}
+
+.hm-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background-color: #FFFFFF;
+  color: #0F172A;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.hm-input:focus {
+  outline: none;
+  border-color: #14B8A6;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+}
+
+/* Institutional Data Table (matching .fee-table from reference) */
+.hm-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.hm-table thead th {
+  background-color: #F0FDFA;
+  color: #0F766E;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 12px 14px;
+  border-top: 1px solid #CCFBF1;
+  border-bottom: 1px solid #CCFBF1;
+  text-align: left;
+}
+.hm-table tbody tr {
+  transition: background-color 0.15s;
+}
+.hm-table tbody tr:hover {
+  background-color: #F0FDFA;
+}
+.hm-table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #E2E8F0;
+  color: #334155;
+  font-size: 0.92rem;
 }
