@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import (
@@ -17,7 +19,7 @@ from apps.academic.views import (
 )
 from apps.attendance.views import AttendanceViewSet
 from apps.batches.views import BatchViewSet, TeacherAssignmentViewSet
-from apps.class_sessions.views import ClassScheduleViewSet, ClassSessionViewSet
+from apps.class_sessions.views import ClassScheduleViewSet, ClassSessionViewSet, SessionMaterialViewSet
 from apps.feedback.views import HelpRequestViewSet, LearningFeedbackViewSet
 from apps.notifications.views import AnnouncementViewSet, NotificationViewSet
 from apps.students.views import StudentViewSet
@@ -35,6 +37,7 @@ router.register(r"teacher-assignments", TeacherAssignmentViewSet, basename="teac
 router.register(r"students", StudentViewSet, basename="student")
 router.register(r"class-schedules", ClassScheduleViewSet, basename="class-schedule")
 router.register(r"class-sessions", ClassSessionViewSet, basename="class-session")
+router.register(r"session-materials", SessionMaterialViewSet, basename="session-material")
 router.register(r"feedback", LearningFeedbackViewSet, basename="feedback")
 router.register(r"help-requests", HelpRequestViewSet, basename="help-request")
 router.register(r"attendance", AttendanceViewSet, basename="attendance")
@@ -60,3 +63,6 @@ urlpatterns = [
     # Core Academic & Student Endpoints
     path("api/v1/", include(router.urls)),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

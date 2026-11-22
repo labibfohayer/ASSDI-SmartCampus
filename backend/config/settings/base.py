@@ -33,6 +33,8 @@ ALLOWED_HOSTS = [
     for h in config("ALLOWED_HOSTS", default="localhost,127.0.0.1,0.0.0.0").split(",")
     if h.strip()
 ]
+if "testserver" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("testserver")
 
 # Application definition
 DJANGO_APPS = [

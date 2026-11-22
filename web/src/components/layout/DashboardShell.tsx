@@ -340,6 +340,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             titleEn: 'Learning & Support',
             items: [
               {
+                href: '/student?tab=materials',
+                labelBn: 'লেকচার শিট ও রিসোর্স হাব',
+                labelEn: 'Lecture Notes & Hub',
+                icon: BookOpen,
+              },
+              {
                 href: '/student?tab=attendance',
                 labelBn: 'উপস্থিতির হিস্ট্রি লগ',
                 labelEn: 'Attendance Log',

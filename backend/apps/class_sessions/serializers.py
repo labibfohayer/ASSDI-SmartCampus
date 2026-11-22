@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from apps.accounts.models import UserRole
 from .constants import DAY_OF_WEEK_CHOICES
-from .models import ClassSchedule, ClassSession, SessionAudience, SessionStatus
+from .models import ClassSchedule, ClassSession, MaterialType, SessionAudience, SessionMaterial, SessionStatus
 
 
 class ClassScheduleSerializer(serializers.ModelSerializer):
@@ -138,3 +138,87 @@ class CancelSessionSerializer(serializers.Serializer):
         allow_blank=False,
         help_text="Required explanation for cancelling this session.",
     )
+
+
+class SessionMaterialSerializer(serializers.ModelSerializer):
+    subject_name = serializers.CharField(source="subject.name", read_only=True)
+    subject_code = serializers.CharField(source="subject.code", read_only=True)
+    topic_title = serializers.CharField(source="topic.title", read_only=True, allow_null=True)
+    session_date = serializers.DateField(source="session.session_date", read_only=True, allow_null=True)
+    session_time = serializers.SerializerMethodField()
+    teacher_name = serializers.SerializerMethodField()
+    uploaded_by_name = serializers.CharField(source="uploaded_by.full_name", read_only=True, allow_null=True)
+    formatted_file_size = serializers.SerializerMethodField()
+    material_type_display = serializers.CharField(source="get_material_type_display", read_only=True)
+    key_takeaways = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SessionMaterial
+        fields = [
+            "id",
+            "session",
+            "session_date",
+            "session_time",
+            "subject",
+            "subject_name",
+            "subject_code",
+            "topic",
+            "topic_title",
+            "teacher_name",
+            "title",
+            "description",
+            "key_takeaways",
+            "hadith_or_ethics_ref",
+            "material_type",
+            "material_type_display",
+            "file",
+            "file_url",
+            "file_size_bytes",
+            "formatted_file_size",
+            "download_count",
+            "uploaded_by",
+            "uploaded_by_name",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["created_at", "updated_at", "download_count", "uploaded_by"]
+
+    @extend_schema_field(serializers.CharField)
+    def get_session_time(self, obj) -> str:
+        if obj.session:
+            return f"{obj.session.start_time.strftime('%H:%M')} - {obj.session.end_time.strftime('%H:%M')}"
+        return ""
+
+    @extend_schema_field(serializers.CharField)
+    def get_teacher_name(self, obj) -> str:
+        if obj.session and obj.session.teacher_user:
+            return obj.session.teacher_user.full_name
+        return ""
+
+    @extend_schema_field(serializers.CharField)
+    def get_formatted_file_size(self, obj) -> str:
+        size = obj.file_size_bytes or (obj.file.size if obj.file else 0)
+        if size >= 1024 * 1024:
+            return f"{size / (1024 * 1024):.1f} MB"
+        elif size >= 1024:
+            return f"{size / 1024:.0f} KB"
+        return f"{size} B"
+
+    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
+    def get_key_takeaways(self, obj) -> list[str]:
+        if not obj.key_takeaways:
+            return []
+        import json
+        if isinstance(obj.key_takeaways, list):
+            return obj.key_takeaways
+        val = str(obj.key_takeaways).strip()
+        if val.startswith("[") and val.endswith("]"):
+            try:
+                import ast
+                return ast.literal_eval(val)
+            except Exception:
+                try:
+                    return json.loads(val)
+                except Exception:
+                    pass
+        return [line.strip("-•* ").strip() for line in val.split("\n") if line.strip()]

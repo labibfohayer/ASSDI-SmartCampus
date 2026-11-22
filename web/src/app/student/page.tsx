@@ -20,9 +20,15 @@ import {
   X,
   QrCode,
   CreditCard,
+  Search,
+  Download,
+  FileText,
+  Filter,
+  Sparkles,
 } from 'lucide-react';
 import WebQRScannerModal from '@/components/student/WebQRScannerModal';
 import StudentIdCardModal from '@/components/student/StudentIdCardModal';
+import LectureMaterialsModal, { SessionMaterialItem } from '@/components/student/LectureMaterialsModal';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -110,9 +116,19 @@ export default function StudentPortalPage() {
   const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>([]);
   const [helpRequests, setHelpRequests] = useState<HelpRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help'>('today');
+  const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help' | 'materials'>('today');
   const [scannerOpen, setScannerOpen] = useState(false);
   const [idCardOpen, setIdCardOpen] = useState(false);
+
+  // Lecture Materials Hub & Modal
+  const [materials, setMaterials] = useState<SessionMaterialItem[]>([]);
+  const [materialsModalOpen, setMaterialsModalOpen] = useState(false);
+  const [selectedSessionForMaterials, setSelectedSessionForMaterials] = useState<ClassSessionItem | null>(null);
+  const [selectedMaterialForModal, setSelectedMaterialForModal] = useState<SessionMaterialItem | null>(null);
+  const [materialSearchQuery, setMaterialSearchQuery] = useState('');
+  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState<string>('all');
+  const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>('all');
+  const [downloadingMatId, setDownloadingMatId] = useState<number | null>(null);
 
   // Feedback modal / card
   const [selectedSessionForFeedback, setSelectedSessionForFeedback] = useState<ClassSessionItem | null>(null);
@@ -129,7 +145,7 @@ export default function StudentPortalPage() {
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab');
-        if (tab === 'attendance' || tab === 'help' || tab === 'today') {
+        if (tab === 'attendance' || tab === 'help' || tab === 'today' || tab === 'materials') {
           setActiveTab(tab as any);
         }
         if (params.get('scan') === 'true') {
@@ -153,13 +169,21 @@ export default function StudentPortalPage() {
     setLoading(true);
     try {
       // Normal student loading with graceful individual error handling
-      const [profRes, attRes, sessRes, fbRes, helpRes] = await Promise.all([
+      const [profRes, attRes, sessRes, fbRes, helpRes, matRes] = await Promise.all([
         api.get('/api/v1/students/me/').catch(() => ({ data: null })),
         api.get('/api/v1/attendance/mine/').catch(() => ({ data: null })),
         api.get('/api/v1/class-sessions/?status=published').catch(() => ({ data: [] })),
         api.get('/api/v1/feedback/mine/').catch(() => ({ data: [] })),
         api.get('/api/v1/help-requests/').catch(() => ({ data: [] })),
+        api.get('/api/v1/session-materials/').catch(() => ({ data: [] })),
       ]);
+
+      if (matRes.data) {
+        const matList = Array.isArray(matRes.data)
+          ? matRes.data
+          : matRes.data?.results || [];
+        setMaterials(matList);
+      }
 
       if (profRes.data) {
         setProfile(profRes.data?.data || profRes.data);
@@ -275,6 +299,33 @@ export default function StudentPortalPage() {
     }
   };
 
+  const handleDownloadMaterial = async (mat: SessionMaterialItem) => {
+    setDownloadingMatId(mat.id);
+    try {
+      const res = await api.get(`/api/v1/session-materials/${mat.id}/download/`, {
+        responseType: 'blob',
+      });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const cleanTitle = mat.title.replace(/[/\\?%*:|"<>]/g, '_');
+      link.setAttribute('download', `${cleanTitle}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      mat.download_count += 1;
+      setMaterials([...materials]);
+      toast.success(isBangla ? 'লেকচার শিট ডাউনলোড শুরু হয়েছে!' : 'Download started!');
+    } catch (err) {
+      toast.error(isBangla ? 'ফাইল ডাউনলোড ব্যর্থ হয়েছে' : 'Download failed');
+    } finally {
+      setDownloadingMatId(null);
+    }
+  };
+
   const safeFixed = (val: any, decimals = 1): string => {
     if (val === null || val === undefined || isNaN(Number(val))) return 'N/A';
     return Number(val).toFixed(decimals);
@@ -317,6 +368,30 @@ export default function StudentPortalPage() {
   const hasAttended = (sessionId: number) => {
     return attRecords.some((rec) => rec.session === sessionId);
   };
+
+  // Derived subjects and filtered materials for Tab 4 (Resource Hub)
+  const availableSubjects = Array.from(
+    new Set(materials.map((m) => m.subject_name).filter(Boolean))
+  );
+
+  const filteredMaterials = materials.filter((m) => {
+    if (selectedSubjectFilter !== 'all' && m.subject_name !== selectedSubjectFilter) {
+      return false;
+    }
+    if (selectedTypeFilter !== 'all' && m.material_type !== selectedTypeFilter) {
+      return false;
+    }
+    if (materialSearchQuery.trim()) {
+      const q = materialSearchQuery.toLowerCase();
+      const matchTitle = m.title?.toLowerCase().includes(q);
+      const matchTopic = m.topic_title?.toLowerCase().includes(q);
+      const matchSubject = m.subject_name?.toLowerCase().includes(q);
+      const matchDesc = m.description?.toLowerCase().includes(q);
+      const matchEthics = m.hadith_or_ethics_ref?.toLowerCase().includes(q);
+      return Boolean(matchTitle || matchTopic || matchSubject || matchDesc || matchEthics);
+    }
+    return true;
+  });
 
   return (
     <div className="space-y-6">
@@ -528,6 +603,23 @@ export default function StudentPortalPage() {
             </span>
           )}
         </button>
+
+        <button
+          onClick={() => setActiveTab('materials')}
+          className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === 'materials'
+              ? 'bg-white text-[#0B2A21] shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+          }`}
+        >
+          <BookOpen className="w-4 h-4 text-[#0B2A21]" />
+          <span>{isBangla ? 'লেকচার শিট ও রিসোর্স হাব' : 'Lecture Notes & Hub'}</span>
+          {materials.length > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-[#0B2A21] font-bold">
+              {materials.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* TAB 1: Today's Classes & Feedback */}
@@ -575,6 +667,19 @@ export default function StudentPortalPage() {
 
                   <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedSessionForMaterials(s);
+                          setSelectedMaterialForModal(null);
+                          setMaterialsModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-[#0B2A21] border border-emerald-300 rounded-md transition-colors cursor-pointer shadow-2xs"
+                        title={isBangla ? 'ক্লাস লেকচার শিট ও রিসোর্স' : 'Lecture Sheet & Resources'}
+                      >
+                        <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>{isBangla ? 'লেকচার শিট' : 'Lecture Sheet'}</span>
+                      </button>
+
                       {hasAttended(s.id) ? (
                         <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -814,6 +919,251 @@ export default function StudentPortalPage() {
         </div>
       )}
 
+      {/* TAB 4: Lecture Sheets & Resource Hub */}
+      {activeTab === 'materials' && (
+        <div className="space-y-5">
+          {/* Hub Header & Controls */}
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-[#0B2A21] text-[#E5C378] uppercase tracking-wider">
+                    {isBangla ? 'রিসোর্স হাব' : 'Resource Hub'}
+                  </span>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {isBangla ? `মোট ${materials.length}টি লেকচার শিট` : `${materials.length} Materials`}
+                  </span>
+                </div>
+                <h2 className="text-lg sm:text-xl font-black text-slate-900 mt-1">
+                  {isBangla ? 'লেকচার শিট ও রিসোর্স ডাউনলোড হাব' : 'Lecture Sheet & Study Resource Hub'}
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {isBangla
+                    ? 'আপনার কোর্সের প্রতিটি ক্লাসের পূর্ণাঙ্গ হ্যান্ডআউট, হাদিস রেফারেন্স ও প্র্যাকটিক্যাল শিট ডাউনলোড করুন।'
+                    : 'Download authentic handouts, ethical guidelines, and practice sheets for every class.'}
+                </p>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative w-full md:w-72">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={materialSearchQuery}
+                  onChange={(e) => setMaterialSearchQuery(e.target.value)}
+                  placeholder={
+                    isBangla
+                      ? 'টপিক, বিষয় বা শিরোনাম খুঁজুন...'
+                      : 'Search topics, subjects...'
+                  }
+                  className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#0B2A21] focus:ring-1 focus:ring-[#0B2A21]"
+                />
+                {materialSearchQuery && (
+                  <button
+                    onClick={() => setMaterialSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Subject Filter Pills */}
+            <div className="pt-2 border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto pb-1">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+                <Filter className="w-3 h-3 text-slate-400" />
+                {isBangla ? 'বিষয়:' : 'Subject:'}
+              </span>
+              <button
+                onClick={() => setSelectedSubjectFilter('all')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                  selectedSubjectFilter === 'all'
+                    ? 'bg-[#0B2A21] text-[#E5C378] shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {isBangla ? 'সকল বিষয়' : 'All Subjects'}
+              </button>
+              {availableSubjects.map((subj) => (
+                <button
+                  key={subj}
+                  onClick={() => setSelectedSubjectFilter(subj)}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                    selectedSubjectFilter === subj
+                      ? 'bg-[#0B2A21] text-[#E5C378] shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {subj}
+                </button>
+              ))}
+            </div>
+
+            {/* Material Type Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+                <Layers className="w-3 h-3 text-slate-400" />
+                {isBangla ? 'ধরন:' : 'Type:'}
+              </span>
+              {[
+                { key: 'all', bn: 'সব ধরন', en: 'All Types' },
+                { key: 'lecture_sheet', bn: 'লেকচার শিট', en: 'Lecture Sheets' },
+                { key: 'handout', bn: 'হ্যান্ডআউট', en: 'Handouts' },
+                { key: 'hadith_ref', bn: 'হাদিস ও ইসলামিক এথিক্স', en: 'Hadith & Ethics' },
+                { key: 'exercise_sheet', bn: 'প্র্যাকটিক্যাল এক্সারসাইজ', en: 'Exercises' },
+              ].map((t) => (
+                <button
+                  key={t.key}
+                  onClick={() => setSelectedTypeFilter(t.key)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all shrink-0 cursor-pointer ${
+                    selectedTypeFilter === t.key
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  {isBangla ? t.bn : t.en}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Materials Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {filteredMaterials.map((mat) => (
+              <div
+                key={mat.id}
+                className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between gap-4 relative overflow-hidden pl-6"
+              >
+                <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#0B2A21]" />
+                <div className="space-y-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-[#0B2A21] border border-emerald-200">
+                      {mat.subject_name}
+                    </span>
+                    <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+                      {mat.material_type_display}
+                    </span>
+                  </div>
+
+                  <h3
+                    onClick={() => {
+                      setSelectedMaterialForModal(mat);
+                      setSelectedSessionForMaterials(null);
+                      setMaterialsModalOpen(true);
+                    }}
+                    className="font-black text-slate-900 text-sm hover:text-emerald-800 transition cursor-pointer leading-snug"
+                  >
+                    {mat.title}
+                  </h3>
+
+                  {mat.topic_title && (
+                    <p className="text-xs font-semibold text-emerald-800 flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>{mat.topic_title}</span>
+                    </p>
+                  )}
+
+                  {mat.teacher_name && (
+                    <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                      <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{isBangla ? 'শিক্ষক:' : 'Faculty:'} <strong>{mat.teacher_name}</strong></span>
+                      {mat.session_date && (
+                        <span>• <span className="font-mono">{mat.session_date}</span></span>
+                      )}
+                    </p>
+                  )}
+
+                  {/* Key takeaways snippet */}
+                  {Array.isArray(mat.key_takeaways) && mat.key_takeaways.length > 0 && (
+                    <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-200/60 text-xs text-slate-700 space-y-1">
+                      {mat.key_takeaways.slice(0, 2).map((pt, i) => (
+                        <p key={i} className="flex items-start gap-1.5 line-clamp-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span className="truncate">{pt}</span>
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Ethics snippet */}
+                  {mat.hadith_or_ethics_ref && (
+                    <p className="text-[11px] text-amber-900 bg-amber-50/70 px-2.5 py-1.5 rounded-lg border border-amber-200/70 italic line-clamp-1">
+                      &ldquo;{mat.hadith_or_ethics_ref}&rdquo;
+                    </p>
+                  )}
+                </div>
+
+                {/* Card Action Footer */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                    <span className="font-mono font-bold text-slate-700">
+                      {mat.formatted_file_size || '1.2 MB'}
+                    </span>
+                    <span>•</span>
+                    <span className="text-emerald-700 font-semibold">
+                      {mat.download_count} {isBangla ? 'ডাউনলোড' : 'downloads'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedMaterialForModal(mat);
+                        setSelectedSessionForMaterials(null);
+                        setMaterialsModalOpen(true);
+                      }}
+                      className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-xl transition cursor-pointer shadow-2xs"
+                    >
+                      {isBangla ? 'বিস্তারিত দেখুন' : 'Preview'}
+                    </button>
+
+                    <button
+                      onClick={() => handleDownloadMaterial(mat)}
+                      disabled={downloadingMatId === mat.id}
+                      className="px-3.5 py-1.5 text-xs font-extrabold bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
+                    >
+                      {downloadingMatId === mat.id ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
+                      ) : (
+                        <Download className="w-3.5 h-3.5 text-[#C5A059]" />
+                      )}
+                      <span>{isBangla ? 'ডাউনলোড' : 'Download'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {filteredMaterials.length === 0 && (
+              <div className="col-span-1 lg:col-span-2 p-12 text-center text-slate-500 bg-white rounded-2xl border border-slate-100">
+                <BookOpen className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                <p className="font-bold text-slate-700 text-sm">
+                  {isBangla ? 'কোনো লেকচার শিট বা রিসোর্স পাওয়া যায়নি' : 'No materials found'}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {isBangla
+                    ? 'আপনার সার্চ বা ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন।'
+                    : 'Try clearing your search or selecting a different filter.'}
+                </p>
+                {(materialSearchQuery || selectedSubjectFilter !== 'all' || selectedTypeFilter !== 'all') && (
+                  <button
+                    onClick={() => {
+                      setMaterialSearchQuery('');
+                      setSelectedSubjectFilter('all');
+                      setSelectedTypeFilter('all');
+                    }}
+                    className="mt-3 px-3 py-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 cursor-pointer"
+                  >
+                    {isBangla ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Quick Feedback Submission Modal (10-15s submittable) */}
       {selectedSessionForFeedback && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -1021,6 +1371,19 @@ export default function StudentPortalPage() {
               }
             : null
         }
+      />
+
+      {/* Student Lecture Sheets and Resources Modal */}
+      <LectureMaterialsModal
+        isOpen={materialsModalOpen}
+        onClose={() => {
+          setMaterialsModalOpen(false);
+          setSelectedSessionForMaterials(null);
+          setSelectedMaterialForModal(null);
+        }}
+        session={selectedSessionForMaterials}
+        initialMaterial={selectedMaterialForModal}
+        onDownloadSuccess={loadStudentData}
       />
     </div>
   );

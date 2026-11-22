@@ -267,3 +267,75 @@ class ClassSession(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+
+
+class MaterialType(models.TextChoices):
+    PDF = "pdf", "PDF Document"
+    SLIDE = "slide", "Presentation Slide"
+    HANDOUT = "handout", "Class Handout"
+    HADITH_REF = "hadith_ref", "Hadith & Fiqh Reference"
+    EXCEL = "excel", "Spreadsheet Exercise"
+    LINK = "link", "Resource Link"
+
+
+class SessionMaterial(models.Model):
+    """
+    Lecture notes, handouts, PDF slides, and references attached to a ClassSession or Subject/Topic.
+    """
+
+    session = models.ForeignKey(
+        ClassSession,
+        on_delete=models.CASCADE,
+        related_name="materials",
+        null=True,
+        blank=True,
+        help_text="Class session this material is attached to (optional if topic-wide).",
+    )
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE,
+        related_name="materials",
+    )
+    topic = models.ForeignKey(
+        ClassTopic,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="materials",
+    )
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+    key_takeaways = models.TextField(blank=True, default="", help_text="Summary points or bullet notes.")
+    hadith_or_ethics_ref = models.TextField(blank=True, default="", help_text="Islamic / ethical references.")
+    material_type = models.CharField(
+        max_length=20,
+        choices=MaterialType.choices,
+        default=MaterialType.PDF,
+        db_index=True,
+    )
+    file = models.FileField(upload_to="session_materials/", null=True, blank=True)
+    file_url = models.URLField(max_length=500, blank=True, default="")
+    file_size_bytes = models.PositiveIntegerField(default=0)
+    download_count = models.PositiveIntegerField(default=0)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="uploaded_materials",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "session_materials"
+        verbose_name = "Session Material"
+        verbose_name_plural = "Session Materials"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["subject", "material_type"]),
+            models.Index(fields=["session"]),
+        ]
+
+    def __str__(self):
+        return f"{self.title} ({self.get_material_type_display()}) - {self.subject.name}"

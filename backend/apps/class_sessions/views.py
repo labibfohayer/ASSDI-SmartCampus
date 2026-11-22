@@ -33,12 +33,13 @@ from apps.feedback.serializers import FeedbackSummarySerializer, LearningFeedbac
 from apps.students.models import EducationBackground, EnrollmentStatus, Student, StudentStatus
 
 from .constants import date_to_day_of_week
-from .models import ClassSchedule, ClassSession, SessionAudience, SessionStatus
+from .models import ClassSchedule, ClassSession, MaterialType, SessionAudience, SessionMaterial, SessionStatus
 from .serializers import (
     CancelSessionSerializer,
     ClassScheduleSerializer,
     ClassSessionSerializer,
     GenerateSessionsSerializer,
+    SessionMaterialSerializer,
 )
 
 
@@ -1002,3 +1003,118 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
             "attendance_percentage": pct,
         }
         return Response(SessionAttendanceSummarySerializer(data).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="materials")
+    def materials(self, request, pk=None):
+        """
+        Lists all lecture handouts, PDF notes, and references for this session or its topic.
+        """
+        session = self.get_object()
+        materials_qs = SessionMaterial.objects.filter(
+            Q(session=session)
+            | (Q(topic=session.topic) & Q(topic__isnull=False))
+            | (Q(subject=session.subject) & Q(session__isnull=True) & Q(topic__isnull=True))
+        ).select_related("session", "subject", "topic", "uploaded_by").distinct()
+        serializer = SessionMaterialSerializer(materials_qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SessionMaterialViewSet(viewsets.ModelViewSet):
+    """
+    CRUD and downloading for lecture sheets, slides, handouts, and references.
+    Role-based visibility:
+    - Students see materials for their current batch/enrolled subjects matching audience.
+    - Teachers see materials for their assigned subjects / batches.
+    - Coordinators see materials for their assigned courses.
+    - Super Admins see all.
+    """
+
+    serializer_class = SessionMaterialSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["title", "description", "subject__name", "topic__title", "key_takeaways"]
+    ordering_fields = ["created_at", "title"]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return SessionMaterial.objects.none()
+
+        qs = SessionMaterial.objects.select_related(
+            "session", "subject", "topic", "uploaded_by", "session__teacher_user", "session__batch"
+        )
+
+        session_id = self.request.query_params.get("session_id")
+        if session_id:
+            qs = qs.filter(session_id=session_id)
+
+        subject_id = self.request.query_params.get("subject_id")
+        if subject_id:
+            qs = qs.filter(subject_id=subject_id)
+
+        topic_id = self.request.query_params.get("topic_id")
+        if topic_id:
+            qs = qs.filter(topic_id=topic_id)
+
+        material_type = self.request.query_params.get("material_type")
+        if material_type:
+            qs = qs.filter(material_type=material_type)
+
+        batch_id = self.request.query_params.get("batch_id")
+        if batch_id:
+            qs = qs.filter(Q(session__batch_id=batch_id) | Q(subject__course__batches__id=batch_id)).distinct()
+
+        if user.role == UserRole.SUPER_ADMIN:
+            return qs
+
+        if user.role == UserRole.COORDINATOR:
+            assigned = user.coordinator_course_assignments.values_list("course_id", flat=True)
+            return qs.filter(subject__course_id__in=assigned).distinct()
+
+        if user.role == UserRole.TEACHER:
+            return qs.filter(
+                Q(session__teacher_user=user)
+                | Q(subject__teacher_assignments__teacher_user=user)
+                | Q(uploaded_by=user)
+            ).distinct()
+
+        if user.role == UserRole.STUDENT:
+            student = Student.objects.filter(user=user).first()
+            if not student or not student.current_batch:
+                return SessionMaterial.objects.none()
+
+            # Allowed audiences according to student education background
+            if student.education_background in [EducationBackground.ALIYA, EducationBackground.QAWMI]:
+                allowed_audiences = [SessionAudience.ALL, SessionAudience.MADRASA]
+            else:
+                allowed_audiences = [SessionAudience.ALL, SessionAudience.GENERAL]
+
+            return qs.filter(
+                Q(session__batch=student.current_batch, session__audience__in=allowed_audiences)
+                | Q(subject__course=student.current_batch.course, subject__audience_type__in=allowed_audiences)
+            ).distinct()
+
+        return qs
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role == UserRole.STUDENT:
+            raise PermissionDenied("Students cannot upload lecture materials.")
+        serializer.save(uploaded_by=user)
+
+    @action(detail=True, methods=["get"], url_path="download")
+    def download(self, request, pk=None):
+        material = self.get_object()
+        material.download_count += 1
+        material.save(update_fields=["download_count"])
+
+        if material.file and material.file.storage.exists(material.file.name):
+            from django.http import FileResponse
+            filename = material.file.name.split("/")[-1]
+            response = FileResponse(material.file.open("rb"), content_type="application/pdf")
+            response["Content-Disposition"] = f'attachment; filename="{filename}"'
+            return response
+        elif material.file_url:
+            from django.shortcuts import redirect
+            return redirect(material.file_url)
+
+        return Response({"detail": "File not found on server."}, status=status.HTTP_404_NOT_FOUND)
