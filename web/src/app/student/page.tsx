@@ -17,6 +17,7 @@ import {
   Layers,
   MessageSquare,
   ChevronRight,
+  X,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -666,15 +667,15 @@ export default function StudentPortalPage() {
 
       {/* Quick Feedback Submission Modal (10-15s submittable) */}
       {selectedSessionForFeedback && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 border-t-4 border-t-[#1B4D3E]">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 text-[#1B4D3E] flex items-center justify-center">
-                  <Star className="w-5 h-5 fill-emerald-600 text-emerald-600" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-[#0B2A21] flex items-center justify-center shadow-xs">
+                  <Star className="w-5 h-5 fill-[#C5A059] text-[#C5A059]" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">
+                  <h3 className="font-extrabold text-slate-900 text-sm">
                     {isBangla ? 'ক্লাস ফিডব্যাক ও মূল্যায়ন' : 'Class Understanding Feedback'}
                   </h3>
                   <p className="text-[11px] text-slate-500 font-medium">
@@ -685,9 +686,9 @@ export default function StudentPortalPage() {
 
               <button
                 onClick={() => setSelectedSessionForFeedback(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg text-lg font-bold cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -700,7 +701,7 @@ export default function StudentPortalPage() {
               <form onSubmit={handleFeedbackSubmit} className="space-y-4">
                 {/* 5-Star Rating Buttons */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-2">
+                  <label className="block text-xs font-bold text-slate-700 mb-2">
                     {isBangla
                       ? 'আজকের পাঠ আপনি কেমন বুঝতে পেরেছেন?'
                       : 'How well did you understand this topic?'}
@@ -711,24 +712,24 @@ export default function StudentPortalPage() {
                         key={starVal}
                         type="button"
                         onClick={() => setFeedbackRating(starVal)}
-                        className={`flex-1 py-2.5 rounded-lg flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                        className={`flex-1 py-2.5 rounded-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer active:scale-95 ${
                           feedbackRating >= starVal
-                            ? 'bg-amber-50 border-2 border-amber-500 text-amber-800 shadow-2xs'
+                            ? 'bg-amber-50 border-2 border-amber-500 text-amber-900 shadow-xs'
                             : 'bg-slate-50 border border-slate-200 text-slate-400 hover:bg-slate-100'
                         }`}
                       >
                         <Star
                           className={`w-5 h-5 ${
                             feedbackRating >= starVal
-                              ? 'fill-amber-400 text-amber-400'
+                              ? 'fill-[#C5A059] text-[#C5A059]'
                               : 'text-slate-300'
                           }`}
                         />
-                        <span className="text-[11px] font-bold">{starVal}</span>
+                        <span className="text-[11px] font-extrabold">{starVal}</span>
                       </button>
                     ))}
                   </div>
-                  <p className="text-center text-xs font-bold text-[#1B4D3E] mt-2">
+                  <p className="text-center text-xs font-bold text-[#0B2A21] mt-2.5 bg-emerald-50/60 py-1 rounded-md border border-emerald-100">
                     {isBangla
                       ? ratingDescriptions[feedbackRating]?.bn
                       : ratingDescriptions[feedbackRating]?.en}
@@ -736,13 +737,13 @@ export default function StudentPortalPage() {
                 </div>
 
                 {/* Need Help Checkbox */}
-                <div className="bg-emerald-50/60 p-3 rounded-lg border border-emerald-200">
+                <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-200/80">
                   <label className="flex items-start gap-2.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={feedbackNeedsHelp}
                       onChange={(e) => setFeedbackNeedsHelp(e.target.checked)}
-                      className="mt-0.5 rounded text-[#1B4D3E] focus:ring-[#1B4D3E] w-4 h-4 cursor-pointer"
+                      className="mt-0.5 rounded text-[#0B2A21] focus:ring-[#0B2A21] w-4 h-4 cursor-pointer accent-[#0B2A21]"
                     />
                     <div>
                       <span className="text-xs font-bold text-slate-900 block">
@@ -761,7 +762,7 @@ export default function StudentPortalPage() {
 
                 {/* Optional Comment / Question */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     {feedbackNeedsHelp
                       ? isBangla
                         ? 'আপনার সুনির্দিষ্ট প্রশ্ন বা সমস্যা লিখুন (বাধ্যতামূলক):'
@@ -784,7 +785,7 @@ export default function StudentPortalPage() {
                         ? 'আলহামদুলিল্লাহ ভালো ক্লাস হয়েছে...'
                         : 'Overall good session...'
                     }
-                    className="w-full px-3 py-2 text-xs bg-slate-50/50 border border-slate-300 rounded-lg focus:bg-white focus:outline-none focus:border-[#1B4D3E] focus:ring-1 focus:ring-[#1B4D3E]"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#0B2A21] focus:ring-1 focus:ring-[#0B2A21]"
                   />
                 </div>
 
@@ -793,19 +794,19 @@ export default function StudentPortalPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedSessionForFeedback(null)}
-                    className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
                   >
                     {isBangla ? 'বাতিল' : 'Cancel'}
                   </button>
                   <button
                     type="submit"
                     disabled={submittingFeedback}
-                    className="px-5 py-2 text-xs font-semibold bg-[#1B4D3E] hover:bg-[#153E32] active:bg-[#102E25] text-white rounded-lg shadow-xs transition-colors flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                    className="px-5 py-2.5 text-xs font-extrabold bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer active:scale-95"
                   >
                     {submittingFeedback ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
                     ) : (
-                      <Send className="w-3.5 h-3.5" />
+                      <Send className="w-3.5 h-3.5 text-[#C5A059]" />
                     )}
                     <span>{isBangla ? 'ফিডব্যাক জমা দিন' : 'Submit Feedback'}</span>
                   </button>

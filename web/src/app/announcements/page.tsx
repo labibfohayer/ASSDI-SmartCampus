@@ -326,14 +326,14 @@ export default function AnnouncementsPage() {
 
         {/* Publish Notice Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-[#1B4D3E] flex items-center justify-center font-bold">
-                    <Megaphone className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0B2A21] border border-emerald-100 flex items-center justify-center font-bold">
+                    <Megaphone className="w-4 h-4 text-[#C5A059]" />
                   </div>
-                  <h3 className="font-bold text-slate-900 text-sm sm:text-base">
+                  <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
                     {isBangla ? 'নতুন নোটিশ প্রকাশ করুন' : 'Publish New Notice'}
                   </h3>
                 </div>
@@ -450,7 +450,7 @@ export default function AnnouncementsPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-5 py-2.5 rounded-xl bg-[#1B4D3E] hover:bg-[#153e32] text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-[#0B2A21] hover:bg-[#164E3D] text-white text-xs font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer active:scale-95"
                   >
                     {submitting ? (isBangla ? 'প্রকাশ হচ্ছে...' : 'Publishing...') : (isBangla ? 'নোটিশ প্রকাশ করুন' : 'Publish Notice')}
                   </button>

@@ -18,6 +18,7 @@ import {
   ChevronRight,
   BookOpen,
   Info,
+  X,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -632,18 +633,18 @@ export default function AdminSessionsPage() {
 
       {/* Auto-Generate Sessions Modal */}
       {showGenerateModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 border-t-4 border-t-[#1B4D3E]">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
-                  <Play className="w-5 h-5 fill-emerald-700" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0B2A21] border border-emerald-100 flex items-center justify-center font-bold">
+                  <Play className="w-5 h-5 fill-[#0B2A21] text-[#0B2A21]" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">
+                  <h3 className="font-extrabold text-slate-900 text-sm">
                     {isBangla ? 'শিডিউল থেকে সেশন তৈরি' : 'Generate Concrete Sessions'}
                   </h3>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-slate-500">
                     {isBangla
                       ? 'সাপ্তাহিক রুটিন টেমপ্লেট থেকে নির্দিষ্ট তারিখের জন্য সেশন জেনারেট করুন'
                       : 'Create concrete class sessions automatically from weekly schedules'}
@@ -652,9 +653,9 @@ export default function AdminSessionsPage() {
               </div>
               <button
                 onClick={() => setShowGenerateModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
               >
-                ×
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -731,16 +732,16 @@ export default function AdminSessionsPage() {
                 <button
                   type="submit"
                   disabled={isGenerating}
-                  className="px-5 py-2 text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl shadow-xs transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2.5 text-xs font-bold bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl shadow-xs transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer active:scale-95"
                 >
                   {isGenerating ? (
                     <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
                       {isBangla ? 'জেনারেট হচ্ছে...' : 'Generating...'}
                     </>
                   ) : (
                     <>
-                      <Play className="w-3.5 h-3.5 fill-white" />
+                      <Play className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
                       {isBangla ? 'সেশন তৈরি শুরু করুন' : 'Start Generation'}
                     </>
                   )}

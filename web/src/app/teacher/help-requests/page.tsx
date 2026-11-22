@@ -323,33 +323,33 @@ export default function TeacherHelpRequestsPage() {
 
       {/* Resolution Modal */}
       {resolvingItem && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-100 space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-emerald-600" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-[#0B2A21]" />
                 <span>{isBangla ? 'হেল্প রিকোয়েস্ট সমাধান' : 'Resolve Help Request'}</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setResolvingItem(null)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="font-semibold text-gray-700">
+              <div className="p-3.5 bg-slate-50 border border-slate-200/70 rounded-xl">
+                <p className="font-extrabold text-slate-800">
                   {resolvingItem.student_name} ({resolvingItem.student_id_number}):
                 </p>
-                <p className="italic text-gray-600 mt-1">"{resolvingItem.student_comment}"</p>
+                <p className="italic text-slate-600 mt-1">"{resolvingItem.student_comment}"</p>
               </div>
 
               <form onSubmit={handleSubmitResolve} className="space-y-4 pt-2">
                 <div>
-                  <label className="block font-bold text-gray-800 mb-1">
+                  <label className="block font-bold text-slate-800 mb-1">
                     {isBangla ? 'সমাধানের বিবরণ / শিক্ষকের নোট:' : 'Resolution Note / Action Taken:'}
                   </label>
                   <textarea
@@ -362,7 +362,7 @@ export default function TeacherHelpRequestsPage() {
                         ? 'যেমন: ক্লাসের পর সরাসরি ল্যাবে ফর্মুলা প্রয়োগ করে সমস্যাটি সমাধান করে দেয়া হয়েছে।'
                         : 'Explain how you resolved this question for the student...'
                     }
-                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-[#0B2A21] focus:ring-1 focus:ring-[#0B2A21]"
                   />
                 </div>
 
@@ -370,14 +370,14 @@ export default function TeacherHelpRequestsPage() {
                   <button
                     type="button"
                     onClick={() => setResolvingItem(null)}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl"
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl cursor-pointer"
                   >
                     {t('common.cancel')}
                   </button>
                   <button
                     type="submit"
                     disabled={submittingResolution}
-                    className="px-5 py-2 bg-[#1B4D3E] hover:bg-[#153E32] text-white text-xs font-bold rounded-xl shadow-xs transition"
+                    className="px-5 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
                   >
                     {submittingResolution ? (
                       isBangla ? 'সংরক্ষণ হচ্ছে...' : 'Saving...'

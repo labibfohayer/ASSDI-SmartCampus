@@ -244,17 +244,17 @@ export default function AdminCoursesPage() {
 
       {/* Create Batch Modal */}
       {showBatchModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 border-t-4 border-t-[#1B4D3E] space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-emerald-700" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <PlusCircle className="w-5 h-5 text-[#0B2A21]" />
                 <span>{isBangla ? 'নতুন ব্যাচ তৈরি করুন' : 'Create New Batch'}</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setShowBatchModal(false)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -361,7 +361,7 @@ export default function AdminCoursesPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 bg-[#1B4D3E] hover:bg-[#153E32] text-white font-bold rounded-xl shadow-xs transition"
+                  className="px-5 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-white font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
                 >
                   {submitting ? (isBangla ? 'তৈরি হচ্ছে...' : 'Creating...') : (isBangla ? 'ব্যাচ তৈরি সম্পন্ন করুন' : 'Confirm Create')}
                 </button>
