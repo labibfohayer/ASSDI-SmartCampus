@@ -742,6 +742,9 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
         ]
         if new_records:
             AttendanceRecord.objects.bulk_create(new_records)
+            from apps.attendance.services import check_and_create_consecutive_absence_alert
+            for s in unmarked_students:
+                check_and_create_consecutive_absence_alert(s.id, session)
 
         # Return session attendance summary
         total_expected = enrolled_qs.count()

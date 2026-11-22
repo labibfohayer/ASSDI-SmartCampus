@@ -17,6 +17,7 @@ import {
   PlusCircle,
   Clock,
   CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,6 +33,7 @@ export default function AdminOverviewPage() {
     totalTeachers: 0,
     totalSessions: 0,
   });
+  const [repeatedAbsences, setRepeatedAbsences] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function AdminOverviewPage() {
           totalTeachers: dashData.total_teachers || 0,
           totalSessions: sessionsList.length || 0,
         });
+        setRepeatedAbsences(dashData.repeated_absences_list || []);
       } catch (err) {
         console.error('Failed to load admin stats:', err);
       } finally {
@@ -151,6 +154,59 @@ export default function AdminOverviewPage() {
           </div>
         </div>
       </div>
+
+      {/* Consecutive Absence Alert Card */}
+      {repeatedAbsences.length > 0 && (
+        <div className="bg-rose-50 border-2 border-rose-300 rounded-2xl p-5 shadow-xs space-y-3 animate-in fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-sm sm:text-base text-rose-950 flex items-center gap-2">
+                  <span>{isBangla ? 'টানা ৩+ দিন ক্লাসে অনুপস্থিতির জরুরি সতর্কবার্তা' : 'Urgent: 3+ Consecutive Absences Alert'}</span>
+                  <span className="px-2 py-0.5 rounded-full text-[11px] bg-rose-200 text-rose-900 font-mono font-bold">
+                    {repeatedAbsences.filter((st: any) => st.consecutive_absences >= 3).length || repeatedAbsences.length} জন
+                  </span>
+                </h3>
+                <p className="text-xs text-rose-800 mt-0.5">
+                  {isBangla
+                    ? 'নিচের শিক্ষার্থীরা নির্ধারিত কোর্সে টানা ৩ দিন বা ততোধিক ক্লাসে অনুপস্থিত থাকায় সিস্টেম স্বয়ংক্রিয়ভাবে সতর্কবার্তা ফ্ল্যাগ করেছে।'
+                    : 'System has automatically flagged students who have missed 3 or more consecutive class sessions.'}
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/coordinator/at-risk?filter=absence"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 cursor-pointer"
+            >
+              <span>{isBangla ? 'অ্যাট-রিস্ক ড্যাশবোর্ডে বিস্তারিত দেখুন' : 'View in At-Risk Dashboard'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-2 border-t border-rose-200/80">
+            {repeatedAbsences.slice(0, 3).map((st: any, idx: number) => (
+              <div
+                key={idx}
+                className="bg-white p-3 rounded-xl border border-rose-200 shadow-2xs flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-bold text-xs text-slate-900">{st.student_name}</p>
+                  <p className="text-[11px] font-mono text-slate-500">{st.student_id_number}</p>
+                </div>
+                <div className="text-right">
+                  <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-mono font-bold text-xs">
+                    {st.consecutive_absences} দিন টানা
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* KPI Stats Bento Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

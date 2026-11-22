@@ -144,7 +144,9 @@ export default function NotificationBell() {
       // Smart role-based navigation based on notification payload
       if (navigate && payload) {
         setIsOpen(false);
-        if (payload.help_request_id) {
+        if (payload.action_url) {
+          router.push(payload.action_url);
+        } else if (payload.help_request_id) {
           if (user?.role === 'teacher') {
             router.push(`/teacher/help-requests?highlight=${payload.help_request_id}`);
           } else {
