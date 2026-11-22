@@ -106,9 +106,7 @@ export default function StudentPortalPage() {
   const [attSummary, setAttSummary] = useState<AttendanceSummary | null>(null);
   const [attRecords, setAttRecords] = useState<AttendanceRecord[]>([]);
   const [sessions, setSessions] = useState<ClassSessionItem[]>([]);
-  const { user, login } = useAuth();
-  const [isAdminPreview, setIsAdminPreview] = useState(false);
-  const [switchingUser, setSwitchingUser] = useState(false);
+  const { user } = useAuth();
   const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>([]);
   const [helpRequests, setHelpRequests] = useState<HelpRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -144,97 +142,16 @@ export default function StudentPortalPage() {
     return () => window.removeEventListener('popstate', handleUrlTab);
   }, [user]);
 
-  const handleQuickSwitchToStudent = async () => {
-    setSwitchingUser(true);
-    try {
-      const res = await api.post('/api/v1/auth/login/', {
-        login_id: 'STD-2026-042-001',
-        password: 'StudentPass2026!',
-      });
-      if (res.data?.success) {
-        const { access, refresh, user: studentUser } = res.data.data;
-        login(access, refresh, studentUser);
-        toast.success(
-          isBangla
-            ? 'সফলভাবে শিক্ষার্থী (আব্দুল্লাহ) অ্যাকাউন্টে স্যুইচ করা হয়েছে!'
-            : 'Successfully switched to Student (Abdullah) account!'
-        );
-        window.location.reload();
-      }
-    } catch (err: any) {
-      toast.error(isBangla ? 'স্যুইচ করতে ব্যর্থ হয়েছে।' : 'Failed to switch user.');
-    } finally {
-      setSwitchingUser(false);
-    }
-  };
-
   const loadStudentData = async () => {
+    const currentUser = user || getUser();
+    if (currentUser && currentUser.role !== 'student') {
+      // Non-students are blocked and redirected by StudentLayout
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      const currentUser = user || getUser();
-      const isStudent = currentUser ? currentUser.role === 'student' : false;
-
-      if (currentUser && !isStudent) {
-        setIsAdminPreview(true);
-        // Load in Admin Preview Mode using student listing and published sessions
-        const [stdListRes, sessRes, helpRes] = await Promise.all([
-          api.get('/api/v1/students/?status=active').catch(() => ({ data: [] })),
-          api.get('/api/v1/class-sessions/?status=published').catch(() => ({ data: [] })),
-          api.get('/api/v1/help-requests/').catch(() => ({ data: [] })),
-        ]);
-
-        const stdResults = stdListRes.data?.results || stdListRes.data || [];
-        const demoStudent = stdResults[0] || null;
-
-        if (demoStudent) {
-          setProfile({
-            id: demoStudent.id,
-            student_id_number: demoStudent.student_id_number,
-            registration_no: demoStudent.registration_no,
-            full_name: demoStudent.full_name,
-            phone: demoStudent.phone,
-            education_background: demoStudent.education_background,
-            campus_name: demoStudent.campus_name || 'Kazi Bari Campus',
-            current_batch_name: demoStudent.current_batch_name || 'SBMC Batch 42',
-            status: demoStudent.status,
-          });
-
-          try {
-            const attSumRes = await api.get(`/api/v1/students/${demoStudent.id}/attendance-summary/`);
-            if (attSumRes.data) {
-              setAttSummary({
-                total_sessions: attSumRes.data.total_sessions || 15,
-                present: attSumRes.data.present || 12,
-                late: attSumRes.data.late || 0,
-                absent: attSumRes.data.absent || 3,
-                approved_leave: attSumRes.data.approved_leave || 0,
-                attendance_percentage: attSumRes.data.attendance_percentage ?? 80.0,
-              });
-            }
-          } catch {
-            setAttSummary({
-              total_sessions: 15,
-              present: 12,
-              late: 0,
-              absent: 3,
-              approved_leave: 0,
-              attendance_percentage: 80.0,
-            });
-          }
-        }
-
-        const sessList = Array.isArray(sessRes.data)
-          ? sessRes.data
-          : sessRes.data?.results || [];
-        setSessions(sessList);
-
-        const helpList = Array.isArray(helpRes.data)
-          ? helpRes.data
-          : helpRes.data?.results || [];
-        setHelpRequests(helpList);
-        return;
-      }
-
       // Normal student loading with graceful individual error handling
       const [profRes, attRes, sessRes, fbRes, helpRes] = await Promise.all([
         api.get('/api/v1/students/me/').catch(() => ({ data: null })),
@@ -399,40 +316,6 @@ export default function StudentPortalPage() {
 
   return (
     <div className="space-y-6">
-      {/* Admin Preview Mode Alert Banner */}
-      {(isAdminPreview || (user && user.role !== 'student')) && (
-        <div className="bg-gradient-to-r from-amber-500/15 via-emerald-500/10 to-amber-500/15 border-2 border-amber-500/40 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-          <div className="flex items-start gap-3.5">
-            <div className="p-2.5 bg-amber-500/20 rounded-xl text-amber-700 dark:text-amber-400 mt-0.5 shrink-0">
-              <UserCheck className="w-5 h-5 text-amber-600" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-amber-500 text-black rounded-md">
-                  {isBangla ? 'অ্যাডমিন প্রিভিউ মোড' : 'Admin Preview Mode'}
-                </span>
-                <span className="text-xs font-semibold text-gray-500">
-                  {user ? `${user.full_name} (${user.role})` : 'Super Admin'}
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium mt-1">
-                {isBangla
-                  ? 'আপনি বর্তমানে সুপার অ্যাডমিন হিসেবে শিক্ষার্থী পোর্টালটি প্রিভিউ করছেন। নিচে ডেমো শিক্ষার্থী "আব্দুল্লাহ স্টুডেন্ট"-এর সম্পূর্ণ ক্লাস শিডিউল, উপস্থিতি ও পারফরম্যান্স প্রদর্শিত হচ্ছে।'
-                  : 'You are viewing the student portal in admin preview mode. Showing demo student data for "Abdullah Student".'}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={handleQuickSwitchToStudent}
-            disabled={switchingUser}
-            className="shrink-0 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${switchingUser ? 'animate-spin' : ''}`} />
-            <span>{isBangla ? 'এক ক্লিকে শিক্ষার্থী অ্যাকাউন্টে স্যুইচ করুন' : 'Switch to Student Account'}</span>
-          </button>
-        </div>
-      )}
-
       {/* Student Profile Hero Card */}
       <div className="bg-[#0B2A21] rounded-2xl border border-emerald-900 shadow-md p-6 sm:p-7 text-white relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
