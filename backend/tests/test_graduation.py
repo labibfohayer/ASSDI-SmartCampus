@@ -159,3 +159,20 @@ class TestGraduationEligibility:
         api_client.force_authenticate(user=student_user)
         response = api_client.get(f"/api/v1/students/{other_std.id}/graduation-eligibility/")
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_teacher_and_superadmin_can_view_student_graduation_eligibility(
+        self, api_client, teacher_user, super_admin_user, graduation_student_profile
+    ):
+        # 1. Super Admin access
+        api_client.force_authenticate(user=super_admin_user)
+        res_admin = api_client.get(f"/api/v1/students/{graduation_student_profile.id}/graduation-eligibility/")
+        assert res_admin.status_code == status.HTTP_200_OK
+        assert res_admin.data["student_id"] == graduation_student_profile.id
+        assert "overall_readiness_score" in res_admin.data
+
+        # 2. Assigned Teacher access
+        api_client.force_authenticate(user=teacher_user)
+        res_teacher = api_client.get(f"/api/v1/students/{graduation_student_profile.id}/graduation-eligibility/")
+        assert res_teacher.status_code == status.HTTP_200_OK
+        assert res_teacher.data["student_id"] == graduation_student_profile.id
+

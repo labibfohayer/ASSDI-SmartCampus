@@ -23,6 +23,7 @@ import {
   Ban,
   ShieldAlert,
   CreditCard,
+  Award,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -30,6 +31,7 @@ import { getAccessToken } from '@/lib/auth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import MultiFormatExportDropdown from '@/components/common/MultiFormatExportDropdown';
 import StudentIdCardModal from '@/components/student/StudentIdCardModal';
+import { GraduationCertificateModal, GraduationData } from '@/components/student/GraduationCertificateModal';
 
 interface StudentItem {
   id: number;
@@ -103,6 +105,20 @@ export default function AdminStudentsPage() {
   });
   const [updating, setUpdating] = useState(false);
   const [selectedStudentForIdCard, setSelectedStudentForIdCard] = useState<StudentItem | null>(null);
+  const [selectedStudentForGraduation, setSelectedStudentForGraduation] = useState<GraduationData | null>(null);
+  const [loadingGraduationId, setLoadingGraduationId] = useState<number | null>(null);
+
+  const handleOpenGraduation = async (st: StudentItem) => {
+    setLoadingGraduationId(st.id);
+    try {
+      const res = await api.get(`/api/v1/students/${st.id}/graduation-eligibility/`);
+      setSelectedStudentForGraduation(res.data);
+    } catch (err: any) {
+      toast.error(isBangla ? 'গ্র্যাজুয়েশন তথ্য লোড করা যায়নি।' : 'Failed to load graduation info.');
+    } finally {
+      setLoadingGraduationId(null);
+    }
+  };
 
   const openEditModal = (st: StudentItem) => {
     setEditingStudent(st);
@@ -522,6 +538,23 @@ export default function AdminStudentsPage() {
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleOpenGraduation(st)}
+                          disabled={loadingGraduationId === st.id}
+                          className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-[#0B2A21] text-amber-900 hover:text-[#E5C378] border border-amber-200 hover:border-[#0B2A21] text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
+                          title={isBangla ? 'সনদ ও গ্র্যাজুয়েশন যোগ্যতা পর্যালোচনা করুন' : 'View Graduation & Certificate'}
+                        >
+                          <Award className="w-3.5 h-3.5 text-[#C5A059]" />
+                          <span>
+                            {loadingGraduationId === st.id
+                              ? isBangla
+                                ? 'লোড হচ্ছে...'
+                                : 'Loading...'
+                              : isBangla
+                              ? 'সনদ ও যোগ্যতা'
+                              : 'Certificate'}
+                          </span>
+                        </button>
                         <button
                           onClick={() => setSelectedStudentForIdCard(st)}
                           className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#0B2A21] text-emerald-800 hover:text-[#E5C378] border border-emerald-200 hover:border-[#0B2A21] text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
@@ -1243,6 +1276,15 @@ export default function AdminStudentsPage() {
             batch_name: selectedStudentForIdCard.current_batch_name,
             campus_name: selectedStudentForIdCard.campus_name,
           }}
+        />
+      )}
+
+      {/* Student Graduation & Certificate Modal */}
+      {selectedStudentForGraduation && (
+        <GraduationCertificateModal
+          isOpen={!!selectedStudentForGraduation}
+          onClose={() => setSelectedStudentForGraduation(null)}
+          data={selectedStudentForGraduation}
         />
       )}
     </div>

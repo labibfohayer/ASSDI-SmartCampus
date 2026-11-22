@@ -15,10 +15,12 @@ import {
   Filter,
   ShieldCheck,
   Users,
+  Award,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { GraduationCertificateModal, GraduationData } from '@/components/student/GraduationCertificateModal';
 
 interface StudentRosterItem {
   student_id: number;
@@ -57,6 +59,21 @@ export default function ManualAttendancePage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
+
+  const [selectedStudentForGraduation, setSelectedStudentForGraduation] = useState<GraduationData | null>(null);
+  const [loadingGraduationId, setLoadingGraduationId] = useState<number | null>(null);
+
+  const handleOpenGraduation = async (studentId: number) => {
+    setLoadingGraduationId(studentId);
+    try {
+      const res = await api.get(`/api/v1/students/${studentId}/graduation-eligibility/`);
+      setSelectedStudentForGraduation(res.data);
+    } catch (err: any) {
+      toast.error(isBangla ? 'গ্র্যাজুয়েশন তথ্য লোড করা যায়নি।' : 'Failed to load graduation info.');
+    } finally {
+      setLoadingGraduationId(null);
+    }
+  };
 
   // 1. Fetch Teacher's Sessions
   useEffect(() => {
@@ -344,6 +361,7 @@ export default function ManualAttendancePage() {
                   <th className="py-3.5 px-4">{isBangla ? 'হাজিরার মাধ্যম' : 'Method'}</th>
                   <th className="py-3.5 px-4 text-center">{isBangla ? 'হাজিরা স্ট্যাটাস' : 'Attendance Status'}</th>
                   <th className="py-3.5 px-4">{isBangla ? 'মন্তব্য / কারণ' : 'Reason / Note'}</th>
+                  <th className="py-3.5 px-4 text-center">{isBangla ? 'সনদ ও যোগ্যতা' : 'Graduation & Cert'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -418,6 +436,22 @@ export default function ManualAttendancePage() {
                         className="w-full px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       />
                     </td>
+                    <td className="py-3 px-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenGraduation(item.student_id)}
+                        disabled={loadingGraduationId === item.student_id}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-[#0B2A21] text-amber-900 hover:text-[#E5C378] border border-amber-200 hover:border-[#0B2A21] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
+                        title={isBangla ? 'গ্র্যাজুয়েশন ও সনদপত্র ট্র্যাকার দেখুন' : 'View Graduation & Certificate'}
+                      >
+                        <Award className="w-3.5 h-3.5 text-[#C5A059]" />
+                        <span>
+                          {loadingGraduationId === item.student_id
+                            ? (isBangla ? 'লোড হচ্ছে...' : 'Loading...')
+                            : (isBangla ? 'সনদ যোগ্যতা' : 'Eligibility')}
+                        </span>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -425,6 +459,15 @@ export default function ManualAttendancePage() {
           </div>
         )}
       </div>
+
+      {/* Graduation & Certificate Modal */}
+      {selectedStudentForGraduation && (
+        <GraduationCertificateModal
+          isOpen={!!selectedStudentForGraduation}
+          onClose={() => setSelectedStudentForGraduation(null)}
+          data={selectedStudentForGraduation}
+        />
+      )}
     </div>
   );
 }

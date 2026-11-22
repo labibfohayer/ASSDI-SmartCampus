@@ -14,11 +14,13 @@ import {
   ArrowRight,
   ShieldAlert,
   Star,
+  Award,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { GraduationCertificateModal, GraduationData } from '@/components/student/GraduationCertificateModal';
 
 export default function CoordinatorAtRiskPage() {
   const { user } = useAuth();
@@ -31,6 +33,20 @@ export default function CoordinatorAtRiskPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'absence' | 'academic'>('all');
+  const [selectedStudentForGraduation, setSelectedStudentForGraduation] = useState<GraduationData | null>(null);
+  const [loadingGraduationId, setLoadingGraduationId] = useState<number | null>(null);
+
+  const handleOpenGraduation = async (studentId: number) => {
+    setLoadingGraduationId(studentId);
+    try {
+      const res = await api.get(`/api/v1/students/${studentId}/graduation-eligibility/`);
+      setSelectedStudentForGraduation(res.data);
+    } catch (err: any) {
+      toast.error(isBangla ? 'গ্র্যাজুয়েশন তথ্য লোড করা যায়নি।' : 'Failed to load graduation info.');
+    } finally {
+      setLoadingGraduationId(null);
+    }
+  };
 
   useEffect(() => {
     const fetchAtRiskData = async () => {
@@ -180,6 +196,7 @@ export default function CoordinatorAtRiskPage() {
                     <th className="py-3 px-4">{isBangla ? 'মোট অনুপস্থিতি' : 'Total Absences'}</th>
                     <th className="py-3 px-4">{isBangla ? 'গড় লার্নিং রেটিং' : 'Average Rating'}</th>
                     <th className="py-3 px-4">{isBangla ? 'যোগাযোগ নম্বর' : 'Phone'}</th>
+                    <th className="py-3 px-4 text-center">{isBangla ? 'সনদ ও যোগ্যতা' : 'Graduation & Cert'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -246,6 +263,22 @@ export default function CoordinatorAtRiskPage() {
                           '-'
                         )}
                       </td>
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenGraduation(st.student_id)}
+                          disabled={loadingGraduationId === st.student_id}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-[#0B2A21] text-amber-900 hover:text-[#E5C378] border border-amber-200 hover:border-[#0B2A21] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
+                          title={isBangla ? 'গ্র্যাজুয়েশন ও সনদপত্র ট্র্যাকার দেখুন' : 'View Graduation & Certificate'}
+                        >
+                          <Award className="w-3.5 h-3.5 text-[#C5A059]" />
+                          <span>
+                            {loadingGraduationId === st.student_id
+                              ? (isBangla ? 'লোড হচ্ছে...' : 'Loading...')
+                              : (isBangla ? 'সনদ ও যোগ্যতা' : 'Eligibility')}
+                          </span>
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -253,6 +286,15 @@ export default function CoordinatorAtRiskPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Graduation & Certificate Modal */}
+      {selectedStudentForGraduation && (
+        <GraduationCertificateModal
+          isOpen={!!selectedStudentForGraduation}
+          onClose={() => setSelectedStudentForGraduation(null)}
+          data={selectedStudentForGraduation}
+        />
       )}
     </div>
   );
