@@ -258,3 +258,58 @@ class StudentTransferSerializer(serializers.Serializer):
         except Batch.DoesNotExist:
             raise ValidationError("Target batch does not exist.")
         return value
+
+
+class GraduationChecklistItemSerializer(serializers.Serializer):
+    key = serializers.CharField()
+    label_bn = serializers.CharField()
+    target = serializers.CharField()
+    current = serializers.CharField()
+    met = serializers.BooleanField()
+
+
+class CertificateInfoSerializer(serializers.Serializer):
+    certificate_no = serializers.CharField()
+    student_name = serializers.CharField()
+    student_id_number = serializers.CharField()
+    registration_no = serializers.CharField()
+    course_name = serializers.CharField()
+    course_code = serializers.CharField()
+    batch_name = serializers.CharField()
+    campus_name = serializers.CharField()
+    issue_date = serializers.CharField()
+    completion_date = serializers.CharField()
+    authorized_signatory_1 = serializers.CharField()
+    authorized_signatory_2 = serializers.CharField()
+    institute_reg_no = serializers.CharField()
+
+
+class StudentGraduationEligibilitySerializer(serializers.Serializer):
+    student_id = serializers.IntegerField()
+    student_id_number = serializers.CharField()
+    student_name = serializers.CharField()
+    batch_name = serializers.CharField()
+    course_name = serializers.CharField()
+    campus_name = serializers.CharField()
+    attendance_percentage = serializers.FloatField()
+    attendance_eligible = serializers.BooleanField()
+    total_sessions = serializers.IntegerField()
+    attended_sessions = serializers.IntegerField()
+    absent_sessions = serializers.IntegerField()
+    feedback_count = serializers.IntegerField()
+    average_understanding_percentage = serializers.FloatField()
+    average_rating = serializers.FloatField()
+    feedback_eligible = serializers.BooleanField()
+    total_help_requests = serializers.IntegerField()
+    pending_help_requests = serializers.IntegerField()
+    resolved_help_requests = serializers.IntegerField()
+    help_requests_eligible = serializers.BooleanField()
+    is_eligible = serializers.BooleanField()
+    overall_readiness_score = serializers.FloatField()
+    eligibility_status = serializers.CharField()
+    eligibility_status_bn = serializers.CharField()
+    performance_grade_en = serializers.CharField()
+    performance_grade_bn = serializers.CharField()
+    criteria_checklist = GraduationChecklistItemSerializer(many=True)
+    certificate_info = CertificateInfoSerializer()
+

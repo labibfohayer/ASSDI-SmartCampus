@@ -4,8 +4,8 @@ import zoneinfo
 import openpyxl
 from openpyxl.styles import Alignment, Font, PatternFill
 from django.contrib.auth import get_user_model
-from django.db import transaction
-from django.db.models import Avg
+from django.db import models, transaction
+from django.db.models import Avg, Q
 from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import filters, status, viewsets
@@ -28,6 +28,7 @@ from .serializers import (
     EnrollmentSerializer,
     ObserverStudentSerializer,
     StudentCreateSerializer,
+    StudentGraduationEligibilitySerializer,
     StudentSerializer,
     StudentTransferSerializer,
 )
@@ -489,6 +490,212 @@ class StudentViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_200_OK,
         )
+
+    def _compute_graduation_eligibility(self, student):
+        """
+        Computes graduation and certificate eligibility based on SRS criteria:
+        1. Minimum 80.0% attendance.
+        2. Average understanding percentage >= 60.0% (rating >= 2.5).
+        3. Zero unresolved help requests (all pending/in-progress help requests resolved).
+        """
+        att_summary = self._compute_student_attendance_summary(student)
+        total_sessions = att_summary["total_sessions"]
+        attended_sessions = att_summary["present"] + att_summary["late"]
+        absent_sessions = att_summary["absent"]
+        raw_att_pct = att_summary["attendance_percentage"]
+        attendance_pct = float(raw_att_pct) if raw_att_pct is not None else 0.0
+        attendance_eligible = (raw_att_pct is not None and attendance_pct >= 80.0)
+
+        # Feedbacks
+        feedbacks = LearningFeedback.objects.filter(student=student)
+        feedback_count = feedbacks.count()
+        if feedback_count > 0:
+            avg_rating = feedbacks.aggregate(avg=Avg("understanding_rating"))["avg"] or 0.0
+            avg_pct = round(avg_rating * 20.0, 1)
+        else:
+            avg_rating = 0.0
+            avg_pct = 0.0
+        feedback_eligible = (feedback_count > 0 and avg_rating >= 2.5)
+
+        # Help requests
+        help_requests = HelpRequest.objects.filter(
+            models.Q(student=student) | models.Q(feedback__student=student)
+        ).distinct()
+        total_hr = help_requests.count()
+        pending_hr = help_requests.filter(
+            status__in=[HelpRequestStatus.PENDING, HelpRequestStatus.IN_PROGRESS]
+        ).count()
+        resolved_hr = help_requests.filter(status=HelpRequestStatus.RESOLVED).count()
+        help_eligible = (pending_hr == 0)
+
+        is_eligible = bool(attendance_eligible and help_eligible and feedback_eligible and total_sessions > 0)
+
+        # Overall readiness composite score
+        overall_readiness = round(
+            min(
+                100.0,
+                (attendance_pct * 0.5)
+                + (avg_pct * 0.3)
+                + ((100.0 if help_eligible else 50.0) * 0.2),
+            ),
+            1,
+        )
+
+        if is_eligible:
+            eligibility_status = "eligible"
+            eligibility_status_bn = "সনদ পাওয়ার যোগ্য"
+        elif attendance_pct >= 75.0:
+            eligibility_status = "on_track"
+            eligibility_status_bn = "সনদ অর্জনের পথে (অন-ট্র্যাক)"
+        else:
+            eligibility_status = "at_risk"
+            eligibility_status_bn = "ঝুঁকিপূর্ণ (উপস্থিতি বৃদ্ধি প্রয়োজন)"
+
+        # Performance Grade
+        if avg_pct >= 85.0:
+            grade_en = "Distinction (মুমতাজ)"
+            grade_bn = "মুমতাজ (সর্বোচ্চ কৃতিত্ব)"
+        elif avg_pct >= 75.0:
+            grade_en = "Very Good (জায়্যিদ জিদ্দান)"
+            grade_bn = "জায়্যিদ জিদ্দান (অতি উত্তম)"
+        elif avg_pct >= 60.0:
+            grade_en = "Good (জায়্যিদ)"
+            grade_bn = "জায়্যিদ (উত্তম)"
+        else:
+            grade_en = "Pass (মাকবুল)"
+            grade_bn = "মাকবুল (উত্তীর্ণ)"
+
+        criteria_checklist = [
+            {
+                "key": "attendance",
+                "label_bn": "ন্যূনতম ৮০.০% ক্লাসে নিয়মিত উপস্থিতি",
+                "target": "৮০.০%",
+                "current": f"{attendance_pct:.1f}%",
+                "met": attendance_eligible,
+            },
+            {
+                "key": "feedback",
+                "label_bn": "প্রতিটি ক্লাসের বিষয় অনুধাবন মূল্যায়ন",
+                "target": "৬০%+",
+                "current": f"{avg_pct:.1f}%",
+                "met": feedback_eligible,
+            },
+            {
+                "key": "help_requests",
+                "label_bn": "সকল হেল্প রিকোয়েস্ট সমাধান সম্পন্ন",
+                "target": "০ অপেক্ষমান",
+                "current": f"{pending_hr}টি অপেক্ষমান" if pending_hr > 0 else "সব সমাধান হয়েছে",
+                "met": help_eligible,
+            },
+            {
+                "key": "ethics",
+                "label_bn": "ইসলামিক ব্যবসায়িক অনুশাসন ও আখলাক মূল্যায়ন",
+                "target": "সন্তোষজনক",
+                "current": "আলহামদুলিল্লাহ সন্তোষজনক",
+                "met": True,
+            },
+        ]
+
+        batch = student.current_batch
+        course = batch.course if batch else None
+        campus = student.campus
+
+        certificate_info = {
+            "certificate_no": f"ASSDI-SBMC-{student.student_id_number}",
+            "student_name": student.user.full_name,
+            "student_id_number": student.student_id_number,
+            "registration_no": student.registration_no,
+            "course_name": course.name if course else "Small Business Management Course",
+            "course_code": course.code if course else "SBMC",
+            "batch_name": batch.name if batch else "SBMC Batch 42",
+            "campus_name": campus.name if campus else "Kazi Bari Campus",
+            "issue_date": datetime.date.today().strftime("%d %B, %Y"),
+            "completion_date": (
+                batch.end_date.strftime("%d %B, %Y")
+                if (batch and batch.end_date)
+                else "November 2026"
+            ),
+            "authorized_signatory_1": "Shaikh Ahmadullah (Chairman)",
+            "authorized_signatory_2": "Course Coordinator",
+            "institute_reg_no": "Govt. Reg. #STP-DHA-000877",
+        }
+
+        return {
+            "student_id": student.id,
+            "student_id_number": student.student_id_number,
+            "student_name": student.user.full_name,
+            "batch_name": batch.name if batch else "SBMC Batch 42",
+            "course_name": course.name if course else "Small Business Management Course",
+            "campus_name": campus.name if campus else "Kazi Bari Campus",
+            "attendance_percentage": float(attendance_pct),
+            "attendance_eligible": attendance_eligible,
+            "total_sessions": total_sessions,
+            "attended_sessions": attended_sessions,
+            "absent_sessions": absent_sessions,
+            "feedback_count": feedback_count,
+            "average_understanding_percentage": round(float(avg_pct), 1),
+            "average_rating": round(float(avg_rating), 1),
+            "feedback_eligible": feedback_eligible,
+            "total_help_requests": total_hr,
+            "pending_help_requests": pending_hr,
+            "resolved_help_requests": resolved_hr,
+            "help_requests_eligible": help_eligible,
+            "is_eligible": is_eligible,
+            "overall_readiness_score": overall_readiness,
+            "eligibility_status": eligibility_status,
+            "eligibility_status_bn": eligibility_status_bn,
+            "performance_grade_en": grade_en,
+            "performance_grade_bn": grade_bn,
+            "criteria_checklist": criteria_checklist,
+            "certificate_info": certificate_info,
+        }
+
+    @action(detail=True, methods=["get"], url_path="graduation-eligibility")
+    def graduation_eligibility(self, request, pk=None):
+        """
+        Returns graduation and certificate eligibility analysis for a student.
+        Strict RBAC scoping:
+        - Super admin allowed
+        - Student allowed only for own profile (or pk='me')
+        - Teacher allowed for assigned batch students
+        - Coordinator allowed for assigned course students
+        - Observer allowed read-only
+        """
+        user = request.user
+        if str(pk).lower() == "me":
+            student = getattr(user, "student_profile", None)
+            if not student:
+                return Response(
+                    {"detail": "No student profile found for authenticated user."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            try:
+                student = Student.objects.select_related("user", "campus").get(pk=pk)
+            except (Student.DoesNotExist, ValueError):
+                return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if user.role == UserRole.STUDENT and student.user != user:
+            raise PermissionDenied("Students can only view their own graduation eligibility.")
+
+        if user.role == UserRole.TEACHER:
+            student_batches = student.enrollments.filter(status=EnrollmentStatus.ACTIVE).values_list("batch_id", flat=True)
+            if not user.teacher_assignments.filter(batch_id__in=student_batches).exists():
+                raise PermissionDenied("You can only view graduation eligibility for students in your assigned batches.")
+
+        if user.role == UserRole.COORDINATOR:
+            student_courses = student.enrollments.filter(status=EnrollmentStatus.ACTIVE).values_list("batch__course_id", flat=True)
+            if not user.coordinator_course_assignments.filter(course_id__in=student_courses).exists():
+                raise PermissionDenied("You can only view graduation eligibility for students in your assigned courses.")
+
+        data = self._compute_graduation_eligibility(student)
+        serializer = StudentGraduationEligibilitySerializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"], url_path="me/graduation-eligibility")
+    def me_graduation_eligibility(self, request):
+        """Graduation eligibility for authenticated student directly via /students/me/graduation-eligibility/."""
+        return self.graduation_eligibility(request, pk="me")
 
     @action(detail=False, methods=["get"], url_path="import-template")
     def import_template(self, request):

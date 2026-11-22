@@ -25,10 +25,14 @@ import {
   FileText,
   Filter,
   Sparkles,
+  Award,
+  FileCheck2,
+  ShieldCheck,
 } from 'lucide-react';
 import WebQRScannerModal from '@/components/student/WebQRScannerModal';
 import StudentIdCardModal from '@/components/student/StudentIdCardModal';
 import LectureMaterialsModal, { SessionMaterialItem } from '@/components/student/LectureMaterialsModal';
+import { GraduationCertificateModal, GraduationData } from '@/components/student/GraduationCertificateModal';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -116,9 +120,11 @@ export default function StudentPortalPage() {
   const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>([]);
   const [helpRequests, setHelpRequests] = useState<HelpRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help' | 'materials'>('today');
+  const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help' | 'materials' | 'graduation'>('today');
   const [scannerOpen, setScannerOpen] = useState(false);
   const [idCardOpen, setIdCardOpen] = useState(false);
+  const [certModalOpen, setCertModalOpen] = useState(false);
+  const [graduationData, setGraduationData] = useState<GraduationData | null>(null);
 
   // Lecture Materials Hub & Modal
   const [materials, setMaterials] = useState<SessionMaterialItem[]>([]);
@@ -148,7 +154,7 @@ export default function StudentPortalPage() {
           : window.location.search;
         const params = new URLSearchParams(search);
         const tab = params.get('tab');
-        if (tab === 'attendance' || tab === 'help' || tab === 'today' || tab === 'materials') {
+        if (tab === 'attendance' || tab === 'help' || tab === 'today' || tab === 'materials' || tab === 'graduation') {
           setActiveTab(tab as any);
         } else if (!tab && !params.get('scan')) {
           setActiveTab('today');
@@ -173,7 +179,7 @@ export default function StudentPortalPage() {
     };
   }, [user]);
 
-  const handleTabChange = (tab: 'today' | 'attendance' | 'help' | 'materials') => {
+  const handleTabChange = (tab: 'today' | 'attendance' | 'help' | 'materials' | 'graduation') => {
     setActiveTab(tab);
     if (typeof window !== 'undefined') {
       const href = tab === 'today' ? '/student' : `/student?tab=${tab}`;
@@ -193,14 +199,19 @@ export default function StudentPortalPage() {
     setLoading(true);
     try {
       // Normal student loading with graceful individual error handling
-      const [profRes, attRes, sessRes, fbRes, helpRes, matRes] = await Promise.all([
+      const [profRes, attRes, sessRes, fbRes, helpRes, matRes, gradRes] = await Promise.all([
         api.get('/api/v1/students/me/').catch(() => ({ data: null })),
         api.get('/api/v1/attendance/mine/').catch(() => ({ data: null })),
         api.get('/api/v1/class-sessions/?status=published').catch(() => ({ data: [] })),
         api.get('/api/v1/feedback/mine/').catch(() => ({ data: [] })),
         api.get('/api/v1/help-requests/').catch(() => ({ data: [] })),
         api.get('/api/v1/session-materials/').catch(() => ({ data: [] })),
+        api.get('/api/v1/students/me/graduation-eligibility/').catch(() => ({ data: null })),
       ]);
+
+      if (gradRes.data) {
+        setGraduationData(gradRes.data);
+      }
 
       if (matRes.data) {
         const matList = Array.isArray(matRes.data)
@@ -465,6 +476,14 @@ export default function StudentPortalPage() {
               <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
             </button>
             <button
+              onClick={() => setCertModalOpen(true)}
+              className="px-4 py-2 rounded-xl bg-[#061C16] hover:bg-[#08261e] text-[#E5C378] border border-[#C5A059]/40 font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-95"
+              title={isBangla ? 'কোর্স সনদপত্র প্রিভিউ ও প্রিন্ট' : 'Course Certificate Preview & Print'}
+            >
+              <Award className="w-4 h-4 text-[#C5A059]" />
+              <span>{isBangla ? 'সনদপত্র' : 'Certificate'}</span>
+            </button>
+            <button
               onClick={() => setScannerOpen(true)}
               className="px-4 py-2 rounded-xl bg-[#C5A059] hover:bg-[#B38F48] text-[#061C16] font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-md hover:shadow-lg active:scale-95"
               title={isBangla ? 'ক্যামেরা দিয়ে কিউআর স্ক্যান করুন' : 'Scan Attendance QR'}
@@ -641,6 +660,27 @@ export default function StudentPortalPage() {
           {materials.length > 0 && (
             <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-[#0B2A21] font-bold">
               {materials.length}
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => handleTabChange('graduation')}
+          className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === 'graduation'
+              ? 'bg-white text-[#0B2A21] shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+          }`}
+        >
+          <Award className="w-4 h-4 text-[#C5A059]" />
+          <span>{isBangla ? 'সনদ ও গ্র্যাজুয়েশন' : 'Graduation & Certificate'}</span>
+          {graduationData?.is_eligible ? (
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-[#0B2A21] font-extrabold border border-emerald-300">
+              {isBangla ? 'যোগ্য' : 'Eligible'}
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-bold">
+              {graduationData?.overall_readiness_score || 0}%
             </span>
           )}
         </button>
@@ -1188,6 +1228,333 @@ export default function StudentPortalPage() {
         </div>
       )}
 
+      {/* TAB 5: Graduation & Certificate Eligibility Tracker */}
+      {activeTab === 'graduation' && (
+        <div className="space-y-5">
+          {/* Tracker Header */}
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-[#0B2A21] text-[#E5C378] uppercase tracking-wider flex items-center gap-1">
+                  <Award className="w-3 h-3 text-[#C5A059]" />
+                  {isBangla ? 'গ্র্যাজুয়েশন ও সনদ' : 'Graduation & Certificate'}
+                </span>
+                <span className="text-xs text-slate-500 font-medium">
+                  {profile?.current_batch_name || 'SBMC Batch 42'}
+                </span>
+              </div>
+              <h2 className="text-lg sm:text-xl font-black text-slate-900 mt-1">
+                {isBangla ? 'সনদ ও গ্র্যাজুয়েশন অর্জনের যোগ্যতা ট্র্যাকার' : 'Graduation & Certificate Eligibility Tracker'}
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5 max-w-2xl leading-relaxed">
+                {isBangla
+                  ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট কর্তৃক সনদ অর্জনের অগ্রগতি, শর্তাবলি পূরণ ও কোর্স সমাপনী সনদপত্র।'
+                  : 'Track your real-time completion progress, institutional compliance criteria, and certificate readiness.'}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setCertModalOpen(true)}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0B2A21] to-[#164E3D] hover:from-[#082019] hover:to-[#124234] text-[#F3E5C8] font-bold text-xs sm:text-sm border border-[#C5A059]/50 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              >
+                <Award className="w-4 h-4 text-[#C5A059]" />
+                <span>{isBangla ? 'সনদপত্র দেখুন ও প্রিন্ট করুন' : 'View & Print Certificate'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Readiness Bento Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* Left Card: Overall Readiness Score Ring */}
+            <div className="bg-gradient-to-br from-[#0B2A21] via-[#10382C] to-[#0B2A21] text-white p-6 rounded-2xl border border-emerald-900/60 shadow-lg flex flex-col justify-between relative overflow-hidden">
+              {/* Background Glow */}
+              <div className="absolute -right-8 -bottom-8 w-44 h-44 rounded-full bg-[#C5A059]/10 blur-2xl pointer-events-none" />
+
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                    {isBangla ? 'সার্বিক গ্র্যাজুয়েশন প্রস্তুতি' : 'Graduation Readiness'}
+                  </span>
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
+                      graduationData?.is_eligible
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        : graduationData?.eligibility_status === 'on_track'
+                        ? 'bg-teal-500/20 text-teal-300 border-teal-500/40'
+                        : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                    }`}
+                  >
+                    {graduationData?.eligibility_status_bn || 'প্রস্তুতি চলছে'}
+                  </span>
+                </div>
+
+                {/* Circular Score Visual */}
+                <div className="flex items-center gap-5 my-6">
+                  <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                      <path
+                        className="text-white/10"
+                        strokeWidth="3.5"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-[#C5A059] transition-all duration-1000 ease-out"
+                        strokeDasharray={`${Math.min(graduationData?.overall_readiness_score || 0, 100)}, 100`}
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                    <div className="absolute flex flex-col items-center justify-center text-center">
+                      <span className="text-xl font-black text-[#F3E5C8]">
+                        {graduationData?.overall_readiness_score || 0}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-xs text-emerald-200/80 font-medium">
+                      {isBangla ? 'প্রত্যাশিত ফলাফল ও গ্রেড:' : 'Expected Grade:'}
+                    </p>
+                    <p className="text-base font-bold text-white leading-tight">
+                      {graduationData?.grade_bn || 'মুমতাজ (সর্বোচ্চ কৃতিত্ব)'}
+                    </p>
+                    <p className="text-[11px] text-[#C5A059] font-mono">
+                      {graduationData?.grade_en || 'Distinction'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-emerald-800/60 text-xs text-emerald-100/80">
+                  <div className="flex justify-between">
+                    <span>{isBangla ? 'উপস্থিতির অবদান (৫০%):' : 'Attendance Weight (50%):'}</span>
+                    <strong className="text-white font-mono">{graduationData?.attendance_percentage || 0}%</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{isBangla ? 'অনুধাবন মান (৩০%):' : 'Comprehension Weight (30%):'}</span>
+                    <strong className="text-white font-mono">{graduationData?.average_understanding_percentage || 0}%</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{isBangla ? 'সমস্যা সমাধান (২০%):' : 'Help Clearance (20%):'}</span>
+                    <strong className="text-white font-mono">
+                      {graduationData?.pending_help_requests === 0
+                        ? isBangla ? '১০০% নিষ্পন্ন' : '100% Cleared'
+                        : isBangla ? `${graduationData?.pending_help_requests}টি বাকি` : `${graduationData?.pending_help_requests} Pending`}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-emerald-800/60">
+                <button
+                  onClick={() => setCertModalOpen(true)}
+                  className="w-full py-2.5 rounded-xl bg-[#C5A059] hover:bg-[#b38e47] text-[#0B2A21] font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Award className="w-4 h-4 text-[#0B2A21]" />
+                  <span>{isBangla ? 'সনদপত্র প্রিভিউ ও ডাউনলোড' : 'Preview & Download Certificate'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Right 2 Columns: Criteria Checklist */}
+            <div className="lg:col-span-2 space-y-3">
+              <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                    <FileCheck2 className="w-4 h-4 text-[#0B2A21]" />
+                    <span>{isBangla ? 'সনদপত্র পাওয়ার ৪টি আবশ্যিক শর্তাবলি' : 'Mandatory Certificate Criteria'}</span>
+                  </h3>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {graduationData?.criteria_checklist?.filter((c) => c.met).length || 0} / 4 {isBangla ? 'শর্ত পূরণ' : 'Met'}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Criterion 1: Attendance */}
+                  <div
+                    className={`p-4 rounded-xl border transition-all ${
+                      (graduationData?.attendance_percentage || 0) >= 80
+                        ? 'bg-emerald-50/60 border-emerald-200'
+                        : 'bg-rose-50/60 border-rose-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                            (graduationData?.attendance_percentage || 0) >= 80
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-rose-600 text-white'
+                          }`}
+                        >
+                          {(graduationData?.attendance_percentage || 0) >= 80 ? (
+                            <CheckCircle2 className="w-4 h-4" />
+                          ) : (
+                            <AlertCircle className="w-4 h-4" />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-xs sm:text-sm text-slate-900">
+                            {isBangla ? '১. ক্লাসে ন্যূনতম ৮০.০% নিয়মিত উপস্থিতি' : '1. Minimum 80.0% Session Attendance'}
+                          </h4>
+                          <p className="text-xs text-slate-600 mt-0.5">
+                            {isBangla
+                              ? `মোট ${graduationData?.total_sessions || 0}টি নির্ধারিত ক্লাসের মধ্যে ${graduationData?.attended_sessions || 0}টি ক্লাসে উপস্থিত ছিলেন।`
+                              : `Attended ${graduationData?.attended_sessions || 0} out of ${graduationData?.total_sessions || 0} scheduled classes.`}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span
+                          className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                            (graduationData?.attendance_percentage || 0) >= 80
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-rose-100 text-rose-800'
+                          }`}
+                        >
+                          {graduationData?.attendance_percentage || 0}% / ৮০%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Criterion 2: Understanding Rating */}
+                  <div
+                    className={`p-4 rounded-xl border transition-all ${
+                      (graduationData?.average_understanding_percentage || 0) >= 60
+                        ? 'bg-emerald-50/60 border-emerald-200'
+                        : 'bg-amber-50/60 border-amber-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                            (graduationData?.average_understanding_percentage || 0) >= 60
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-amber-600 text-white'
+                          }`}
+                        >
+                          {(graduationData?.average_understanding_percentage || 0) >= 60 ? (
+                            <CheckCircle2 className="w-4 h-4" />
+                          ) : (
+                            <AlertCircle className="w-4 h-4" />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-xs sm:text-sm text-slate-900">
+                            {isBangla ? '২. ক্লাসের বিষয়বস্তু অনুধাবন মান ন্যূনতম ৬০.০%' : '2. Class Understanding Rate Minimum 60.0%'}
+                          </h4>
+                          <p className="text-xs text-slate-600 mt-0.5">
+                            {isBangla
+                              ? `মোট ${graduationData?.total_feedback_count || 0}টি সেশনে মূল্যায়ন সম্পন্ন হয়েছে (গড় অনুধাবন রেটিং: ${graduationData?.average_understanding_rating || 0}/৫)।`
+                              : `Completed ${graduationData?.total_feedback_count || 0} class feedback submissions.`}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span
+                          className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                            (graduationData?.average_understanding_percentage || 0) >= 60
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-amber-100 text-amber-800'
+                          }`}
+                        >
+                          {graduationData?.average_understanding_percentage || 0}% / ৬০%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Criterion 3: Help Requests Clearance */}
+                  <div
+                    className={`p-4 rounded-xl border transition-all ${
+                      (graduationData?.pending_help_requests || 0) === 0
+                        ? 'bg-emerald-50/60 border-emerald-200'
+                        : 'bg-blue-50/60 border-blue-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                            (graduationData?.pending_help_requests || 0) === 0
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-blue-600 text-white'
+                          }`}
+                        >
+                          {(graduationData?.pending_help_requests || 0) === 0 ? (
+                            <CheckCircle2 className="w-4 h-4" />
+                          ) : (
+                            <AlertCircle className="w-4 h-4" />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-xs sm:text-sm text-slate-900">
+                            {isBangla ? '৩. সকল শিক্ষকের সহায়তা ও প্রশ্ন সমাধান (০টি পেন্ডিং)' : '3. Resolution of All Help Requests (0 Pending)'}
+                          </h4>
+                          <p className="text-xs text-slate-600 mt-0.5">
+                            {isBangla
+                              ? `মোট ${graduationData?.resolved_help_requests || 0}টি অ্যাকাডেমিক সমস্যার সমাধান শিক্ষক সম্পন্ন করেছেন।`
+                              : `Resolved ${graduationData?.resolved_help_requests || 0} questions with course teachers.`}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span
+                          className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                            (graduationData?.pending_help_requests || 0) === 0
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}
+                        >
+                          {graduationData?.pending_help_requests || 0}টি পেন্ডিং
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Criterion 4: Institutional Registration & Verification */}
+                  <div className="p-4 rounded-xl border bg-slate-50 border-slate-200 transition-all">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-[#0B2A21] text-[#C5A059] flex items-center justify-center shrink-0 mt-0.5">
+                          <ShieldCheck className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-xs sm:text-sm text-slate-900">
+                            {isBangla ? '৪. প্রাতিষ্ঠানিক ডাটাবেজ ভেরিফিকেশন ও অনুমোদন' : '4. Institutional Verification & Govt. Accreditation'}
+                          </h4>
+                          <p className="text-xs text-slate-600 mt-0.5">
+                            {isBangla
+                              ? `Govt. Reg #STP-DHA-000877 • সনদ সিরিয়াল: ${graduationData?.certificate_info?.certificate_no || 'ASSDI-SBMC-REG-2026'}`
+                              : 'Official QR accreditation linked to As-Sunnah central verification database.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                          {isBangla ? 'ভেরিফায়েড' : 'Verified'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quick Feedback Submission Modal (10-15s submittable) */}
       {selectedSessionForFeedback && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -1408,6 +1775,13 @@ export default function StudentPortalPage() {
         session={selectedSessionForMaterials}
         initialMaterial={selectedMaterialForModal}
         onDownloadSuccess={loadStudentData}
+      />
+
+      {/* Student Course Completion & Merit Certificate Modal */}
+      <GraduationCertificateModal
+        isOpen={certModalOpen}
+        onClose={() => setCertModalOpen(false)}
+        data={graduationData}
       />
     </div>
   );

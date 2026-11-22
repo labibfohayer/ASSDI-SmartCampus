@@ -24,6 +24,7 @@ import {
   Star,
   CheckCircle2,
   BookOpen,
+  Award,
   ArrowLeft,
   Globe,
   Clock,
@@ -396,6 +397,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelBn: 'শিক্ষকের সমাধান ও উত্তর',
                 labelEn: 'Teacher Help & Replies',
                 icon: HelpCircle,
+              },
+              {
+                href: '/student?tab=graduation',
+                labelBn: 'সনদ ও গ্র্যাজুয়েশন ট্র্যাকার',
+                labelEn: 'Graduation & Certificate',
+                icon: Award,
               },
               {
                 href: '/announcements',
