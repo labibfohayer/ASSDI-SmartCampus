@@ -359,18 +359,18 @@ export default function AdminStudentsPage() {
   return (
     <div className="space-y-6">
       {/* Header & Add Button */}
-      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative z-20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none rounded-2xl overflow-hidden" />
+      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-md relative z-20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none rounded-2xl overflow-hidden" />
 
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
-            <Users className="w-3.5 h-3.5 text-[#C5A059]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs font-semibold text-white mb-2.5">
+            <Users className="w-3.5 h-3.5 text-[#C1982E]" />
             <span>{isBangla ? 'ভর্তি ও এনরোলমেন্ট প্রশাসন' : 'Admissions & Enrollment'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
             {isBangla ? 'শিক্ষার্থী ব্যবস্থাপনা ও ভর্তি পোর্টাল' : 'Student Management & Admissions'}
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-teal-50 mt-1 max-w-xl">
             {isBangla
               ? 'শিক্ষার্থীদের তালিকা, রোল নম্বর, শিক্ষাগত পটভূমি ও ব্যাচ অন্তর্ভুক্তি ব্যবস্থাপনা করুন।'
               : 'View student directory, enrollment details, and register new students.'}
@@ -390,24 +390,24 @@ export default function AdminStudentsPage() {
               setImportResult(null);
               setBulkFile(null);
             }}
-            className="px-3.5 py-2.5 bg-[#061C16] hover:bg-[#07241C] text-emerald-100 border border-emerald-900/80 text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer active:scale-95"
+            className="px-3.5 py-2.5 bg-[#0D9488] hover:bg-[#115E59] text-white border border-teal-500/30 text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer active:scale-95"
           >
-            <FileSpreadsheet className="w-4 h-4 text-[#C5A059]" />
+            <FileSpreadsheet className="w-4 h-4 text-[#C1982E]" />
             <span>{isBangla ? 'বাল্ক ইমপোর্ট (এক্সেল/সিএসভি)' : 'Bulk Import (Excel/CSV)'}</span>
           </button>
 
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] text-xs font-extrabold rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95"
+            className="px-4 py-2.5 bg-[#C1982E] hover:bg-[#A88224] text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95"
           >
-            <PlusCircle className="w-4 h-4 text-[#0B2A21]" />
+            <PlusCircle className="w-4 h-4 text-white" />
             <span>{isBangla ? 'নতুন শিক্ষার্থী ভর্তি' : 'Enroll New Student'}</span>
           </button>
         </div>
       </div>
 
       {/* Roster Table Card */}
-      <div className="bg-white rounded-2xl border border-emerald-100 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
         {/* Search & Filter Bar */}
         <div className="p-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-wrap flex-1">
@@ -483,23 +483,23 @@ export default function AdminStudentsPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredStudents.map((st) => (
-                  <tr key={st.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-4 font-bold font-mono text-slate-900">
+                  <tr key={st.id} className="hover:bg-[#F0FDFA] transition-colors">
+                    <td className="py-3.5 px-4 font-bold font-mono text-[#0F172A]">
                       {st.student_id_number}
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                    <td className="py-3.5 px-4 font-bold text-[#0F172A] font-heading">
                       {st.full_name}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-500">
+                    <td className="py-3.5 px-4 font-mono text-[#475569]">
                       {st.registration_no}
                     </td>
                     <td className="py-3.5 px-4">
                       {st.current_batch_name ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#0B2A21] border border-emerald-200/80 font-bold text-[10px]">
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] font-bold text-[10px]">
                           {st.current_batch_name}
                         </span>
                       ) : (
-                        <span className="text-slate-400 italic text-[11px]">Unassigned</span>
+                        <span className="text-[#94A3B8] italic text-[11px]">Unassigned</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4">
@@ -511,13 +511,13 @@ export default function AdminStudentsPage() {
                         {st.education_background}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-600">
+                    <td className="py-3.5 px-4 font-mono text-[#475569]">
                       {st.phone || '-'}
                     </td>
                     <td className="py-3.5 px-4">
                       {st.status === 'active' ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold border border-emerald-200 flex items-center gap-1 w-fit">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#F0FDF4] text-[#16A34A] text-[10px] font-extrabold border border-[#DCFCE7] flex items-center gap-1 w-fit">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
                           {isBangla ? 'সক্রিয়' : 'Active'}
                         </span>
                       ) : st.status === 'expelled' ? (
@@ -541,10 +541,10 @@ export default function AdminStudentsPage() {
                         <button
                           onClick={() => handleOpenGraduation(st)}
                           disabled={loadingGraduationId === st.id}
-                          className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-[#0B2A21] text-amber-900 hover:text-[#E5C378] border border-amber-200 hover:border-[#0B2A21] text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
+                          className="px-2.5 py-1.5 rounded-lg bg-[#F0FDFA] hover:bg-[#0F766E] text-[#0F766E] hover:text-white border border-[#CCFBF1] text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
                           title={isBangla ? 'সনদ ও গ্র্যাজুয়েশন যোগ্যতা পর্যালোচনা করুন' : 'View Graduation & Certificate'}
                         >
-                          <Award className="w-3.5 h-3.5 text-[#C5A059]" />
+                          <Award className="w-3.5 h-3.5 text-[#C1982E]" />
                           <span>
                             {loadingGraduationId === st.id
                               ? isBangla
@@ -557,15 +557,15 @@ export default function AdminStudentsPage() {
                         </button>
                         <button
                           onClick={() => setSelectedStudentForIdCard(st)}
-                          className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#0B2A21] text-emerald-800 hover:text-[#E5C378] border border-emerald-200 hover:border-[#0B2A21] text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
+                          className="px-2.5 py-1.5 rounded-lg bg-[#F0FDFA] hover:bg-[#0F766E] text-[#0F766E] hover:text-white border border-[#CCFBF1] text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
                           title={isBangla ? 'ডিজিটাল আইডি কার্ড ও এডমিট কার্ড দেখুন' : 'View ID Card & Admit Card'}
                         >
-                          <CreditCard className="w-3.5 h-3.5 text-[#C5A059]" />
+                          <CreditCard className="w-3.5 h-3.5 text-[#C1982E]" />
                           <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
                         </button>
                         <button
                           onClick={() => openEditModal(st)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0B2A21] hover:text-[#E5C378] text-slate-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                          className="px-3 py-1.5 rounded-lg bg-[#F8FAFC] hover:bg-[#0F766E] hover:text-white text-[#0F172A] border border-[#E2E8F0] text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
                           title={isBangla ? 'শিক্ষার্থীর তথ্য ও স্ট্যাটাস সম্পাদনা করুন' : 'Edit Student'}
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -584,10 +584,10 @@ export default function AdminStudentsPage() {
       {/* Add Student Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] space-y-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-[#0B2A21]" />
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-[#E2E8F0] border-t-4 border-t-[#C1982E] space-y-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
+              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2 font-heading">
+                <PlusCircle className="w-5 h-5 text-[#0F766E]" />
                 <span>{isBangla ? 'নতুন শিক্ষার্থী নিবন্ধন' : 'Enroll New Student'}</span>
               </h3>
               <button
@@ -731,7 +731,7 @@ export default function AdminStudentsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-white font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+                  className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
                 >
                   {submitting ? (isBangla ? 'নিবন্ধন হচ্ছে...' : 'Saving...') : (isBangla ? 'ভর্তি সম্পন্ন করুন' : 'Confirm Enrollment')}
                 </button>
@@ -744,11 +744,11 @@ export default function AdminStudentsPage() {
       {/* Bulk Import Modal */}
       {showBulkModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C1982E] max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0B2A21] border border-emerald-100 flex items-center justify-center">
-                  <FileSpreadsheet className="w-5 h-5 text-[#C5A059]" />
+                <div className="w-10 h-10 rounded-xl bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center">
+                  <FileSpreadsheet className="w-5 h-5 text-[#C1982E]" />
                 </div>
                 <div>
                   <h3 className="font-extrabold text-slate-900 text-sm">
@@ -771,10 +771,10 @@ export default function AdminStudentsPage() {
             </div>
 
             {/* Step 1: Template Download Banner */}
-            <div className="p-4 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div className="p-4 bg-[#F0FDFA] border border-[#CCFBF1] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <p className="text-xs font-bold text-[#0B2A21] flex items-center gap-1.5">
-                  <FileSpreadsheet className="w-4 h-4 text-[#C5A059]" />
+                <p className="text-xs font-bold text-[#0F766E] flex items-center gap-1.5">
+                  <FileSpreadsheet className="w-4 h-4 text-[#C1982E]" />
                   <span>{isBangla ? '১. নমুনা টেমপ্লেট ডাউনলোড করুন' : '1. Download Sample Template'}</span>
                 </p>
                 <p className="text-[11px] text-emerald-800/80 mt-0.5">
@@ -789,20 +789,20 @@ export default function AdminStudentsPage() {
                   type="button"
                   onClick={() => handleDownloadTemplate('xlsx')}
                   disabled={downloadingTemplate}
-                  className="px-3 py-1.5 bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
+                  className="px-3 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
                   title="Download .XLSX"
                 >
-                  <Download className="w-3.5 h-3.5 text-[#C5A059]" />
+                  <Download className="w-3.5 h-3.5 text-[#C1982E]" />
                   <span>{isBangla ? 'এক্সেল (.xlsx)' : 'Excel (.xlsx)'}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDownloadTemplate('csv')}
                   disabled={downloadingTemplate}
-                  className="px-3 py-1.5 bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
+                  className="px-3 py-1.5 bg-white hover:bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
                   title="Download .CSV"
                 >
-                  <Download className="w-3.5 h-3.5 text-emerald-700" />
+                  <Download className="w-3.5 h-3.5 text-[#0F766E]" />
                   <span>{isBangla ? 'সিএসভি (.csv)' : 'CSV (.csv)'}</span>
                 </button>
               </div>
@@ -980,7 +980,7 @@ export default function AdminStudentsPage() {
                 <button
                   type="submit"
                   disabled={importing || !bulkFile || !bulkBatchId}
-                  className="px-5 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] text-xs font-bold rounded-xl border border-[#C5A059]/40 shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
+                  className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
                 >
                   {importing ? (
                     <>
@@ -989,7 +989,7 @@ export default function AdminStudentsPage() {
                     </>
                   ) : (
                     <>
-                      <UploadCloud className="w-3.5 h-3.5" />
+                      <UploadCloud className="w-3.5 h-3.5 text-[#C1982E]" />
                       <span>{isBangla ? 'ইমপোর্ট শুরু করুন' : 'Start Import'}</span>
                     </>
                   )}
@@ -1003,11 +1003,11 @@ export default function AdminStudentsPage() {
       {/* Edit Student Profile & Status Modal */}
       {editingStudent && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] space-y-4 max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C1982E] space-y-4 max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-base font-extrabold text-[#0B2A21] flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-[#C5A059]" />
+                <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
+                  <Edit3 className="w-5 h-5 text-[#0F766E]" />
                   <span>
                     {isBangla ? 'শিক্ষার্থীর তথ্য ও স্ট্যাটাস সম্পাদনা' : 'Edit Student Profile & Lifecycle'}
                   </span>
@@ -1039,7 +1039,7 @@ export default function AdminStudentsPage() {
                     onChange={(e) =>
                       setEditFormData({ ...editFormData, full_name: e.target.value })
                     }
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
                 <div>
@@ -1052,7 +1052,7 @@ export default function AdminStudentsPage() {
                     onChange={(e) =>
                       setEditFormData({ ...editFormData, phone: e.target.value })
                     }
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
               </div>
@@ -1070,7 +1070,7 @@ export default function AdminStudentsPage() {
                     onChange={(e) =>
                       setEditFormData({ ...editFormData, registration_no: e.target.value })
                     }
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
                 <div>
@@ -1083,7 +1083,7 @@ export default function AdminStudentsPage() {
                     onChange={(e) =>
                       setEditFormData({ ...editFormData, guardian_phone: e.target.value })
                     }
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
               </div>
@@ -1102,7 +1102,7 @@ export default function AdminStudentsPage() {
                         education_background: e.target.value,
                       })
                     }
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   >
                     <option value="General">General (জেনারেল)</option>
                     <option value="Aliya">Aliya Madrasa (আলিয়া মাদ্রাসা)</option>
@@ -1118,7 +1118,7 @@ export default function AdminStudentsPage() {
                     onChange={(e) =>
                       setEditFormData({ ...editFormData, batch_id: e.target.value })
                     }
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   >
                     <option value="">{isBangla ? '-- ব্যাচ নির্বাচন করুন --' : '-- Select Batch --'}</option>
                     {batches.map((b) => (
@@ -1132,8 +1132,8 @@ export default function AdminStudentsPage() {
 
               {/* Student Lifecycle Status (Crucial) */}
               <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-xl space-y-2">
-                <label className="block font-extrabold text-[#0B2A21] flex items-center gap-1.5">
-                  <ShieldAlert className="w-4 h-4 text-[#C5A059]" />
+                <label className="block font-extrabold text-[#0F172A] flex items-center gap-1.5">
+                  <ShieldAlert className="w-4 h-4 text-[#C1982E]" />
                   <span>{isBangla ? 'শিক্ষার্থীর অবস্থা / স্ট্যাটাস (Status Lifecycle)' : 'Student Status'}</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2 text-xs">
@@ -1152,7 +1152,7 @@ export default function AdminStudentsPage() {
                       onChange={(e) =>
                         setEditFormData({ ...editFormData, status: e.target.value })
                       }
-                      className="accent-[#0B2A21]"
+                      className="accent-[#0F766E]"
                     />
                     <span>{isBangla ? 'সক্রিয় (Active)' : 'Active'}</span>
                   </label>
@@ -1236,12 +1236,12 @@ export default function AdminStudentsPage() {
                 <button
                   type="submit"
                   disabled={updating}
-                  className="px-5 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] font-bold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {updating ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
                   ) : (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A059]" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C1982E]" />
                   )}
                   <span>
                     {updating

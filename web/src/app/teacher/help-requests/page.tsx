@@ -132,18 +132,18 @@ export default function TeacherHelpRequestsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
 
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
-            <HelpCircle className="w-3.5 h-3.5 text-[#C5A059]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs font-semibold text-white mb-2.5">
+            <HelpCircle className="w-3.5 h-3.5 text-[#C1982E]" />
             <span>{isBangla ? 'শিক্ষার্থী সাপোর্ট ডেস্ক' : 'Student Support Desk'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
             {isBangla ? 'শিক্ষার্থী হেল্প রিকোয়েস্ট বোর্ড' : 'Student Help Requests Board'}
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-teal-50 mt-1 max-w-xl">
             {isBangla
               ? 'ক্লাস শেষে শিক্ষার্থীরা যেসব প্রশ্ন বা সমস্যার সমাধান চেয়ে অনুরোধ জানিয়েছে তা তদারকি করুন।'
               : 'Review and resolve questions/requests submitted by students during daily feedback.'}
@@ -151,11 +151,11 @@ export default function TeacherHelpRequestsPage() {
         </div>
 
         {/* Tab Filter Segmented Controls */}
-        <div className="flex items-center gap-1 bg-[#061C16] border border-emerald-900/80 p-1.5 rounded-xl relative z-10">
+        <div className="flex items-center gap-1 bg-[#0D9488] border border-teal-500/30 p-1.5 rounded-xl relative z-10">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              activeTab === 'all' ? 'bg-[#0B2A21] text-white border border-[#C5A059]/40 shadow-xs' : 'text-slate-400 hover:text-white'
+              activeTab === 'all' ? 'bg-white text-[#0F766E] shadow-xs' : 'text-teal-100 hover:text-white'
             }`}
           >
             {isBangla ? 'সকল' : 'All'} ({d(requests.length)})
@@ -163,7 +163,7 @@ export default function TeacherHelpRequestsPage() {
           <button
             onClick={() => setActiveTab('pending')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              activeTab === 'pending' ? 'bg-amber-600 text-white shadow-xs' : 'text-amber-400/80 hover:text-amber-300'
+              activeTab === 'pending' ? 'bg-amber-600 text-white shadow-xs' : 'text-amber-200 hover:text-white'
             }`}
           >
             {isBangla ? 'অমীমাংসিত' : 'Pending'} ({d(pendingList.length)})
@@ -171,7 +171,7 @@ export default function TeacherHelpRequestsPage() {
           <button
             onClick={() => setActiveTab('in_progress')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              activeTab === 'in_progress' ? 'bg-blue-600 text-white shadow-xs' : 'text-blue-400/80 hover:text-blue-300'
+              activeTab === 'in_progress' ? 'bg-[#016C90] text-white shadow-xs' : 'text-sky-200 hover:text-white'
             }`}
           >
             {isBangla ? 'চলমান' : 'In Progress'} ({d(inProgressList.length)})
@@ -179,7 +179,7 @@ export default function TeacherHelpRequestsPage() {
           <button
             onClick={() => setActiveTab('resolved')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              activeTab === 'resolved' ? 'bg-emerald-700 text-white shadow-xs' : 'text-emerald-400/80 hover:text-emerald-300'
+              activeTab === 'resolved' ? 'bg-[#16A34A] text-white shadow-xs' : 'text-emerald-200 hover:text-white'
             }`}
           >
             {isBangla ? 'সমাধানকৃত' : 'Resolved'} ({d(resolvedList.length)})
@@ -212,28 +212,28 @@ export default function TeacherHelpRequestsPage() {
             return (
               <div
                 key={req.id}
-                className={`bg-white rounded-2xl p-5 border transition shadow-xs flex flex-col justify-between space-y-4 ${
+                className={`bg-white rounded-xl p-5 border transition shadow-xs flex flex-col justify-between space-y-4 ${
                   isHighlighted
-                    ? 'border-emerald-500 ring-2 ring-emerald-400/50'
+                    ? 'border-[#0F766E] ring-2 ring-[#0F766E]/30'
                     : req.status === 'pending'
                     ? 'border-amber-200 bg-amber-50/20'
                     : req.status === 'in_progress'
                     ? 'border-blue-200 bg-blue-50/20'
-                    : 'border-emerald-100'
+                    : 'border-[#E2E8F0]'
                 }`}
               >
                 {/* Header: Student & Status Badge */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                      <div className="w-8 h-8 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] flex items-center justify-center font-bold text-xs">
                         <User className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-gray-900 leading-tight">
+                        <h4 className="text-xs font-bold text-[#0F172A] leading-tight font-heading">
                           {req.student_name || `Student #${req.student}`}
                         </h4>
-                        <p className="text-[10px] text-gray-500 font-mono">
+                        <p className="text-[10px] text-[#475569] font-mono">
                           {req.student_id_number || `STD-${req.student}`}
                         </p>
                       </div>
@@ -244,8 +244,8 @@ export default function TeacherHelpRequestsPage() {
                         req.status === 'pending'
                           ? 'bg-amber-100 text-amber-800'
                           : req.status === 'in_progress'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-[#F0FDFA] text-[#016C90] border border-[#CCFBF1]'
+                          : 'bg-[#F0FDF4] text-[#16A34A] border border-[#DCFCE7]'
                       }`}
                     >
                       {req.status === 'pending'
@@ -263,27 +263,27 @@ export default function TeacherHelpRequestsPage() {
                   </div>
 
                   {/* Subject & Topic Tag */}
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-600 bg-gray-50 px-2.5 py-1 rounded-lg">
-                    <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#0F766E] bg-[#F0FDFA] px-2.5 py-1 rounded-lg border border-[#CCFBF1]">
+                    <BookOpen className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
                     <span className="font-semibold truncate">
                       {req.topic_title || req.subject_name || 'SBMC'}
                     </span>
                   </div>
 
                   {/* Student Question / Comment Box */}
-                  <div className="p-3 bg-gray-50/80 rounded-xl border border-gray-100">
-                    <p className="text-xs text-gray-800 italic leading-relaxed">
+                  <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+                    <p className="text-xs text-[#334155] italic leading-relaxed">
                       "{req.student_comment}"
                     </p>
                   </div>
 
                   {/* Teacher Resolution Notes (If Resolved) */}
                   {req.status === 'resolved' && req.teacher_notes && (
-                    <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200/80 space-y-1">
-                      <p className="text-[10px] font-bold text-emerald-900 uppercase tracking-wide">
+                    <div className="p-3 bg-[#F0FDFA] rounded-xl border border-[#CCFBF1] space-y-1">
+                      <p className="text-[10px] font-bold text-[#0F766E] uppercase tracking-wide">
                         {isBangla ? 'শিক্ষকের সমাধান নোট:' : 'Teacher Resolution Note:'}
                       </p>
-                      <p className="text-xs text-emerald-950 leading-relaxed font-medium">
+                      <p className="text-xs text-[#0F172A] leading-relaxed font-medium">
                         {req.teacher_notes}
                       </p>
                     </div>
@@ -291,8 +291,8 @@ export default function TeacherHelpRequestsPage() {
                 </div>
 
                 {/* Footer: Date & Actions */}
-                <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
+                  <span className="text-[10px] text-[#475569] flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     <span>{d(new Date(req.created_at).toLocaleDateString(isBangla ? 'bn-BD' : 'en-US'))}</span>
                   </span>
@@ -302,7 +302,7 @@ export default function TeacherHelpRequestsPage() {
                       <button
                         type="button"
                         onClick={() => handleStartHelping(req.id)}
-                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
+                        className="px-3 py-1.5 bg-[#016C90] hover:bg-[#035977] text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
                       >
                         <Play className="w-3 h-3" />
                         <span>{isBangla ? 'সহায়তা শুরু' : 'Start'}</span>
@@ -313,7 +313,7 @@ export default function TeacherHelpRequestsPage() {
                       <button
                         type="button"
                         onClick={() => openResolveModal(req)}
-                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
+                        className="px-3 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
                       >
                         <CheckCircle className="w-3 h-3" />
                         <span>{isBangla ? 'সমাধান সম্পন্ন' : 'Resolve'}</span>
@@ -330,10 +330,10 @@ export default function TeacherHelpRequestsPage() {
       {/* Resolution Modal */}
       {resolvingItem && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-[#0B2A21]" />
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-[#E2E8F0] border-t-4 border-t-[#C1982E] space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
+              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2 font-heading">
+                <CheckCircle className="w-5 h-5 text-[#0F766E]" />
                 <span>{isBangla ? 'হেল্প রিকোয়েস্ট সমাধান' : 'Resolve Help Request'}</span>
               </h3>
               <button
@@ -346,16 +346,16 @@ export default function TeacherHelpRequestsPage() {
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="p-3.5 bg-slate-50 border border-slate-200/70 rounded-xl">
-                <p className="font-extrabold text-slate-800">
+              <div className="p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                <p className="font-extrabold text-[#0F172A]">
                   {resolvingItem.student_name} ({resolvingItem.student_id_number}):
                 </p>
-                <p className="italic text-slate-600 mt-1">"{resolvingItem.student_comment}"</p>
+                <p className="italic text-[#334155] mt-1">"{resolvingItem.student_comment}"</p>
               </div>
 
               <form onSubmit={handleSubmitResolve} className="space-y-4 pt-2">
                 <div>
-                  <label className="block font-bold text-slate-800 mb-1">
+                  <label className="block font-bold text-[#0F172A] mb-1">
                     {isBangla ? 'সমাধানের বিবরণ / শিক্ষকের নোট:' : 'Resolution Note / Action Taken:'}
                   </label>
                   <textarea
@@ -368,7 +368,7 @@ export default function TeacherHelpRequestsPage() {
                         ? 'যেমন: ক্লাসের পর সরাসরি ল্যাবে ফর্মুলা প্রয়োগ করে সমস্যাটি সমাধান করে দেয়া হয়েছে।'
                         : 'Explain how you resolved this question for the student...'
                     }
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-[#0B2A21] focus:ring-1 focus:ring-[#0B2A21]"
+                    className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:bg-white focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
                   />
                 </div>
 
@@ -383,7 +383,7 @@ export default function TeacherHelpRequestsPage() {
                   <button
                     type="submit"
                     disabled={submittingResolution}
-                    className="px-5 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+                    className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
                   >
                     {submittingResolution ? (
                       isBangla ? 'সংরক্ষণ হচ্ছে...' : 'Saving...'

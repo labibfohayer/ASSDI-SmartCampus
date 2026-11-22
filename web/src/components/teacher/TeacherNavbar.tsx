@@ -61,13 +61,13 @@ export default function TeacherNavbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white border-b border-[#E2E8F0] shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo & Title */}
           <div className="flex items-center gap-3">
             <Link href="/teacher" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/60 p-1 flex items-center justify-center shadow-xs">
+              <div className="w-10 h-10 rounded-lg bg-[#F0FDFA] border border-[#CCFBF1] p-1 flex items-center justify-center shadow-xs">
                 <Image
                   src="/logo.png"
                   alt="ASSDI Logo"
@@ -78,14 +78,14 @@ export default function TeacherNavbar() {
               </div>
               <div className="hidden sm:block">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-gray-900 text-sm tracking-tight">
+                  <span className="font-bold text-[#0F172A] text-sm tracking-tight font-heading">
                     {t('brand.name')}
                   </span>
-                  <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-100 text-emerald-800 rounded">
+                  <span className="px-2 py-0.5 text-[10px] font-bold bg-[#0F766E] text-white rounded-full">
                     {isBangla ? 'শিক্ষক পোর্টাল' : 'Teacher Portal'}
                   </span>
                 </div>
-                <p className="text-[11px] text-emerald-700 font-medium">
+                <p className="text-[11px] text-[#0F766E] font-medium">
                   {t('brand.course')}
                 </p>
               </div>
@@ -103,8 +103,8 @@ export default function TeacherNavbar() {
                   href={item.href}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-[#1B4D3E] text-white shadow-xs'
-                      : 'text-gray-600 hover:text-emerald-900 hover:bg-emerald-50/60'
+                      ? 'bg-[#0F766E] text-white shadow-xs'
+                      : 'text-[#475569] hover:text-[#0F766E] hover:bg-[#F0FDFA]'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -119,15 +119,15 @@ export default function TeacherNavbar() {
             <LanguageSwitcher />
 
             {/* User Profile */}
-            <div className="hidden md:flex items-center gap-2.5 pl-2 border-l border-gray-200">
-              <div className="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-800">
-                <UserIcon className="w-4 h-4" />
+            <div className="hidden md:flex items-center gap-2.5 pl-2 border-l border-[#E2E8F0]">
+              <div className="w-8 h-8 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] flex items-center justify-center text-[#0F766E] font-bold text-xs">
+                {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
               </div>
               <div className="text-left">
-                <p className="text-xs font-bold text-gray-800 leading-tight">
+                <p className="text-xs font-bold text-[#0F172A] leading-tight font-heading">
                   {user?.full_name || user?.login_id || 'Teacher'}
                 </p>
-                <p className="text-[10px] text-gray-500 font-mono">
+                <p className="text-[10px] text-[#0F766E] font-mono">
                   {user?.login_id}
                 </p>
               </div>
@@ -138,7 +138,7 @@ export default function TeacherNavbar() {
               type="button"
               onClick={handleLogout}
               title={t('auth.logout')}
-              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+              className="p-2 text-[#475569] hover:text-red-600 hover:bg-red-50 rounded-lg transition"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -147,7 +147,7 @@ export default function TeacherNavbar() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-gray-600 hover:text-emerald-900 hover:bg-emerald-50 rounded-lg"
+              className="lg:hidden p-2 text-[#475569] hover:text-[#0F766E] hover:bg-[#F0FDFA] rounded-lg"
             >
               {mobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -161,8 +161,8 @@ export default function TeacherNavbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-emerald-100 px-4 pt-2 pb-4 space-y-1 shadow-lg">
-          <div className="pb-2 mb-2 border-b border-gray-100 flex items-center gap-2 px-2 text-xs font-semibold text-emerald-800">
+        <div className="lg:hidden bg-white border-b border-[#E2E8F0] px-4 pt-2 pb-4 space-y-1 shadow-lg">
+          <div className="pb-2 mb-2 border-b border-[#E2E8F0] flex items-center gap-2 px-2 text-xs font-semibold text-[#0F766E]">
             <UserIcon className="w-4 h-4" />
             <span>
               {user?.full_name} ({user?.login_id})
@@ -178,8 +178,8 @@ export default function TeacherNavbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium ${
                   isActive
-                    ? 'bg-[#1B4D3E] text-white font-bold'
-                    : 'text-gray-700 hover:bg-emerald-50'
+                    ? 'bg-[#0F766E] text-white font-bold'
+                    : 'text-[#475569] hover:bg-[#F0FDFA] hover:text-[#0F766E]'
                 }`}
               >
                 <Icon className="w-4 h-4" />

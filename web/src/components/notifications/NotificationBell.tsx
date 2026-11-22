@@ -63,11 +63,12 @@ export default function NotificationBell() {
             duration: 4000,
             icon: '🔔',
             style: {
-              background: '#0B2A21',
-              color: '#F8ECC9',
-              border: '1px solid #C5A059',
+              background: '#0F766E',
+              color: '#FFFFFF',
+              border: '1px solid #14B8A6',
               fontWeight: 600,
               fontSize: '13px',
+              borderRadius: '12px',
             },
           }
         );
@@ -281,13 +282,13 @@ export default function NotificationBell() {
         onClick={() => setIsOpen(!isOpen)}
         className={`relative p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
           isOpen
-            ? 'bg-[#0B2A21] text-[#E5C378] shadow-xs'
-            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            ? 'bg-[#0F766E] text-white shadow-xs'
+            : 'text-slate-600 hover:text-[#0F766E] hover:bg-[#F0FDFA]'
         }`}
         title={isBangla ? 'বিজ্ঞপ্তি ও নোটিফিকেশন সেন্টার' : 'Notifications Center'}
         aria-label="Notifications"
       >
-        <Bell className={`w-5 h-5 transition-transform ${unreadCount > 0 ? 'text-[#0B2A21]' : ''}`} />
+        <Bell className={`w-5 h-5 transition-transform ${unreadCount > 0 ? 'text-[#0F766E]' : ''}`} />
         
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-[20px] px-1 text-[10.5px] font-black text-white bg-rose-600 rounded-full border-2 border-white shadow-xs animate-pulse">
@@ -298,19 +299,19 @@ export default function NotificationBell() {
 
       {/* Dropdown Menu Window */}
       {isOpen && (
-        <div className="absolute right-0 mt-2.5 w-[330px] sm:w-[410px] bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute right-0 mt-2.5 w-[330px] sm:w-[410px] bg-white border border-[#E2E8F0] rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           
           {/* Header Bar */}
-          <div className="p-3.5 bg-gradient-to-r from-[#0B2A21] to-[#164E3D] text-white flex items-center justify-between shadow-xs">
+          <div className="p-3.5 bg-[#0F766E] border-b border-[#0D9488] text-white flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center text-[#E5C378]">
+              <div className="w-7 h-7 rounded-lg bg-white/15 border border-white/25 flex items-center justify-center text-[#C1982E]">
                 <Bell className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-extrabold text-xs sm:text-sm tracking-tight text-white leading-tight">
+                <h3 className="font-extrabold text-xs sm:text-sm tracking-tight text-white leading-tight font-serif">
                   {isBangla ? 'রিয়েল-টাইম নোটিফিকেশন' : 'Live Notification Center'}
                 </h3>
-                <p className="text-[10px] text-emerald-200/80">
+                <p className="text-[10px] text-teal-100/80">
                   {unreadCount > 0
                     ? (isBangla ? `${unreadCount}টি নতুন অপঠিত বিজ্ঞপ্তি` : `${unreadCount} unread alert(s)`)
                     : (isBangla ? 'সব নোটিফিকেশন হালনাগাদ' : 'All caught up')}
@@ -322,17 +323,17 @@ export default function NotificationBell() {
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllRead}
-                  className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[#E5C378] text-[10.5px] font-bold transition flex items-center gap-1 cursor-pointer"
+                  className="px-2 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-[#C1982E] text-[10.5px] font-bold transition flex items-center gap-1 cursor-pointer"
                   title={isBangla ? 'সবগুলো পঠিত হিসেবে চিহ্নিত করুন' : 'Mark all as read'}
                 >
-                  <CheckCheck className="w-3 h-3 text-[#C5A059]" />
+                  <CheckCheck className="w-3 h-3 text-[#C1982E]" />
                   <span>{isBangla ? 'সব পঠিত' : 'Mark all'}</span>
                 </button>
               )}
               
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-6 h-6 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+                className="w-6 h-6 rounded-lg bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -340,13 +341,13 @@ export default function NotificationBell() {
           </div>
 
           {/* Filter Sub-header */}
-          <div className="px-3.5 py-2 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between gap-2">
+          <div className="px-3.5 py-2 bg-[#F8FAFC] border-b border-[#E2E8F0] flex items-center justify-between gap-2">
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setFilter('all')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
                   filter === 'all'
-                    ? 'bg-white text-[#0B2A21] shadow-2xs border border-slate-200'
+                    ? 'bg-white text-[#0F766E] shadow-2xs border border-[#CCFBF1]'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -357,7 +358,7 @@ export default function NotificationBell() {
                 onClick={() => setFilter('unread')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
                   filter === 'unread'
-                    ? 'bg-white text-[#0B2A21] shadow-2xs border border-slate-200'
+                    ? 'bg-white text-[#0F766E] shadow-2xs border border-[#CCFBF1]'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -407,12 +408,12 @@ export default function NotificationBell() {
                     onClick={() => handleMarkAsRead(item.id, item.data_payload, true)}
                     className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer text-left group relative ${
                       item.is_read
-                        ? 'bg-white hover:bg-slate-50/80'
-                        : 'bg-emerald-50/40 hover:bg-emerald-50/70 border-l-3 border-[#0B2A21]'
+                        ? 'bg-white hover:bg-[#F8FAFC]'
+                        : 'bg-[#F0FDFA] hover:bg-[#CCFBF1]/40 border-l-4 border-[#0F766E]'
                     }`}
                   >
                     {/* Category Icon */}
-                    <div className="w-8 h-8 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
+                    <div className="w-8 h-8 rounded-xl bg-white border border-[#E2E8F0] flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
                       {meta.icon}
                     </div>
 
@@ -429,7 +430,7 @@ export default function NotificationBell() {
 
                       <p
                         className={`text-xs mt-1 leading-snug line-clamp-1 ${
-                          item.is_read ? 'font-semibold text-slate-800' : 'font-extrabold text-[#0B2A21]'
+                          item.is_read ? 'font-semibold text-[#0F172A]' : 'font-extrabold text-[#0F766E]'
                         }`}
                       >
                         {item.title}

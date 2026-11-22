@@ -41,18 +41,18 @@ export default function CoordinatorBatchesPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-md relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
 
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C5A059]/15 border border-[#C5A059]/35 rounded-full text-xs font-semibold text-[#E5C378] mb-2.5">
-            <Layers className="w-3.5 h-3.5 text-[#C5A059]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs font-semibold text-white mb-2.5">
+            <Layers className="w-3.5 h-3.5 text-[#C1982E]" />
             <span>{isBangla ? 'ব্যাচ ও শিক্ষক বিশ্লেষণ' : 'Batch & Faculty Analytics'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
             {isBangla ? 'সক্রিয় ব্যাচ ও শিক্ষক পারফরম্যান্স ড্যাশবোর্ড' : 'Batches & Faculty Performance'}
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-teal-50 mt-1 max-w-xl">
             {isBangla
               ? 'সক্রিয় ব্যাচসমূহের উপস্থিতি, লার্নিং আউটকাম এবং শিক্ষকদের পারফরম্যান্স রেটিং পর্যালোচনা করুন।'
               : 'Review batch progress metrics and faculty effectiveness ratings.'}
@@ -62,59 +62,59 @@ export default function CoordinatorBatchesPage() {
 
       {/* Batches Cards Grid */}
       <div>
-        <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <GraduationCap className="w-5 h-5 text-emerald-800" />
+        <h2 className="text-base font-bold text-[#0F172A] font-heading mb-3 flex items-center gap-2">
+          <GraduationCap className="w-5 h-5 text-[#0F766E]" />
           <span>{isBangla ? 'সক্রিয় ব্যাচ পারফরম্যান্স কার্ড' : 'Active Batch Performance'}</span>
         </h2>
 
         {loading ? (
           <div className="py-12 text-center">
-            <div className="w-8 h-8 border-3 border-emerald-600/30 border-t-emerald-700 rounded-full animate-spin mx-auto mb-2" />
-            <p className="text-xs text-gray-500">{t('common.loading')}</p>
+            <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin mx-auto mb-2" />
+            <p className="text-xs text-[#475569]">{t('common.loading')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data?.batch_wise_performance?.map((b: any) => (
               <div
                 key={b.batch_id}
-                className="bg-white p-6 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition shadow-xs space-y-4"
+                className="bg-white p-6 rounded-xl border border-[#E2E8F0] hover:border-[#0F766E]/40 transition shadow-xs space-y-4"
               >
-                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">{b.batch_name}</h3>
-                    <p className="text-xs text-emerald-700 font-medium">SBMC</p>
+                    <h3 className="text-lg font-bold text-[#0F172A] font-heading">{b.batch_name}</h3>
+                    <p className="text-xs text-[#0F766E] font-medium">SBMC</p>
                   </div>
-                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] font-bold rounded-full border border-emerald-200">
+                  <span className="px-2 py-0.5 bg-[#F0FDFA] text-[#0F766E] text-[10px] font-bold rounded-full border border-[#CCFBF1]">
                     {isBangla ? 'সক্রিয়' : 'Active'}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="bg-gray-50 p-3 rounded-xl">
-                    <p className="text-gray-500 font-medium">{isBangla ? 'মোট শিক্ষার্থী' : 'Enrolled'}</p>
-                    <h4 className="text-base font-bold text-gray-900 mt-0.5">
+                  <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-lg">
+                    <p className="text-[#475569] font-medium">{isBangla ? 'মোট শিক্ষার্থী' : 'Enrolled'}</p>
+                    <h4 className="text-base font-bold text-[#0F172A] font-heading mt-0.5">
                       {d(b.student_count)} {isBangla ? 'জন' : ''}
                     </h4>
                   </div>
 
-                  <div className="bg-emerald-50 p-3 rounded-xl">
-                    <p className="text-emerald-700 font-medium">{isBangla ? 'উপস্থিতির হার' : 'Attendance'}</p>
-                    <h4 className="text-base font-bold text-emerald-800 mt-0.5">
+                  <div className="bg-[#F0FDFA] border border-[#CCFBF1] p-3 rounded-lg">
+                    <p className="text-[#0F766E] font-medium">{isBangla ? 'উপস্থিতির হার' : 'Attendance'}</p>
+                    <h4 className="text-base font-bold text-[#0F766E] font-heading mt-0.5">
                       {d(safeFixed(b.attendance_percentage))}%
                     </h4>
                   </div>
 
-                  <div className="bg-amber-50 p-3 rounded-xl">
+                  <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg">
                     <p className="text-amber-700 font-medium">{isBangla ? 'লার্নিং প্রগ্রেস' : 'Learning'}</p>
-                    <h4 className="text-base font-bold text-amber-800 mt-0.5">
+                    <h4 className="text-base font-bold text-amber-800 font-heading mt-0.5">
                       {d(safeFixed(b.learning_percentage))}%
                     </h4>
                   </div>
 
-                  <div className="bg-purple-50 p-3 rounded-xl">
-                    <p className="text-purple-700 font-medium">{isBangla ? 'গড় রেটিং' : 'Rating'}</p>
-                    <h4 className="text-base font-bold text-purple-800 mt-0.5 flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500 inline" />
+                  <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-lg">
+                    <p className="text-[#475569] font-medium">{isBangla ? 'গড় রেটিং' : 'Rating'}</p>
+                    <h4 className="text-base font-bold text-[#0F172A] font-heading mt-0.5 flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-[#C1982E] text-[#C1982E] inline" />
                       <span>{d(safeFixed(b.average_rating))}</span>
                     </h4>
                   </div>
@@ -123,7 +123,7 @@ export default function CoordinatorBatchesPage() {
                 <div className="pt-1">
                   <Link
                     href={`/reports?batch=${b.batch_id}`}
-                    className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition"
+                    className="w-full py-2 bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition border border-[#CCFBF1]"
                   >
                     <span>{isBangla ? 'ব্যাচ রিপোর্ট ও এক্সপোর্ট' : 'View Batch Report'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -136,13 +136,13 @@ export default function CoordinatorBatchesPage() {
       </div>
 
       {/* Teachers / Faculty Performance Table */}
-      <div className="bg-white rounded-2xl border border-emerald-100 shadow-xs overflow-hidden">
-        <div className="p-5 border-b border-gray-100">
-          <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-emerald-800" />
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        <div className="p-5 border-b border-[#E2E8F0] bg-[#F8FAFC]">
+          <h2 className="text-base font-bold text-[#0F172A] font-heading flex items-center gap-2">
+            <UserCheck className="w-5 h-5 text-[#0F766E]" />
             <span>{isBangla ? 'শিক্ষক ও প্রশিক্ষক পারফরম্যান্স সামারি' : 'Faculty Effectiveness Summary'}</span>
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-[#475569] mt-0.5">
             {isBangla
               ? 'ক্লাস সংখ্যা, ক্লাসে শিক্ষার্থীর উপস্থিতির হার এবং শিক্ষার্থী ফিডব্যাকের গড় রেটিং।'
               : 'Number of sessions conducted, student attendance %, and satisfaction rating.'}
@@ -151,7 +151,7 @@ export default function CoordinatorBatchesPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-600 font-bold uppercase tracking-wider text-[11px]">
+            <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#475569] font-bold uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="py-3.5 px-4">{isBangla ? 'শিক্ষকের নাম' : 'Faculty Name'}</th>
                 <th className="py-3.5 px-4">{isBangla ? 'ক্লাস সংখ্যা' : 'Sessions Conducted'}</th>
@@ -160,21 +160,24 @@ export default function CoordinatorBatchesPage() {
                 <th className="py-3.5 px-4">{isBangla ? 'শিক্ষার্থী সন্তুষ্টি রেটিং' : 'Student Rating'}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-[#E2E8F0]">
               {data?.teacher_wise_performance?.map((tItem: any) => (
-                <tr key={tItem.teacher_id} className="hover:bg-emerald-50/30 transition">
-                  <td className="py-3 px-4 font-bold text-gray-900">{tItem.teacher_name}</td>
-                  <td className="py-3 px-4 text-gray-600 font-mono">
+                <tr key={tItem.teacher_id} className="hover:bg-[#F0FDFA] transition">
+                  <td className="py-3 px-4 font-bold text-[#0F172A] font-heading">{tItem.teacher_name}</td>
+                  <td className="py-3 px-4 text-[#475569] font-mono">
                     {d(tItem.sessions_taken)} {isBangla ? 'টি' : ''}
                   </td>
-                  <td className="py-3 px-4 font-bold text-emerald-800">
+                  <td className="py-3 px-4 font-bold text-[#0F766E]">
                     {d(safeFixed(tItem.attendance_percentage))}%
                   </td>
                   <td className="py-3 px-4 font-bold text-amber-700">
                     {d(safeFixed(tItem.learning_percentage))}%
                   </td>
-                  <td className="py-3 px-4 text-gray-900 font-semibold">
-                    ⭐ {d(safeFixed(tItem.average_rating))} / ৫
+                  <td className="py-3 px-4 text-[#0F172A] font-semibold">
+                    <span className="inline-flex items-center gap-1">
+                      <Star className="w-3 h-3 text-[#C1982E] fill-[#C1982E]" />
+                      <span>{d(safeFixed(tItem.average_rating))} / ৫</span>
+                    </span>
                   </td>
                 </tr>
               ))}

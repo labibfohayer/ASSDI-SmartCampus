@@ -84,18 +84,18 @@ export default function CoordinatorAtRiskPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
 
         <div className="relative z-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-500/20 border border-red-500/40 rounded-full text-xs font-semibold text-red-200 mb-2">
             <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
             <span>{isBangla ? 'প্রাতিষ্ঠানিক আর্লি ওয়ার্নিং সিস্টেম' : 'Early Warning Alert System'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
             {isBangla ? 'ঝুঁকিপূর্ণ শিক্ষার্থী ও পুনরাবৃত্ত অনুপস্থিতি অ্যালার্ট' : 'At-Risk & Repeated Absence Alerts'}
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-2xl">
+          <p className="text-xs sm:text-sm text-teal-50 mt-1 max-w-2xl">
             {isBangla
               ? 'টানা ৩ দিন বা মোট ৫ দিন অনুপস্থিত এবং গড় বোঝাপড়ার রেটিং ২.০ বা তার নিচে থাকা শিক্ষার্থীদের প্রাথমিক হস্তক্ষেপ তালিকা।'
               : 'Early warning list for students with 3+ consecutive absences, 5+ total absences, or rating <= 2.0.'}
@@ -103,7 +103,7 @@ export default function CoordinatorAtRiskPage() {
         </div>
 
         <div className="flex items-center gap-2 relative z-10">
-          <span className="px-4 py-2 bg-red-600/30 text-red-200 text-xs font-bold rounded-xl border border-red-500/50 shadow-xs">
+          <span className="px-4 py-2 bg-red-600/30 text-red-100 text-xs font-bold rounded-xl border border-red-500/50 shadow-xs">
             {isBangla ? 'চিহ্নিত শিক্ষার্থী:' : 'Flagged Students:'} {d(data?.students_requiring_attention_count || 0)} {isBangla ? 'জন' : ''}
           </span>
         </div>
@@ -126,26 +126,26 @@ export default function CoordinatorAtRiskPage() {
 
       {/* Main Table for Non-Observers */}
       {!isObserver && (
-        <div className="bg-white rounded-2xl border border-emerald-100 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
           {/* Search & Filter Tabs */}
-          <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="p-4 border-b border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[#F8FAFC]">
             <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-[#475569] absolute left-3 top-2.5" />
               <input
                 type="text"
                 placeholder={isBangla ? 'শিক্ষার্থীর নাম বা আইডি দিয়ে খুঁজুন...' : 'Search by student name or ID...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
             </div>
 
-            <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl">
+            <div className="flex items-center gap-1.5 bg-white border border-[#E2E8F0] p-1 rounded-lg">
               <button
                 type="button"
                 onClick={() => setFilterType('all')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                  filterType === 'all' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-500'
+                className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
+                  filterType === 'all' ? 'bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] shadow-xs' : 'text-[#475569]'
                 }`}
               >
                 {isBangla ? 'সকল অ্যালার্ট' : 'All Alerts'}
@@ -153,8 +153,8 @@ export default function CoordinatorAtRiskPage() {
               <button
                 type="button"
                 onClick={() => setFilterType('absence')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                  filterType === 'absence' ? 'bg-red-600 text-white shadow-xs' : 'text-red-700'
+                className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
+                  filterType === 'absence' ? 'bg-[#DC2626] text-white shadow-xs' : 'text-red-700'
                 }`}
               >
                 {isBangla ? 'অনুপস্থিতি সমস্যা' : 'Absence Streaks'}
@@ -162,7 +162,7 @@ export default function CoordinatorAtRiskPage() {
               <button
                 type="button"
                 onClick={() => setFilterType('academic')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
                   filterType === 'academic' ? 'bg-amber-600 text-white shadow-xs' : 'text-amber-700'
                 }`}
               >
@@ -174,20 +174,20 @@ export default function CoordinatorAtRiskPage() {
           {/* Table */}
           {loading ? (
             <div className="py-16 text-center">
-              <div className="w-8 h-8 border-3 border-emerald-600/30 border-t-emerald-700 rounded-full animate-spin mx-auto mb-2" />
-              <p className="text-xs text-gray-500">{t('common.loading')}</p>
+              <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs text-[#475569]">{t('common.loading')}</p>
             </div>
           ) : filteredStudents.length === 0 ? (
             <div className="py-16 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-              <p className="text-sm font-bold text-gray-800">
+              <CheckCircle2 className="w-10 h-10 text-[#0F766E] mx-auto" />
+              <p className="text-sm font-bold text-[#0F172A] font-heading">
                 {isBangla ? 'এই ফিল্টারে কোনো ঝুঁকিপূর্ণ শিক্ষার্থী পাওয়া যায়নি।' : 'No flagged students found.'}
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50 border-b border-gray-100 text-gray-600 font-bold uppercase tracking-wider text-[11px]">
+                <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#475569] font-bold uppercase tracking-wider text-[11px]">
                   <tr>
                     <th className="py-3 px-4">{isBangla ? 'রোল / আইডি' : 'Student ID'}</th>
                     <th className="py-3 px-4">{isBangla ? 'শিক্ষার্থীর নাম' : 'Student Name'}</th>
@@ -199,16 +199,16 @@ export default function CoordinatorAtRiskPage() {
                     <th className="py-3 px-4 text-center">{isBangla ? 'সনদ ও যোগ্যতা' : 'Graduation & Cert'}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-[#E2E8F0]">
                   {filteredStudents.map((st) => (
-                    <tr key={st.student_id} className="hover:bg-red-50/30 transition">
-                      <td className="py-3 px-4 font-bold font-mono text-gray-800">
+                    <tr key={st.student_id} className="hover:bg-red-50/20 transition">
+                      <td className="py-3 px-4 font-bold font-mono text-[#0F172A]">
                         {st.student_id_number}
                       </td>
-                      <td className="py-3 px-4 font-bold text-gray-900">
+                      <td className="py-3 px-4 font-bold text-[#0F172A] font-heading">
                         {st.student_name}
                       </td>
-                      <td className="py-3 px-4 text-gray-600">
+                      <td className="py-3 px-4 text-[#475569]">
                         {st.batch_name}
                       </td>
                       <td className="py-3 px-4">
@@ -218,7 +218,7 @@ export default function CoordinatorAtRiskPage() {
                             {d(st.consecutive_absences)} {isBangla ? 'দিন' : 'days'}
                           </span>
                         ) : (
-                          <span className="text-gray-500 font-mono">{d(st.consecutive_absences)}</span>
+                          <span className="text-[#475569] font-mono">{d(st.consecutive_absences)}</span>
                         )}
                       </td>
                       <td className="py-3 px-4">
@@ -228,17 +228,17 @@ export default function CoordinatorAtRiskPage() {
                             {d(st.total_absences)} {isBangla ? 'দিন' : 'days'}
                           </span>
                         ) : (
-                          <span className="text-gray-500 font-mono">{d(st.total_absences)}</span>
+                          <span className="text-[#475569] font-mono">{d(st.total_absences)}</span>
                         )}
                       </td>
                       <td className="py-3 px-4">
                         {st.average_rating && st.average_rating <= 2.0 ? (
                           <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] inline-flex items-center gap-1">
-                            <Star className="w-3 h-3 text-[#C5A059] fill-[#C5A059]" />
+                            <Star className="w-3 h-3 text-[#C1982E] fill-[#C1982E]" />
                             <span>{d(safeFixed(st.average_rating))} / ৫</span>
                           </span>
                         ) : (
-                          <span className="text-gray-600 inline-flex items-center gap-1">
+                          <span className="text-[#475569] inline-flex items-center gap-1">
                             {st.average_rating ? (
                               <>
                                 <Star className="w-3 h-3 text-slate-400" />
@@ -250,11 +250,11 @@ export default function CoordinatorAtRiskPage() {
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-4 font-mono text-gray-600">
+                      <td className="py-3 px-4 font-mono text-[#475569]">
                         {st.phone ? (
                           <a
                             href={`tel:${st.phone}`}
-                            className="inline-flex items-center gap-1 text-emerald-800 font-semibold hover:underline"
+                            className="inline-flex items-center gap-1 text-[#0F766E] font-semibold hover:underline"
                           >
                             <Phone className="w-3 h-3" />
                             <span>{st.phone}</span>
@@ -268,10 +268,10 @@ export default function CoordinatorAtRiskPage() {
                           type="button"
                           onClick={() => handleOpenGraduation(st.student_id)}
                           disabled={loadingGraduationId === st.student_id}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-[#0B2A21] text-amber-900 hover:text-[#E5C378] border border-amber-200 hover:border-[#0B2A21] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F0FDFA] hover:bg-[#0F766E] text-[#0F766E] hover:text-white border border-[#CCFBF1] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
                           title={isBangla ? 'গ্র্যাজুয়েশন ও সনদপত্র ট্র্যাকার দেখুন' : 'View Graduation & Certificate'}
                         >
-                          <Award className="w-3.5 h-3.5 text-[#C5A059]" />
+                          <Award className="w-3.5 h-3.5 text-[#C1982E]" />
                           <span>
                             {loadingGraduationId === st.student_id
                               ? (isBangla ? 'লোড হচ্ছে...' : 'Loading...')

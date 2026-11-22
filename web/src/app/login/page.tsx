@@ -113,12 +113,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B2A21] flex flex-col justify-between text-white relative">
-      {/* Top Institutional Header */}
-      <header className="border-b border-emerald-950/80 bg-[#071F18]/80">
-        <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between text-[#0F172A] relative">
+      {/* Top Institutional Header (Madrasat-us-Sunnah reference teal bar) */}
+      <header className="border-b border-[#0D9488] bg-[#0F766E] text-white shadow-xs">
+        <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-md border border-emerald-500/30">
+            <div className="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-sm border border-teal-200/50">
               <Image
                 src="/logo.png"
                 alt="ASSDI Logo"
@@ -129,10 +129,10 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <h2 className="text-white font-extrabold text-sm sm:text-base leading-tight">
+              <h2 className="text-white font-bold text-sm sm:text-base leading-tight font-serif">
                 {t('brand.name')}
               </h2>
-              <p className="text-emerald-300 text-xs font-medium">
+              <p className="text-teal-100 text-xs font-medium">
                 {t('brand.course')}
               </p>
             </div>
@@ -146,10 +146,10 @@ export default function LoginPage() {
 
       {/* Main Login Card Container */}
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 my-8">
-        <div className="w-full max-w-md bg-white text-slate-800 rounded-2xl border border-emerald-950/40 shadow-2xl border-t-4 border-t-[#C5A059] p-7 sm:p-8">
+        <div className="w-full max-w-md bg-white text-[#0F172A] rounded-2xl border border-[#E2E8F0] shadow-xl border-t-4 border-t-[#0F766E] p-7 sm:p-8">
           {/* Card Brand Header */}
           <div className="text-center mb-6">
-            <div className="mx-auto w-16 h-16 rounded-2xl bg-slate-50 border-2 border-[#C5A059]/60 p-2 mb-3.5 flex items-center justify-center shadow-xs">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-[#F0FDFA] border-2 border-[#CCFBF1] p-2 mb-3.5 flex items-center justify-center shadow-xs">
               <Image
                 src="/logo.png"
                 alt="ASSDI Logo"
@@ -160,22 +160,22 @@ export default function LoginPage() {
               />
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight font-serif">
               {t('brand.name')}
             </h1>
-            <p className="text-xs text-slate-600 font-semibold mt-1">
+            <p className="text-xs text-[#475569] font-medium mt-1">
               {t('brand.systemTitle')}
             </p>
-            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 bg-[#0B2A21] text-emerald-200 border border-emerald-800 rounded-full text-xs font-bold">
-              <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] rounded-full text-xs font-bold">
+              <BookOpen className="w-3.5 h-3.5 text-[#0F766E]" />
               <span>{t('brand.course')}</span>
             </div>
           </div>
 
           {/* Error Alert */}
           {errorMessage && (
-            <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-rose-800 text-xs font-semibold">
-              <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <div className="mb-5 p-3.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl flex items-start gap-2.5 text-[#991B1B] text-xs font-semibold">
+              <ShieldAlert className="w-4 h-4 text-[#DC2626] shrink-0 mt-0.5" />
               <span className="leading-relaxed">{errorMessage}</span>
             </div>
           )}
@@ -185,7 +185,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="login_id"
-                className="block text-xs font-bold text-slate-700 mb-1.5"
+                className="block text-xs font-bold text-[#334155] mb-1.5"
               >
                 {t('auth.loginId')}
               </label>
@@ -201,7 +201,7 @@ export default function LoginPage() {
                   value={loginId}
                   onChange={(e) => setLoginId(e.target.value)}
                   placeholder={t('auth.loginIdPlaceholder')}
-                  className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50/70 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0B2A21] focus:ring-2 focus:ring-[#0B2A21]/20 focus:bg-white transition"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#14B8A6] focus:ring-4 focus:ring-[#14B8A6]/15 transition"
                 />
               </div>
             </div>
@@ -209,7 +209,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-xs font-bold text-slate-700 mb-1.5"
+                className="block text-xs font-bold text-[#334155] mb-1.5"
               >
                 {t('auth.password')}
               </label>
@@ -225,7 +225,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t('auth.passwordPlaceholder')}
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50/70 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0B2A21] focus:ring-2 focus:ring-[#0B2A21]/20 focus:bg-white transition"
+                  className="w-full pl-10 pr-10 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#14B8A6] focus:ring-4 focus:ring-[#14B8A6]/15 transition"
                 />
                 <button
                   type="button"
@@ -246,7 +246,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 bg-[#0B2A21] hover:bg-[#134E3E] active:bg-[#071F18] text-white text-sm font-bold rounded-xl shadow-md border border-emerald-800/80 flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 bg-[#0F766E] hover:bg-[#115E59] active:scale-[0.99] text-white text-sm font-bold rounded-xl shadow-md border border-[#0D9488] flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -255,7 +255,7 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <LogIn className="w-4 h-4 text-emerald-300" />
+                  <LogIn className="w-4 h-4 text-white" />
                   <span>{t('auth.loginBtn')}</span>
                 </>
               )}
@@ -263,43 +263,43 @@ export default function LoginPage() {
           </form>
 
           {/* Quick Demo Fill Buttons for Testing */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <p className="text-[11px] font-bold text-slate-500 mb-2.5 text-center uppercase tracking-wider">
+          <div className="mt-6 pt-5 border-t border-[#E2E8F0]">
+            <p className="text-[11px] font-bold text-[#475569] mb-2.5 text-center uppercase tracking-wider font-serif">
               {t('auth.quickDemo')}
             </p>
             <div className="grid grid-cols-3 gap-2 text-center">
               <button
                 type="button"
                 onClick={() => setDemoRole('admin01', 'AdminPass2026!', 'Super Admin')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg transition border border-slate-200/80 cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
               >
                 Super Admin
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('coord01', 'CoordPass2026!', 'Coordinator')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg transition border border-emerald-200 cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
               >
                 Coordinator
               </button>
               <button
                 type="button"
-                onClick={() => setDemoRole('teacher_msoffice', 'TeacherPass2026!', 'Teacher')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg transition border border-teal-200 cursor-pointer"
+                onClick={() => setDemoRole('teacher01', 'TeacherPass2026!', 'Teacher')}
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0D9488] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
               >
                 Teacher
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('observer01', 'ObserverPass2026!', 'Observer')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg transition border border-purple-200 cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#334155] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
               >
                 Observer
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('STD-2026-042-001', 'StudentPass2026!', 'Student')}
-                className="col-span-2 px-2 py-1.5 text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-lg transition border border-amber-200 cursor-pointer"
+                className="col-span-2 px-2 py-1.5 text-[11px] font-bold bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] rounded-lg transition border border-[#FCD34D] cursor-pointer"
               >
                 Student (STD-2026-042-001)
               </button>
@@ -308,8 +308,8 @@ export default function LoginPage() {
         </div>
       </main>
 
-      {/* Institutional Footer */}
-      <footer className="border-t border-emerald-950/80 bg-[#071F18]/80 py-4 text-center text-xs text-emerald-300/80">
+      {/* Institutional Footer (Madrasat-us-Sunnah reference dark navy footer) */}
+      <footer className="relative bg-[#0B1A2B] border-t-2 border-t-[#0F766E] py-4 text-center text-xs text-[#A9B8C9]">
         <p>
           © 2026 {t('brand.name')} • {t('brand.tagline')} • ঢাকা, বাংলাদেশ
         </p>

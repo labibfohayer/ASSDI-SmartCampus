@@ -252,18 +252,18 @@ export default function AdminSessionsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0B2A21] p-6 sm:p-7 rounded-2xl border border-[#071F18] text-white shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#164E3D_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-sm relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
 
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C5A059]/15 border border-[#C5A059]/35 text-xs font-semibold text-[#E5C378] mb-2.5">
-            <Calendar className="w-3.5 h-3.5 text-[#C5A059]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 border border-white/25 text-xs font-semibold text-[#CCFBF1] mb-2.5">
+            <Calendar className="w-3.5 h-3.5 text-[#C1982E]" />
             <span>{isBangla ? 'সেশন ও সময়সূচি নিয়ন্ত্রণ' : 'Session & Timetable Management'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             {isBangla ? 'ক্লাস সেশন ও রুটিন তালিকা' : 'Class Sessions & Timetable'}
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100/80 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-[#F0FDFA]/90 mt-1 max-w-xl">
             {isBangla
               ? 'দৈনিক ও সাপ্তাহিক ক্লাস সূচি, ড্রাফট সেশন পাবলিশ এবং বাতিল কার্যক্রম পরিচালনা করুন।'
               : 'Manage daily/weekly schedules, publish draft sessions, or handle class cancellations.'}
@@ -276,24 +276,24 @@ export default function AdminSessionsPage() {
               setShowGenerateModal(true);
               setGenerateResult(null);
             }}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] text-xs font-extrabold rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C1982E] hover:bg-[#A88225] text-white text-xs font-extrabold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
           >
-            <Play className="w-4 h-4 fill-[#0B2A21] text-[#0B2A21]" />
+            <Play className="w-4 h-4 fill-white text-white" />
             <span>{isBangla ? 'শিডিউল থেকে সেশন তৈরি' : 'Auto-Generate Sessions'}</span>
           </button>
           <button
             onClick={fetchInitialData}
             title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
-            className="p-2.5 rounded-xl bg-[#061C16] border border-emerald-900/80 text-emerald-100 hover:bg-[#07241C] transition-colors cursor-pointer active:scale-95 shadow-xs"
+            className="p-2.5 rounded-xl bg-white/15 border border-white/25 text-white hover:bg-white/25 transition-colors cursor-pointer active:scale-95 shadow-xs"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#C5A059]' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#C1982E]' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* KPI Counters */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between text-gray-500 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">
               {isBangla ? 'সর্বমোট সেশন' : 'Total Sessions'}
@@ -305,16 +305,16 @@ export default function AdminSessionsPage() {
           <p className="text-2xl font-bold text-gray-900">{totalSessions}</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs">
-          <div className="flex items-center justify-between text-emerald-700 mb-2">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between text-[#0F766E] mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">
               {isBangla ? 'পাবলিশড (লাইভ)' : 'Published'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
+            <div className="w-8 h-8 rounded-lg bg-[#F0FDFA] flex items-center justify-center text-[#0F766E]">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-emerald-800">{publishedSessions}</p>
+          <p className="text-2xl font-bold text-[#0F766E]">{publishedSessions}</p>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-amber-100 shadow-xs">
@@ -355,7 +355,7 @@ export default function AdminSessionsPage() {
                 ? 'বিষয়, টপিক, শিক্ষক বা ব্যাচ দিয়ে খুঁজুন...'
                 : 'Search by subject, topic, teacher or batch...'
             }
-            className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:border-transparent transition-all"
           />
         </div>
 
@@ -363,7 +363,7 @@ export default function AdminSessionsPage() {
           <select
             value={selectedBatch}
             onChange={(e) => setSelectedBatch(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           >
             <option value="all">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
             {batches.map((b) => (
@@ -376,7 +376,7 @@ export default function AdminSessionsPage() {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           >
             <option value="all">{isBangla ? 'সকল স্ট্যাটাস' : 'All Status'}</option>
             <option value="published">{isBangla ? 'পাবলিশড' : 'Published'}</option>
@@ -388,7 +388,7 @@ export default function AdminSessionsPage() {
             type="date"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           />
 
           {(selectedBatch !== 'all' || selectedStatus !== 'all' || filterDate || searchQuery) && (
@@ -447,7 +447,7 @@ export default function AdminSessionsPage() {
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-gray-900">{s.session_date}</div>
                       <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                        <Clock className="w-3 h-3 text-emerald-600" />
+                        <Clock className="w-3 h-3 text-[#0F766E]" />
                         {s.start_time?.slice(0, 5)} - {s.end_time?.slice(0, 5)}
                       </div>
                     </td>
@@ -455,7 +455,7 @@ export default function AdminSessionsPage() {
                     {/* Batch & Subject */}
                     <td className="py-3.5 px-4">
                       <div className="font-medium text-gray-900">{s.subject_name}</div>
-                      <div className="text-xs text-emerald-700 font-semibold mt-0.5">
+                      <div className="text-xs text-[#0F766E] font-semibold mt-0.5">
                         {s.batch_name}
                       </div>
                     </td>
@@ -510,8 +510,8 @@ export default function AdminSessionsPage() {
                     {/* Status */}
                     <td className="py-3.5 px-4">
                       {s.status === 'published' && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]">
+                          <CheckCircle2 className="w-3 h-3 text-[#0F766E]" />
                           {isBangla ? 'পাবলিশড' : 'Published'}
                         </span>
                       )}
@@ -543,7 +543,7 @@ export default function AdminSessionsPage() {
                           <button
                             onClick={() => handlePublish(s)}
                             disabled={actionLoadingId === s.id}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-2xs disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-lg transition-colors shadow-2xs disabled:opacity-50"
                           >
                             <Play className="w-3 h-3 fill-white" />
                             {isBangla ? 'পাবলিশ' : 'Publish'}
@@ -634,11 +634,11 @@ export default function AdminSessionsPage() {
       {/* Auto-Generate Sessions Modal */}
       {showGenerateModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C1982E] animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0B2A21] border border-emerald-100 flex items-center justify-center font-bold">
-                  <Play className="w-5 h-5 fill-[#0B2A21] text-[#0B2A21]" />
+                <div className="w-10 h-10 rounded-xl bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center font-bold">
+                  <Play className="w-5 h-5 fill-[#0F766E] text-[#0F766E]" />
                 </div>
                 <div>
                   <h3 className="font-extrabold text-slate-900 text-sm">
@@ -660,8 +660,8 @@ export default function AdminSessionsPage() {
             </div>
 
             {generateResult && (
-              <div className="p-3 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="p-3 mb-4 rounded-xl bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] text-xs font-medium flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#0F766E] shrink-0" />
                 <span>{generateResult}</span>
               </div>
             )}
@@ -674,7 +674,7 @@ export default function AdminSessionsPage() {
                 <select
                   value={genBatchId}
                   onChange={(e) => setGenBatchId(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 >
                   <option value="">{isBangla ? 'সব সক্রিয় ব্যাচ' : 'All Active Batches'}</option>
                   {batches.map((b) => (
@@ -695,7 +695,7 @@ export default function AdminSessionsPage() {
                     required
                     value={genStartDate}
                     onChange={(e) => setGenStartDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
                 <div>
@@ -707,7 +707,7 @@ export default function AdminSessionsPage() {
                     required
                     value={genEndDate}
                     onChange={(e) => setGenEndDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
               </div>
@@ -732,16 +732,16 @@ export default function AdminSessionsPage() {
                 <button
                   type="submit"
                   disabled={isGenerating}
-                  className="px-5 py-2.5 text-xs font-bold bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl shadow-xs transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer active:scale-95"
+                  className="px-5 py-2.5 text-xs font-bold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl shadow-xs transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer active:scale-95"
                 >
                   {isGenerating ? (
                     <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
                       {isBangla ? 'জেনারেট হচ্ছে...' : 'Generating...'}
                     </>
                   ) : (
                     <>
-                      <Play className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
+                      <Play className="w-3.5 h-3.5 fill-[#C1982E] text-[#C1982E]" />
                       {isBangla ? 'সেশন তৈরি শুরু করুন' : 'Start Generation'}
                     </>
                   )}

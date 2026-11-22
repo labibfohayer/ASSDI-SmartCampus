@@ -203,26 +203,26 @@ export default function MultiFormatExportDropdown({
         type="button"
         disabled={disabled || downloadingFormat !== null}
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B2A21] text-xs font-extrabold rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
       >
         {downloadingFormat ? (
-          <RefreshCw className="w-4 h-4 animate-spin text-[#0B2A21]" />
+          <RefreshCw className="w-4 h-4 animate-spin text-white" />
         ) : (
-          <Download className="w-4 h-4 text-[#0B2A21]" />
+          <Download className="w-4 h-4 text-white" />
         )}
         <span>
           {downloadingFormat
             ? (isBangla ? `${downloadingFormat.toUpperCase()} প্রস্তুত হচ্ছে...` : `Exporting ${downloadingFormat.toUpperCase()}...`)
             : (isBangla ? 'রিপোর্ট ডাউনলোড করুন' : 'Export Report')}
         </span>
-        <ChevronDown className={`w-3.5 h-3.5 text-[#0B2A21] transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-white transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Dropdown Menu Options */}
       {dropdownOpen && (
-        <div className="absolute right-0 mt-2 w-72 sm:w-80 rounded-2xl bg-white border border-gray-200/90 shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-          <div className="px-4 py-2 border-b border-gray-100">
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#0B2A21]">
+        <div className="absolute right-0 mt-2 w-72 sm:w-80 rounded-2xl bg-white border border-[#E2E8F0] shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="px-4 py-2 border-b border-[#E2E8F0]">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#0F766E] font-serif">
               {isBangla ? 'ডাউনলোড ফরম্যাট নির্বাচন করুন:' : 'Choose Download Format:'}
             </p>
           </div>

@@ -430,36 +430,36 @@ export default function StudentPortalPage() {
 
   return (
     <div className="space-y-6">
-      {/* Student Profile Hero Card */}
-      <div className="bg-[#0B2A21] rounded-2xl border border-emerald-900 shadow-md p-6 sm:p-7 text-white relative overflow-hidden">
+      {/* Student Profile Hero Card (Madrasat-us-Sunnah Dark Midnight Architecture) */}
+      <div className="bg-[#0B1A2B] rounded-2xl border border-[#122036] border-t-4 border-t-[#0F766E] shadow-xl p-6 sm:p-7 text-white relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
           <div className="flex items-center gap-4 sm:gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-[#164E3D] border-2 border-[#C5A059]/70 text-white flex items-center justify-center font-bold text-2xl shadow-inner shrink-0">
-              <GraduationCap className="w-8 h-8 text-emerald-200" />
+            <div className="w-16 h-16 rounded-2xl bg-[#122036] border-2 border-[#C1982E]/60 text-white flex items-center justify-center font-bold text-2xl shadow-inner shrink-0">
+              <GraduationCap className="w-8 h-8 text-[#2DD4BF]" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#164E3D] border border-emerald-600/50 text-emerald-200">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#122036] border border-[#2DD4BF]/30 text-[#2DD4BF]">
                   {profile?.current_batch_name || 'SBMC Batch 42'}
                 </span>
-                <span className="text-xs font-mono font-bold bg-[#071F18] text-[#C5A059] px-2.5 py-0.5 rounded-md border border-[#C5A059]/40">
+                <span className="text-xs font-mono font-bold bg-[#0A1420] text-[#C1982E] px-2.5 py-0.5 rounded-md border border-[#C1982E]/40">
                   {profile?.student_id_number || 'STD-2026-042-001'}
                 </span>
-                <span className="text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/30 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[11px] font-semibold bg-[#0F766E]/30 text-[#5EEAD4] px-2 py-0.5 rounded-md border border-[#0F766E]/50 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6] animate-pulse" />
                   {isBangla ? 'নিয়মিত শিক্ষার্থী' : 'Active Student'}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-2 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mt-2 tracking-tight font-serif">
                 {profile?.full_name || 'Abdullah Student'}
               </h1>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-emerald-200/90 mt-1.5 font-medium">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#A9B8C9] mt-1.5 font-medium">
                 <span className="flex items-center gap-1.5">
-                  <Building className="w-3.5 h-3.5 text-emerald-400" />
+                  <Building className="w-3.5 h-3.5 text-[#2DD4BF]" />
                   {profile?.campus_name || 'Kazi Bari Campus'}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                  <BookOpen className="w-3.5 h-3.5 text-[#2DD4BF]" />
                   {isBangla ? 'ব্যাকগ্রাউন্ড:' : 'Background:'} {profile?.education_background || 'General'}
                 </span>
               </div>
@@ -469,34 +469,34 @@ export default function StudentPortalPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => setIdCardOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#061C16] hover:bg-[#08261e] text-[#E5C378] border border-[#C5A059]/40 font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-95"
+              className="px-4 py-2 rounded-xl bg-[#122036] hover:bg-[#1A2E4C] text-[#C1982E] border border-[#C1982E]/40 font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
               title={isBangla ? 'ডিজিটাল আইডি কার্ড ও এডমিট কার্ড' : 'Digital ID & Admit Card'}
             >
-              <CreditCard className="w-4 h-4 text-[#C5A059]" />
+              <CreditCard className="w-4 h-4 text-[#C1982E]" />
               <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
             </button>
             <button
               onClick={() => setCertModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#061C16] hover:bg-[#08261e] text-[#E5C378] border border-[#C5A059]/40 font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-95"
+              className="px-4 py-2 rounded-xl bg-[#122036] hover:bg-[#1A2E4C] text-[#C1982E] border border-[#C1982E]/40 font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
               title={isBangla ? 'কোর্স সনদপত্র প্রিভিউ ও প্রিন্ট' : 'Course Certificate Preview & Print'}
             >
-              <Award className="w-4 h-4 text-[#C5A059]" />
+              <Award className="w-4 h-4 text-[#C1982E]" />
               <span>{isBangla ? 'সনদপত্র' : 'Certificate'}</span>
             </button>
             <button
               onClick={() => setScannerOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#C5A059] hover:bg-[#B38F48] text-[#061C16] font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-md hover:shadow-lg active:scale-95"
+              className="px-4 py-2 rounded-xl bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-md active:scale-95"
               title={isBangla ? 'ক্যামেরা দিয়ে কিউআর স্ক্যান করুন' : 'Scan Attendance QR'}
             >
-              <QrCode className="w-4 h-4 text-[#061C16]" />
+              <QrCode className="w-4 h-4 text-white" />
               <span>{isBangla ? 'কিউআর দিয়ে উপস্থিতি' : 'Scan Attendance QR'}</span>
             </button>
             <button
               onClick={loadStudentData}
               title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
-              className="px-4 py-2 rounded-xl bg-[#164E3D] hover:bg-[#1D634E] text-white border border-emerald-500/40 transition-colors flex items-center gap-2 text-xs font-bold cursor-pointer shadow-xs"
+              className="px-4 py-2 rounded-xl bg-[#122036] hover:bg-[#1A2E4C] text-white border border-white/20 transition-colors flex items-center gap-2 text-xs font-bold cursor-pointer shadow-xs"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-emerald-200 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-[#2DD4BF] ${loading ? 'animate-spin' : ''}`} />
               <span>{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh Data'}</span>
             </button>
           </div>
@@ -516,7 +516,7 @@ export default function StudentPortalPage() {
             </div>
           </div>
           <div className="flex items-baseline gap-2 mt-3">
-            <span className="text-3xl font-black text-[#0B2A21]">
+            <span className="text-3xl font-black text-[#0F766E]">
               {safeFixed(attSummary?.attendance_percentage)}%
             </span>
           </div>
@@ -610,11 +610,11 @@ export default function StudentPortalPage() {
           onClick={() => handleTabChange('today')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'today'
-              ? 'bg-white text-[#0B2A21] shadow-xs'
+              ? 'bg-white text-[#0F766E] shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
           }`}
         >
-          <Calendar className="w-4 h-4 text-[#0B2A21]" />
+          <Calendar className="w-4 h-4 text-[#0F766E]" />
           <span>{isBangla ? 'আজকের ক্লাস ও মূল্যায়ন' : "Today's Classes & Feedback"}</span>
         </button>
 
@@ -622,11 +622,11 @@ export default function StudentPortalPage() {
           onClick={() => handleTabChange('attendance')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'attendance'
-              ? 'bg-white text-[#0B2A21] shadow-xs'
+              ? 'bg-white text-[#0F766E] shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
           }`}
         >
-          <CheckCircle2 className="w-4 h-4 text-[#0B2A21]" />
+          <CheckCircle2 className="w-4 h-4 text-[#0F766E]" />
           <span>{isBangla ? 'উপস্থিতির হিস্ট্রি লগ' : 'Attendance Log'}</span>
         </button>
 
@@ -634,11 +634,11 @@ export default function StudentPortalPage() {
           onClick={() => handleTabChange('help')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'help'
-              ? 'bg-white text-[#0B2A21] shadow-xs'
+              ? 'bg-white text-[#0F766E] shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
           }`}
         >
-          <HelpCircle className="w-4 h-4 text-[#0B2A21]" />
+          <HelpCircle className="w-4 h-4 text-[#0F766E]" />
           <span>{isBangla ? 'শিক্ষকের সহায়তা ও উত্তর' : 'Teacher Help Requests'}</span>
           {helpRequests.length > 0 && (
             <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-800 font-bold">
@@ -651,14 +651,14 @@ export default function StudentPortalPage() {
           onClick={() => handleTabChange('materials')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'materials'
-              ? 'bg-white text-[#0B2A21] shadow-xs'
+              ? 'bg-white text-[#0F766E] shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
           }`}
         >
-          <BookOpen className="w-4 h-4 text-[#0B2A21]" />
+          <BookOpen className="w-4 h-4 text-[#0F766E]" />
           <span>{isBangla ? 'লেকচার শিট ও রিসোর্স হাব' : 'Lecture Notes & Hub'}</span>
           {materials.length > 0 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-[#0B2A21] font-bold">
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-[#0F766E] font-bold">
               {materials.length}
             </span>
           )}
@@ -668,14 +668,14 @@ export default function StudentPortalPage() {
           onClick={() => handleTabChange('graduation')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'graduation'
-              ? 'bg-white text-[#0B2A21] shadow-xs'
+              ? 'bg-white text-[#0F766E] shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
           }`}
         >
-          <Award className="w-4 h-4 text-[#C5A059]" />
+          <Award className="w-4 h-4 text-[#C1982E]" />
           <span>{isBangla ? 'সনদ ও গ্র্যাজুয়েশন' : 'Graduation & Certificate'}</span>
           {graduationData?.is_eligible ? (
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-[#0B2A21] font-extrabold border border-emerald-300">
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-[#0F766E] font-extrabold border border-emerald-300">
               {isBangla ? 'যোগ্য' : 'Eligible'}
             </span>
           ) : (
@@ -708,10 +708,10 @@ export default function StudentPortalPage() {
                   key={s.id}
                   className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between gap-4 relative overflow-hidden pl-6"
                 >
-                  <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#0B2A21]" />
+                  <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#0F766E]" />
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-[#0B2A21] border border-emerald-200">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-[#0F766E] border border-emerald-200">
                         {s.subject_name}
                       </span>
                       <span className="text-xs text-slate-500 flex items-center gap-1 font-mono font-medium">
@@ -737,7 +737,7 @@ export default function StudentPortalPage() {
                           setSelectedMaterialForModal(null);
                           setMaterialsModalOpen(true);
                         }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-[#0B2A21] border border-emerald-300 rounded-md transition-colors cursor-pointer shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-[#0F766E] border border-emerald-300 rounded-md transition-colors cursor-pointer shadow-2xs"
                         title={isBangla ? 'ক্লাস লেকচার শিট ও রিসোর্স' : 'Lecture Sheet & Resources'}
                       >
                         <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
@@ -777,7 +777,7 @@ export default function StudentPortalPage() {
                             setFeedbackNeedsHelp(false);
                             setFeedbackComment('');
                           }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold bg-[#0B2A21] hover:bg-[#134E3E] text-white rounded-md shadow-xs transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors cursor-pointer"
                         >
                           <Star className="w-3.5 h-3.5 fill-white" />
                           <span>{isBangla ? 'ফিডব্যাক দিন' : 'Rate Class'}</span>
@@ -952,7 +952,7 @@ export default function StudentPortalPage() {
                     <button
                       onClick={() => handleMarkHelpResolved(hr.id)}
                       disabled={resolvingHelpId === hr.id}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#0B2A21] hover:text-[#E5C378] text-emerald-800 border border-emerald-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
+                      className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#0F766E] hover:text-[#C1982E] text-emerald-800 border border-emerald-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>
@@ -991,7 +991,7 @@ export default function StudentPortalPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-[#0B2A21] text-[#E5C378] uppercase tracking-wider">
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-[#0F766E] text-[#C1982E] uppercase tracking-wider">
                     {isBangla ? 'রিসোর্স হাব' : 'Resource Hub'}
                   </span>
                   <span className="text-xs text-slate-500 font-medium">
@@ -1020,7 +1020,7 @@ export default function StudentPortalPage() {
                       ? 'টপিক, বিষয় বা শিরোনাম খুঁজুন...'
                       : 'Search topics, subjects...'
                   }
-                  className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#0B2A21] focus:ring-1 focus:ring-[#0B2A21]"
+                  className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
                 />
                 {materialSearchQuery && (
                   <button
@@ -1043,7 +1043,7 @@ export default function StudentPortalPage() {
                 onClick={() => setSelectedSubjectFilter('all')}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   selectedSubjectFilter === 'all'
-                    ? 'bg-[#0B2A21] text-[#E5C378] shadow-xs'
+                    ? 'bg-[#0F766E] text-[#C1982E] shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -1055,7 +1055,7 @@ export default function StudentPortalPage() {
                   onClick={() => setSelectedSubjectFilter(subj)}
                   className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
                     selectedSubjectFilter === subj
-                      ? 'bg-[#0B2A21] text-[#E5C378] shadow-xs'
+                      ? 'bg-[#0F766E] text-[#C1982E] shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -1099,10 +1099,10 @@ export default function StudentPortalPage() {
                 key={mat.id}
                 className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between gap-4 relative overflow-hidden pl-6"
               >
-                <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#0B2A21]" />
+                <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#0F766E]" />
                 <div className="space-y-2.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-[#0B2A21] border border-emerald-200">
+                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-[#0F766E] border border-emerald-200">
                       {mat.subject_name}
                     </span>
                     <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
@@ -1185,12 +1185,12 @@ export default function StudentPortalPage() {
                     <button
                       onClick={() => handleDownloadMaterial(mat)}
                       disabled={downloadingMatId === mat.id}
-                      className="px-3.5 py-1.5 text-xs font-extrabold bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
+                      className="px-3.5 py-1.5 text-xs font-extrabold bg-[#0F766E] hover:bg-[#115E59] text-[#C1982E] rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
                     >
                       {downloadingMatId === mat.id ? (
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C1982E]" />
                       ) : (
-                        <Download className="w-3.5 h-3.5 text-[#C5A059]" />
+                        <Download className="w-3.5 h-3.5 text-[#C1982E]" />
                       )}
                       <span>{isBangla ? 'ডাউনলোড' : 'Download'}</span>
                     </button>
@@ -1235,8 +1235,8 @@ export default function StudentPortalPage() {
           <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-[#0B2A21] text-[#E5C378] uppercase tracking-wider flex items-center gap-1">
-                  <Award className="w-3 h-3 text-[#C5A059]" />
+                <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-[#0F766E] text-[#C1982E] uppercase tracking-wider flex items-center gap-1">
+                  <Award className="w-3 h-3 text-[#C1982E]" />
                   {isBangla ? 'গ্র্যাজুয়েশন ও সনদ' : 'Graduation & Certificate'}
                 </span>
                 <span className="text-xs text-slate-500 font-medium">
@@ -1256,9 +1256,9 @@ export default function StudentPortalPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setCertModalOpen(true)}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0B2A21] to-[#164E3D] hover:from-[#082019] hover:to-[#124234] text-[#F3E5C8] font-bold text-xs sm:text-sm border border-[#C5A059]/50 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0F766E] to-[#115E59] hover:from-[#122036] hover:to-[#124234] text-[#FEF3C7] font-bold text-xs sm:text-sm border border-[#C1982E]/50 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95"
               >
-                <Award className="w-4 h-4 text-[#C5A059]" />
+                <Award className="w-4 h-4 text-[#C1982E]" />
                 <span>{isBangla ? 'সনদপত্র দেখুন ও প্রিন্ট করুন' : 'View & Print Certificate'}</span>
               </button>
             </div>
@@ -1267,9 +1267,9 @@ export default function StudentPortalPage() {
           {/* Readiness Bento Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             {/* Left Card: Overall Readiness Score Ring */}
-            <div className="bg-gradient-to-br from-[#0B2A21] via-[#10382C] to-[#0B2A21] text-white p-6 rounded-2xl border border-emerald-900/60 shadow-lg flex flex-col justify-between relative overflow-hidden">
+            <div className="bg-gradient-to-br from-[#0F766E] via-[#122036] to-[#0F766E] text-white p-6 rounded-2xl border border-emerald-900/60 shadow-lg flex flex-col justify-between relative overflow-hidden">
               {/* Background Glow */}
-              <div className="absolute -right-8 -bottom-8 w-44 h-44 rounded-full bg-[#C5A059]/10 blur-2xl pointer-events-none" />
+              <div className="absolute -right-8 -bottom-8 w-44 h-44 rounded-full bg-[#C1982E]/10 blur-2xl pointer-events-none" />
 
               <div>
                 <div className="flex items-center justify-between">
@@ -1301,7 +1301,7 @@ export default function StudentPortalPage() {
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       />
                       <path
-                        className="text-[#C5A059] transition-all duration-1000 ease-out"
+                        className="text-[#C1982E] transition-all duration-1000 ease-out"
                         strokeDasharray={`${Math.min(graduationData?.overall_readiness_score || 0, 100)}, 100`}
                         strokeWidth="3.5"
                         strokeLinecap="round"
@@ -1311,7 +1311,7 @@ export default function StudentPortalPage() {
                       />
                     </svg>
                     <div className="absolute flex flex-col items-center justify-center text-center">
-                      <span className="text-xl font-black text-[#F3E5C8]">
+                      <span className="text-xl font-black text-[#FEF3C7]">
                         {graduationData?.overall_readiness_score || 0}%
                       </span>
                     </div>
@@ -1324,7 +1324,7 @@ export default function StudentPortalPage() {
                     <p className="text-base font-bold text-white leading-tight">
                       {graduationData?.grade_bn || 'মুমতাজ (সর্বোচ্চ কৃতিত্ব)'}
                     </p>
-                    <p className="text-[11px] text-[#C5A059] font-mono">
+                    <p className="text-[11px] text-[#C1982E] font-mono">
                       {graduationData?.grade_en || 'Distinction'}
                     </p>
                   </div>
@@ -1353,9 +1353,9 @@ export default function StudentPortalPage() {
               <div className="mt-5 pt-3 border-t border-emerald-800/60">
                 <button
                   onClick={() => setCertModalOpen(true)}
-                  className="w-full py-2.5 rounded-xl bg-[#C5A059] hover:bg-[#b38e47] text-[#0B2A21] font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                  className="w-full py-2.5 rounded-xl bg-[#C1982E] hover:bg-[#A17E24] text-[#0F766E] font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                 >
-                  <Award className="w-4 h-4 text-[#0B2A21]" />
+                  <Award className="w-4 h-4 text-[#0F766E]" />
                   <span>{isBangla ? 'সনদপত্র প্রিভিউ ও ডাউনলোড' : 'Preview & Download Certificate'}</span>
                 </button>
               </div>
@@ -1366,7 +1366,7 @@ export default function StudentPortalPage() {
               <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                    <FileCheck2 className="w-4 h-4 text-[#0B2A21]" />
+                    <FileCheck2 className="w-4 h-4 text-[#0F766E]" />
                     <span>{isBangla ? 'সনদপত্র পাওয়ার ৪টি আবশ্যিক শর্তাবলি' : 'Mandatory Certificate Criteria'}</span>
                   </h3>
                   <span className="text-xs text-slate-500 font-medium">
@@ -1526,7 +1526,7 @@ export default function StudentPortalPage() {
                   <div className="p-4 rounded-xl border bg-slate-50 border-slate-200 transition-all">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
-                        <div className="w-7 h-7 rounded-lg bg-[#0B2A21] text-[#C5A059] flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="w-7 h-7 rounded-lg bg-[#0F766E] text-[#C1982E] flex items-center justify-center shrink-0 mt-0.5">
                           <ShieldCheck className="w-4 h-4" />
                         </div>
                         <div>
@@ -1558,11 +1558,11 @@ export default function StudentPortalPage() {
       {/* Quick Feedback Submission Modal (10-15s submittable) */}
       {selectedSessionForFeedback && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 border-t-4 border-t-[#C1982E] animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-[#0B2A21] flex items-center justify-center shadow-xs">
-                  <Star className="w-5 h-5 fill-[#C5A059] text-[#C5A059]" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-[#0F766E] flex items-center justify-center shadow-xs">
+                  <Star className="w-5 h-5 fill-[#C1982E] text-[#C1982E]" />
                 </div>
                 <div>
                   <h3 className="font-extrabold text-slate-900 text-sm">
@@ -1597,7 +1597,7 @@ export default function StudentPortalPage() {
                         ? 'আজকের পাঠ আপনি শতকরা কতটুকু বুঝেছেন?'
                         : 'How much of this class did you understand?'}
                     </label>
-                    <span className="text-xs font-black text-[#0B2A21] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                    <span className="text-xs font-black text-[#0F766E] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                       {ratingDescriptions[feedbackRating]?.pct}
                     </span>
                   </div>
@@ -1619,7 +1619,7 @@ export default function StudentPortalPage() {
                         <Star
                           className={`w-5 h-5 ${
                             feedbackRating >= starVal
-                              ? 'fill-[#C5A059] text-[#C5A059]'
+                              ? 'fill-[#C1982E] text-[#C1982E]'
                               : 'text-slate-300'
                           }`}
                         />
@@ -1629,7 +1629,7 @@ export default function StudentPortalPage() {
                       </button>
                     ))}
                   </div>
-                  <p className="text-center text-xs font-bold text-[#0B2A21] mt-2.5 bg-emerald-50/60 py-1.5 px-3 rounded-md border border-emerald-100">
+                  <p className="text-center text-xs font-bold text-[#0F766E] mt-2.5 bg-emerald-50/60 py-1.5 px-3 rounded-md border border-emerald-100">
                     {isBangla
                       ? ratingDescriptions[feedbackRating]?.bn
                       : ratingDescriptions[feedbackRating]?.en}
@@ -1662,7 +1662,7 @@ export default function StudentPortalPage() {
                       type="checkbox"
                       checked={feedbackNeedsHelp}
                       onChange={(e) => setFeedbackNeedsHelp(e.target.checked)}
-                      className="mt-0.5 rounded text-[#0B2A21] focus:ring-[#0B2A21] w-4 h-4 cursor-pointer accent-[#0B2A21]"
+                      className="mt-0.5 rounded text-[#0F766E] focus:ring-[#0F766E] w-4 h-4 cursor-pointer accent-[#0F766E]"
                     />
                     <div>
                       <span className="text-xs font-bold text-slate-900 block">
@@ -1705,7 +1705,7 @@ export default function StudentPortalPage() {
                         ? 'আলহামদুলিল্লাহ পুরো পাঠটি চমৎকারভাবে বুঝতে পেরেছি...'
                         : 'Understood everything clearly...'
                     }
-                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#0B2A21] focus:ring-1 focus:ring-[#0B2A21]"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
                   />
                 </div>
 
@@ -1721,12 +1721,12 @@ export default function StudentPortalPage() {
                   <button
                     type="submit"
                     disabled={submittingFeedback}
-                    className="px-5 py-2.5 text-xs font-extrabold bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer active:scale-95"
+                    className="px-5 py-2.5 text-xs font-extrabold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer active:scale-95"
                   >
                     {submittingFeedback ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C1982E]" />
                     ) : (
-                      <Send className="w-3.5 h-3.5 text-[#C5A059]" />
+                      <Send className="w-3.5 h-3.5 text-[#C1982E]" />
                     )}
                     <span>{isBangla ? 'ফিডব্যাক জমা দিন' : 'Submit Feedback'}</span>
                   </button>

@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   iconWrapperActive: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colors.primaryLight,
   },
   navLabel: {
     fontSize: 12,

@@ -142,8 +142,8 @@ export function PwaInstaller() {
     <>
       {/* Success Notification after install */}
       {installedSuccessfully && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1B4D3E] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-emerald-400/30 animate-bounce">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#0F766E] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-[#14B8A6]/40 animate-bounce">
+          <CheckCircle2 className="w-5 h-5 text-[#5EEAD4]" />
           <span className="text-sm font-medium">
             {language === 'bn'
               ? 'আস-সুন্নাহ পোর্টাল সফলভাবে আপনার ডিভাইসে ইনস্টল হয়েছে!'
@@ -155,9 +155,9 @@ export function PwaInstaller() {
       {/* Modern Floating Bottom PWA Banner */}
       {showBanner && !installedSuccessfully && (
         <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
-          <div className="bg-white/95 backdrop-blur-md border-2 border-[#1B4D3E]/20 shadow-2xl rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+          <div className="bg-white border-2 border-[#0F766E]/20 shadow-xl rounded-2xl p-4 sm:p-5 relative overflow-hidden">
             {/* Top decorative gradient bar */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#1B4D3E] via-emerald-500 to-[#1B4D3E]" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0F766E] via-[#14B8A6] to-[#0F766E]" />
 
             <button
               onClick={handleDismiss}
@@ -168,7 +168,7 @@ export function PwaInstaller() {
             </button>
 
             <div className="flex items-start gap-3.5 pr-6">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-[#F0FDFA] border border-[#CCFBF1] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
                 <Image
                   src="/logo.png"
                   alt="ASSDI Logo"
@@ -180,14 +180,14 @@ export function PwaInstaller() {
 
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-bold text-[#1B4D3E]">
+                  <h4 className="text-sm font-bold text-[#0F766E] font-serif">
                     {language === 'bn' ? 'আস-সুন্নাহ অ্যাপ ইনস্টল করুন' : 'Install ASSDI App'}
                   </h4>
-                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-emerald-600" /> PWA
+                  <span className="bg-[#CCFBF1] text-[#0F766E] text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-[#0F766E]" /> PWA
                   </span>
                 </div>
-                <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                <p className="text-xs text-[#475569] mt-1 leading-relaxed">
                   {language === 'bn'
                     ? 'সহজ ও দ্রুত ব্যবহারের জন্য কোনো ডাউনলোড ছাড়াই আপনার ফোনের হোমস্ক্রিনে আসল অ্যাপের মতো যুক্ত করুন।'
                     : 'Add directly to your device home screen for lightning-fast access, offline support, and app experience.'}
@@ -195,10 +195,10 @@ export function PwaInstaller() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 mt-4 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-2.5 mt-4 pt-3 border-t border-[#E2E8F0]">
               <button
                 onClick={handleInstallClick}
-                className="flex-1 bg-[#1B4D3E] hover:bg-[#14382D] text-white text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition active:scale-95 cursor-pointer"
+                className="flex-1 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>
@@ -219,8 +219,8 @@ export function PwaInstaller() {
 
       {/* iOS Safari Instruction Modal */}
       {showIosModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl p-6 max-w-sm w-full shadow-2xl relative animate-in fade-in slide-in-from-bottom-8 duration-300">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-4">
+          <div className="bg-white rounded-t-3xl sm:rounded-2xl p-6 max-w-sm w-full shadow-2xl relative animate-in fade-in slide-in-from-bottom-8 duration-300 border border-[#E2E8F0]">
             <button
               onClick={() => setShowIosModal(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1 rounded-full"
@@ -228,27 +228,27 @@ export function PwaInstaller() {
               <X className="w-5 h-5" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-4">
-              <Smartphone className="w-6 h-6 text-[#1B4D3E]" />
+            <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] border border-[#CCFBF1] flex items-center justify-center mx-auto mb-4">
+              <Smartphone className="w-6 h-6 text-[#0F766E]" />
             </div>
 
-            <h3 className="text-base font-bold text-center text-[#1B4D3E] mb-2">
+            <h3 className="text-base font-bold text-center text-[#0F766E] font-serif mb-2">
               {language === 'bn' ? 'আইফোনে যেভাবে অ্যাপ যুক্ত করবেন' : 'Install on iPhone & iPad'}
             </h3>
 
-            <p className="text-xs text-gray-600 text-center mb-5">
+            <p className="text-xs text-[#475569] text-center mb-5">
               {language === 'bn'
                 ? 'সাফারি ব্রাউজারে মাত্র দুটি সহজ ধাপে হোমস্ক্রিনে অ্যাপ আইকন পেয়ে যান:'
                 : 'Follow these 2 simple steps in Safari to add the app to your home screen:'}
             </p>
 
-            <div className="space-y-3.5 bg-gray-50 p-4 rounded-xl border border-gray-100 text-xs text-gray-700">
+            <div className="space-y-3.5 bg-[#F8FAFC] p-4 rounded-xl border border-[#E2E8F0] text-xs text-[#334155]">
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-xs">
-                  <Share className="w-4 h-4 text-blue-600" />
+                <div className="w-7 h-7 rounded-lg bg-white border border-[#E2E8F0] flex items-center justify-center shrink-0 shadow-2xs">
+                  <Share className="w-4 h-4 text-[#0F766E]" />
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-900">১. </span>
+                  <span className="font-bold text-[#0F172A]">১. </span>
                   {language === 'bn'
                     ? 'সাফারির নিচে থাকা শেয়ার (Share) আইকনে চাপ দিন'
                     : 'Tap the Share button at the bottom of Safari'}
@@ -256,11 +256,11 @@ export function PwaInstaller() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-xs">
-                  <PlusSquare className="w-4 h-4 text-gray-800" />
+                <div className="w-7 h-7 rounded-lg bg-white border border-[#E2E8F0] flex items-center justify-center shrink-0 shadow-2xs">
+                  <PlusSquare className="w-4 h-4 text-[#0F172A]" />
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-900">২. </span>
+                  <span className="font-bold text-[#0F172A]">২. </span>
                   {language === 'bn'
                     ? "মেনু স্ক্রোল করে 'Add to Home Screen' চাপ দিন"
                     : "Scroll and tap 'Add to Home Screen'"}
@@ -273,7 +273,7 @@ export function PwaInstaller() {
                 setShowIosModal(false);
                 handleDismiss();
               }}
-              className="w-full mt-5 bg-[#1B4D3E] hover:bg-[#14382D] text-white text-xs font-semibold py-3 rounded-xl transition cursor-pointer"
+              className="w-full mt-5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold py-3 rounded-xl transition cursor-pointer shadow-xs"
             >
               {language === 'bn' ? 'বুঝেছি' : 'Got it'}
             </button>

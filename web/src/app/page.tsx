@@ -20,10 +20,10 @@ export default function HomePage() {
   }, [user, isMounted, router]);
 
   return (
-    <div className="min-h-screen bg-[#0B2A21] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-3 border-emerald-900 border-t-[#C5A059] rounded-full animate-spin" />
-        <p className="text-emerald-100 text-sm font-semibold tracking-wide">
+        <div className="w-10 h-10 border-3 border-[#CCFBF1] border-t-[#0F766E] rounded-full animate-spin" />
+        <p className="text-[#0F766E] text-sm font-semibold tracking-wide font-serif">
           লোড হচ্ছে...
         </p>
       </div>

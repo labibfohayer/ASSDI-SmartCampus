@@ -234,7 +234,7 @@ export default function LiveQrProjectorPage() {
       ref={containerRef}
       className={`transition-all duration-300 ${
         isFullscreen
-          ? 'bg-[#1B4D3E] text-white p-6 sm:p-12 flex flex-col justify-between h-screen w-screen overflow-hidden'
+          ? 'bg-[#0B1A2B] text-white p-6 sm:p-12 flex flex-col justify-between h-screen w-screen overflow-hidden'
           : 'space-y-6'
       }`}
     >
@@ -242,23 +242,23 @@ export default function LiveQrProjectorPage() {
       <div
         className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-xl border ${
           isFullscreen
-            ? 'bg-emerald-950/40 border-emerald-700/60 text-white'
-            : 'bg-white border-slate-200/90 shadow-2xs text-slate-900'
+            ? 'bg-[#122036] border-[#0F766E]/40 text-white'
+            : 'bg-white border-[#E2E8F0] shadow-xs text-[#0F172A]'
         }`}
       >
         <div className="flex items-center gap-3">
           <Link
             href="/teacher"
             className={`p-2 rounded-lg transition ${
-              isFullscreen ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+              isFullscreen ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-[#F8FAFC] hover:bg-[#F0FDFA] text-[#0F766E]'
             }`}
             title={isBangla ? 'ড্যাশবোর্ডে ফিরুন' : 'Back to Dashboard'}
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold flex items-center gap-2">
-              <QrCode className="w-6 h-6 text-[#0B2A21] dark:text-[#C5A059]" />
+            <h1 className="text-xl sm:text-2xl font-extrabold flex items-center gap-2 font-heading">
+              <QrCode className="w-6 h-6 text-[#0F766E] dark:text-[#C1982E]" />
               <span>{isBangla ? 'ক্লাসরুম লাইভ কিউআর প্রজেক্টর' : 'Live Classroom QR Projector'}</span>
             </h1>
             <p className="text-xs opacity-80 mt-0.5">
@@ -274,7 +274,7 @@ export default function LiveQrProjectorPage() {
           <select
             value={selectedSessionId || ''}
             onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-            className="px-3.5 py-2.5 bg-slate-50 dark:bg-emerald-950/80 border border-slate-200 dark:border-emerald-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+            className="px-3.5 py-2.5 bg-[#F8FAFC] dark:bg-[#122036] border border-[#E2E8F0] dark:border-teal-800 rounded-xl text-xs font-semibold text-[#0F172A] dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           >
             {sessions.map((s) => (
               <option key={s.id} value={s.id}>
@@ -286,16 +286,16 @@ export default function LiveQrProjectorPage() {
           {/* Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
-            className="px-4 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition shadow-sm cursor-pointer active:scale-95"
+            className="px-4 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition shadow-sm cursor-pointer active:scale-95"
           >
             {isFullscreen ? (
               <>
-                <Minimize2 className="w-4 h-4 text-[#C5A059]" />
+                <Minimize2 className="w-4 h-4 text-[#C1982E]" />
                 <span>{isBangla ? 'ফুলস্ক্রিন বন্ধ' : 'Exit Fullscreen'}</span>
               </>
             ) : (
               <>
-                <Maximize2 className="w-4 h-4 text-[#C5A059]" />
+                <Maximize2 className="w-4 h-4 text-[#C1982E]" />
                 <span>{isBangla ? 'ফুলস্ক্রিন প্রজেক্টর' : 'Projector Mode'}</span>
               </>
             )}
@@ -305,22 +305,22 @@ export default function LiveQrProjectorPage() {
 
       {/* Main QR Display Canvas */}
       <div className="flex-1 flex flex-col items-center justify-center my-4">
-        <div className="w-full max-w-xl bg-white rounded-3xl p-8 sm:p-10 shadow-2xl border-4 border-emerald-500/20 text-center space-y-6">
+        <div className="w-full max-w-xl bg-white rounded-3xl p-8 sm:p-10 shadow-xl border-4 border-[#0F766E]/20 text-center space-y-6">
           {/* Active Session Info Banner */}
           {activeSession && (
-            <div className="bg-emerald-50 border border-emerald-200/80 rounded-2xl p-4">
-              <span className="px-2.5 py-0.5 bg-emerald-600 text-white text-[11px] font-bold rounded-full uppercase tracking-wider">
+            <div className="bg-[#F0FDFA] border border-[#CCFBF1] rounded-2xl p-4">
+              <span className="px-2.5 py-0.5 bg-[#0F766E] text-white text-[11px] font-bold rounded-full uppercase tracking-wider">
                 {activeSession.audience} Session
               </span>
-              <h2 className="text-xl font-black text-gray-900 mt-2">
+              <h2 className="text-xl font-black text-[#0F172A] font-heading mt-2">
                 {activeSession.subject_name}
               </h2>
-              <p className="text-xs text-emerald-800 font-semibold mt-0.5">
-                {activeSession.topic_title || isBangla ? 'টপিক আলোচনা' : 'Topic Overview'}
+              <p className="text-xs text-[#0F766E] font-semibold mt-0.5">
+                {activeSession.topic_title || (isBangla ? 'টপিক আলোচনা' : 'Topic Overview')}
               </p>
-              <div className="mt-2 flex items-center justify-center gap-4 text-xs font-bold text-gray-700">
+              <div className="mt-2 flex items-center justify-center gap-4 text-xs font-bold text-[#475569]">
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-emerald-700" />
+                  <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
                   {d(activeSession.start_time.slice(0, 5))} - {d(activeSession.end_time.slice(0, 5))}
                 </span>
                 <span>•</span>
@@ -332,9 +332,9 @@ export default function LiveQrProjectorPage() {
           {/* QR Code Presentation Box */}
           <div className="flex justify-center items-center py-2">
             {loadingToken && !qrToken ? (
-              <div className="w-72 h-72 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-3">
-                <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin" />
-                <p className="text-xs font-bold text-gray-500">
+              <div className="w-72 h-72 rounded-2xl bg-[#F8FAFC] border-2 border-dashed border-[#CBD5E1] flex flex-col items-center justify-center gap-3">
+                <RefreshCw className="w-8 h-8 text-[#0F766E] animate-spin" />
+                <p className="text-xs font-bold text-[#475569]">
                   {isBangla ? 'সিকিউর টোকেন জেনারেট হচ্ছে...' : 'Generating Secure Signed Token...'}
                 </p>
               </div>
@@ -348,21 +348,21 @@ export default function LiveQrProjectorPage() {
                   <button
                     onClick={handleReopenWindow}
                     disabled={reopeningWindow}
-                    className="w-full py-2 bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] text-xs font-bold rounded-xl border border-[#C5A059]/40 transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    className="w-full py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl border border-transparent transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 text-[#C5A059] ${reopeningWindow ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-3.5 h-3.5 text-[#C1982E] ${reopeningWindow ? 'animate-spin' : ''}`} />
                     <span>{isBangla ? 'এখনই কিউআর উইন্ডো চালু করুন' : 'Activate QR Window Now'}</span>
                   </button>
                   <button
                     onClick={fetchQrToken}
-                    className="w-full py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 transition cursor-pointer"
+                    className="w-full py-2 bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-xs font-bold rounded-xl border border-[#E2E8F0] transition cursor-pointer"
                   >
                     {isBangla ? 'আবার চেষ্টা করুন' : 'Retry'}
                   </button>
                 </div>
               </div>
             ) : qrToken ? (
-              <div className="p-4 bg-white rounded-2xl border-2 border-gray-200 shadow-inner flex items-center justify-center relative">
+              <div className="p-4 bg-white rounded-2xl border-2 border-[#E2E8F0] shadow-inner flex items-center justify-center relative">
                 <QRCodeSVG
                   value={qrToken}
                   size={isFullscreen ? 320 : 260}
@@ -375,7 +375,7 @@ export default function LiveQrProjectorPage() {
 
           {/* Countdown & Live Indicator */}
           {qrToken && (
-            <div className="flex items-center justify-between border-t border-gray-100 pt-4">
+            <div className="flex items-center justify-between border-t border-[#E2E8F0] pt-4">
               {/* Circular Timer */}
               <div className="flex items-center gap-3">
                 <div className="relative w-12 h-12 flex items-center justify-center">
@@ -399,22 +399,22 @@ export default function LiveQrProjectorPage() {
                       strokeDashoffset={strokeDashoffset}
                       strokeLinecap="round"
                       className={`${
-                        remainingSeconds <= 10 ? 'text-red-500' : 'text-emerald-600'
+                        remainingSeconds <= 10 ? 'text-red-500' : 'text-[#0F766E]'
                       } transition-all duration-1000`}
                       fill="transparent"
                     />
                   </svg>
                   <span className={`absolute text-xs font-extrabold ${
-                    remainingSeconds <= 10 ? 'text-red-600' : 'text-gray-900'
+                    remainingSeconds <= 10 ? 'text-red-600' : 'text-[#0F172A]'
                   }`}>
                     {d(remainingSeconds)}
                   </span>
                 </div>
                 <div className="text-left">
-                  <p className="text-xs font-bold text-gray-800">
+                  <p className="text-xs font-bold text-[#0F172A]">
                     {isBangla ? 'টোকেন পরিবর্তনের বাকি' : 'Token Expires In'}
                   </p>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-[11px] text-[#475569]">
                     {d(remainingSeconds)} {isBangla ? 'সেকেন্ড' : 'seconds'}
                   </p>
                 </div>
@@ -424,16 +424,16 @@ export default function LiveQrProjectorPage() {
               <button
                 onClick={fetchQrToken}
                 disabled={loadingToken}
-                className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                className="px-3.5 py-2 bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] border border-[#CCFBF1] rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
               >
-                <RefreshCw className={`w-3.5 h-3.5 text-emerald-700 ${loadingToken ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 text-[#0F766E] ${loadingToken ? 'animate-spin' : ''}`} />
                 <span>{isBangla ? 'এখনই রিফ্রেশ' : 'Refresh Now'}</span>
               </button>
             </div>
           )}
 
           {/* Student Instruction Banner */}
-          <p className="text-xs text-gray-500 font-medium leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100">
+          <p className="text-xs text-[#475569] font-medium leading-relaxed bg-[#F8FAFC] p-3 rounded-xl border border-[#E2E8F0]">
             {isBangla
               ? 'শিক্ষার্থীদের নির্দেশ দিন: আপনার অফিসিয়াল ASSDI মোবাইল অ্যাপ ওপেন করে এই কোডটি স্ক্যান করুন।'
               : 'Instruct students: Open the official ASSDI Mobile App and scan this rotating code.'}

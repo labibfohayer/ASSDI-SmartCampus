@@ -62,13 +62,13 @@ export default function ReportsNavbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left: Logo & Title */}
           <div className="flex items-center gap-3">
             <Link href="/reports" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/60 p-1 flex items-center justify-center shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-[#F0FDFA] border border-[#CCFBF1] p-1 flex items-center justify-center shadow-xs">
                 <Image
                   src="/logo.png"
                   alt="ASSDI Logo"
@@ -82,11 +82,11 @@ export default function ReportsNavbar() {
                   <span className="font-bold text-gray-900 text-sm tracking-tight">
                     {t('brand.name')}
                   </span>
-                  <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-700 text-white rounded-full">
+                  <span className="px-2 py-0.5 text-[10px] font-bold bg-[#0F766E] text-white rounded-full">
                     {isBangla ? 'এসআরএস রিপোর্টস হাব' : 'Reports Hub'}
                   </span>
                 </div>
-                <p className="text-[11px] text-emerald-700 font-medium">
+                <p className="text-[11px] text-[#0F766E] font-medium">
                   {t('brand.course')}
                 </p>
               </div>
@@ -97,7 +97,7 @@ export default function ReportsNavbar() {
           <div className="flex items-center gap-3">
             <Link
               href={backNav.href}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-emerald-800 transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-[#F0FDFA] hover:text-[#0F766E] hover:border-[#CCFBF1] transition-colors"
             >
               <BackIcon className="w-3.5 h-3.5 text-gray-500" />
               <span>{backNav.label}</span>
@@ -106,7 +106,7 @@ export default function ReportsNavbar() {
             <LanguageSwitcher />
 
             <div className="hidden md:flex items-center gap-2 pl-3 border-l border-gray-200">
-              <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] flex items-center justify-center text-xs font-bold">
                 {user?.full_name?.charAt(0) || <UserIcon className="w-3.5 h-3.5" />}
               </div>
               <div className="text-left text-xs">
