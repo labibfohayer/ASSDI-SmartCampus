@@ -18,6 +18,10 @@ import {
   UploadCloud,
   AlertTriangle,
   RefreshCw,
+  Edit3,
+  UserX,
+  Ban,
+  ShieldAlert,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -81,6 +85,82 @@ export default function AdminStudentsPage() {
   const [importing, setImporting] = useState(false);
   const [downloadingTemplate, setDownloadingTemplate] = useState(false);
   const [importResult, setImportResult] = useState<any>(null);
+
+  // Edit student modal state
+  const [editingStudent, setEditingStudent] = useState<StudentItem | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    full_name: '',
+    phone: '',
+    guardian_phone: '',
+    registration_no: '',
+    education_background: 'General',
+    status: 'active',
+    campus_id: '1',
+    batch_id: '',
+  });
+  const [updating, setUpdating] = useState(false);
+
+  const openEditModal = (st: StudentItem) => {
+    setEditingStudent(st);
+    setEditFormData({
+      full_name: st.full_name || '',
+      phone: st.phone || '',
+      guardian_phone: st.guardian_phone || '',
+      registration_no: st.registration_no || '',
+      education_background: st.education_background || 'General',
+      status: st.status || 'active',
+      campus_id: String(st.campus || '1'),
+      batch_id: st.current_batch_id ? String(st.current_batch_id) : '',
+    });
+  };
+
+  const handleUpdateStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingStudent) return;
+    setUpdating(true);
+
+    try {
+      const payload: any = {
+        full_name: editFormData.full_name.trim(),
+        phone: editFormData.phone.trim(),
+        guardian_phone: editFormData.guardian_phone.trim(),
+        registration_no: editFormData.registration_no.trim(),
+        education_background: editFormData.education_background,
+        status: editFormData.status,
+      };
+
+      await api.patch(`/api/v1/students/${editingStudent.id}/`, payload);
+
+      // Handle batch transfer if batch changed
+      if (
+        editFormData.batch_id &&
+        Number(editFormData.batch_id) !== editingStudent.current_batch_id
+      ) {
+        await api.post(`/api/v1/students/${editingStudent.id}/transfer/`, {
+          new_batch_id: Number(editFormData.batch_id),
+          reason: 'Admin updated student batch allocation',
+        });
+      }
+
+      toast.success(
+        isBangla
+          ? 'শিক্ষার্থীর তথ্য ও স্ট্যাটাস সফলভাবে আপডেট করা হয়েছে!'
+          : 'Student profile & status updated successfully!'
+      );
+      setEditingStudent(null);
+      fetchStudents();
+    } catch (err: any) {
+      const errData = err.response?.data;
+      const msg =
+        errData?.detail ||
+        errData?.error?.message ||
+        errData?.registration_no?.[0] ||
+        (isBangla ? 'শিক্ষার্থীর তথ্য আপডেট করা সম্ভব হয়নি।' : 'Failed to update student');
+      toast.error(msg);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   const fetchStudents = async () => {
     try {
@@ -363,6 +443,7 @@ export default function AdminStudentsPage() {
                   <th className="py-3 px-4">{isBangla ? 'পটভূমি' : 'Background'}</th>
                   <th className="py-3 px-4">{isBangla ? 'মোবাইল নম্বর' : 'Phone'}</th>
                   <th className="py-3 px-4">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
+                  <th className="py-3 px-4 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -399,9 +480,36 @@ export default function AdminStudentsPage() {
                       {st.phone || '-'}
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                        {st.status || 'Active'}
-                      </span>
+                      {st.status === 'active' ? (
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold border border-emerald-200 flex items-center gap-1 w-fit">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          {isBangla ? 'সক্রিয়' : 'Active'}
+                        </span>
+                      ) : st.status === 'expelled' ? (
+                        <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-extrabold border border-rose-200 flex items-center gap-1 w-fit">
+                          <Ban className="w-3 h-3 text-rose-600" />
+                          {isBangla ? 'বহিষ্কৃত' : 'Expelled'}
+                        </span>
+                      ) : st.status === 'dropped' ? (
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold border border-amber-200 flex items-center gap-1 w-fit">
+                          <UserX className="w-3 h-3 text-amber-600" />
+                          {isBangla ? 'ড্রপ / বাদ' : 'Dropped'}
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-extrabold border border-slate-200 flex items-center gap-1 w-fit">
+                          {isBangla ? 'নিষ্ক্রিয়' : 'Inactive'}
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-right">
+                      <button
+                        onClick={() => openEditModal(st)}
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0B2A21] hover:text-[#E5C378] text-slate-700 text-xs font-bold transition flex items-center gap-1.5 ml-auto cursor-pointer shadow-2xs active:scale-95"
+                        title={isBangla ? 'শিক্ষার্থীর তথ্য ও স্ট্যাটাস সম্পাদনা করুন' : 'Edit Student'}
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>{isBangla ? 'সম্পাদনা' : 'Edit'}</span>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -757,6 +865,265 @@ export default function AdminStudentsPage() {
                       <span>{isBangla ? 'ইমপোর্ট শুরু করুন' : 'Start Import'}</span>
                     </>
                   )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Student Profile & Status Modal */}
+      {editingStudent && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C5A059] space-y-4 max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-extrabold text-[#0B2A21] flex items-center gap-2">
+                  <Edit3 className="w-5 h-5 text-[#C5A059]" />
+                  <span>
+                    {isBangla ? 'শিক্ষার্থীর তথ্য ও স্ট্যাটাস সম্পাদনা' : 'Edit Student Profile & Lifecycle'}
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                  {editingStudent.student_id_number} • {editingStudent.full_name}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingStudent(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateStudent} className="space-y-4 text-xs">
+              {/* Full Name & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isBangla ? 'শিক্ষার্থীর পূর্ণ নাম *' : 'Full Name *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editFormData.full_name}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, full_name: e.target.value })
+                    }
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isBangla ? 'মোবাইল নম্বর' : 'Phone'}
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.phone}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, phone: e.target.value })
+                    }
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                  />
+                </div>
+              </div>
+
+              {/* Reg No & Guardian Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isBangla ? 'রেজিস্ট্রেশন নম্বর *' : 'Registration No *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editFormData.registration_no}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, registration_no: e.target.value })
+                    }
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isBangla ? 'অভিভাবকের মোবাইল' : 'Guardian Phone'}
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.guardian_phone}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, guardian_phone: e.target.value })
+                    }
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                  />
+                </div>
+              </div>
+
+              {/* Background & Batch */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isBangla ? 'শিক্ষাগত পটভূমি' : 'Education Background'}
+                  </label>
+                  <select
+                    value={editFormData.education_background}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        education_background: e.target.value,
+                      })
+                    }
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                  >
+                    <option value="General">General (জেনারেল)</option>
+                    <option value="Aliya">Aliya Madrasa (আলিয়া মাদ্রাসা)</option>
+                    <option value="Qawmi">Qawmi Madrasa (কওমি মাদ্রাসা)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isBangla ? 'বর্তমান ব্যাচ স্থানান্তর' : 'Batch Allocation'}
+                  </label>
+                  <select
+                    value={editFormData.batch_id}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, batch_id: e.target.value })
+                    }
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0B2A21]"
+                  >
+                    <option value="">{isBangla ? '-- ব্যাচ নির্বাচন করুন --' : '-- Select Batch --'}</option>
+                    {batches.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name} (Batch #{b.batch_number})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Student Lifecycle Status (Crucial) */}
+              <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-xl space-y-2">
+                <label className="block font-extrabold text-[#0B2A21] flex items-center gap-1.5">
+                  <ShieldAlert className="w-4 h-4 text-[#C5A059]" />
+                  <span>{isBangla ? 'শিক্ষার্থীর অবস্থা / স্ট্যাটাস (Status Lifecycle)' : 'Student Status'}</span>
+                </label>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <label
+                    className={`p-2.5 rounded-lg border flex items-center gap-2 cursor-pointer transition ${
+                      editFormData.status === 'active'
+                        ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-bold'
+                        : 'bg-white border-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="status"
+                      value="active"
+                      checked={editFormData.status === 'active'}
+                      onChange={(e) =>
+                        setEditFormData({ ...editFormData, status: e.target.value })
+                      }
+                      className="accent-[#0B2A21]"
+                    />
+                    <span>{isBangla ? 'সক্রিয় (Active)' : 'Active'}</span>
+                  </label>
+
+                  <label
+                    className={`p-2.5 rounded-lg border flex items-center gap-2 cursor-pointer transition ${
+                      editFormData.status === 'inactive'
+                        ? 'bg-slate-100 border-slate-500 text-slate-900 font-bold'
+                        : 'bg-white border-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="status"
+                      value="inactive"
+                      checked={editFormData.status === 'inactive'}
+                      onChange={(e) =>
+                        setEditFormData({ ...editFormData, status: e.target.value })
+                      }
+                      className="accent-slate-700"
+                    />
+                    <span>{isBangla ? 'নিষ্ক্রিয় (Inactive)' : 'Inactive'}</span>
+                  </label>
+
+                  <label
+                    className={`p-2.5 rounded-lg border flex items-center gap-2 cursor-pointer transition ${
+                      editFormData.status === 'dropped'
+                        ? 'bg-amber-50 border-amber-500 text-amber-950 font-bold'
+                        : 'bg-white border-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="status"
+                      value="dropped"
+                      checked={editFormData.status === 'dropped'}
+                      onChange={(e) =>
+                        setEditFormData({ ...editFormData, status: e.target.value })
+                      }
+                      className="accent-amber-600"
+                    />
+                    <span>{isBangla ? 'ড্রপ / বাদ (Dropped)' : 'Dropped'}</span>
+                  </label>
+
+                  <label
+                    className={`p-2.5 rounded-lg border flex items-center gap-2 cursor-pointer transition ${
+                      editFormData.status === 'expelled'
+                        ? 'bg-rose-50 border-rose-500 text-rose-950 font-bold'
+                        : 'bg-white border-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="status"
+                      value="expelled"
+                      checked={editFormData.status === 'expelled'}
+                      onChange={(e) =>
+                        setEditFormData({ ...editFormData, status: e.target.value })
+                      }
+                      className="accent-rose-600"
+                    />
+                    <span>{isBangla ? 'বহিষ্কৃত (Expelled)' : 'Expelled'}</span>
+                  </label>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  {isBangla
+                    ? 'বহিষ্কৃত বা ড্রপ করা হলে শিক্ষার্থী সিস্টেমে লগইন করতে পারবে না।'
+                    : 'Expelling or dropping a student suspends account login access.'}
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingStudent(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition cursor-pointer"
+                >
+                  {isBangla ? 'বাতিল' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={updating}
+                  className="px-5 py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] font-bold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {updating ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C5A059]" />
+                  ) : (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A059]" />
+                  )}
+                  <span>
+                    {updating
+                      ? isBangla
+                        ? 'আপডেট হচ্ছে...'
+                        : 'Updating...'
+                      : isBangla
+                        ? 'পরিবর্তন সংরক্ষণ করুন'
+                        : 'Save Changes'}
+                  </span>
                 </button>
               </div>
             </form>

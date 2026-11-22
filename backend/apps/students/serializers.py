@@ -34,9 +34,9 @@ class EnrollmentSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     """Full student serializer for Admin, Coordinator, Teacher and Student self-view."""
 
-    full_name = serializers.CharField(source="user.full_name")
+    full_name = serializers.CharField(source="user.full_name", required=False)
     email = serializers.EmailField(source="user.email", read_only=True)
-    phone = serializers.CharField(source="user.phone", read_only=True)
+    phone = serializers.CharField(source="user.phone", required=False)
     campus_name = serializers.CharField(source="campus.name", read_only=True)
     current_batch_id = serializers.SerializerMethodField()
     current_batch_name = serializers.SerializerMethodField()
@@ -78,9 +78,25 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", {})
+        user_fields_to_update = []
         if "full_name" in user_data:
             instance.user.full_name = user_data["full_name"]
-            instance.user.save(update_fields=["full_name"])
+            user_fields_to_update.append("full_name")
+        if "phone" in user_data:
+            instance.user.phone = user_data["phone"]
+            user_fields_to_update.append("phone")
+
+        new_status = validated_data.get("status")
+        if new_status:
+            if new_status in [StudentStatus.DROPPED, StudentStatus.EXPELLED]:
+                instance.user.is_active = False
+                user_fields_to_update.append("is_active")
+            elif new_status == StudentStatus.ACTIVE:
+                instance.user.is_active = True
+                user_fields_to_update.append("is_active")
+
+        if user_fields_to_update:
+            instance.user.save(update_fields=list(set(user_fields_to_update)))
 
         return super().update(instance, validated_data)
 

@@ -280,12 +280,15 @@ class HelpRequestViewSet(viewsets.ReadOnlyModelViewSet):
         hr = self.get_object()
         user = request.user
 
-        if user.role == UserRole.TEACHER and hr.teacher_user != user:
+        if user.role == UserRole.STUDENT:
+            if hr.student.user != user:
+                raise PermissionDenied("You can only update your own help requests.")
+        elif user.role == UserRole.TEACHER and hr.teacher_user != user:
             raise PermissionDenied("You can only update help requests assigned to you.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=hr.session.batch.course).exists():
                 raise PermissionDenied("You can only update requests for your assigned course(s).")
-        elif user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR, UserRole.TEACHER]:
+        elif user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR, UserRole.TEACHER, UserRole.STUDENT]:
             raise PermissionDenied("You do not have permission to update help requests.")
 
         try:
@@ -301,12 +304,15 @@ class HelpRequestViewSet(viewsets.ReadOnlyModelViewSet):
         hr = self.get_object()
         user = request.user
 
-        if user.role == UserRole.TEACHER and hr.teacher_user != user:
+        if user.role == UserRole.STUDENT:
+            if hr.student.user != user:
+                raise PermissionDenied("You can only resolve your own help requests.")
+        elif user.role == UserRole.TEACHER and hr.teacher_user != user:
             raise PermissionDenied("You can only resolve help requests assigned to you.")
         elif user.role == UserRole.COORDINATOR:
             if not user.coordinator_course_assignments.filter(course=hr.session.batch.course).exists():
                 raise PermissionDenied("You can only resolve requests for your assigned course(s).")
-        elif user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR, UserRole.TEACHER]:
+        elif user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR, UserRole.TEACHER, UserRole.STUDENT]:
             raise PermissionDenied("You do not have permission to resolve help requests.")
 
         serializer = HelpRequestResolveSerializer(data=request.data)

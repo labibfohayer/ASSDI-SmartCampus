@@ -12,7 +12,9 @@ class EducationBackground(models.TextChoices):
 
 class StudentStatus(models.TextChoices):
     ACTIVE = "active", "Active"
+    INACTIVE = "inactive", "Inactive"
     DROPPED = "dropped", "Dropped / Deactivated"
+    EXPELLED = "expelled", "Expelled"
     TRANSFERRED = "transferred", "Transferred"
 
 

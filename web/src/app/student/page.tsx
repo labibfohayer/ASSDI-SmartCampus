@@ -21,6 +21,7 @@ import {
   QrCode,
 } from 'lucide-react';
 import WebQRScannerModal from '@/components/student/WebQRScannerModal';
+import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -114,6 +115,7 @@ export default function StudentPortalPage() {
   const [feedbackComment, setFeedbackComment] = useState<string>('');
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [feedbackSuccessMsg, setFeedbackSuccessMsg] = useState<string | null>(null);
+  const [resolvingHelpId, setResolvingHelpId] = useState<number | null>(null);
 
   useEffect(() => {
     loadStudentData();
@@ -172,19 +174,31 @@ export default function StudentPortalPage() {
     e.preventDefault();
     if (!selectedSessionForFeedback) return;
 
+    // Strict Anti-Fakibaz Validation:
+    // If understanding is less than 100% (rating < 5) or needs_help is true,
+    // student MUST specify exactly what was not understood.
+    if ((feedbackRating < 5 || feedbackNeedsHelp) && feedbackComment.trim().length < 8) {
+      toast.error(
+        isBangla
+          ? 'যেহেতু পুরো পাঠটি সম্পূর্ণ বুঝতে পারেননি, ক্লাসের কোন নির্দিষ্ট অংশটি বুঝতে সমস্যা হয়েছে তা স্পষ্টভাবে উল্লেখ করুন।'
+          : 'Please specifically describe which part of the class you struggled with.'
+      );
+      return;
+    }
+
     setSubmittingFeedback(true);
     setFeedbackSuccessMsg(null);
     try {
       await api.post('/api/v1/feedback/', {
         session: selectedSessionForFeedback.id,
         understanding_rating: feedbackRating,
-        needs_help: feedbackNeedsHelp,
+        needs_help: feedbackNeedsHelp || feedbackRating <= 3,
         student_comment: feedbackComment.trim(),
       });
 
       setFeedbackSuccessMsg(
         isBangla
-          ? 'আলহামদুলিল্লাহ! আপনার ক্লাসের ফিডব্যাক সফলভাবে জমা হয়েছে।'
+          ? 'আলহামদুলিল্লাহ! আপনার ক্লাসের মূল্যায়ন সফলভাবে জমা হয়েছে।'
           : 'Alhamdulillah! Your session feedback has been submitted successfully.'
       );
 
@@ -204,7 +218,7 @@ export default function StudentPortalPage() {
         setFeedbackSuccessMsg(null);
       }, 1500);
     } catch (err: any) {
-      alert(
+      toast.error(
         err?.response?.data?.detail ||
           err?.response?.data?.error?.message ||
           (isBangla ? 'ফিডব্যাক জমা দিতে ব্যর্থ হয়েছে।' : 'Failed to submit feedback.')
@@ -214,17 +228,62 @@ export default function StudentPortalPage() {
     }
   };
 
+  const handleMarkHelpResolved = async (helpRequestId: number) => {
+    setResolvingHelpId(helpRequestId);
+    try {
+      const target = helpRequests.find((h) => h.id === helpRequestId);
+      if (target?.status === 'pending') {
+        await api.post(`/api/v1/help-requests/${helpRequestId}/start/`);
+      }
+      await api.post(`/api/v1/help-requests/${helpRequestId}/resolve/`, {
+        teacher_note: isBangla
+          ? 'শিক্ষার্থী নিজে অনুশীলন করে/শিক্ষকের সাথে কথা বলে বিষয়টি সম্পূর্ণ বুঝে নিয়েছেন।'
+          : 'Student reviewed and fully understood the topic.',
+      });
+      toast.success(
+        isBangla
+          ? 'মাশাআল্লাহ! বিষয়টি এখন সম্পূর্ণ বুঝে গেছেন হিসেবে সমাধান করা হয়েছে।'
+          : 'Marked as understood and resolved!'
+      );
+      loadStudentData();
+    } catch (err: any) {
+      toast.error(isBangla ? 'স্ট্যাটাস আপডেট করা যায়নি' : 'Failed to update status');
+    } finally {
+      setResolvingHelpId(null);
+    }
+  };
+
   const safeFixed = (val: any, decimals = 1): string => {
     if (val === null || val === undefined || isNaN(Number(val))) return 'N/A';
     return Number(val).toFixed(decimals);
   };
 
-  const ratingDescriptions: Record<number, { bn: string; en: string }> = {
-    1: { bn: 'খুব কম বুঝেছি (১/৫)', en: 'Very Low Understanding (1/5)' },
-    2: { bn: 'আংশিক বুঝেছি (২/৫)', en: 'Partial Understanding (2/5)' },
-    3: { bn: 'মোটামুটি বুঝেছি (৩/৫)', en: 'Moderate Understanding (3/5)' },
-    4: { bn: 'ভালো বুঝেছি (৪/৫)', en: 'Good Understanding (4/5)' },
-    5: { bn: 'চমৎকারভাবে বুঝেছি (৫/৫)', en: 'Excellent Understanding (5/5)' },
+  const ratingDescriptions: Record<number, { bn: string; en: string; pct: string }> = {
+    1: {
+      bn: '২০% বুঝেছি, বাকি ৮০% বুঝতে পারিনি (সহায়তা আবশ্যক)',
+      en: '20% Understood, 80% struggle (Assistance Needed)',
+      pct: '২০%',
+    },
+    2: {
+      bn: '৪০% বুঝেছি, বাকি ৬০% অস্পষ্ট (সহায়তা আবশ্যক)',
+      en: '40% Understood, 60% unclear (Assistance Needed)',
+      pct: '৪০%',
+    },
+    3: {
+      bn: '৬০% বুঝেছি, বাকি ৪০% আরও স্পষ্ট হওয়া দরকার',
+      en: '60% Understood, 40% needs review',
+      pct: '৬০%',
+    },
+    4: {
+      bn: '৮০% ভালোভাবে বুঝেছি, সামান্য কিছু অস্পষ্ট',
+      en: '80% Good Understanding, minor queries',
+      pct: '৮০%',
+    },
+    5: {
+      bn: '১০০% সম্পূর্ণ পাঠ চমৎকারভাবে বুঝতে পেরেছি',
+      en: '100% Full & Complete Understanding',
+      pct: '১০০%',
+    },
   };
 
   // Check if student already gave feedback for a session
@@ -683,6 +742,28 @@ export default function StudentPortalPage() {
                       : 'Teacher will review and answer your request soon.'}
                   </p>
                 )}
+
+                {hr.status !== 'resolved' && (
+                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <p className="text-[11px] text-slate-500 font-medium">
+                      {isBangla
+                        ? 'পাঠটি কি এখন বুঝে গেছেন?'
+                        : 'Do you now understand this topic?'}
+                    </p>
+                    <button
+                      onClick={() => handleMarkHelpResolved(hr.id)}
+                      disabled={resolvingHelpId === hr.id}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-[#0B2A21] hover:text-[#E5C378] text-emerald-800 border border-emerald-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>
+                        {resolvingHelpId === hr.id
+                          ? isBangla ? 'আপডেট হচ্ছে...' : 'Updating...'
+                          : isBangla ? 'আলহামদুলিল্লাহ, এখন বুঝে গেছি' : 'Mark as Understood'}
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
 
@@ -737,19 +818,27 @@ export default function StudentPortalPage() {
               </div>
             ) : (
               <form onSubmit={handleFeedbackSubmit} className="space-y-4">
-                {/* 5-Star Rating Buttons */}
+                {/* 5-Star / Percentage Rating Buttons */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-2">
-                    {isBangla
-                      ? 'আজকের পাঠ আপনি কেমন বুঝতে পেরেছেন?'
-                      : 'How well did you understand this topic?'}
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-bold text-slate-700">
+                      {isBangla
+                        ? 'আজকের পাঠ আপনি শতকরা কতটুকু বুঝেছেন?'
+                        : 'How much of this class did you understand?'}
+                    </label>
+                    <span className="text-xs font-black text-[#0B2A21] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      {ratingDescriptions[feedbackRating]?.pct}
+                    </span>
+                  </div>
                   <div className="flex items-center justify-between gap-1.5">
                     {[1, 2, 3, 4, 5].map((starVal) => (
                       <button
                         key={starVal}
                         type="button"
-                        onClick={() => setFeedbackRating(starVal)}
+                        onClick={() => {
+                          setFeedbackRating(starVal);
+                          if (starVal < 5) setFeedbackNeedsHelp(true);
+                        }}
                         className={`flex-1 py-2.5 rounded-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer active:scale-95 ${
                           feedbackRating >= starVal
                             ? 'bg-amber-50 border-2 border-amber-500 text-amber-900 shadow-xs'
@@ -763,16 +852,37 @@ export default function StudentPortalPage() {
                               : 'text-slate-300'
                           }`}
                         />
-                        <span className="text-[11px] font-extrabold">{starVal}</span>
+                        <span className="text-[10px] font-extrabold font-mono">
+                          {starVal === 1 ? '২০%' : starVal === 2 ? '৪০%' : starVal === 3 ? '৬০%' : starVal === 4 ? '৮০%' : '১০০%'}
+                        </span>
                       </button>
                     ))}
                   </div>
-                  <p className="text-center text-xs font-bold text-[#0B2A21] mt-2.5 bg-emerald-50/60 py-1 rounded-md border border-emerald-100">
+                  <p className="text-center text-xs font-bold text-[#0B2A21] mt-2.5 bg-emerald-50/60 py-1.5 px-3 rounded-md border border-emerald-100">
                     {isBangla
                       ? ratingDescriptions[feedbackRating]?.bn
                       : ratingDescriptions[feedbackRating]?.en}
                   </p>
                 </div>
+
+                {/* Anti-Fakibaz Guardrail Notice if not 100% */}
+                {feedbackRating < 5 && (
+                  <div className="p-3 bg-amber-50/90 border border-amber-200/90 rounded-xl text-xs text-amber-950 space-y-1">
+                    <p className="font-extrabold flex items-center gap-1.5 text-amber-900">
+                      <AlertCircle className="w-4 h-4 text-amber-600" />
+                      <span>
+                        {isBangla
+                          ? 'সুনির্দিষ্ট কারণ উল্লেখ করা আবশ্যক'
+                          : 'Specific Explanation Required'}
+                      </span>
+                    </p>
+                    <p className="text-[11px] text-amber-800 leading-snug">
+                      {isBangla
+                        ? `যেহেতু আপনি পাঠের ${ratingDescriptions[feedbackRating]?.pct} বুঝেছেন এবং বাকি অংশ বুঝতে পারেননি, শিক্ষককে নির্দিষ্টভাবে জানাতে নিচের বক্সে কোন অংশটি/ধাপটি বুঝেননি তা লিখুন। ফাঁকিবাজি রোধে সুনির্দিষ্ট বিবরণ ছাড়া জমা হবে না।`
+                        : `Since you understood ${ratingDescriptions[feedbackRating]?.pct}, describe specifically which concept was unclear so the teacher can resolve it.`}
+                    </p>
+                  </div>
+                )}
 
                 {/* Need Help Checkbox */}
                 <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-200/80">
@@ -798,30 +908,31 @@ export default function StudentPortalPage() {
                   </label>
                 </div>
 
-                {/* Optional Comment / Question */}
+                {/* Specific Problem Description Field */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    {feedbackNeedsHelp
+                    {feedbackRating < 5 || feedbackNeedsHelp
                       ? isBangla
-                        ? 'আপনার সুনির্দিষ্ট প্রশ্ন বা সমস্যা লিখুন (বাধ্যতামূলক):'
-                        : 'Explain your specific problem (Required):'
+                        ? 'ক্লাসের কোন অংশটি বা বিষয়টি বুঝতে পারেননি (বাধ্যতামূলক):'
+                        : 'Specify which part/concept was not understood (Required):'
                       : isBangla
-                      ? 'অতিরিক্ত মন্তব্য (ঐচ্ছিক):'
+                      ? 'অতিরিক্ত মন্তব্য বা অভিজ্ঞতা (ঐচ্ছিক):'
                       : 'Additional Comments (Optional):'}
                   </label>
                   <textarea
                     rows={2}
-                    required={feedbackNeedsHelp}
+                    required={feedbackRating < 5 || feedbackNeedsHelp}
+                    minLength={feedbackRating < 5 || feedbackNeedsHelp ? 8 : 0}
                     value={feedbackComment}
                     onChange={(e) => setFeedbackComment(e.target.value)}
                     placeholder={
-                      feedbackNeedsHelp
+                      feedbackRating < 5 || feedbackNeedsHelp
                         ? isBangla
-                          ? 'উদা: প্র্যাক্টিক্যাল করার সময় ৩য় ধাপে বুঝতে সমস্যা হচ্ছে...'
-                          : 'E.g., Having trouble on step 3 in practical...'
+                          ? 'উদা: হিসাবের ৩য় জার্নাল এন্ট্রি বা ডেবিল-ক্রেডিট রুল বুঝতে সমস্যা হয়েছে... (সুনির্দিষ্ট সমস্যা লিখুন)'
+                          : 'E.g., Having trouble understanding the 3rd journal entry formula in practice...'
                         : isBangla
-                        ? 'আলহামদুলিল্লাহ ভালো ক্লাস হয়েছে...'
-                        : 'Overall good session...'
+                        ? 'আলহামদুলিল্লাহ পুরো পাঠটি চমৎকারভাবে বুঝতে পেরেছি...'
+                        : 'Understood everything clearly...'
                     }
                     className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#0B2A21] focus:ring-1 focus:ring-[#0B2A21]"
                   />
