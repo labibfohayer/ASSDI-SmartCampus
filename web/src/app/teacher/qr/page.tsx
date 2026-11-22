@@ -44,6 +44,7 @@ export default function LiveQrProjectorPage() {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(45);
   const [loadingToken, setLoadingToken] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [reopeningWindow, setReopeningWindow] = useState<boolean>(false);
   const [attendedCount, setAttendedCount] = useState<number>(0);
   const [totalStudents, setTotalStudents] = useState<number>(0);
 
@@ -98,16 +99,65 @@ export default function LiveQrProjectorPage() {
       // Fetch live attendance count
       fetchAttendanceSummary();
     } catch (err: any) {
-      const msg =
+      const rawMsg = String(
         err.response?.data?.error?.message ||
         err.response?.data?.detail ||
-        (isBangla
+        ''
+      );
+
+      let msg = rawMsg;
+      if (rawMsg.includes('closed') || rawMsg.includes('window')) {
+        msg = isBangla
+          ? 'ক্লাস শুরুর নির্ধারিত ১৫ মিনিটের কিউআর উইন্ডোটি বন্ধ হয়ে গেছে।'
+          : 'The 15-minute QR attendance window has closed.';
+      } else if (rawMsg.includes('start time')) {
+        msg = isBangla
+          ? 'ক্লাস শুরুর নির্ধারিত সময়ের পূর্বে কিউআর কোড চালু করা যায় না।'
+          : 'QR token can only be generated starting at class start time.';
+      } else if (!msg) {
+        msg = isBangla
           ? 'কিউআর কোড প্রস্তুত করা যায়নি। কিউআর উইন্ডোটি ক্লাস শুরুর সময় থেকে ১৫ মিনিট পর্যন্ত উন্মুক্ত থাকে।'
-          : 'Unable to generate QR token. QR window is active only within 15 minutes of class start.');
+          : 'Unable to generate QR token. QR window is active only within 15 minutes of class start.';
+      }
       setErrorMessage(msg);
       setQrToken(null);
     } finally {
       setLoadingToken(false);
+    }
+  };
+
+  const handleReopenWindow = async () => {
+    if (!selectedSessionId) return;
+    setReopeningWindow(true);
+    try {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = '00';
+      await api.patch(`/api/v1/class-sessions/${selectedSessionId}/`, {
+        start_time: `${hh}:${mm}:${ss}`,
+      });
+      toast.success(
+        isBangla
+          ? 'কিউআর উইন্ডো সফলভাবে সক্রিয় করা হয়েছে।'
+          : 'QR window reopened successfully.'
+      );
+      // Reload sessions to update start time in dropdown and fetch token
+      const res = await api.get('/api/v1/class-sessions/today/');
+      let list: SessionOption[] = [];
+      if (Array.isArray(res.data)) list = res.data;
+      else if (res.data?.results) list = res.data.results;
+      else if (res.data?.data) list = res.data.data;
+      if (list.length > 0) setSessions(list);
+      fetchQrToken();
+    } catch (err: any) {
+      toast.error(
+        isBangla
+          ? 'উইন্ডো সক্রিয় করা যায়নি।'
+          : 'Failed to reopen QR window.'
+      );
+    } finally {
+      setReopeningWindow(false);
     }
   };
 
@@ -283,17 +333,27 @@ export default function LiveQrProjectorPage() {
                 </p>
               </div>
             ) : errorMessage ? (
-              <div className="w-72 h-72 rounded-2xl bg-amber-50 border-2 border-amber-200 p-6 flex flex-col items-center justify-center text-center gap-3">
+              <div className="w-80 rounded-2xl bg-amber-50/90 border-2 border-amber-200 p-6 flex flex-col items-center justify-center text-center gap-3 shadow-xs">
                 <AlertTriangle className="w-10 h-10 text-amber-600" />
-                <p className="text-xs font-bold text-amber-800 leading-snug">
+                <p className="text-xs font-bold text-amber-900 leading-relaxed">
                   {errorMessage}
                 </p>
-                <button
-                  onClick={fetchQrToken}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition"
-                >
-                  {isBangla ? 'আবার চেষ্টা করুন' : 'Retry'}
-                </button>
+                <div className="flex flex-col w-full gap-2 mt-1">
+                  <button
+                    onClick={handleReopenWindow}
+                    disabled={reopeningWindow}
+                    className="w-full py-2 bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] text-xs font-bold rounded-xl border border-[#C5A059]/40 transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 text-[#C5A059] ${reopeningWindow ? 'animate-spin' : ''}`} />
+                    <span>{isBangla ? 'এখনই কিউআর উইন্ডো চালু করুন' : 'Activate QR Window Now'}</span>
+                  </button>
+                  <button
+                    onClick={fetchQrToken}
+                    className="w-full py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 transition cursor-pointer"
+                  >
+                    {isBangla ? 'আবার চেষ্টা করুন' : 'Retry'}
+                  </button>
+                </div>
               </div>
             ) : qrToken ? (
               <div className="p-4 bg-white rounded-2xl border-2 border-gray-200 shadow-inner flex items-center justify-center relative">
