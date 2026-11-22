@@ -1,9 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Hind_Siliguri } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Toaster } from 'react-hot-toast';
+import { PwaInstaller } from '@/components/pwa/PwaInstaller';
 
 const hindSiliguri = Hind_Siliguri({
   weight: ['300', '400', '500', '600', '700'],
@@ -15,6 +16,19 @@ const hindSiliguri = Hind_Siliguri({
 export const metadata: Metadata = {
   title: 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট | ASSDI',
   description: 'শিক্ষার্থী লার্নিং প্রগ্রেস, ফিডব্যাক ও ম্যানেজমেন্ট সিস্টেম - স্মল বিজনেস ম্যানেজমেন্ট কোর্স (SBMC)',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'ASSDI Portal',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#1B4D3E',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -26,7 +40,12 @@ export default function RootLayout({
     <html lang="bn" suppressHydrationWarning className={`${hindSiliguri.variable} h-full antialiased`}>
       <head>
         <link rel="icon" type="image/png" href="/logo.png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="ASSDI Portal" />
+        <meta name="mobile-web-app-capable" content="yes" />
         {/* Strip browser extension injected attributes to prevent React hydration errors */}
         <script
           dangerouslySetInnerHTML={{
@@ -74,6 +93,7 @@ export default function RootLayout({
         <LanguageProvider>
           <AuthProvider>
             {children}
+            <PwaInstaller />
             <Toaster
               position="top-right"
               toastOptions={{

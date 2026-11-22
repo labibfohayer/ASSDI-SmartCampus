@@ -33,7 +33,9 @@ import {
   Settings,
   Bookmark,
   Archive,
+  Smartphone,
 } from 'lucide-react';
+import { triggerPwaInstall } from '@/components/pwa/PwaInstaller';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
@@ -700,6 +702,21 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               <LogOut className="w-4 h-4" />
             </button>
           </div>
+
+          {/* Mobile PWA Install Trigger */}
+          <button
+            type="button"
+            onClick={triggerPwaInstall}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/90 text-emerald-300 border border-emerald-800/50 text-[11px] font-medium transition cursor-pointer"
+          >
+            <span className="flex items-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{isBangla ? 'হোমস্ক্রিনে অ্যাপ ইনস্টল' : 'Install PWA App'}</span>
+            </span>
+            <span className="bg-emerald-800 text-[9px] text-white px-1.5 py-0.5 rounded-md font-bold">
+              {isBangla ? 'যুক্ত করুন' : 'Install'}
+            </span>
+          </button>
 
           {/* Language Switcher Bar */}
           <div className="flex items-center justify-between px-2 pt-1">
