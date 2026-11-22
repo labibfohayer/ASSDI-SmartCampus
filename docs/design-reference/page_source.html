@@ -1,0 +1,1262 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+  <!-- Title & Description (SEO) -->
+  <title>Madrasatus Sunnah</title>
+  <meta name="description" content="Madrasatus Sunnah delivers excellence in Islamic and modern education — combining Qur’an, Hadith, Arabic, and general studies to nurture a generation rooted in faith and prepared for the challenges of the modern world." />
+  <meta name="keywords" content="Madrasha, Islamic School, Quran, Hadith, Arabic Studies, Islamic Education Bangladesh, Madrasatus Sunnah" />
+  <meta name="author" content="Madrasatus Sunnah" />
+  <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://madrasatussunnah.org/" />
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="https://madrasatussunnah.org/images/favicon.png" />
+  <link rel="apple-touch-icon" href="https://madrasatussunnah.org/images/favicon.png" />
+
+  <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://madrasatussunnah.org/" />
+<meta property="og:title" content="Madrasatus Sunnah" />
+<meta property="og:description" content="Madrasatus Sunnah delivers excellence in Islamic and modern education — combining Qur’an, Hadith, Arabic, and general studies to nurture a generation rooted in faith and prepared for the challenges of the modern world." />
+<meta property="og:image" content="https://madrasatussunnah.org/images/ms_circle2.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Madrasatus Sunnah" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content="https://madrasatussunnah.org/" />
+<meta name="twitter:title" content="Madrasatus Sunnah" />
+<meta name="twitter:description" content="Learn Quran, Hadith, Arabic, and modern studies at Madrasatus Sunnah with a balanced Islamic curriculum." />
+<meta name="twitter:image" content="https://madrasatussunnah.org/images/ms_circle2.png" />
+
+<!-- Schema.org JSON-LD (Educational Organization) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "Madrasatus Sunnah",
+  "url": "https://madrasatussunnah.org/",
+  "logo": "https://madrasatussunnah.org/images/favicon.png",
+  "sameAs": [
+    "https://www.facebook.com/madrasatussunnah.org",
+    "https://www.youtube.com/@Diniyatcourse"
+  ],
+  "description": "Madrasatus Sunnah is a combined madrasha in Bangladesh, providing Islamic education including Quran, Hadith, Arabic, and modern studies.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "BD"
+  }
+}
+</script>
+
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://madrasatussunnah.org/css/custom_style.css?v=26" />
+  <link rel="stylesheet" href="https://madrasatussunnah.org/css/custom.css" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Acme&family=Noto+Serif+Bengali:wght@100..900&display=swap" rel="stylesheet" />
+
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />-->
+  <!-- Bootstrap 5 CSS -->
+
+
+</head>
+
+  <style>
+.border-red-500 {
+    border-color: rgb(239 68 68 / 1);
+}
+.text-red-800 {
+    color: rgb(153 27 27 / 1);
+}
+.border-red-400 {
+    border-color: rgb(248 113 113 / 1);
+}
+.bg-red-50 {
+    background-color: rgb(254 242 242 / 1);
+}
+.text-pink-300 {
+    color: rgb(249 168 212 / 1);
+}
+    body {
+      font-family: 'Tiro Bangla', sans-serif;
+    }
+
+
+/* Optional: prevent any AOS transformed elements from breaking viewport */
+[data-aos] {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+    /* Typography */
+    body {
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Noto Serif Bengali', serif;
+    }
+
+    /* Notice Marquee */
+    @keyframes marquee {
+      0% {
+        transform: translateX(100%);
+      }
+
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    .animate-marquee {
+      animation: marquee 100s linear infinite;
+    }
+
+    /* Nav Hover Animation */
+    nav a {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      left: 0;
+      bottom: -4px;
+      background: #0f766e;
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    /* Dropdown animation */
+    .dropdown-menu {
+      transform: translateY(-10px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .group:hover .dropdown-menu {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Mobile menu animation */
+    #mobileMenu {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: calc(100vh - 72px);
+      max-height: calc(100dvh - 72px);
+      transition: max-height 0.4s ease;
+    }
+
+    /* Prevent page-level horizontal scrolling from wide/transformed content.
+       Applied to the root only so body never becomes a second scroller. */
+    html {
+      overflow-x: hidden;
+    }
+    @media (max-width: 1024px) {
+        .mhide{
+            display:none;
+        }
+        html, body {
+          max-width: 100%;
+        }
+    }
+    /* The full menu is ~770px wide, so show it only where it fits and keep
+       the hamburger on tablets (same 1024px boundary as .mhide). */
+    @media (max-width: 1023.98px) {
+      .nav-desktop { display: none !important; }
+      .nav-toggle { display: block !important; }
+    }
+    .top_btn{
+        border-radius:3px;
+    }
+    .top_btn:hover{
+        color:rgb(15 118 110 / var(--tw-bg-opacity, 1));
+        background:#fff;
+        cursor:pointer;
+    }
+     .head_nav {
+        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .head_nav.sticky {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0 8px 22px -12px rgba(15,23,42,.55);
+        z-index: 999;
+        animation: navDrop 0.32s ease;
+      }
+      /* Add .stop_sticky_nav on <body> to disable the pinned nav */
+      body.stop_sticky_nav .head_nav.sticky {
+        position: static;
+        animation: none;
+        box-shadow: none;
+      }
+      @keyframes navDrop {
+        from { transform: translateY(-100%); }
+        to   { transform: translateY(0); }
+      }
+      nav button{
+        background: transparent;
+      }
+  </style>
+</head>
+
+<body data-scroll-container>
+  <!-- Header Notice -->
+<header class="bg-teal-700 text-white py-3">
+  <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0" style="padding-left:2rem">
+
+    <!-- Contact Info -->
+    <div class="flex flex-col md:flex-row items-center gap-2 md:gap-8 text-sm text-center md:text-left">
+      <div class="flex items-center gap-2">
+        <span class="text-orange-400 font-semibold">Call Us:</span>
+        <span>+8809639151525</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-orange-400 font-semibold">Email:</span>
+        <span>info@madrasatussunnah.org</span>
+      </div>
+    </div>
+
+    <!-- Social + Login -->
+    <div class="flex flex-col md:flex-row items-center gap-3">
+      <div class="flex items-center gap-3">
+          <a href="https://www.facebook.com/madrasatussunnah.org" class="h-8 w-8 rounded-full border border-orange-400 flex items-center justify-center text-orange-400 hover:bg-orange-400 hover:text-white transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        
+        <!--<a href="https://wa.me/8801409979959" target="_blank" class="h-8 w-8 rounded-full border border-orange-400 flex items-center justify-center text-orange-400 hover:bg-orange-400 hover:text-white transition-colors">-->
+        <!--  <svg fill="#fb923c" width="16px" height="16px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#fb923c">-->
+
+        <!--    <g id="SVGRepo_bgCarrier" stroke-width="0"/>-->
+            
+        <!--    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>-->
+            
+        <!--    <g id="SVGRepo_iconCarrier"> <title>whatsapp</title> <path d="M26.576 5.363c-2.69-2.69-6.406-4.354-10.511-4.354-8.209 0-14.865 6.655-14.865 14.865 0 2.732 0.737 5.291 2.022 7.491l-0.038-0.070-2.109 7.702 7.879-2.067c2.051 1.139 4.498 1.809 7.102 1.809h0.006c8.209-0.003 14.862-6.659 14.862-14.868 0-4.103-1.662-7.817-4.349-10.507l0 0zM16.062 28.228h-0.005c-0 0-0.001 0-0.001 0-2.319 0-4.489-0.64-6.342-1.753l0.056 0.031-0.451-0.267-4.675 1.227 1.247-4.559-0.294-0.467c-1.185-1.862-1.889-4.131-1.889-6.565 0-6.822 5.531-12.353 12.353-12.353s12.353 5.531 12.353 12.353c0 6.822-5.53 12.353-12.353 12.353h-0zM22.838 18.977c-0.371-0.186-2.197-1.083-2.537-1.208-0.341-0.124-0.589-0.185-0.837 0.187-0.246 0.371-0.958 1.207-1.175 1.455-0.216 0.249-0.434 0.279-0.805 0.094-1.15-0.466-2.138-1.087-2.997-1.852l0.010 0.009c-0.799-0.74-1.484-1.587-2.037-2.521l-0.028-0.052c-0.216-0.371-0.023-0.572 0.162-0.757 0.167-0.166 0.372-0.434 0.557-0.65 0.146-0.179 0.271-0.384 0.366-0.604l0.006-0.017c0.043-0.087 0.068-0.188 0.068-0.296 0-0.131-0.037-0.253-0.101-0.357l0.002 0.003c-0.094-0.186-0.836-2.014-1.145-2.758-0.302-0.724-0.609-0.625-0.836-0.637-0.216-0.010-0.464-0.012-0.712-0.012-0.395 0.010-0.746 0.188-0.988 0.463l-0.001 0.002c-0.802 0.761-1.3 1.834-1.3 3.023 0 0.026 0 0.053 0.001 0.079l-0-0.004c0.131 1.467 0.681 2.784 1.527 3.857l-0.012-0.015c1.604 2.379 3.742 4.282 6.251 5.564l0.094 0.043c0.548 0.248 1.25 0.513 1.968 0.74l0.149 0.041c0.442 0.14 0.951 0.221 1.479 0.221 0.303 0 0.601-0.027 0.889-0.078l-0.031 0.004c1.069-0.223 1.956-0.868 2.497-1.749l0.009-0.017c0.165-0.366 0.261-0.793 0.261-1.242 0-0.185-0.016-0.366-0.047-0.542l0.003 0.019c-0.092-0.155-0.34-0.247-0.712-0.434z"/> </g>-->
+            
+        <!--    </svg>-->
+        <!--</a>-->
+        <a href="https://www.youtube.com/@madrasatussunnah" class="h-8 w-8 rounded-full border border-orange-400 flex items-center justify-center text-orange-400 hover:bg-orange-400 hover:text-white transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+        </a>
+              <a href="https://app.madrasatussunnah.org/" class="px-3 py-1 border border-orange-400 text-orange-400 rounded hover:bg-orange-400 hover:text-white transition-colors text-sm">Login</a>
+
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<script>
+  /* Smart nav: scrolling down lets the nav scroll away with the page;
+     scrolling back up (towards the top) pins it. At the very top it is normal. */
+  (function () {
+    var lastScrollTop = 0;
+    var THRESHOLD = 60;
+
+    $(window).on("scroll", function () {
+      var nav = document.getElementById('navbar');
+      if (!nav) return;
+      if (document.body.classList.contains('stop_sticky_nav')) {
+        nav.classList.remove("sticky");
+        return;
+      }
+      var st = window.pageYOffset || document.documentElement.scrollTop || 0;
+      var goingDown = st > lastScrollTop;
+
+      if (st <= THRESHOLD || goingDown) {
+        nav.classList.remove("sticky");
+      } else {
+        nav.classList.add("sticky");
+      }
+      lastScrollTop = st < 0 ? 0 : st;
+    });
+  })();
+</script>
+  <!-- Main Nav -->
+<nav class="bg-white shadow-sm relative z-50 head_nav" id="navbar">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+    <!-- Logo -->
+    <div class="flex items-center gap-2">
+      <a href="https://madrasatussunnah.org/">
+        <img src="https://madrasatussunnah.org/assets/madrasatus-sunnah-logo.svg" alt="Logo" class="h-[3.5rem] w-auto" />
+      </a>
+    </div>
+
+    
+    <!-- Desktop Menu -->
+    <div class="nav-desktop hidden md:flex items-center gap-3 text-gray-700 font-medium">
+      <a href="https://madrasatussunnah.org/" class="hover:text-teal-600">হোম</a><div class="relative group">
+                  <a href="#" class="hover:text-teal-600 inline-flex items-center">
+                    আমাদের সম্পর্কে <i data-feather="chevron-down" class="ml-1 h-4 w-4"></i>
+                  </a>
+                  <div class="absolute left-0 mt-2 p-2 w-48 bg-white rounded-md shadow-lg dropdown-menu"><a href="https://madrasatussunnah.org/message-chairman" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">চেয়ারম্যানের বার্তা</a><a href="https://madrasatussunnah.org/mission-vision" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">লক্ষ্য ও উদ্দেশ্য</a></div>
+                </div><div class="relative group">
+                  <a href="#" class="hover:text-teal-600 inline-flex items-center">
+                    ক্যাম্পাস <i data-feather="chevron-down" class="ml-1 h-4 w-4"></i>
+                  </a>
+                  <div class="absolute left-0 mt-2 p-2 w-48 bg-white rounded-md shadow-lg dropdown-menu"><a href="https://madrasatussunnah.org/branch/dhaka" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">প্রধান শাখা</a><a href="https://madrasatussunnah.org/branch/cumilla" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">কুমিল্লা শাখা</a></div>
+                </div><div class="relative group">
+                  <a href="#" class="hover:text-teal-600 inline-flex items-center">
+                    একাডেমিক <i data-feather="chevron-down" class="ml-1 h-4 w-4"></i>
+                  </a>
+                  <div class="absolute left-0 mt-2 p-2 w-48 bg-white rounded-md shadow-lg dropdown-menu"><a href="https://madrasatussunnah.org/syllabus" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">কারিকুলাম রূপরেখা</a><a href="https://madrasatussunnah.org/academic-calendar" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">একাডেমিক ক্যালেন্ডার</a><a href="https://madrasatussunnah.org/all-teacher" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">সম্মানিত শিক্ষকবৃন্দ</a></div>
+                </div><div class="relative group">
+                  <a href="#" class="hover:text-teal-600 inline-flex items-center">
+                    ভর্তি <i data-feather="chevron-down" class="ml-1 h-4 w-4"></i>
+                  </a>
+                  <div class="absolute left-0 mt-2 p-2 w-48 bg-white rounded-md shadow-lg dropdown-menu"><a href="https://madrasatussunnah.org/admission-procedure" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ভর্তির প্রক্রিয়া</a><a href="https://madrasatussunnah.org/admission_outline" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ভর্তির আউটলাইন</a><a href="https://madrasatussunnah.org/prospectus" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">প্রসপেক্টাস</a><a href="https://madrasatussunnah.org/fees" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ফি চার্ট </a></div>
+                </div><div class="relative group">
+                  <a href="#" class="hover:text-teal-600 inline-flex items-center">
+                    গ্যালারী <i data-feather="chevron-down" class="ml-1 h-4 w-4"></i>
+                  </a>
+                  <div class="absolute left-0 mt-2 p-2 w-48 bg-white rounded-md shadow-lg dropdown-menu"><a href="https://madrasatussunnah.org/gallery/img" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ছবি</a><a href="https://madrasatussunnah.org/gallery/video" class="hover:text-teal-600 block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ভিডিও</a></div>
+                </div><a href="https://madrasatussunnah.org/career" class="hover:text-teal-600">ক্যারিয়ার</a><a href="https://madrasatussunnah.org/contact" class="hover:text-teal-600">যোগাযোগ</a><a href="https://madrasatussunnah.org/faq" class="hover:text-teal-600">FAQ</a><a href="https://madrasatussunnah.org/notice" class="hover:text-teal-600">নোটিশ</a>      <!-- Admission CTA -->
+      <a href="https://madrasatussunnah.org/admission-procedure" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-md transition inline-block ml-4">প্রি-এডমিশন</a>
+    </div>
+
+    <!-- Mobile Hamburger -->
+    <div class="nav-toggle md:hidden">
+      <button id="menuToggle" class="text-gray-700 focus:outline-none" style="background:transparent;">
+        <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="md:hidden hidden px-4 pb-4 space-y-2 bg-white text-gray-700 font-medium">
+                  <a href="https://madrasatussunnah.org/" class="block hover:text-teal-600 py-2">হোম</a>
+                        <div>
+          <button class="flex justify-between items-center w-full text-left hover:text-teal-600 py-2 mobile-submenu-toggle">
+            আমাদের সম্পর্কে <i data-feather="chevron-down" class="ml-1 h-4 w-4 submenu-arrow"></i>
+          </button>
+          <div class="pl-4 space-y-2 mobile-submenu hidden">
+                          <a href="https://madrasatussunnah.org/message-chairman" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">চেয়ারম্যানের বার্তা</a>
+                          <a href="https://madrasatussunnah.org/mission-vision" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">লক্ষ্য ও উদ্দেশ্য</a>
+                      </div>
+        </div>
+                        <div>
+          <button class="flex justify-between items-center w-full text-left hover:text-teal-600 py-2 mobile-submenu-toggle">
+            ক্যাম্পাস <i data-feather="chevron-down" class="ml-1 h-4 w-4 submenu-arrow"></i>
+          </button>
+          <div class="pl-4 space-y-2 mobile-submenu hidden">
+                          <a href="https://madrasatussunnah.org/branch/dhaka" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">প্রধান শাখা</a>
+                          <a href="https://madrasatussunnah.org/branch/cumilla" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">কুমিল্লা শাখা</a>
+                      </div>
+        </div>
+                        <div>
+          <button class="flex justify-between items-center w-full text-left hover:text-teal-600 py-2 mobile-submenu-toggle">
+            একাডেমিক <i data-feather="chevron-down" class="ml-1 h-4 w-4 submenu-arrow"></i>
+          </button>
+          <div class="pl-4 space-y-2 mobile-submenu hidden">
+                          <a href="https://madrasatussunnah.org/syllabus" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">কারিকুলাম রূপরেখা</a>
+                          <a href="https://madrasatussunnah.org/academic-calendar" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">একাডেমিক ক্যালেন্ডার</a>
+                          <a href="https://madrasatussunnah.org/all-teacher" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">সম্মানিত শিক্ষকবৃন্দ</a>
+                      </div>
+        </div>
+                        <div>
+          <button class="flex justify-between items-center w-full text-left hover:text-teal-600 py-2 mobile-submenu-toggle">
+            ভর্তি <i data-feather="chevron-down" class="ml-1 h-4 w-4 submenu-arrow"></i>
+          </button>
+          <div class="pl-4 space-y-2 mobile-submenu hidden">
+                          <a href="https://madrasatussunnah.org/admission-procedure" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ভর্তির প্রক্রিয়া</a>
+                          <a href="https://madrasatussunnah.org/admission_outline" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ভর্তির আউটলাইন</a>
+                          <a href="https://madrasatussunnah.org/prospectus" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">প্রসপেক্টাস</a>
+                          <a href="https://madrasatussunnah.org/fees" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ফি চার্ট </a>
+                      </div>
+        </div>
+                        <div>
+          <button class="flex justify-between items-center w-full text-left hover:text-teal-600 py-2 mobile-submenu-toggle">
+            গ্যালারী <i data-feather="chevron-down" class="ml-1 h-4 w-4 submenu-arrow"></i>
+          </button>
+          <div class="pl-4 space-y-2 mobile-submenu hidden">
+                          <a href="https://madrasatussunnah.org/gallery/img" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ছবি</a>
+                          <a href="https://madrasatussunnah.org/gallery/video" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">ভিডিও</a>
+                      </div>
+        </div>
+                        <a href="https://madrasatussunnah.org/career" class="block hover:text-teal-600 py-2">ক্যারিয়ার</a>
+                        <a href="https://madrasatussunnah.org/contact" class="block hover:text-teal-600 py-2">যোগাযোগ</a>
+                        <a href="https://madrasatussunnah.org/faq" class="block hover:text-teal-600 py-2">FAQ</a>
+                        <a href="https://madrasatussunnah.org/notice" class="block hover:text-teal-600 py-2">নোটিশ</a>
+              <a href="https://madrasatussunnah.org/admission-procedure" class="block text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-md w-fit">প্রি-এডমিশন</a>
+  </div>
+</nav>
+
+<style>
+/* ===== Home page (scoped) ===== */
+.hm-page{
+  --hm-ink:#0f172a;--hm-muted:#475569;--hm-teal:#0f766e;--hm-teal-2:#0d9488;--hm-teal-3:#14b8a6;
+  --hm-line:#e2e8f0;--hm-bg:#f8fafc;
+  color:var(--hm-ink);background:#fff;
+}
+.hm-page *{box-sizing:border-box;}
+.hm-container{width:100%;max-width:1120px;margin-inline:auto;padding-inline:20px;}
+.hm-section{padding:64px 0;}
+.hm-section--tint{background:var(--hm-bg);}
+.hm-eyebrow{display:inline-block;padding:6px 14px;border-radius:999px;background:#ccfbf1;color:#0f766e;font-weight:600;font-size:.82rem;margin-bottom:14px;}
+.hm-h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800;color:var(--hm-teal);line-height:1.3;margin:0;}
+.hm-sub{color:var(--hm-muted);line-height:1.8;margin:10px 0 0;}
+.hm-center{text-align:center;}
+.hm-sec-head{max-width:760px;margin:0 auto 40px;text-align:center;}
+.hm-card{background:#fff;border:1px solid var(--hm-line);border-radius:16px;box-shadow:0 20px 45px -40px rgba(15,23,42,.75);}
+
+/* Hero */
+.hm-hero{
+  position:relative;overflow:hidden;padding:40px 0;
+  background:
+    radial-gradient(900px 340px at 10% -10%,rgba(20,184,166,.14),transparent 60%),
+    radial-gradient(760px 320px at 95% 0%,rgba(13,148,136,.10),transparent 60%),
+    linear-gradient(180deg,#f0fdfa 0%,#ffffff 100%);
+  border-bottom:1px solid var(--hm-line);
+}
+.hm-hero__grid{display:grid;gap:26px;grid-template-columns:1fr;align-items:stretch;}
+@media (min-width:1024px){.hm-hero__grid{grid-template-columns:5fr 2fr;}}
+.hm-admission{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 22px;border:1px solid #86efac;border-left:5px solid #15803d;border-radius:12px;background:linear-gradient(110deg,#f0fdf4 0%,#fff 72%);box-shadow:0 16px 36px -30px rgba(21,128,61,.55);animation:hmAdmissionEnter .65s cubic-bezier(.2,.75,.25,1) both;}
+.hm-admission__text{min-width:0;}
+.hm-admission__title{display:flex;align-items:center;margin:0;color:#166534;font-size:1.08rem;font-weight:800;line-height:1.5;}
+.hm-admission__title::before{content:"";width:10px;height:10px;flex:0 0 auto;margin-right:10px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 0 rgba(22,163,74,.38);animation:hmAdmissionPulse 2.2s ease-out infinite;}
+.hm-admission__detail{margin:3px 0 0;color:#3f6212;font-size:.94rem;line-height:1.6;}
+.hm-admission__link{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:8px;background:#15803d;color:#fff;font-weight:700;text-decoration:none;transition:background .18s,transform .18s,box-shadow .18s;}
+.hm-admission__link:hover{background:#166534;color:#fff;transform:translateY(-1px);}
+.hm-admission__link:hover{box-shadow:0 8px 18px -10px rgba(22,101,52,.8);}
+.hm-admission__link svg{width:18px;height:18px;transition:transform .18s;}
+.hm-admission__link:hover svg{transform:translateX(3px);}
+.hm-admission--closed{border-color:#fcd34d;border-left-color:#d97706;background:#fffbeb;}
+.hm-admission--closed .hm-admission__title{color:#92400e;}
+.hm-admission--closed .hm-admission__title::before{background:#d97706;box-shadow:none;animation:none;}
+.hm-admission--closed .hm-admission__detail{color:#78350f;}
+.hm-admission--closed .hm-admission__link{background:#b45309;}
+.hm-admission--closed .hm-admission__link:hover{background:#92400e;}
+.hm-admission__branches{display:flex;flex-wrap:wrap;gap:8px;margin:11px 0 0;padding:0;list-style:none;}
+.hm-admission__branch{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;font-size:.86rem;font-weight:600;border:1px solid transparent;line-height:1.5;}
+.hm-admission__branch-name{font-weight:700;}
+.hm-admission__branch.is-open{background:#dcfce7;color:#166534;border-color:#86efac;}
+.hm-admission__branch.is-closed{background:#f1f5f9;color:#64748b;border-color:#e2e8f0;}
+.hm-admission__branch.is-open .hm-admission__branch-status::before{content:"●";margin-right:5px;font-size:.6rem;color:#16a34a;vertical-align:middle;}
+.hm-admission__branch.is-closed .hm-admission__branch-status::before{content:"●";margin-right:5px;font-size:.6rem;color:#94a3b8;vertical-align:middle;}
+@media (max-width:640px){.hm-admission{align-items:stretch;flex-direction:column;padding:16px;}.hm-admission__link{width:100%;}}
+@keyframes hmAdmissionEnter{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes hmAdmissionPulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.38);}70%,100%{box-shadow:0 0 0 7px rgba(22,163,74,0);}}
+@media (prefers-reduced-motion:reduce){.hm-admission,.hm-admission__title::before{animation:none;}.hm-admission__link,.hm-admission__link svg{transition:none;}}
+
+.hm-hero__slider{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 24px 55px -40px rgba(15,23,42,.9);}
+.hm-hero__slider .swiper{width:100%;height:420px;}
+.hm-hero__slider .swiper-slide{position:relative;overflow:hidden;background:#0f172a;}
+.hm-hero__slider .swiper-slide img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s ease;border-radius:12px;}
+.hm-hero__slider .swiper-slide-active img{transform:scale(1.03);}
+.hm-hero__slider .swiper-slide::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),rgba(0,0,0,.12) 48%,transparent 78%);pointer-events:none;}
+@media (max-width:768px){.hm-hero__slider .swiper{height:300px;}}
+@media (max-width:480px){.hm-hero__slider .swiper{height:220px;}}
+.hm-hero__slider .swiper-button-prev,
+.hm-hero__slider .swiper-button-next{
+  width:44px;height:44px;border-radius:999px;background:rgba(15,23,42,.5);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:22px;opacity:0;transition:.25s;backdrop-filter:blur(4px);
+}
+.hm-hero__slider:hover .swiper-button-prev,
+.hm-hero__slider:hover .swiper-button-next{opacity:1;}
+.hm-hero__slider .swiper-button-prev:hover,
+.hm-hero__slider .swiper-button-next:hover{background:var(--hm-teal-3);}
+.hm-hero__slider .swiper-button-prev::after,
+.hm-hero__slider .swiper-button-next::after{display:none;}
+.hm-hero__slider .swiper-button-prev{left:14px;}
+.hm-hero__slider .swiper-button-next{right:14px;}
+.hm-hero__slider .swiper-pagination{bottom:14px;}
+.hm-hero__slider .swiper-pagination-bullet{background:rgba(255,255,255,.65);opacity:1;width:8px;height:8px;box-shadow:0 0 0 1.5px rgba(15,23,42,.4);transition:.3s;}
+.hm-hero__slider .swiper-pagination-bullet-active{background:var(--hm-teal-3);width:22px;border-radius:10px;box-shadow:0 0 0 2px rgba(255,255,255,.9);}
+
+/* Notices */
+.hm-notices{display:flex;flex-direction:column;background:#fff;border:1px solid var(--hm-line);border-radius:16px;padding:22px;box-shadow:0 20px 45px -40px rgba(15,23,42,.75);}
+.hm-notices__title{font-size:1.2rem;font-weight:800;color:#0f172a;text-align:center;margin:0 0 16px;}
+#notice-container{position:relative;overflow:hidden;min-height:250px;padding-top:4px;flex:1;}
+.hm-notice{display:block;padding:12px;margin-bottom:12px;border:1px solid var(--hm-line);border-radius:12px;background:#fff;text-decoration:none;transition:.2s;}
+.hm-notice:hover{background:#f0fdfa;border-color:#99f6e4;}
+.hm-notice__date{font-size:.75rem;color:#94a3b8;margin:0 0 4px;}
+.hm-notice__title{font-size:.95rem;font-weight:700;line-height:1.45;color:#1e293b;margin:0;transition:.2s;}
+.hm-notice:hover .hm-notice__title{color:var(--hm-teal);}
+#scrolling-wrapper{position:relative;overflow:hidden;height:190px;}
+#scrolling-wrapper::-webkit-scrollbar{display:none;}
+#scrolling-wrapper{scrollbar-width:none;}
+@keyframes hmBlink{
+  0%,100%{background-color:#f0fdfa;border-color:#14b8a6;box-shadow:0 0 6px rgba(20,184,166,.2);}
+  50%{background-color:#ccfbf1;border-color:#0d9488;box-shadow:0 0 14px rgba(20,184,166,.35);}
+}
+.blink-highlight{border-left:5px solid var(--hm-teal-3);animation:hmBlink 1.6s ease-in-out infinite;}
+.hm-notices__all{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;color:var(--hm-teal);font-weight:600;font-size:.9rem;text-decoration:none;}
+.hm-notices__all:hover{color:#115e59;}
+.hm-notices__all svg{width:16px;height:16px;}
+
+/* About */
+.hm-about__grid{display:grid;gap:40px;grid-template-columns:1fr;align-items:center;}
+@media (min-width:900px){.hm-about__grid{grid-template-columns:1fr 1fr;}}
+.hm-about__media{position:relative;}
+.hm-about__media img{width:100%;height:auto;max-height:420px;object-fit:cover;border-radius:16px;box-shadow:0 30px 60px -45px rgba(15,23,42,.9);display:block;}
+.hm-about__badge{position:absolute;left:16px;bottom:16px;background:#fff;color:var(--hm-teal);font-weight:700;font-size:.9rem;padding:8px 14px;border-radius:10px;box-shadow:0 10px 24px -16px rgba(15,23,42,.7);}
+.hm-about__text p{color:#334155;line-height:1.95;font-size:1.03rem;text-align:justify;margin:0;}
+.hm-about__text p + p{margin-top:16px;}
+
+/* Why (posts) */
+.hm-why__grid{display:grid;gap:24px;grid-template-columns:1fr;}
+@media (min-width:700px){.hm-why__grid{grid-template-columns:1fr 1fr;}}
+@media (min-width:1024px){.hm-why__grid{grid-template-columns:repeat(3,1fr);}}
+.hm-why__card{padding:28px;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;}
+.hm-why__card:hover{transform:translateY(-4px);box-shadow:0 30px 55px -42px rgba(15,23,42,.9);}
+.hm-why__top{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.hm-why__num{font-size:2.4rem;font-weight:800;color:#99f6e4;line-height:1;}
+.hm-why__ic{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:999px;background:#f0fdfa;color:var(--hm-teal);}
+.hm-why__ic svg{width:26px;height:26px;}
+.hm-why__title{font-size:1.22rem;font-weight:800;color:#0f172a;line-height:1.5;margin:0 0 12px;}
+.hm-why__text{color:#475569;line-height:1.85;font-size:.97rem;margin:0 0 20px;flex-grow:1;}
+.hm-link{display:inline-flex;align-items:center;gap:8px;color:var(--hm-teal);font-weight:700;text-decoration:none;margin-top:auto;}
+.hm-link svg{width:18px;height:18px;transition:transform .2s;}
+.hm-link:hover{color:#115e59;}
+.hm-link:hover svg{transform:translateX(4px);}
+
+/* Facilities */
+.hm-fac__grid{display:grid;gap:24px;grid-template-columns:1fr;}
+@media (min-width:820px){.hm-fac__grid{grid-template-columns:1fr 1fr;}}
+.hm-fac__card{padding:30px;display:flex;flex-direction:column;border-top:4px solid var(--hm-teal-2);}
+.hm-fac__ic{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:16px;background:#f0fdfa;color:var(--hm-teal);margin-bottom:20px;}
+.hm-fac__ic svg{width:30px;height:30px;}
+.hm-fac__card h3{font-size:1.3rem;font-weight:800;color:#0f172a;line-height:1.5;margin:0 0 12px;}
+.hm-fac__card p{color:#475569;line-height:1.9;font-size:.98rem;margin:0;}
+.hm-fac__cta{text-align:center;margin-top:38px;}
+.hm-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;border-radius:12px;font-weight:700;text-decoration:none;transition:.2s;}
+.hm-btn--primary{background:var(--hm-teal);color:#fff;box-shadow:0 16px 32px -20px rgba(15,118,110,1);}
+.hm-btn--primary:hover{background:#115e59;transform:translateY(-2px);}
+
+/* Chairman */
+.hm-chair{background:var(--hm-bg);}
+.hm-chair__card{padding:34px;display:grid;gap:28px;grid-template-columns:1fr;align-items:center;border-bottom:4px solid var(--hm-teal-2);}
+@media (min-width:820px){.hm-chair__card{grid-template-columns:200px minmax(0,1fr);padding:44px;}}
+.hm-chair__img{width:150px;height:150px;border-radius:999px;object-fit:cover;border:5px solid #99f6e4;box-shadow:0 20px 40px -28px rgba(15,23,42,.8);display:block;margin:0 auto;}
+@media (min-width:820px){.hm-chair__img{width:190px;height:190px;}}
+.hm-chair__quote{font-size:clamp(1.1rem,2.4vw,1.4rem);line-height:1.9;color:#1e293b;text-align:justify;margin:0 0 18px;}
+.hm-chair__name{font-size:1.15rem;font-weight:800;color:#0f172a;margin:0;}
+.hm-chair__role{color:var(--hm-teal);font-size:1rem;margin:2px 0 0;}
+
+/* Contact */
+.hm-contact__cards{display:grid;gap:22px;grid-template-columns:1fr;margin-bottom:44px;}
+@media (min-width:820px){.hm-contact__cards{grid-template-columns:repeat(3,1fr);}}
+.hm-contact__card{padding:26px;text-align:center;display:flex;flex-direction:column;align-items:center;border-bottom:4px solid var(--hm-teal-2);transition:transform .2s,box-shadow .2s;}
+.hm-contact__card:hover{transform:translateY(-4px);box-shadow:0 30px 55px -42px rgba(15,23,42,.9);}
+.hm-contact__ic{display:inline-flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:999px;background:#f0fdfa;color:var(--hm-teal);margin-bottom:16px;}
+.hm-contact__ic svg{width:26px;height:26px;}
+.hm-contact__card h3{font-size:1.15rem;font-weight:800;color:#0f172a;margin:0 0 8px;}
+.hm-contact__card p{color:#475569;line-height:1.7;margin:0;}
+.hm-contact__card p + p{margin-top:6px;font-size:.9rem;color:#94a3b8;}
+.hm-contact__card a{color:var(--hm-teal);font-weight:600;text-decoration:none;margin-top:8px;}
+.hm-contact__card a:hover{text-decoration:underline;}
+.hm-contact__split{display:grid;gap:32px;grid-template-columns:1fr;background:#fff;border:1px solid var(--hm-line);border-radius:18px;padding:30px;box-shadow:0 20px 45px -42px rgba(15,23,42,.8);}
+.hm-contact__split > div{min-width:0;}
+@media (min-width:900px){.hm-contact__split{grid-template-columns:1fr 1fr;}}
+.hm-contact__split h3{font-size:1.5rem;font-weight:800;color:#0f172a;margin:0 0 22px;}
+.hm-form{display:grid;gap:16px;}
+.hm-form__row{display:grid;gap:16px;grid-template-columns:1fr;}
+@media (min-width:560px){.hm-form__row{grid-template-columns:1fr 1fr;}}
+.hm-form input,.hm-form textarea{width:100%;padding:13px 15px;border:1.5px solid var(--hm-line);border-radius:11px;font-size:1rem;font-family:inherit;background:#fff;transition:border-color .18s,box-shadow .18s;}
+.hm-form input:focus,.hm-form textarea:focus{outline:none;border-color:var(--hm-teal-3);box-shadow:0 0 0 4px rgba(20,184,166,.15);}
+.hm-form textarea{resize:vertical;min-height:140px;}
+.hm-form__submit{background:var(--hm-teal);color:#fff;border:none;border-radius:12px;padding:14px 30px;font-weight:700;font-size:1rem;cursor:pointer;transition:.2s;justify-self:start;}
+.hm-form__submit:hover{background:#115e59;transform:translateY(-1px);}
+#feedbackMsg{margin-top:14px;font-weight:600;}
+.hm-map{border-radius:14px;overflow:hidden;border:1px solid var(--hm-line);height:340px;}
+.hm-map iframe{width:100%;height:340px;border:0;display:block;}
+@media (max-width:900px){.hm-map,.hm-map iframe{height:300px;}}
+
+/* Branches */
+.hm-branch__card{background:#fff;border:1px solid var(--hm-line);border-radius:16px;padding:26px;height:100%;border-top:4px solid var(--hm-teal-2);box-shadow:0 20px 45px -42px rgba(15,23,42,.8);}
+.hm-branch__card h4{font-size:1.2rem;font-weight:800;color:#0f172a;text-align:center;margin:0 0 12px;}
+.hm-branch__addr{color:#475569;line-height:1.8;margin:0 0 12px;}
+.hm-branch__card a{display:block;color:var(--hm-teal);text-decoration:none;font-size:.95rem;line-height:1.9;}
+.hm-branch__card a:hover{text-decoration:underline;}
+.hm-branch .swiper{padding-bottom:8px;overflow:visible;}
+.hm-branch .swiper-wrapper{flex-wrap:wrap;justify-content:center;gap:22px;height:auto;}
+.hm-branch .swiper-slide{width:340px;max-width:100%;height:auto;flex:0 1 340px;}
+@media (max-width:420px){
+  .hm-branch .swiper-slide{width:100%;flex-basis:100%;}
+}
+
+@media (max-width:640px){
+  .hm-section{padding:48px 0;}
+  .hm-hero{padding:28px 0;}
+  .hm-chair__card{padding:26px;}
+  .hm-about__text p,.hm-fac__card p,.hm-why__text{text-align:left;}
+}
+</style>
+
+<main class="hm-page">
+
+  <!-- ===== Hero ===== -->
+  <section class="hm-hero">
+    <div class="hm-container">
+      <div class="hm-admission hm-admission--closed" role="status">
+        <div class="hm-admission__text">
+                      <h2 class="hm-admission__title">ভর্তির আবেদন বর্তমানে বন্ধ</h2>
+            <p class="hm-admission__detail">এই মুহূর্তে অনলাইনে আবেদন নেওয়া হচ্ছে না। সর্বশেষ সেশন: 2027। ভর্তি-সংক্রান্ত তথ্য এখানে দেখুন।</p>
+                  </div>
+        <a class="hm-admission__link" href="https://madrasatussunnah.org/admission-procedure">
+          ভর্তির তথ্য দেখুন          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="hm-hero__grid" style="margin-top:20px">
+      <!-- Slider -->
+      <div class="hm-hero__slider" data-aos="fade-up" data-aos-duration="1200">
+        <div class="swiper mySwiper">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="https://madrasatussunnah.org/images/slider/1.webp" alt="Image 1"></div>
+            <div class="swiper-slide"><img src="https://madrasatussunnah.org/images/slider/7.webp" alt="Image 2"></div>
+            <div class="swiper-slide"><img src="https://madrasatussunnah.org/images/slider/2.webp" alt="Image 4"></div>
+            <div class="swiper-slide"><img src="https://madrasatussunnah.org/images/slider/4.webp" alt="Image 6"></div>
+            <div class="swiper-slide"><img src="https://madrasatussunnah.org/images/slider/5.webp" alt="Image 7"></div>
+            <div class="swiper-slide"><img src="https://madrasatussunnah.org/images/slider/6.webp" alt="Image 7"></div>
+            <div class="swiper-slide"><img src="https://madrasatussunnah.org/images/slider/3.webp" alt="Image 7"></div>
+          </div>
+          <div class="swiper-button-prev"><span>❮</span></div>
+          <div class="swiper-button-next"><span>❯</span></div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
+
+      <!-- Notices -->
+      <aside class="hm-notices" data-aos="fade-up" data-aos-duration="1200">
+        <h3 class="hm-notices__title">গুরুত্বপূর্ণ আপডেট</h3>
+        <div id="notice-container">
+                      <a href="https://madrasatussunnah.org/notice_details/136"
+               class="hm-notice ">
+              <p class="hm-notice__date">১০ জুন, ২০২৬</p>
+              <h4 class="hm-notice__title">শিক্ষার্থী পরিবহনে সিসি ক্যামেরা স্থাপন সংক্রান্ত বিজ্ঞপ্তি</h4>
+            </a>
+          
+          <div id="scrolling-wrapper">
+            <div id="tab-notices">
+                              <a href="https://madrasatussunnah.org/notice_details/137"
+                   class="hm-notice ">
+                  <p class="hm-notice__date">২০ মে, ২০২৬</p>
+                  <h4 class="hm-notice__title">ঈদুল আযহা উপলক্ষে ছুটি ও প্রয়োজনীয় নির্দেশনা</h4>
+                </a>
+                              <a href="https://madrasatussunnah.org/notice_details/69"
+                   class="hm-notice ">
+                  <p class="hm-notice__date">০৮ এপ্রিল, ২০২৬</p>
+                  <h4 class="hm-notice__title">শিক্ষার্থীদের স্বাস্থ্য সুরক্ষা ও সংক্রামক রোগ প্রতিরোধ সংক্রান্ত জরুরি বিজ্ঞপ্তি</h4>
+                </a>
+                              <a href="https://madrasatussunnah.org/notice_details/65"
+                   class="hm-notice ">
+                  <p class="hm-notice__date">০৫ মার্চ, ২০২৬</p>
+                  <h4 class="hm-notice__title">পবিত্র রমাদান ও ঈদুল ফিতর ২০২৬ উপলক্ষে ছুটির বিজ্ঞপ্তি</h4>
+                </a>
+                              <a href="https://madrasatussunnah.org/notice_details/47"
+                   class="hm-notice blink-highlight">
+                  <p class="hm-notice__date">২১ জানুয়ারি, ২০২৬</p>
+                  <h4 class="hm-notice__title">বার্ষিক ক্রীড়া প্রতিযোগিতা ও পুরস্কার বিতরণী অনুষ্ঠান–২০২৬</h4>
+                </a>
+                              <a href="https://madrasatussunnah.org/notice_details/24"
+                   class="hm-notice ">
+                  <p class="hm-notice__date">০৩ জানুয়ারি, ২০২৬</p>
+                  <h4 class="hm-notice__title">বই বিতরণ ও নিয়মিত পাঠদান কার্যক্রম সম্পর্কে নোটিশ</h4>
+                </a>
+                              <a href="https://madrasatussunnah.org/notice_details/13"
+                   class="hm-notice ">
+                  <p class="hm-notice__date">১৯ নভেম্বর, ২০২৫</p>
+                  <h4 class="hm-notice__title">শিক্ষার্থী অগ্রগতির মূল্যায়ন ও করণীয়</h4>
+                </a>
+                              <a href="https://madrasatussunnah.org/notice_details/12"
+                   class="hm-notice ">
+                  <p class="hm-notice__date">১৫ নভেম্বর, ২০২৫</p>
+                  <h4 class="hm-notice__title">ভর্তি আবেদনের সময়সীমা বৃদ্ধি প্রসঙ্গে নোটিশ</h4>
+                </a>
+                              <a href="https://madrasatussunnah.org/notice_details/11"
+                   class="hm-notice ">
+                  <p class="hm-notice__date">১০ নভেম্বর, ২০২৫</p>
+                  <h4 class="hm-notice__title">বার্ষিক পরীক্ষা–২০২৫ সংক্রান্ত নোটিশ</h4>
+                </a>
+                              <a href="https://madrasatussunnah.org/notice_details/10"
+                   class="hm-notice ">
+                  <p class="hm-notice__date">০৬ নভেম্বর, ২০২৫</p>
+                  <h4 class="hm-notice__title">Entrepreneurship & Food Sharing Program-2025</h4>
+                </a>
+                          </div>
+          </div>
+        </div>
+        <a href="https://madrasatussunnah.org/notice" id="view-all-button" class="hm-notices__all">
+          সকল নোটিশ দেখুন
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===== About ===== -->
+  <section class="hm-section">
+    <div class="hm-container hm-about__grid">
+      <div class="hm-about__media" data-aos="fade-up" data-aos-duration="1200">
+        <img src="https://madrasatussunnah.org/images/ins_bg.webp" alt="Madrasah Campus" />
+        <div class="hm-about__badge">প্রতিষ্ঠা : ২০২৩ সাল</div>
+      </div>
+      <div class="hm-about__text" data-aos="fade-up" data-aos-duration="1200">
+        <h2 class="hm-h2">কেন মাদরাসাতুস সুন্নাহ</h2>
+        <p style="margin-top:18px">সমাজে বিদ্যমান বিভিন্ন শিক্ষাধারার মধ্যে মাদরাসা শিক্ষাধারা সুপ্রাচীন এবং কল্যাণমুখী শিক্ষার ধারক হিসেবে সুবিদিত। এই শিক্ষাধারা ইসলামী জীবন-দর্শনের আলোকে উপমহাদেশে গড়ে তুলছে পরকালমুখী মূল্যবোধসম্পন্ন আদর্শ মানুষ। কিন্তু এই শিক্ষাধারা নৈতিকতা ও মূল্যবোধের মানদণ্ডে উত্তীর্ণ একদল আদর্শ মানুষ ও দক্ষ আলেম তৈরিতে সফল হলেও এর দ্বারা সময়োপযোগী ও সৃজনশীল মানুষ সেভাবে তৈরি হচ্ছে না।</p>
+        <p>পক্ষান্তরে প্রচলিত সাধারণ শিক্ষাধারা আমাদের সন্তানদের পার্থিব শিক্ষায় শিক্ষিত করছে বটে, কিন্তু এই মাধ্যমে নৈতিকতা এবং প্রকৃত জীবনবোধসম্পন্ন মানুষ গড়ে উঠছে না। এজন্য আমরা মনে করছি এরকম একটি শিক্ষাপ্রতিষ্ঠান দরকার যেটি উন্নত চরিত্রসমৃদ্ধ কুরআন-সুন্নাহর গভীর জ্ঞানসম্পন্ন মানুষ তৈরি করবে, যারা জাগতিক জ্ঞান-বিজ্ঞানেও প্রয়োজনীয় ধারণা রাখবে। এই লক্ষ্য বাস্তবায়নেই মাদরাসাতুস সুন্নাহর অভিযাত্রা।</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Why (posts) ===== -->
+    <section class="hm-section hm-section--tint">
+    <div class="hm-container">
+      <div class="hm-sec-head" data-aos="fade-up" data-aos-duration="1200">
+        <h2 class="hm-h2">যে কারণে মাদরাসাতুস সুন্নাহ অনন্য</h2>
+      </div>
+      <div class="hm-why__grid">
+                    <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০১</span>
+                <span class="hm-why__ic"><i data-feather="book-open"></i></span>
+              </div>
+              <h3 class="hm-why__title">সমন্বিত কারিকুলাম </h3>
+              <p class="hm-why__text">এখানে জেনারেল শিক্ষা ও ইসলামী শিক্ষার সমন্বয় করে পাঠদান করা হয়। মাদরাসাতুস সুন্নাহর লক্ষ্য হলো—এমন এক প্রজন্ম গড়ে…</p>
+              <a href="https://madrasatussunnah.org/view/integrated-curriculum" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                      <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০২</span>
+                <span class="hm-why__ic"><i data-feather="book-open"></i></span>
+              </div>
+              <h3 class="hm-why__title">হিফযুল কুরআন</h3>
+              <p class="hm-why__text">কুরআন ও সুন্নাহর নুসূস (মূলপাঠ) আত্মস্থ করা ছাড়া বিজ্ঞ আলেম হওয়া সম্ভব নয়। এজন্য হিফযুল কুরআনকে মাদরাসাতুস সুন্নাহর…</p>
+              <a href="https://madrasatussunnah.org/view/hifzul-quran" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                      <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০৩</span>
+                <span class="hm-why__ic"><i data-feather="globe"></i></span>
+              </div>
+              <h3 class="hm-why__title">ভাষাগত দক্ষতা</h3>
+              <p class="hm-why__text">যুগচ্যালেঞ্জ মোকাবিলা ও কার্যকর দাওয়াহ পরিচালনার জন্য ভাষাগত দক্ষতা অত্যন্ত গুরুত্বপূর্ণ। এই উপলব্ধি থেকেই মাদরাসাতুস…</p>
+              <a href="https://madrasatussunnah.org/view/language-skills" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                      <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০৪</span>
+                <span class="hm-why__ic"><i data-feather="book"></i></span>
+              </div>
+              <h3 class="hm-why__title">নিজস্ব বই দ্বারা পাঠদান</h3>
+              <p class="hm-why__text">মাদরাসাতুস সুন্নাহ–র অন্যতম বৈশিষ্ট্য হলো— এখানে Islamic Studies বিষয়টি পাঠদান করা হয় প্রতিষ্ঠানের নিজস্বভাবে প্রণীত…</p>
+              <a href="https://madrasatussunnah.org/view/teaching-with-own-books" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                      <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০৫</span>
+                <span class="hm-why__ic"><i data-feather="monitor"></i></span>
+              </div>
+              <h3 class="hm-why__title">শিক্ষায় আধুনিক প্রযুক্তির ব্যবহার</h3>
+              <p class="hm-why__text">মাদরাসাতুস সুন্নাহ শিক্ষাব্যবস্থায় আধুনিক প্রযুক্তির সুচিন্তিত ও কার্যকর প্রয়োগ করে থাকে।এখানে পাঠদান পরিচালিত হয়…</p>
+              <a href="https://madrasatussunnah.org/view/modern-technology-in-education" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                      <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০৬</span>
+                <span class="hm-why__ic"><i data-feather="navigation"></i></span>
+              </div>
+              <h3 class="hm-why__title">রুট পরিবর্তনের সুযোগ</h3>
+              <p class="hm-why__text">মাদরাসাতুস সুন্নাহর সিলেবাস এমনভাবে সাজানো হয়েছে, যাতে একজন শিক্ষার্থী মাধ্যমিক স্তরের শিক্ষা সম্পন্ন করার পাশাপাশি…</p>
+              <a href="https://madrasatussunnah.org/view/route-change-option" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                      <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০৭</span>
+                <span class="hm-why__ic"><i data-feather="award"></i></span>
+              </div>
+              <h3 class="hm-why__title">আখলাক ও মূল্যবোধ</h3>
+              <p class="hm-why__text">ইসলামের মৌলিক শিক্ষাসমূহের অন্যতম হলো অর্জিত জ্ঞান অনুযায়ী আমলি জীবন গড়ে তোলা, শিষ্টাচার ও মূল্যবোধ লালন করা।…</p>
+              <a href="https://madrasatussunnah.org/view/morality-and-values" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                      <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০৮</span>
+                <span class="hm-why__ic"><i data-feather="users"></i></span>
+              </div>
+              <h3 class="hm-why__title">হালাকা ও নাসীহা প্রোগ্রাম</h3>
+              <p class="hm-why__text">একজন শিক্ষার্থীর শিক্ষাগত যোগ্যতা এবং চারিত্রিক মানোন্নয়নে শিক্ষক-অভিভাবকের সম্মিলিত প্রচেষ্টা ব্যতীত সম্ভব নয়। তাই…</p>
+              <a href="https://madrasatussunnah.org/view/halaqa-and-nasihah-program" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                      <article class="hm-card hm-why__card" data-aos="fade-up" data-aos-duration="1200">
+              <div class="hm-why__top">
+                <span class="hm-why__num">০৯</span>
+                <span class="hm-why__ic"><i data-feather="user"></i></span>
+              </div>
+              <h3 class="hm-why__title">অভিভাবকদের দীনি শিক্ষা কার্যক্রম</h3>
+              <p class="hm-why__text">সন্তান মা-বাবার নিকট আল্লাহ তাআলার পক্ষ থেকে আমানত। শিশুর প্রথম পাঠশালা হচ্ছে মায়ের কোল। এখানে সে জীবনের অনেক কিছু…</p>
+              <a href="https://madrasatussunnah.org/view/parents-islamic-education" class="hm-link">
+                আরও দেখুন
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+                </div>
+    </div>
+  </section>
+
+  <!-- ===== Facilities ===== -->
+  <section class="hm-section">
+    <div class="hm-container">
+      <div class="hm-sec-head" data-aos="fade-up" data-aos-duration="1200">
+        <h2 class="hm-h2">মাদরাসার সুযোগ-সুবিধাসমূহ</h2>
+      </div>
+      <div class="hm-fac__grid">
+        <article class="hm-card hm-fac__card" data-aos="fade-up" data-aos-duration="1200">
+          <span class="hm-fac__ic"><i data-feather="truck"></i></span>
+          <h3>নিজস্ব পরিবহন ব্যবস্থা</h3>
+          <p>শিক্ষার্থীদের যাতায়াতের সুবিধার্থে মাদরাসাতুস সুন্নাহর রয়েছে ৫টি নিজস্ব বাস। মাদরাসার এই বাসগুলো তিনটি রুটের (আফতাবনগর গেইট, উত্তর বাড্ডা ও নতুন বাজার) বিভিন্ন পয়েন্ট থেকে শিক্ষার্থীদের আনা-নেওয়া করে থাকে। আগামী শিক্ষাবর্ষ থেকে প্রয়োজন সাপেক্ষে বাসের সংখ্যা আরো বৃদ্ধি করা হবে, ইন-শা-আল্লাহ।</p>
+        </article>
+        <article class="hm-card hm-fac__card" data-aos="fade-up" data-aos-duration="1200">
+          <span class="hm-fac__ic"><i data-feather="home"></i></span>
+          <h3>আবাসিক ছাত্রাবাস</h3>
+          <p>দেশের বিভিন্ন প্রান্ত থেকে আগত শিক্ষার্থীদের পড়াশোনার সুবিধার্থে মাদরাসাতুস সুন্নাহর রয়েছে সীমিত আকারে আবাসিক ব্যবস্থা। শিক্ষার্থীদের পড়াশোনা, নৈতিক মানোন্নয়ন, রুচিসম্মত খাবার পরিবেশন এবং তাদেরকে মনোরম পরিবেশে রাখার জন্য মাদরাসাতুস সুন্নাহর সর্বাত্মক প্রচেষ্টা অব্যাহত আছে। মাদরাসার এই আবাসিক ব্যবস্থা শুধু দ্বিতীয় বা তদূর্ধ্ব শ্রেণির ছেলে শিক্ষার্থীদের জন্য প্রযোজ্য।</p>
+        </article>
+        <article class="hm-card hm-fac__card" data-aos="fade-up" data-aos-duration="1200">
+          <span class="hm-fac__ic"><i data-feather="award"></i></span>
+          <h3>স্কলারশিপের সুযোগ</h3>
+          <p>গরীব ও এতিম মেধাবী শিক্ষার্থীদের জন্য রয়েছে সম্পূর্ণ স্কলারশিপের সুযোগ। কোনো শিক্ষার্থী মেধাবী এবং যাকাতের হকদার হয়ে থাকলে অভিভাবকের ঐকান্তিক আগ্রহের ভিত্তিতে তার যাবতীয় ব্যয়ভার আস-সুন্নাহ ফাউন্ডেশন যাকাত তহবিল থেকে বহন করে থাকে আলহামদুলিল্লাহ। এই সুযোগ সর্বোচ্চ ২০ শতাংশ শিক্ষার্থীদের জন্য প্রযোজ্য।</p>
+        </article>
+        <article class="hm-card hm-fac__card" data-aos="fade-up" data-aos-duration="1200">
+          <span class="hm-fac__ic"><i data-feather="users"></i></span>
+          <h3>একই পিতা-মাতার একাধিক সন্তানের জন্য ছাড়</h3>
+          <p>একই বাবা-মায়ের দুই সন্তান মাদরাসাতুস সুন্নাহতে ভর্তি হলে দ্বিতীয়জনের জন্য ভর্তি এবং টিউশন ফি অর্ধেক।</p>
+        </article>
+      </div>
+      <div class="hm-fac__cta">
+        <a href="https://madrasatussunnah.org/facility" class="hm-btn hm-btn--primary">অন্যান্য সুযোগ-সুবিধাসমূহ</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Chairman ===== -->
+  <section class="hm-section hm-chair">
+    <div class="hm-container">
+      <div class="hm-sec-head" data-aos="fade-up" data-aos-duration="1200">
+        <h2 class="hm-h2">চেয়ারম্যানের বাণী</h2>
+      </div>
+      <div class="hm-card hm-chair__card" data-aos="fade-up" data-aos-duration="1200">
+        <div>
+          <img class="hm-chair__img" src="https://madrasatussunnah.org/images/Shaykh Ahmadullah.webp" alt="শাইখ আহমাদুল্লাহ" />
+        </div>
+        <div>
+          <p class="hm-chair__quote"><span style="color:#0d9488;font-size:1.6rem;line-height:0;vertical-align:-4px">“</span> শিশুদের কোমল হৃদয়ে পরকালীন চেতনা জাগাতে না পারলে, দুনিয়ার যত সুন্দর পরিবেশেই লালন-পালন করা হোক না কেন—তারা প্রকৃত মানুষ হয়ে গড়ে উঠবে না। <span style="color:#0d9488;font-size:1.6rem;line-height:0;vertical-align:-4px">”</span></p>
+          <p class="hm-chair__name">শায়খ আহমাদুল্লাহ</p>
+          <p class="hm-chair__role">চেয়ারম্যান, আস-সুন্নাহ ফাউন্ডেশন</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Contact ===== -->
+  <section class="hm-section">
+    <div class="hm-container">
+      <div class="hm-sec-head" data-aos="fade-up" data-aos-duration="1200">
+        <h2 class="hm-h2">আমাদের সাথে যোগাযোগ</h2>
+      </div>
+
+      <div class="hm-contact__cards">
+        <div class="hm-card hm-contact__card" data-aos="fade-up" data-aos-duration="1200">
+          <span class="hm-contact__ic"><i data-feather="phone"></i></span>
+          <h3>ফোন করুন</h3>
+          <p>+880 9639 151525</p>
+          <p>রবি - বৃহস্পতিবার: সকাল ৯টা থেকে দুপুর ৩টা</p>
+        </div>
+        <div class="hm-card hm-contact__card" data-aos="fade-up" data-aos-duration="1200">
+          <span class="hm-contact__ic"><i data-feather="mail"></i></span>
+          <h3>ইমেইল পাঠান</h3>
+          <p>info@madrasatussunnah.org</p>
+          <p>আপনার প্রশ্ন বা ফিডব্যাক পাঠান</p>
+        </div>
+        <div class="hm-card hm-contact__card" data-aos="fade-up" data-aos-duration="1200">
+          <span class="hm-contact__ic"><i data-feather="map-pin"></i></span>
+          <h3>আমাদের অবস্থান</h3>
+          <p>মাদরাসাতুস সুন্নাহ, সাতারকুল, বাড্ডা, ঢাকা।</p>
+          <a href="https://maps.app.goo.gl/fwWmibihFVsmPyZMA" target="_blank" rel="noopener">ম্যাপে দেখুন</a>
+        </div>
+      </div>
+
+      <div class="hm-contact__split">
+        <div>
+          <h3>আপনার মূল্যবান মন্তব্য</h3>
+          <form id="feedbackForm" method="POST" class="hm-form">
+            <div class="hm-form__row">
+              <input type="text" name="full_name" placeholder="আপনার সম্পূর্ণ নাম *" required />
+              <input type="tel" name="phone_number" placeholder="আপনার ফোন *" required />
+            </div>
+            <input type="email" name="email" placeholder="আপনার ইমেইল (ঐচ্ছিক)" />
+            <textarea name="message" rows="6" placeholder="আপনার মন্তব্য *" required></textarea>
+            <button type="submit" class="hm-form__submit">মন্তব্য প্রেরণ করুন</button>
+          </form>
+          <div id="feedbackMsg" class="text-center hidden"></div>
+        </div>
+        <div>
+          <h3>ম্যাপে আমাদের খুঁজুন</h3>
+          <div class="hm-map">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1290.7458354796292!2d90.46044500986012!3d23.790828325016825!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c9b442387745%3A0x81c7513f543bd17c!2sMadrasatus%20Sunnah!5e0!3m2!1sen!2sbd!4v1761584013077!5m2!1sen!2sbd"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="মাদরাসাতুস সুন্নাহ এর অবস্থান"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Branches ===== -->
+  <section class="hm-section hm-section--tint hm-branch">
+    <div class="hm-container">
+      <div class="hm-sec-head" data-aos="fade-up" data-aos-duration="1200">
+        <h2 class="hm-h2">আমাদের শাখাসমূহ</h2>
+      </div>
+      <div class="swiper myBranchSwiper">
+        <div class="swiper-wrapper">
+                      <div class="swiper-slide">
+              <div class="hm-branch__card">
+                <h4>কুমিল্লা শাখা</h4>
+                <p class="hm-branch__addr">ছোটশালঘর (বাস স্ট্যান্ড), দেবিদ্বার, কুমিল্লা।</p>
+                <p>
+                  <a href="mailto:madrasatussunnahbd.cu@gmail.com">madrasatussunnahbd.cu@gmail.com</a>
+                  <a href="tel:01409-979957 (অফিস)">01409-979957 (অফিস)</a>
+                  <a href="tel:01604-758887 (ইনচার্জ)">01604-758887 (ইনচার্জ)</a>
+                </p>
+              </div>
+            </div>
+                      <div class="swiper-slide">
+              <div class="hm-branch__card">
+                <h4>প্রধান শাখা</h4>
+                <p class="hm-branch__addr">মাদরাসাতুস সুন্নাহ, প্লট-৫, রোড-৪, ব্লক-সি, সানভ্যালি আবাসন, স্বদেশ প্রোপার্টিজ, সাঁতারকুল, বাড্ডা, ঢাকা-১২১২</p>
+                <p>
+                  <a href="mailto:info@madrasatussunnah.org">info@madrasatussunnah.org</a>
+                  <a href="tel:+8809639151525 (অফিস)">+8809639151525 (অফিস)</a>
+                  <a href="tel:"></a>
+                </p>
+              </div>
+            </div>
+                  </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Swiper (hero) -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+const swiper = new Swiper(".mySwiper", {
+  loop: true,
+  autoplay: { delay: 4500, disableOnInteraction: false },
+  effect: "fade",
+  fadeEffect: { crossFade: true },
+  pagination: { el: ".swiper-pagination", clickable: true },
+  navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+});
+const hmSwiperEl = document.querySelector(".mySwiper");
+if (hmSwiperEl) {
+  hmSwiperEl.addEventListener("mouseenter", () => swiper.autoplay.stop());
+  hmSwiperEl.addEventListener("mouseleave", () => swiper.autoplay.start());
+}
+</script>
+
+<!-- Notices auto-scroll -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const wrapper = document.getElementById('scrolling-wrapper');
+  const noticeList = document.getElementById('tab-notices');
+  if (!wrapper || !noticeList) return;
+  const notices = noticeList.children;
+  const itemCount = notices.length;
+  if (!itemCount) return;
+  const visibleCount = 3;
+  const itemHeight = notices[0].offsetHeight + 12;
+  let index = 0;
+  let interval;
+
+  for (let i = 0; i < Math.min(visibleCount, itemCount); i++) {
+    noticeList.appendChild(notices[i].cloneNode(true));
+  }
+
+  function startAutoScroll() {
+    interval = setInterval(() => {
+      index++;
+      noticeList.style.transition = "transform 0.7s ease-in-out";
+      noticeList.style.transform = `translateY(-${index * itemHeight}px)`;
+      if (index >= itemCount) {
+        setTimeout(() => {
+          noticeList.style.transition = "none";
+          noticeList.style.transform = "translateY(0)";
+          index = 0;
+        }, 700);
+      }
+    }, 5000);
+  }
+  function stopAutoScroll() { clearInterval(interval); }
+
+  wrapper.addEventListener('mouseenter', stopAutoScroll);
+  wrapper.addEventListener('mouseleave', startAutoScroll);
+  startAutoScroll();
+});
+</script>
+<!-- Footer Section -->
+<footer class="site-footer">
+  <div class="ft-container">
+    <div class="ft-main">
+      <!-- Brand (small) -->
+      <div class="ft-brand">
+        <img src="https://madrasatussunnah.org/assets/madrasatus-sunnah-logo.svg" alt="Madrasatus Sunnah Logo" class="ft-logo" />
+        <p class="ft-about">আস-সুন্নাহ ফাউন্ডেশনের শিক্ষা অভিযাত্রার সূচনা-প্রতিষ্ঠান 'মাদরাসাতুস সুন্নাহ'। ইলম, আমল ও তারবিয়াহর মাধ্যমে আমরা এমন সচেতন ও সময়োপযোগী প্রজন্ম গড়ে তোলার চেষ্টা করি—যারা উম্মাহর সংকট নিরসন ও মানবকল্যাণে নেতৃত্ব দেবে, ইন-শা-আল্লাহ</p>
+      </div>
+
+      <!-- Important links -->
+      <nav class="ft-col" aria-label="গুরুত্বপূর্ণ লিংক">
+        <h4 class="ft-title">গুরুত্বপূর্ণ লিংক</h4>
+        <ul class="ft-links">
+          <li><a href="https://madrasatussunnah.org/admission-procedure">এডমিশন</a></li>
+          <li><a href="https://madrasatussunnah.org/career">ক্যারিয়ার</a></li>
+          <li><a href="https://madrasatussunnah.org/notice">নোটিশ</a></li>
+          <li><a href="https://madrasatussunnah.org/gallery">গ্যালারী</a></li>
+          <li><a href="https://madrasatussunnah.org/contact">যোগাযোগ</a></li>
+          <li><a href="https://madrasatussunnah.org/faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <!-- Contact -->
+      <div class="ft-col">
+        <h4 class="ft-title">যোগাযোগ</h4>
+        <ul class="ft-contact">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <a href="tel:+8809639151525">+8809639151525</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <a href="mailto:info@madrasatussunnah.org">info@madrasatussunnah.org</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Facebook page -->
+      <div class="ft-col ft-fb-col">
+        <h4 class="ft-title">আমাদের ফেসবুক পেজ</h4>
+        <div class="ft-fb">
+          <div class="fb-frame-wrapper">
+            <div class="fb-placeholder">লোড হচ্ছে...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft-bottom">
+    <div class="ft-container ft-bottom__inner">
+      <p>&copy; ২০২৬ মাদরাসাতুস সুন্নাহ - সর্বস্বত্ত্ব সংরক্ষিত।</p>
+      <div class="ft-bottom__links">
+        <a href="#">পরিষেবার শর্তাবলী</a>
+        <a href="#">গোপনীয়তা নীতি</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+.site-footer{
+  --ft-panel:#122036;--ft-line:rgba(255,255,255,.10);
+  --ft-text:#a9b8c9;--ft-head:#ffffff;--ft-teal:#2dd4bf;
+  position:relative;
+  background:linear-gradient(180deg,#0b1a2b 0%,#0a1420 100%);
+  color:var(--ft-text);
+  font-family:'Noto Serif Bengali',serif;
+}
+.site-footer::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#0f766e,#2dd4bf);}
+.site-footer *{box-sizing:border-box;}
+.ft-container{width:100%;max-width:1120px;margin-inline:auto;padding-inline:22px;}
+
+/* Logo | links | contact | Facebook (small box), spaced across the row */
+.ft-main{display:grid;grid-template-columns:minmax(0,345px) minmax(0,160px) minmax(0,190px) minmax(0,235px);justify-content:space-between;gap:34px;align-items:start;padding:58px 0 44px;}
+@media (max-width:980px){
+  .ft-main{grid-template-columns:1fr 1fr;justify-content:start;gap:34px;padding:46px 0 36px;}
+  .ft-fb-col{grid-column:1 / -1;}
+}
+@media (max-width:560px){
+  .ft-main{grid-template-columns:1fr;gap:30px;padding:40px 0 30px;}
+  .ft-fb-col{grid-column:auto;}
+}
+
+.ft-brand .ft-logo{height:72px;width:auto;margin-bottom:16px;display:block;}
+.ft-about{line-height:1.9;font-size:.9rem;color:var(--ft-text);margin:0;}
+
+.ft-title{font-size:1rem;font-weight:700;color:var(--ft-head);margin:0 0 20px;position:relative;padding-bottom:12px;}
+.ft-title::after{content:"";position:absolute;left:0;bottom:0;width:34px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--ft-teal),#0f766e);}
+
+.ft-links{list-style:none;margin:0;padding:0;display:grid;gap:12px;}
+.ft-links a{color:var(--ft-text);text-decoration:none;font-size:.94rem;transition:color .18s,padding-left .18s;}
+.ft-links a:hover{color:var(--ft-teal);padding-left:5px;}
+.ft-contact{list-style:none;margin:0;padding:0;display:grid;gap:12px;}
+.ft-contact li{display:flex;gap:10px;align-items:flex-start;line-height:1.6;font-size:.9rem;}
+.ft-contact svg{width:18px;height:18px;flex:0 0 auto;margin-top:2px;color:var(--ft-teal);}
+.ft-contact a{color:var(--ft-text);text-decoration:none;word-break:break-word;transition:color .18s;}
+.ft-contact a:hover{color:var(--ft-teal);}
+
+.ft-fb{border:1px solid var(--ft-line);border-radius:14px;overflow:hidden;background:var(--ft-panel);}
+.fb-frame-wrapper{position:relative;height:210px;overflow:hidden;}
+.fb-frame-wrapper > *{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.fb-placeholder{display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:.9rem;}
+@media (max-width:560px){.fb-frame-wrapper{height:200px;}}
+
+.ft-bottom{border-top:1px solid var(--ft-line);padding:24px 0;}
+.ft-bottom__inner{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.ft-bottom p{margin:0;font-size:.88rem;color:var(--ft-text);}
+.ft-bottom__links{display:flex;gap:24px;flex-wrap:wrap;}
+.ft-bottom__links a{color:var(--ft-text);text-decoration:none;font-size:.88rem;transition:.18s;}
+.ft-bottom__links a:hover{color:var(--ft-teal);}
+@media (max-width:560px){.ft-bottom__inner{flex-direction:column;align-items:flex-start;}}
+</style>
+
+<script>
+  $(document).ready(function () {
+    var iframeLoaded = false;
+
+    function loadFacebookIframe() {
+      if (!iframeLoaded) {
+        var iframe = `
+          <iframe
+            src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fmadrasatussunnah.org&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
+            width="100%"
+            height="100%"
+            style="border:none; overflow:hidden"
+            scrolling="no"
+            frameborder="0"
+            allowfullscreen="true"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            title="Madrasatus Sunnah Facebook Page"></iframe>
+        `;
+        $(".fb-frame-wrapper").html(iframe);
+        iframeLoaded = true;
+      }
+    }
+
+    function checkIfVisible() {
+      var $el = $(".fb-frame-wrapper");
+      if ($el.length === 0) return;
+      var windowTop = $(window).scrollTop();
+      var windowBottom = windowTop + $(window).height();
+      var elTop = $el.offset().top;
+      var elBottom = elTop + $el.height();
+      if (elBottom >= windowTop && elTop <= windowBottom + 100) {
+        loadFacebookIframe();
+      }
+    }
+
+    checkIfVisible();
+    $(window).on("scroll resize", checkIfVisible);
+  });
+</script>
+
+<!-- Scripts -->
+<script src="https://madrasatussunnah.org/js/style.js?v=3"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    once: true,
+    duration: 1000,
+    easing: 'ease-out',
+  });
+</script>
+<script>
+$('#feedbackForm').on('submit', function(e) {
+  e.preventDefault();
+  $.ajax({
+    url: 'https://madrasatussunnah.org/control.php?feedback=1',
+    type: 'POST',
+    data: $(this).serialize(),
+    dataType: 'json',
+    success: function(res) {
+      if (res.status === 'success') {
+        $('#feedbackMsg').removeClass('hidden text-red-600').addClass('text-green-600').text('✅ ' + res.message);
+        $('#feedbackForm')[0].reset();
+      } else {
+        $('#feedbackMsg').removeClass('hidden text-green-600').addClass('text-red-600').text('❌ ' + res.message);
+      }
+    },
+    error: function() {
+      $('#feedbackMsg').removeClass('hidden text-green-600').addClass('text-red-600').text('❌ সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+    }
+  });
+});
+</script>
+
+</body>
+
+</html>
