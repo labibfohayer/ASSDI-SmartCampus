@@ -39,7 +39,7 @@ export default function NotificationBell() {
 
   const fetchUnreadCount = async () => {
     try {
-      const res = await api.get('/notifications/unread-count/');
+      const res = await api.get('/api/v1/notifications/unread-count/');
       setUnreadCount(res.data.unread_count || 0);
     } catch {
       // Ignore background poll errors silently
@@ -49,7 +49,7 @@ export default function NotificationBell() {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/notifications/');
+      const res = await api.get('/api/v1/notifications/');
       const items = res.data.results || res.data || [];
       setNotifications(items.slice(0, 15));
     } catch (err) {
@@ -88,7 +88,7 @@ export default function NotificationBell() {
 
   const handleMarkAsRead = async (id: number, payload?: Record<string, any>) => {
     try {
-      await api.post(`/notifications/${id}/mark-read/`);
+      await api.post(`/api/v1/notifications/${id}/mark-read/`);
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
       );
@@ -109,7 +109,7 @@ export default function NotificationBell() {
 
   const handleMarkAllRead = async () => {
     try {
-      await api.post('/notifications/mark-all-read/');
+      await api.post('/api/v1/notifications/mark-all-read/');
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (err) {

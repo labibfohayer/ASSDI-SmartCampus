@@ -10,8 +10,11 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to attach Bearer token
+// Request interceptor to attach Bearer token and ensure /api/v1 prefix
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (config.url && !config.url.startsWith('/api/v1') && !config.url.startsWith('http')) {
+    config.url = `/api/v1${config.url.startsWith('/') ? config.url : `/${config.url}`}`;
+  }
   const token = getAccessToken();
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;

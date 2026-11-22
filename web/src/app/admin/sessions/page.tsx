@@ -92,8 +92,8 @@ export default function AdminSessionsPage() {
     setError(null);
     try {
       const [sessionsRes, batchesRes] = await Promise.all([
-        api.get('/class-sessions/'),
-        api.get('/batches/'),
+        api.get('/api/v1/class-sessions/'),
+        api.get('/api/v1/batches/'),
       ]);
 
       const sessData = Array.isArray(sessionsRes.data)
@@ -130,7 +130,7 @@ export default function AdminSessionsPage() {
 
     setActionLoadingId(session.id);
     try {
-      const res = await api.post(`/class-sessions/${session.id}/publish/`);
+      const res = await api.post(`/api/v1/class-sessions/${session.id}/publish/`);
       setSessions((prev) =>
         prev.map((s) => (s.id === session.id ? { ...s, status: 'published', published_at: res.data.published_at } : s))
       );
@@ -150,7 +150,7 @@ export default function AdminSessionsPage() {
 
     setIsSubmittingCancel(true);
     try {
-      await api.post(`/class-sessions/${cancellingSession.id}/cancel/`, {
+      await api.post(`/api/v1/class-sessions/${cancellingSession.id}/cancel/`, {
         cancel_reason: cancelReason.trim(),
       });
       setSessions((prev) =>
@@ -194,14 +194,14 @@ export default function AdminSessionsPage() {
         payload.batch_id = parseInt(genBatchId, 10);
       }
 
-      const res = await api.post('/class-schedules/generate-all-sessions/', payload);
+      const res = await api.post('/api/v1/class-schedules/generate-all-sessions/', payload);
       setGenerateResult(
         isBangla
           ? `সফলভাবে ${res.data.created_count || 0}টি সেশন তৈরি ও পাবলিশ করা হয়েছে!`
           : `Successfully created & published ${res.data.created_count || 0} sessions!`
       );
       // Refresh list
-      const updatedSess = await api.get('/class-sessions/');
+      const updatedSess = await api.get('/api/v1/class-sessions/');
       setSessions(
         Array.isArray(updatedSess.data)
           ? updatedSess.data

@@ -203,7 +203,7 @@ export default function ReportsPage() {
 
   const fetchBatches = async () => {
     try {
-      const res = await api.get('/batches/');
+      const res = await api.get('/api/v1/batches/');
       const data = Array.isArray(res.data) ? res.data : res.data?.results || [];
       setBatches(data);
     } catch (err) {

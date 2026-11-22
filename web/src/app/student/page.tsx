@@ -130,11 +130,11 @@ export default function StudentPortalPage() {
     setLoading(true);
     try {
       const [profRes, attRes, sessRes, fbRes, helpRes] = await Promise.all([
-        api.get('/students/me/'),
-        api.get('/attendance/mine/'),
-        api.get('/class-sessions/'),
-        api.get('/feedback/mine/'),
-        api.get('/help-requests/'),
+        api.get('/api/v1/students/me/'),
+        api.get('/api/v1/attendance/mine/'),
+        api.get('/api/v1/class-sessions/'),
+        api.get('/api/v1/feedback/mine/'),
+        api.get('/api/v1/help-requests/'),
       ]);
 
       setProfile(profRes.data?.data || profRes.data);
@@ -167,7 +167,7 @@ export default function StudentPortalPage() {
     setSubmittingFeedback(true);
     setFeedbackSuccessMsg(null);
     try {
-      await api.post('/feedback/', {
+      await api.post('/api/v1/feedback/', {
         session: selectedSessionForFeedback.id,
         understanding_rating: feedbackRating,
         needs_help: feedbackNeedsHelp,
@@ -182,8 +182,8 @@ export default function StudentPortalPage() {
 
       // Refresh feedbacks & help requests
       const [fbRes, helpRes] = await Promise.all([
-        api.get('/feedback/mine/'),
-        api.get('/help-requests/'),
+        api.get('/api/v1/feedback/mine/'),
+        api.get('/api/v1/help-requests/'),
       ]);
       setFeedbacks(Array.isArray(fbRes.data) ? fbRes.data : []);
       setHelpRequests(Array.isArray(helpRes.data) ? helpRes.data : helpRes.data?.results || []);

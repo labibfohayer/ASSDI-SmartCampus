@@ -63,7 +63,7 @@ export default function AnnouncementsPage() {
   const fetchAnnouncements = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/announcements/');
+      const res = await api.get('/api/v1/announcements/');
       const items = res.data.results || res.data || [];
       setAnnouncements(items);
     } catch (err: any) {
@@ -77,8 +77,8 @@ export default function AnnouncementsPage() {
     if (!canPublish) return;
     try {
       const [coursesRes, batchesRes] = await Promise.all([
-        api.get('/courses/'),
-        api.get('/batches/'),
+        api.get('/api/v1/courses/'),
+        api.get('/api/v1/batches/'),
       ]);
       setCourses(coursesRes.data.results || coursesRes.data || []);
       setBatches(batchesRes.data.results || batchesRes.data || []);
@@ -111,7 +111,7 @@ export default function AnnouncementsPage() {
 
     setSubmitting(true);
     try {
-      await api.post('/announcements/', {
+      await api.post('/api/v1/announcements/', {
         scope,
         target_course: scope === 'Course' ? parseInt(targetCourse) : null,
         target_batch: scope === 'Batch' ? parseInt(targetBatch) : null,
@@ -140,7 +140,7 @@ export default function AnnouncementsPage() {
     }
 
     try {
-      await api.delete(`/announcements/${id}/`);
+      await api.delete(`/api/v1/announcements/${id}/`);
       toast.success(isBangla ? 'নোটিশ মুছে ফেলা হয়েছে।' : 'Notice deleted.');
       setAnnouncements((prev) => prev.filter((a) => a.id !== id));
     } catch {
