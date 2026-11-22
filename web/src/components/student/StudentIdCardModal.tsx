@@ -14,6 +14,7 @@ import {
   CreditCard,
   QrCode,
   Download,
+  User,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
@@ -127,9 +128,9 @@ export default function StudentIdCardModal({
         if (initialData && initialData.student_id_number) {
           setCardData({
             student_id: Number(initialData.student_id) || 1,
-            student_id_number: initialData.student_id_number || '4138',
+            student_id_number: initialData.student_id_number || 'STD-2026-042-001',
             registration_no: initialData.registration_no || 'REG-2026-042-001',
-            full_name: initialData.full_name || 'Labib Fohayer',
+            full_name: initialData.full_name || 'Abdullah Student',
             phone: initialData.phone || '+880 1700-000001',
             guardian_phone: initialData.guardian_phone || '+880 1800-000001',
             education_background: initialData.education_background || 'General',
@@ -146,7 +147,7 @@ export default function StudentIdCardModal({
             expiry_date: initialData.expiry_date || '15-11-2026',
             verification_payload:
               initialData.verification_payload ||
-              `ASSDI:VERIFY:${initialData.student_id_number || '4138'}:ACTIVE`,
+              `ASSDI:VERIFY:${initialData.student_id_number || 'STD-2026-042-001'}:ACTIVE`,
             institution_name_bn: 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট',
             institution_name_en: 'As-Sunnah Skill Development Institute',
             institution_tagline: 'দক্ষ মানবসম্পদ গঠনে আস-সুন্নাহ ফাউন্ডেশনের একটি কল্যাণমূলক উদ্যোগ',
@@ -155,7 +156,7 @@ export default function StudentIdCardModal({
             motto: 'EFFICIENCY · HONESTY · PROSPERITY',
             govt_reg: 'Govt. Reg. #STP-DHA-000877',
             website: 'skill.assunnahfoundation.org',
-            photo_url: '/student-sample.jpg',
+            photo_url: undefined,
             signature_url: '/signature-transparent.png',
           });
         }
@@ -171,9 +172,9 @@ export default function StudentIdCardModal({
 
   const data: StudentIdCardData = cardData || {
     student_id: 1,
-    student_id_number: '4138',
+    student_id_number: 'STD-2026-042-001',
     registration_no: 'REG-2026-042-001',
-    full_name: 'LABIB FOHAYER',
+    full_name: 'আব্দুল্লাহ (Abdullah Student)',
     phone: '+880 1700-000001',
     guardian_phone: '+880 1800-000001',
     education_background: 'General',
@@ -197,7 +198,7 @@ export default function StudentIdCardModal({
     motto: 'EFFICIENCY · HONESTY · PROSPERITY',
     govt_reg: 'Govt. Reg. #STP-DHA-000877',
     website: 'skill.assunnahfoundation.org',
-    photo_url: '/student-sample.jpg',
+    photo_url: undefined,
     signature_url: '/signature-transparent.png',
   };
 
@@ -347,16 +348,23 @@ export default function StudentIdCardModal({
 
                     {/* Student Portrait Photo */}
                     <div className="relative z-10 my-1 flex justify-center">
-                      <div className="w-[114px] h-[138px] rounded-xl border-2 border-[#84CC16] p-0.5 shadow-2xs overflow-hidden bg-emerald-50/50">
-                        <img
-                          src={data.photo_url || '/student-sample.jpg'}
-                          alt={data.full_name}
-                          className="w-full h-full object-cover rounded-[9px]"
-                          onError={(e) => {
-                            // Fallback if image fails to load
-                            (e.target as HTMLElement).style.display = 'none';
-                          }}
-                        />
+                      <div className="w-[114px] h-[138px] rounded-xl border-2 border-[#84CC16] p-0.5 shadow-2xs overflow-hidden bg-slate-100 flex flex-col items-center justify-center">
+                        {data.photo_url ? (
+                          <img
+                            src={data.photo_url}
+                            alt={data.full_name}
+                            className="w-full h-full object-cover rounded-[9px]"
+                          />
+                        ) : (
+                          <div className="w-full h-full rounded-[9px] bg-slate-50 flex flex-col items-center justify-center text-slate-400 select-none">
+                            <div className="w-14 h-14 rounded-full bg-slate-200/80 border border-slate-300 flex items-center justify-center text-slate-500 mb-1">
+                              <User className="w-8 h-8 text-slate-400" />
+                            </div>
+                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider">
+                              Student Photo
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -585,12 +593,23 @@ export default function StudentIdCardModal({
 
                   {/* Right: Student Portrait Photo with Lime Green Border & Verified QR */}
                   <div className="flex flex-col items-center justify-center gap-1.5 shrink-0">
-                    <div className="w-[100px] h-[120px] rounded-xl border-2 border-[#84CC16] p-0.5 shadow-2xs overflow-hidden bg-emerald-50/50">
-                      <img
-                        src={data.photo_url || '/student-sample.jpg'}
-                        alt={data.full_name}
-                        className="w-full h-full object-cover rounded-[9px]"
-                      />
+                    <div className="w-[100px] h-[120px] rounded-xl border-2 border-[#84CC16] p-0.5 shadow-2xs overflow-hidden bg-slate-100 flex flex-col items-center justify-center">
+                      {data.photo_url ? (
+                        <img
+                          src={data.photo_url}
+                          alt={data.full_name}
+                          className="w-full h-full object-cover rounded-[9px]"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-[9px] bg-slate-50 flex flex-col items-center justify-center text-slate-400 select-none">
+                          <div className="w-12 h-12 rounded-full bg-slate-200/80 border border-slate-300 flex items-center justify-center text-slate-500 mb-1">
+                            <User className="w-7 h-7 text-slate-400" />
+                          </div>
+                          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">
+                            Photo
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-1">
                       <QRCodeSVG value={data.verification_payload} size={28} level="L" />

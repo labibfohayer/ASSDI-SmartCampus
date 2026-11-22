@@ -484,7 +484,7 @@ class StudentViewSet(viewsets.ModelViewSet):
                 "motto": "EFFICIENCY · HONESTY · PROSPERITY",
                 "govt_reg": "Govt. Reg. #STP-DHA-000877",
                 "website": "skill.assunnahfoundation.org",
-                "photo_url": "/student-sample.jpg",
+                "photo_url": None,
                 "signature_url": "/signature-transparent.png",
             },
             status=status.HTTP_200_OK,
