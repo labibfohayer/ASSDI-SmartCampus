@@ -25,6 +25,7 @@ import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { getUser } from '@/lib/auth';
 
 interface StudentProfile {
   id: number;
@@ -167,9 +168,10 @@ export default function StudentPortalPage() {
   const loadStudentData = async () => {
     setLoading(true);
     try {
-      const isStudent = user ? user.role === 'student' : true;
+      const currentUser = user || getUser();
+      const isStudent = currentUser ? currentUser.role === 'student' : false;
 
-      if (user && !isStudent) {
+      if (currentUser && !isStudent) {
         setIsAdminPreview(true);
         // Load in Admin Preview Mode using student listing and published sessions
         const [stdListRes, sessRes, helpRes] = await Promise.all([
@@ -260,7 +262,7 @@ export default function StudentPortalPage() {
         : helpRes.data?.results || [];
       setHelpRequests(helpList);
     } catch (err) {
-      console.error('Error loading student portal data:', err);
+      console.warn('Error loading student portal data:', err);
     } finally {
       setLoading(false);
     }
@@ -300,8 +302,8 @@ export default function StudentPortalPage() {
 
       // Refresh feedbacks & help requests
       const [fbRes, helpRes] = await Promise.all([
-        api.get('/api/v1/feedback/mine/'),
-        api.get('/api/v1/help-requests/'),
+        api.get('/api/v1/feedback/mine/').catch(() => ({ data: [] })),
+        api.get('/api/v1/help-requests/').catch(() => ({ data: [] })),
       ]);
       setFeedbacks(Array.isArray(fbRes.data) ? fbRes.data : []);
       setHelpRequests(Array.isArray(helpRes.data) ? helpRes.data : helpRes.data?.results || []);
