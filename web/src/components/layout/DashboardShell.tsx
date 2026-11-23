@@ -97,16 +97,6 @@ const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
     isSystemDefault: true,
   },
   {
-    id: 'coordinator_analytics',
-    href: '/coordinator',
-    labelBn: 'কো-অর্ডিনেটর ড্যাশবোর্ড',
-    labelEn: 'Coordinator Dashboard',
-    iconName: 'BarChart3',
-    section: 'analytics',
-    isArchived: false,
-    isSystemDefault: true,
-  },
-  {
     id: 'reports_hub',
     href: '/reports',
     labelBn: '৯টি এসআরএস রিপোর্টস হাব',
@@ -193,7 +183,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setAdminMenus(parsed);
+            // Strictly exclude any cross-dashboard coordinator navigation from admin menus
+            const sanitized = parsed.filter(
+              (m: any) => m.id !== 'coordinator_analytics' && m.href !== '/coordinator'
+            );
+            setAdminMenus(sanitized);
+            localStorage.setItem('assdi_admin_nav_menus_v1', JSON.stringify(sanitized));
           }
         }
       } catch (e) {

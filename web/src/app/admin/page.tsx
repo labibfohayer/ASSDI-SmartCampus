@@ -18,6 +18,7 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
+  Megaphone,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -98,14 +99,14 @@ export default function AdminOverviewPage() {
       badge: `${d(stats.totalSessions)} ${isBangla ? 'টি সেশন' : 'Sessions'}`,
     },
     {
-      title: isBangla ? 'কোঅর্ডিনেশন অ্যানালিটিক্স' : 'Academic Analytics',
+      title: isBangla ? 'নোটিশ ও প্রাতিষ্ঠানিক যোগাযোগ' : 'Institutional Announcements',
       desc: isBangla
-        ? 'উপস্থিতি ও লার্নিং প্রগ্রেসের সেন্ট্রাল কেপিআই এবং অ্যাট-রিস্ক অ্যালার্ট।'
-        : 'View centralized attendance rates, learning outcomes, and red flags.',
-      icon: BarChart3,
-      href: '/coordinator',
-      color: 'bg-amber-50 text-amber-800 border border-amber-200',
-      badge: isBangla ? 'অ্যানালিটিক্স ড্যাশবোর্ড' : 'Live Analytics',
+        ? 'ইনস্টিটিউটের শিক্ষার্থী ও শিক্ষকদের জন্য জরুরি নোটিশ তৈরি ও প্রকাশ।'
+        : 'Publish official notices, campus alerts, and urgent announcements.',
+      icon: Megaphone,
+      href: '/announcements',
+      color: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
+      badge: isBangla ? 'নোটিশ বোর্ড' : 'Notice Board',
     },
     {
       title: isBangla ? '৯টি এসআরএস রিপোর্ট ও এক্সপোর্ট' : '9 SRS Reports Hub',

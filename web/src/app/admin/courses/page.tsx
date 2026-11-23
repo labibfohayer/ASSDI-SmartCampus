@@ -11,6 +11,9 @@ import {
   UserCheck,
   CheckCircle2,
   Clock,
+  Trash2,
+  RefreshCw,
+  GraduationCap,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -36,6 +39,30 @@ export default function AdminCoursesPage() {
     end_date: '',
     capacity: '40',
   });
+
+  const [selectedBatchFilter, setSelectedBatchFilter] = useState('all');
+  const [teacherToDelete, setTeacherToDelete] = useState<any | null>(null);
+  const [deletingTeacher, setDeletingTeacher] = useState(false);
+
+  const handleRemoveTeacherAssignment = async () => {
+    if (!teacherToDelete) return;
+    setDeletingTeacher(true);
+    try {
+      await api.delete(`/api/v1/teacher-assignments/${teacherToDelete.id}/`);
+      toast.success(
+        isBangla
+          ? `${teacherToDelete.teacher_name}-কে উক্ত ব্যাচ ও বিষয় থেকে সফলভাবে রিমুভ করা হয়েছে।`
+          : `Teacher ${teacherToDelete.teacher_name} unassigned successfully.`
+      );
+      setTeacherToDelete(null);
+      fetchData();
+    } catch (err: any) {
+      console.error('Failed to remove teacher assignment:', err);
+      toast.error(isBangla ? 'শিক্ষক অপসরণ ব্যর্থ হয়েছে।' : 'Failed to unassign teacher.');
+    } finally {
+      setDeletingTeacher(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -110,6 +137,11 @@ export default function AdminCoursesPage() {
       setSubmitting(false);
     }
   };
+
+  const filteredTeachers = teachers.filter((t) => {
+    if (selectedBatchFilter === 'all') return true;
+    return String(t.batch) === selectedBatchFilter;
+  });
 
   return (
     <div className="space-y-6">
@@ -239,6 +271,158 @@ export default function AdminCoursesPage() {
           </table>
         </div>
       </div>
+
+      {/* Teacher Assignments & Faculty Governance */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-[#0F766E]" />
+              <span>{isBangla ? 'শিক্ষক নিয়োগ ও অনুষদ ব্যবস্থাপনা' : 'Teacher Assignments & Faculty Roster'}</span>
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {isBangla
+                ? 'বিষয়ভিত্তিক শিক্ষক অ্যাসাইনমেন্ট পর্যালোচনা ও শিক্ষক রিমুভ / পরিবর্তনের নিয়ন্ত্রণ।'
+                : 'Manage faculty assignments per batch and revoke or remove teachers.'}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <select
+              value={selectedBatchFilter}
+              onChange={(e) => setSelectedBatchFilter(e.target.value)}
+              className="px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+            >
+              <option value="all" className="bg-white text-[#0F172A]">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
+              {batches.map((b) => (
+                <option key={b.id} value={b.id.toString()} className="bg-white text-[#0F172A]">
+                  {b.name}
+                </option>
+              ))}
+            </select>
+            <span className="text-xs font-bold text-[#0369A1] px-3 py-1 bg-[#F0FDFA] rounded-full border border-[#CCFBF1] shrink-0">
+              {d(filteredTeachers.length)} {isBangla ? 'টি নিয়োগ' : 'Assignments'}
+            </span>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+              <tr>
+                <th className="py-3 px-4">{isBangla ? 'শিক্ষকের নাম' : 'Teacher Name'}</th>
+                <th className="py-3 px-4">{isBangla ? 'লগইন আইডি' : 'Login ID'}</th>
+                <th className="py-3 px-4">{isBangla ? 'বিষয়' : 'Subject'}</th>
+                <th className="py-3 px-4">{isBangla ? 'ব্যাচ' : 'Batch'}</th>
+                <th className="py-3 px-4">{isBangla ? 'ভূমিকা' : 'Role'}</th>
+                <th className="py-3 px-4 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredTeachers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-slate-500 font-medium">
+                    {isBangla ? 'কোনো শিক্ষক নিয়োগ পাওয়া যায়নি।' : 'No teacher assignments found.'}
+                  </td>
+                </tr>
+              ) : (
+                filteredTeachers.map((ta) => (
+                  <tr key={ta.id} className="hover:bg-[#F0FDFA]/50 transition">
+                    <td className="py-3.5 px-4 font-bold text-gray-900 flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-[#E0F2FE] text-[#0284C7] font-extrabold flex items-center justify-center text-xs shrink-0">
+                        {ta.teacher_name?.charAt(0) || 'T'}
+                      </div>
+                      <span>{ta.teacher_name}</span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono text-gray-600">
+                      {ta.teacher_login_id}
+                    </td>
+                    <td className="py-3.5 px-4 font-bold text-[#0F766E]">
+                      {ta.subject_name}
+                    </td>
+                    <td className="py-3.5 px-4 text-gray-800 font-medium">
+                      {ta.batch_name}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="px-2 py-0.5 rounded-full bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] text-[10px] font-bold">
+                        {ta.is_primary ? (isBangla ? 'প্রধান শিক্ষক' : 'Primary') : (isBangla ? 'সহকারী' : 'Associate')}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-right">
+                      <button
+                        onClick={() => setTeacherToDelete(ta)}
+                        className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 text-xs font-bold transition inline-flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
+                        title={isBangla ? 'শিক্ষক অ্যাসাইনমেন্ট অপসরণ / রিমুভ করুন' : 'Remove Teacher Assignment'}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>{isBangla ? 'রিমুভ' : 'Remove'}</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Teacher Assignment Deletion Confirmation Modal */}
+      {teacherToDelete && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-rose-200 border-t-4 border-t-rose-600 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-[#0F172A]">
+                  {isBangla ? 'শিক্ষক নিয়োগ অপসরণ নিশ্চিত করুন' : 'Confirm Teacher Removal'}
+                </h3>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                  {teacherToDelete.teacher_name} ({teacherToDelete.teacher_login_id})
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {isBangla
+                ? `আপনি কি নিশ্চিত যে ${teacherToDelete.teacher_name}-কে "${teacherToDelete.batch_name}" ব্যাচের "${teacherToDelete.subject_name}" বিষয় থেকে অপসরণ / রিমুভ করতে চান?`
+                : `Are you sure you want to remove ${teacherToDelete.teacher_name} from ${teacherToDelete.batch_name} for ${teacherToDelete.subject_name}?`}
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setTeacherToDelete(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition cursor-pointer"
+              >
+                {isBangla ? 'বাতিল' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                onClick={handleRemoveTeacherAssignment}
+                disabled={deletingTeacher}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {deletingTeacher ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
+                ) : (
+                  <Trash2 className="w-3.5 h-3.5 text-white" />
+                )}
+                <span>
+                  {deletingTeacher
+                    ? isBangla
+                      ? 'অপসরণ হচ্ছে...'
+                      : 'Removing...'
+                    : isBangla
+                    ? 'হ্যাঁ, রিমুভ করুন'
+                    : 'Confirm Remove'}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Batch Modal */}
       {showBatchModal && (
