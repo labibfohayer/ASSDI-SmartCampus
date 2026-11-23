@@ -19,7 +19,7 @@ export default function NotFound() {
           />
         </div>
 
-        <span className="inline-block px-3 py-1 text-xs font-bold text-[#0F766E] bg-[#F0FDFA] border border-[#CCFBF1] rounded-full mb-3">
+        <span className="inline-block px-3 py-1 text-xs font-bold text-[#0369A1] bg-[#F0FDFA] border border-[#CCFBF1] rounded-full mb-3">
           ৪০৪ • পেজটি পাওয়া যায়নি
         </span>
 
@@ -34,7 +34,7 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/"
-            className="w-full sm:flex-1 py-2.5 px-4 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+            className="w-full sm:flex-1 py-2.5 px-4 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
           >
             <Home className="w-4 h-4" />
             <span>মূল পাতায় যান</span>

@@ -255,11 +255,11 @@ export default function WebQRScannerModal({
         {/* Modal Header */}
         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200/90 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0F766E] text-[#C1982E] flex items-center justify-center shadow-xs">
-              <QrCode className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-[#FFFBEB] border border-[#FCD34D] text-[#B45309] flex items-center justify-center shadow-xs">
+              <QrCode className="w-5 h-5 text-[#B45309]" />
             </div>
             <div>
-              <h3 className="font-extrabold text-[#0F766E] text-base sm:text-lg flex items-center gap-2">
+              <h3 className="font-extrabold text-[#92400E] text-base sm:text-lg flex items-center gap-2">
                 {isBangla ? 'উপস্থিতি কিউআর স্ক্যানার' : 'Attendance QR Scanner'}
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                   Live
@@ -290,7 +290,7 @@ export default function WebQRScannerModal({
             onClick={() => setActiveTab('camera')}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
               activeTab === 'camera'
-                ? 'bg-white text-[#0F766E] shadow-xs'
+                ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -304,7 +304,7 @@ export default function WebQRScannerModal({
             }}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
               activeTab === 'manual'
-                ? 'bg-white text-[#0F766E] shadow-xs'
+                ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -405,9 +405,9 @@ export default function WebQRScannerModal({
                     <div className="flex gap-2 mt-1">
                       <button
                         onClick={startCamera}
-                        className="px-3.5 py-1.5 rounded-lg bg-[#0F766E] hover:bg-[#115E59] text-[#C1982E] text-xs font-bold border border-[#C1982E]/40 flex items-center gap-1.5 transition-colors cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-lg bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold border border-[#FCD34D] flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
-                        <RefreshCw className="w-3.5 h-3.5" />
+                        <RefreshCw className="w-3.5 h-3.5 text-white" />
                         <span>{isBangla ? 'আবার চেষ্টা করুন' : 'Retry Camera'}</span>
                       </button>
                       <button
@@ -469,7 +469,7 @@ export default function WebQRScannerModal({
                         ? 'প্রজেক্টরে প্রদর্শিত টোকেন কোড দিন'
                         : 'Paste or type session token...'
                     }
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:bg-white"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#B45309] focus:bg-white"
                     required
                   />
                 </div>
@@ -483,12 +483,12 @@ export default function WebQRScannerModal({
               <button
                 type="submit"
                 disabled={submitting || !manualToken.trim()}
-                className="w-full py-2.5 px-4 rounded-xl bg-[#0F766E] hover:bg-[#115E59] text-[#C1982E] text-xs sm:text-sm font-bold border border-[#C1982E]/40 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#B45309] hover:bg-[#92400E] text-white text-xs sm:text-sm font-bold border border-[#FCD34D] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
               >
                 {submitting ? (
-                  <RefreshCw className="w-4 h-4 animate-spin text-[#C1982E]" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-white" />
                 ) : (
-                  <ShieldCheck className="w-4 h-4 text-[#C1982E]" />
+                  <ShieldCheck className="w-4 h-4 text-white" />
                 )}
                 <span>
                   {isBangla ? 'উপস্থিতি সাবমিট করুন' : 'Submit Attendance'}

@@ -23,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!isMounted) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin" />
       </div>
     );
   }
@@ -46,7 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <ShieldAlert className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-base font-extrabold text-[#0F766E] font-heading">
+            <h2 className="text-base font-extrabold text-[#B45309] font-heading">
               শুধুমাত্র সুপার অ্যাডমিনের জন্য সংরক্ষিত
             </h2>
             <p className="text-xs text-[#475569] mt-1.5 leading-relaxed">
@@ -60,7 +60,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 await logoutUser();
                 router.replace('/login');
               }}
-              className="w-full py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              className="w-full py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95"
             >
               <LogOut className="w-4 h-4 text-[#C1982E]" />
               <span>লগআউট করে অ্যাডমিন হিসেবে লগইন করুন</span>

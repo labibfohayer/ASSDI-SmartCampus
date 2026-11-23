@@ -6,11 +6,11 @@
   --font-bangla: var(--font-noto-serif-bengali), var(--font-hind-siliguri), sans-serif;
   --font-arabic: var(--font-amiri), serif;
 
-  /* Primary Brand Teal Palette from madrasatussunnah.org */
-  --color-brand-primary: #0F766E;
-  --color-brand-primary-hover: #115E59;
-  --color-brand-teal-2: #0D9488;
-  --color-brand-teal-3: #14B8A6;
+  /* Primary Brand Palette from madrasatussunnah.org (Amber/Terracotta Banner Style) */
+  --color-brand-primary: #B45309;
+  --color-brand-primary-hover: #92400E;
+  --color-brand-teal-2: #D97706;
+  --color-brand-teal-3: #F59E0B;
   --color-brand-teal-soft: #F0FDFA;
   --color-brand-teal-line: #CCFBF1;
   --color-brand-teal-pill: #99F6E4;
@@ -24,9 +24,9 @@
 
   /* Deep Midnight App Shell & Footer Colors */
   --color-brand-navy-dark: #0A1420;
-  --color-brand-navy-start: #0B1A2B;
+  --color-brand-navy-start: #1E293B;
   --color-brand-navy-panel: #122036;
-  --color-brand-royal: #0B1A2B;
+  --color-brand-royal: #1E293B;
   --color-brand-royal-hover: #122036;
 
   /* Neutrals & Surfaces */
@@ -59,11 +59,11 @@
 
   --color-status-info-bg: #F0FDFA;
   --color-status-info-border: #CCFBF1;
-  --color-status-info-text: #0F766E;
-  --color-status-info-accent: #0D9488;
+  --color-status-info-text: #0369A1;
+  --color-status-info-accent: #0284C7;
 
   /* 5-Color Chart Palette */
-  --color-chart-1: #0F766E;
+  --color-chart-1: #B45309;
   --color-chart-2: #14B8A6;
   --color-chart-3: #C1982E;
   --color-chart-4: #16A34A;
@@ -73,10 +73,10 @@
 :root {
   --background: #F8FAFC;
   --foreground: #0F172A;
-  --hm-teal: #0F766E;
-  --hm-teal-hover: #115E59;
-  --hm-teal-2: #0D9488;
-  --hm-teal-3: #14B8A6;
+  --hm-teal: #B45309;
+  --hm-teal-hover: #92400E;
+  --hm-teal-2: #D97706;
+  --hm-teal-3: #F59E0B;
   --hm-teal-soft: #F0FDFA;
   --hm-teal-line: #CCFBF1;
   --hm-teal-pill: #99F6E4;
@@ -89,7 +89,7 @@
   --hm-subtle: #94A3B8;
 
   /* Chart Colors for Recharts */
-  --chart-1: #0F766E;
+  --chart-1: #B45309;
   --chart-2: #14B8A6;
   --chart-3: #C1982E;
   --chart-4: #16A34A;
@@ -119,9 +119,9 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: none !important;
 }
 
-/* Selection highlight in Deep Teal & Gold */
+/* Selection highlight in Warm Amber */
 ::selection {
-  background-color: #0F766E;
+  background-color: #B45309;
   color: #FFFFFF;
 }
 
@@ -160,7 +160,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: #0F766E;
+  background-color: #B45309;
   color: #FFFFFF;
   font-weight: 700;
   border-radius: 12px;
@@ -170,7 +170,7 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
 }
 .hm-btn-primary:hover {
-  background-color: #115E59;
+  background-color: #92400E;
   transform: translateY(-1px);
 }
 .hm-btn-primary:active {
@@ -194,7 +194,7 @@ h1, h2, h3, h4, h5, h6 {
 .hm-btn-secondary:hover {
   background-color: #F8FAFC;
   border-color: #99F6E4;
-  color: #0F766E;
+  color: #B45309;
 }
 
 .hm-input {
@@ -221,7 +221,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .hm-table thead th {
   background-color: #F0FDFA;
-  color: #0F766E;
+  color: #B45309;
   font-weight: 700;
   font-size: 0.88rem;
   padding: 12px 14px;

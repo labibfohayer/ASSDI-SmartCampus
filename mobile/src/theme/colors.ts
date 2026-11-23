@@ -1,9 +1,9 @@
 import { tokens } from '../../theme/tokens';
 
 export const colors = {
-  primary: tokens.colors.primary, // #0F766E
+  primary: tokens.colors.primary, // #B45309
   primaryLight: tokens.colors.tealSoft, // #F0FDFA
-  primaryDark: tokens.colors.primaryHover, // #115E59
+  primaryDark: tokens.colors.primaryHover, // #92400E
   accent: tokens.colors.teal3, // #14B8A6
   gold: tokens.colors.gold, // #C1982E
   white: '#FFFFFF',
@@ -25,7 +25,7 @@ export const colors = {
     2: '#EA580C', // Orange
     3: '#D97706', // Amber/Yellow
     4: '#16A34A', // Light green
-    5: '#0F766E', // Madrasat-us-Sunnah Deep Teal
+    5: '#B45309', // Warm Amber Brand
   },
 
   status: {

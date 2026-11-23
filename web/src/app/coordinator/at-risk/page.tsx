@@ -84,18 +84,16 @@ export default function CoordinatorAtRiskPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
-
+      <div className="bg-[#FFFBEB] p-6 sm:p-7 rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] shadow-xs relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-500/20 border border-red-500/40 rounded-full text-xs font-semibold text-red-200 mb-2">
-            <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 border border-[#FCD34D] rounded-full text-xs font-semibold text-red-700 mb-2 shadow-xs">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
             <span>{isBangla ? 'প্রাতিষ্ঠানিক আর্লি ওয়ার্নিং সিস্টেম' : 'Early Warning Alert System'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading text-[#0F172A]">
             {isBangla ? 'ঝুঁকিপূর্ণ শিক্ষার্থী ও পুনরাবৃত্ত অনুপস্থিতি অ্যালার্ট' : 'At-Risk & Repeated Absence Alerts'}
           </h1>
-          <p className="text-xs sm:text-sm text-teal-50 mt-1 max-w-2xl">
+          <p className="text-xs sm:text-sm text-[#78350F] mt-1 max-w-2xl">
             {isBangla
               ? 'টানা ৩ দিন বা মোট ৫ দিন অনুপস্থিত এবং গড় বোঝাপড়ার রেটিং ২.০ বা তার নিচে থাকা শিক্ষার্থীদের প্রাথমিক হস্তক্ষেপ তালিকা।'
               : 'Early warning list for students with 3+ consecutive absences, 5+ total absences, or rating <= 2.0.'}
@@ -103,7 +101,7 @@ export default function CoordinatorAtRiskPage() {
         </div>
 
         <div className="flex items-center gap-2 relative z-10">
-          <span className="px-4 py-2 bg-red-600/30 text-red-100 text-xs font-bold rounded-xl border border-red-500/50 shadow-xs">
+          <span className="px-4 py-2 bg-red-50 text-red-700 text-xs font-bold rounded-xl border border-red-200 shadow-xs">
             {isBangla ? 'চিহ্নিত শিক্ষার্থী:' : 'Flagged Students:'} {d(data?.students_requiring_attention_count || 0)} {isBangla ? 'জন' : ''}
           </span>
         </div>
@@ -136,7 +134,7 @@ export default function CoordinatorAtRiskPage() {
                 placeholder={isBangla ? 'শিক্ষার্থীর নাম বা আইডি দিয়ে খুঁজুন...' : 'Search by student name or ID...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#B45309]"
               />
             </div>
 
@@ -145,7 +143,7 @@ export default function CoordinatorAtRiskPage() {
                 type="button"
                 onClick={() => setFilterType('all')}
                 className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
-                  filterType === 'all' ? 'bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] shadow-xs' : 'text-[#475569]'
+                  filterType === 'all' ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs' : 'text-[#475569]'
                 }`}
               >
                 {isBangla ? 'সকল অ্যালার্ট' : 'All Alerts'}
@@ -174,12 +172,12 @@ export default function CoordinatorAtRiskPage() {
           {/* Table */}
           {loading ? (
             <div className="py-16 text-center">
-              <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin mx-auto mb-2" />
+              <div className="w-8 h-8 border-3 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin mx-auto mb-2" />
               <p className="text-xs text-[#475569]">{t('common.loading')}</p>
             </div>
           ) : filteredStudents.length === 0 ? (
             <div className="py-16 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-[#0F766E] mx-auto" />
+              <CheckCircle2 className="w-10 h-10 text-[#B45309] mx-auto" />
               <p className="text-sm font-bold text-[#0F172A] font-heading">
                 {isBangla ? 'এই ফিল্টারে কোনো ঝুঁকিপূর্ণ শিক্ষার্থী পাওয়া যায়নি।' : 'No flagged students found.'}
               </p>
@@ -254,7 +252,7 @@ export default function CoordinatorAtRiskPage() {
                         {st.phone ? (
                           <a
                             href={`tel:${st.phone}`}
-                            className="inline-flex items-center gap-1 text-[#0F766E] font-semibold hover:underline"
+                            className="inline-flex items-center gap-1 text-[#B45309] font-semibold hover:underline"
                           >
                             <Phone className="w-3 h-3" />
                             <span>{st.phone}</span>
@@ -268,7 +266,7 @@ export default function CoordinatorAtRiskPage() {
                           type="button"
                           onClick={() => handleOpenGraduation(st.student_id)}
                           disabled={loadingGraduationId === st.student_id}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F0FDFA] hover:bg-[#0F766E] text-[#0F766E] hover:text-white border border-[#CCFBF1] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F0FDFA] hover:bg-[#B45309] text-[#0369A1] hover:text-white border border-[#CCFBF1] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
                           title={isBangla ? 'গ্র্যাজুয়েশন ও সনদপত্র ট্র্যাকার দেখুন' : 'View Graduation & Certificate'}
                         >
                           <Award className="w-3.5 h-3.5 text-[#C1982E]" />

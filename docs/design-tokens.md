@@ -7,20 +7,21 @@ Methodology: Extracted directly from live CSS (`custom_style.css`, inline style 
 ---
 
 ## 1. Primary & Brand Colors (ব্র্যান্ড ও প্রাথমিক রং)
+*Updated per User Design Refresh Direction (Madrasat-us-Sunnah warm banner palette: ivory cream `#FFFBEB`, amber border `#FCD34D`, left accent border `#D97706`, primary CTA `#B45309`, while strictly preserving the soft sky tint `#F0FDFA` / `#CCFBF1`):*
 
 | Token Name | Hex / RGB Value | Role & Usage | Where Seen on Reference Site |
 |---|---|---|---|
-| `--color-brand-primary` / `--hm-teal` | `#0f766e` (rgb 15 118 110) | Primary Brand, H1/H2 Headings, Primary CTA, Active Links | Section headings `.hm-h2`, `.hm-btn--primary`, fee hero title |
-| `--color-brand-primary-hover` | `#115e59` (rgb 17 94 89) | Primary Button Hover, Active Click State | `.hm-btn--primary:hover`, `.hm-form__submit:hover`, `.hm-notices__all:hover` |
-| `--color-brand-teal-2` / `--hm-teal-2` | `#0d9488` (rgb 13 148 136) | Card Top Accent Border, Quote Marks, Midtone Accent | `.hm-branch__card` top border, quote marks in Chairman speech, fee hero gradient |
-| `--color-brand-teal-3` / `--hm-teal-3` | `#14b8a6` (rgb 20 184 166) | Focus Ring, Bright Accent, Table Row Indicator, Active Slider Bullet | Input `:focus` ring, `.fee-table tbody tr th` left border, `.blink-highlight` |
-| `--color-brand-teal-soft` | `#f0fdfa` (rgb 240 253 250) | Table Row Background, Notice Hover Background, Soft Teal Surface | `.fee-table th`, `.hm-notice:hover`, `.fee-feature`, fee hero gradient start |
-| `--color-brand-teal-line` | `#ccfbf1` (rgb 204 251 241) | Soft Teal Borders, Pill Badges, Table Divider Lines | `.fee-table` borders, `.hm-eyebrow` badge background, `.fee-tick` border |
-| `--color-brand-teal-pill` | `#99f6e4` (rgb 153 246 228) | Highlight numbers, icon badges, avatar borders | `.hm-why__num`, `.hm-chair__img` border, `.hm-notice:hover` border |
-| `--color-brand-header-top` | `#0f766e` (`bg-teal-700`) | Header Top Bar / Institutional Announcement Bar | `<header class="bg-teal-700 text-white py-3">` |
+| `--color-brand-primary` | `#b45309` (rgb 180 83 9) | Primary Brand, Active Nav, Primary CTA Buttons, Hero Accents | Madrasatus Sunnah Admission Banner Action CTA Button |
+| `--color-brand-primary-hover` | `#92400e` (rgb 146 64 14) | Primary Button Hover, Active Click State | Admission Banner CTA Hover State |
+| `--color-brand-teal-2` | `#d97706` (rgb 217 119 6) | Warm Banner Thick Left Accent Border | Admission Banner Left Accent Stripe |
+| `--color-brand-teal-3` | `#f59e0b` (rgb 245 158 11) | Highlight Borders, Star Ratings, Amber Focus Rings | Admission Banner Border Accent |
+| `--color-brand-teal-soft` | `#f0fdfa` (rgb 240 253 250) | **Preserved:** Soft Sky Surface Tint, Pill Badge Backgrounds | Reference Table Header, Feature Cards Tint |
+| `--color-brand-teal-line` | `#ccfbf1` (rgb 204 251 241) | **Preserved:** Soft Sky Border Line, Dividers | Reference Table Borders, Sky Badges |
+| `--color-brand-warm-banner-bg` | `#fffbeb` (rgb 255 251 235) | Warm Ivory / Cream Banner Background | Madrasatus Sunnah Admission Notice Banner |
+| `--color-brand-warm-banner-border` | `#fcd34d` (rgb 252 211 77) | Warm Banner Border Line | Madrasatus Sunnah Admission Notice Banner Border |
 | `--color-brand-gold` | `#c1982e` | Islamic Gold / Ochre Accent (Institutional Badge & Seals) | `madrasatus-sunnah-logo.svg` (cls-2 text & decorative calligraphy) |
 | `--color-brand-green-dome` | `#00a14a` | Emerald Green (Symbolic Islamic Element) | `madrasatus-sunnah-logo.svg` gradient stop-0 |
-| `--color-brand-ocean-blue` | `#016c90` | Ocean Blue / Deep Teal | `madrasatus-sunnah-logo.svg` gradient stop-1 |
+| `--color-brand-ocean-blue` | `#016c90` | Ocean Blue / Deep Accent | `madrasatus-sunnah-logo.svg` gradient stop-1 |
 | `--color-brand-cyan-teal` | `#067a85` | Rich Cyan-Teal | `madrasatus-sunnah-logo.svg` cls-13 fill |
 
 ---

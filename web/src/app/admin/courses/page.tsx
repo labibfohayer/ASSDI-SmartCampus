@@ -114,18 +114,16 @@ export default function AdminCoursesPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-sm relative overflow-hidden flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-
+      <div className="bg-[#FFFBEB] p-6 sm:p-7 rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] shadow-xs relative overflow-hidden flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 border border-white/25 rounded-full text-xs font-semibold text-[#CCFBF1] mb-2.5">
-            <Layers className="w-3.5 h-3.5 text-[#C1982E]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5 shadow-xs">
+            <Layers className="w-3.5 h-3.5 text-[#B45309]" />
             <span>{isBangla ? 'একাডেমিক কারিকুলাম কন্ট্রোল' : 'Curriculum Governance'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading text-[#0F172A]">
             {isBangla ? 'কোর্স, ব্যাচ ও কারিকুলাম প্রশাসন' : 'Courses, Batches & Curriculum'}
           </h1>
-          <p className="text-xs sm:text-sm text-[#F0FDFA]/90 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-[#78350F] mt-1 max-w-xl">
             {isBangla
               ? 'ইনস্টিটিউটের কোর্স কারিকুলাম, সক্রিয় ব্যাচ এবং শিক্ষক নিয়োগের সেন্ট্রাল কনফিগারেশন।'
               : 'Configure institute courses, active academic batches, and teacher assignments.'}
@@ -134,7 +132,7 @@ export default function AdminCoursesPage() {
 
         <button
           onClick={() => setShowBatchModal(true)}
-          className="px-4 py-2.5 bg-[#C1982E] hover:bg-[#A88225] text-white text-xs font-extrabold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer relative z-10 active:scale-95"
+          className="px-4 py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-extrabold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer relative z-10 active:scale-95"
         >
           <PlusCircle className="w-4 h-4 text-white" />
           <span>{isBangla ? 'নতুন ব্যাচ তৈরি করুন' : 'Create New Batch'}</span>
@@ -144,7 +142,7 @@ export default function AdminCoursesPage() {
       {/* Courses Overview */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
         <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-[#0F766E]" />
+          <BookOpen className="w-5 h-5 text-[#B45309]" />
           <span>{isBangla ? 'কোর্স কারিকুলাম ও বিবরণ' : 'Active Course Offerings'}</span>
         </h2>
 
@@ -155,7 +153,7 @@ export default function AdminCoursesPage() {
               className="p-5 rounded-2xl bg-gradient-to-br from-[#F0FDFA] to-white border border-[#CCFBF1] space-y-3"
             >
               <div className="flex items-center justify-between">
-                <span className="px-2 py-0.5 bg-[#0F766E] text-white text-[10px] font-bold rounded-full uppercase">
+                <span className="px-2 py-0.5 bg-[#B45309] text-white text-[10px] font-bold rounded-full uppercase">
                   {c.code || 'SBMC'}
                 </span>
                 <span className="text-xs font-semibold text-gray-500">
@@ -172,7 +170,7 @@ export default function AdminCoursesPage() {
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-[#0F766E] font-bold">
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-[#B45309] font-bold">
                 <span>{isBangla ? 'সক্রিয় বিষয় সংখ্যা:' : 'Total Subjects:'} {d(c.subjects_count || 8)} টি</span>
                 <span>{isBangla ? 'ক্যাম্পাস:' : 'Campus:'} {c.campus_name || 'Kazi Bari'}</span>
               </div>
@@ -186,7 +184,7 @@ export default function AdminCoursesPage() {
         <div className="p-5 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-[#0F766E]" />
+              <Layers className="w-5 h-5 text-[#B45309]" />
               <span>{isBangla ? 'ব্যাচ তালিকা ও স্ট্যাটাস' : 'Academic Batches Directory'}</span>
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -195,7 +193,7 @@ export default function AdminCoursesPage() {
                 : 'Timeline, start/end dates, and student capacity for all batches.'}
             </p>
           </div>
-          <span className="text-xs font-bold text-[#0F766E] px-3 py-1 bg-[#F0FDFA] rounded-full border border-[#CCFBF1]">
+          <span className="text-xs font-bold text-[#0369A1] px-3 py-1 bg-[#F0FDFA] rounded-full border border-[#CCFBF1]">
             {d(batches.length)} {isBangla ? 'টি ব্যাচ' : 'Batches'}
           </span>
         </div>
@@ -215,7 +213,7 @@ export default function AdminCoursesPage() {
             <tbody className="divide-y divide-gray-100">
               {batches.map((b) => (
                 <tr key={b.id} className="hover:bg-[#F0FDFA]/50 transition">
-                  <td className="py-3.5 px-4 font-bold font-mono text-[#0F766E]">
+                  <td className="py-3.5 px-4 font-bold font-mono text-[#B45309]">
                     #{b.batch_number}
                   </td>
                   <td className="py-3.5 px-4 font-bold text-gray-900">
@@ -231,7 +229,7 @@ export default function AdminCoursesPage() {
                     {d(b.capacity || 40)} {isBangla ? 'জন' : 'seats'}
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] text-[10px] font-bold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] text-[10px] font-bold">
                       {b.status || 'Active'}
                     </span>
                   </td>
@@ -248,7 +246,7 @@ export default function AdminCoursesPage() {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C1982E] space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-[#0F766E]" />
+                <PlusCircle className="w-5 h-5 text-[#B45309]" />
                 <span>{isBangla ? 'নতুন ব্যাচ তৈরি করুন' : 'Create New Batch'}</span>
               </h3>
               <button
@@ -268,7 +266,7 @@ export default function AdminCoursesPage() {
                 <select
                   value={batchForm.course_id}
                   onChange={(e) => setBatchForm({ ...batchForm, course_id: e.target.value })}
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                 >
                   {courses.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -289,7 +287,7 @@ export default function AdminCoursesPage() {
                     placeholder="44"
                     value={batchForm.batch_number}
                     onChange={(e) => setBatchForm({ ...batchForm, batch_number: e.target.value })}
-                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                   />
                 </div>
 
@@ -303,7 +301,7 @@ export default function AdminCoursesPage() {
                     placeholder="40"
                     value={batchForm.capacity}
                     onChange={(e) => setBatchForm({ ...batchForm, capacity: e.target.value })}
-                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                   />
                 </div>
               </div>
@@ -318,7 +316,7 @@ export default function AdminCoursesPage() {
                   placeholder="SBMC Batch 44 (Morning)"
                   value={batchForm.name}
                   onChange={(e) => setBatchForm({ ...batchForm, name: e.target.value })}
-                  className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                 />
               </div>
 
@@ -332,7 +330,7 @@ export default function AdminCoursesPage() {
                     required
                     value={batchForm.start_date}
                     onChange={(e) => setBatchForm({ ...batchForm, start_date: e.target.value })}
-                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                   />
                 </div>
 
@@ -345,7 +343,7 @@ export default function AdminCoursesPage() {
                     required
                     value={batchForm.end_date}
                     onChange={(e) => setBatchForm({ ...batchForm, end_date: e.target.value })}
-                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                   />
                 </div>
               </div>
@@ -361,7 +359,7 @@ export default function AdminCoursesPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+                  className="px-5 py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
                 >
                   {submitting ? (isBangla ? 'তৈরি হচ্ছে...' : 'Creating...') : (isBangla ? 'ব্যাচ তৈরি সম্পন্ন করুন' : 'Confirm Create')}
                 </button>

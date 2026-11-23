@@ -71,7 +71,7 @@ const GuillocheBorder = () => (
     <defs>
       <linearGradient id="guillocheTealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#10B981" />
-        <stop offset="50%" stopColor="#0D9488" />
+        <stop offset="50%" stopColor="#D97706" />
         <stop offset="100%" stopColor="#059669" />
       </linearGradient>
     </defs>
@@ -211,24 +211,24 @@ export default function StudentIdCardModal({
       <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
         
         {/* Modal Top Control Bar */}
-        <div className="bg-[#0F766E] px-5 sm:px-6 py-3.5 flex items-center justify-between border-b border-[#0A1420] text-white">
+        <div className="bg-white px-5 sm:px-6 py-3.5 flex items-center justify-between border-b border-[#E2E8F0] text-[#0F172A]">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-white/10 border border-[#C1982E]/40 flex items-center justify-center p-1">
+            <div className="w-9 h-9 rounded-xl bg-[#FFFBEB] border border-[#FCD34D] flex items-center justify-center p-1">
               <img src="/logo.png" alt="As-Sunnah" className="w-full h-full object-contain" />
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-extrabold tracking-tight">
                 {isBangla ? 'আস-সুন্নাহ প্রাতিষ্ঠানিক ডিজিটাল ডকুমেন্টস' : 'As-Sunnah Institutional Credentials'}
               </h2>
-              <p className="text-[11px] text-emerald-200/90 font-medium">
-                {data.full_name} • <span className="font-mono text-[#C1982E] font-bold">ID: {data.student_id_number}</span>
+              <p className="text-[11px] text-[#64748B] font-medium">
+                {data.full_name} • <span className="font-mono text-[#B45309] font-bold">ID: {data.student_id_number}</span>
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+            className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -242,7 +242,7 @@ export default function StudentIdCardModal({
               onClick={() => setActiveDocType('id_card')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                 activeDocType === 'id_card'
-                  ? 'bg-[#0F766E] text-[#C1982E] shadow-xs'
+                  ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -254,7 +254,7 @@ export default function StudentIdCardModal({
               onClick={() => setActiveDocType('admit_card')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                 activeDocType === 'admit_card'
-                  ? 'bg-[#0F766E] text-[#C1982E] shadow-xs'
+                  ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -299,9 +299,9 @@ export default function StudentIdCardModal({
             <button
               type="button"
               onClick={handlePrint}
-              className="px-4 py-1.5 bg-[#C1982E] hover:bg-[#B38F46] text-[#0F766E] rounded-xl text-xs font-extrabold shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+              className="px-4 py-1.5 bg-[#B45309] hover:bg-[#92400E] text-white rounded-xl text-xs font-extrabold shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
             >
-              <Printer className="w-3.5 h-3.5 text-[#0F766E]" />
+              <Printer className="w-3.5 h-3.5 text-white" />
               <span>{isBangla ? 'প্রিন্ট করুন' : 'Print'}</span>
             </button>
           </div>
@@ -370,7 +370,7 @@ export default function StudentIdCardModal({
 
                     {/* Student Full Name */}
                     <div className="relative z-10 text-center px-3">
-                      <h3 className="font-extrabold text-[#0F766E] text-[15px] uppercase tracking-wide truncate leading-tight">
+                      <h3 className="font-extrabold text-[#B45309] text-[15px] uppercase tracking-wide truncate leading-tight">
                         {data.full_name}
                       </h3>
                     </div>
@@ -420,7 +420,7 @@ export default function StudentIdCardModal({
                         alt="As-Sunnah Logo"
                         className="w-11 h-11 object-contain mx-auto drop-shadow-2xs"
                       />
-                      <h4 className="text-[13px] font-black text-[#0F766E] tracking-wide uppercase leading-none mt-1.5">
+                      <h4 className="text-[13px] font-black text-[#B45309] tracking-wide uppercase leading-none mt-1.5">
                         AS-SUNNAH
                       </h4>
                       <p className="text-[9.5px] font-black text-[#65A30D] tracking-wider uppercase leading-tight mt-0.5">
@@ -455,7 +455,7 @@ export default function StudentIdCardModal({
                         alt="Authorized Signature"
                         className="h-8 object-contain mb-0.5"
                       />
-                      <div className="w-40 h-[1.5px] bg-[#0D9488]"></div>
+                      <div className="w-40 h-[1.5px] bg-[#D97706]"></div>
                       <span className="text-[9px] font-semibold text-slate-600 mt-0.5">
                         Authorized Signature
                       </span>
@@ -469,13 +469,13 @@ export default function StudentIdCardModal({
                       
                       {/* 3 Green Icons */}
                       <div className="flex items-center justify-center gap-2.5 my-1.5">
-                        <div className="w-4 h-4 rounded-full bg-[#0D9488] text-white flex items-center justify-center shadow-2xs">
+                        <div className="w-4 h-4 rounded-full bg-[#D97706] text-white flex items-center justify-center shadow-2xs">
                           <MapPin className="w-2.5 h-2.5" />
                         </div>
-                        <div className="w-4 h-4 rounded-full bg-[#0D9488] text-white flex items-center justify-center shadow-2xs">
+                        <div className="w-4 h-4 rounded-full bg-[#D97706] text-white flex items-center justify-center shadow-2xs">
                           <Phone className="w-2.5 h-2.5" />
                         </div>
-                        <div className="w-4 h-4 rounded-full bg-[#0D9488] text-white flex items-center justify-center shadow-2xs">
+                        <div className="w-4 h-4 rounded-full bg-[#D97706] text-white flex items-center justify-center shadow-2xs">
                           <Globe className="w-2.5 h-2.5" />
                         </div>
                       </div>
@@ -520,14 +520,14 @@ export default function StudentIdCardModal({
               </div>
 
               {/* Institutional Header */}
-              <div className="p-5 sm:p-6 text-center border-b-2 border-[#0F766E]">
+              <div className="p-5 sm:p-6 text-center border-b-2 border-[#B45309]">
                 <div className="flex flex-col items-center justify-center">
                   <img
                     src="/logo.png"
                     alt="As-Sunnah Logo"
                     className="w-14 h-14 object-contain mb-1.5 drop-shadow-2xs"
                   />
-                  <h2 className="text-xl sm:text-2xl font-black text-[#0F766E] tracking-wide uppercase leading-tight">
+                  <h2 className="text-xl sm:text-2xl font-black text-[#B45309] tracking-wide uppercase leading-tight">
                     AS-SUNNAH
                   </h2>
                   <p className="text-xs sm:text-sm font-black text-[#65A30D] tracking-wider uppercase leading-tight mt-0.5">
@@ -539,7 +539,7 @@ export default function StudentIdCardModal({
                 </div>
 
                 <div className="mt-3.5 inline-block">
-                  <span className="px-5 py-1.5 bg-[#0F766E] text-[#C1982E] text-xs font-black rounded-full uppercase tracking-wider shadow-xs border border-[#C1982E]/40">
+                  <span className="px-5 py-1.5 bg-[#B45309] text-white text-xs font-black rounded-full uppercase tracking-wider shadow-xs border border-[#FCD34D]">
                     FINAL EXAMINATION ADMIT CARD • পরীক্ষার প্রবেশপত্র
                   </span>
                 </div>
@@ -567,7 +567,7 @@ export default function StudentIdCardModal({
 
                     <div>
                       <span className="text-slate-500 font-medium block">{isBangla ? 'শিক্ষার্থী আইডি নং:' : 'Student ID Number:'}</span>
-                      <strong className="font-mono text-[#0F766E] font-extrabold text-base">{data.student_id_number}</strong>
+                      <strong className="font-mono text-[#B45309] font-extrabold text-base">{data.student_id_number}</strong>
                     </div>
 
                     <div>
@@ -628,7 +628,7 @@ export default function StudentIdCardModal({
                   {isBangla ? 'পরীক্ষার বিষয়সূচি ও সিডিউল (Subject Schedule)' : 'Registered Subject Schedule'}
                 </h4>
                 <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
-                  <thead className="bg-[#0F766E] text-white">
+                  <thead className="bg-[#B45309] text-white">
                     <tr>
                       <th className="p-2 font-bold">#</th>
                       <th className="p-2 font-bold">{isBangla ? 'বিষয় কোড' : 'Code'}</th>
@@ -640,21 +640,21 @@ export default function StudentIdCardModal({
                   <tbody className="divide-y divide-slate-100">
                     <tr className="bg-white">
                       <td className="p-2 font-mono">01</td>
-                      <td className="p-2 font-mono font-bold text-[#0F766E]">ACCT-101</td>
+                      <td className="p-2 font-mono font-bold text-[#B45309]">ACCT-101</td>
                       <td className="p-2 font-medium">Accounting & Financial Records</td>
                       <td className="p-2 font-mono text-slate-600">15 Dec 2026, 10:00 AM</td>
                       <td className="p-2 text-center text-slate-300">__________</td>
                     </tr>
                     <tr className="bg-slate-50/50">
                       <td className="p-2 font-mono">02</td>
-                      <td className="p-2 font-mono font-bold text-[#0F766E]">META-MKTG</td>
+                      <td className="p-2 font-mono font-bold text-[#B45309]">META-MKTG</td>
                       <td className="p-2 font-medium">Meta & Digital Marketing</td>
                       <td className="p-2 font-mono text-slate-600">17 Dec 2026, 10:00 AM</td>
                       <td className="p-2 text-center text-slate-300">__________</td>
                     </tr>
                     <tr className="bg-white">
                       <td className="p-2 font-mono">03</td>
-                      <td className="p-2 font-mono font-bold text-[#0F766E]">ISLAMIC-GEN</td>
+                      <td className="p-2 font-mono font-bold text-[#B45309]">ISLAMIC-GEN</td>
                       <td className="p-2 font-medium">Islamic Business Ethics & Principles</td>
                       <td className="p-2 font-mono text-slate-600">19 Dec 2026, 10:00 AM</td>
                       <td className="p-2 text-center text-slate-300">__________</td>
@@ -682,7 +682,7 @@ export default function StudentIdCardModal({
                     alt="Authorized Signature"
                     className="h-8 object-contain mb-0.5"
                   />
-                  <div className="w-36 h-[1.5px] bg-[#0D9488]"></div>
+                  <div className="w-36 h-[1.5px] bg-[#D97706]"></div>
                   <p className="text-[10px] font-bold text-slate-800 mt-0.5">
                     Authorized Signature
                   </p>

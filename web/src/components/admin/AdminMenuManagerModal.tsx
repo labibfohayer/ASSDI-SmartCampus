@@ -201,16 +201,16 @@ export default function AdminMenuManagerModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl border border-gray-100 shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-5 bg-[#0B1A2B] text-white flex items-center justify-between border-b border-[#0F766E]/40">
+        <div className="px-6 py-5 bg-[#FFFBEB] text-[#0F172A] flex items-center justify-between border-b border-[#FCD34D] border-l-4 border-l-[#D97706]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0F766E] border border-[#C1982E]/40 flex items-center justify-center text-[#C1982E]">
-              <Settings className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-white/90 border border-[#FCD34D] flex items-center justify-center text-[#B45309] shadow-xs">
+              <Settings className="w-5 h-5 text-[#B45309]" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight font-heading">
+              <h2 className="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight font-heading">
                 {isBangla ? 'সুপার অ্যাডমিন মেনু ম্যানেজার ও আর্কাইভ কন্ট্রোল' : 'Sidebar Navigation Menu & Archive Manager'}
               </h2>
-              <p className="text-xs text-teal-200/80">
+              <p className="text-xs text-[#78350F]">
                 {isBangla
                   ? 'বাম পাশের সাইডবার মেনু সহজে এডিট করুন, নতুন মেনু যোগ করুন বা প্রয়োজন অনুযায়ী আর্কাইভ/হাইড করুন'
                   : 'Customize, edit, reorder, and archive navigation items on the left sidebar'}
@@ -219,7 +219,7 @@ export default function AdminMenuManagerModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-teal-300 hover:text-white hover:bg-white/10 transition cursor-pointer"
+            className="p-2 rounded-xl text-[#78350F] hover:text-[#0F172A] hover:bg-black/5 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -235,7 +235,7 @@ export default function AdminMenuManagerModal({
               }}
               className={`px-4 py-2 text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-2 ${
                 activeTab === 'active'
-                  ? 'bg-[#0F766E] text-white shadow-xs'
+                  ? 'bg-[#B45309] text-white shadow-xs'
                   : 'bg-white text-[#475569] hover:bg-slate-100 border border-[#E2E8F0]'
               }`}
             >
@@ -276,7 +276,7 @@ export default function AdminMenuManagerModal({
                 setFormIcon('Bookmark');
                 setFormSection('main');
               }}
-              className="px-3.5 py-2 text-xs font-bold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 text-xs font-bold bg-[#B45309] hover:bg-[#92400E] text-white rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>{isBangla ? 'নতুন মেনু যোগ করুন' : 'Add New Menu'}</span>
@@ -288,10 +288,10 @@ export default function AdminMenuManagerModal({
         <div className="p-6 overflow-y-auto space-y-4 flex-1">
           {/* Add / Edit Form Drawer */}
           {(isAddingNew || editingItemId) && (
-            <form onSubmit={handleSaveForm} className="bg-[#F0FDFA] border-2 border-[#0F766E]/30 rounded-2xl p-4 sm:p-5 space-y-4 mb-4">
-              <div className="flex items-center justify-between pb-2 border-b border-[#CCFBF1]">
+            <form onSubmit={handleSaveForm} className="bg-[#FFFBEB] border-2 border-[#FCD34D] rounded-2xl p-4 sm:p-5 space-y-4 mb-4">
+              <div className="flex items-center justify-between pb-2 border-b border-[#FCD34D]">
                 <h4 className="text-xs sm:text-sm font-bold text-[#0F172A] flex items-center gap-2 font-heading">
-                  <Sparkles className="w-4 h-4 text-[#C1982E]" />
+                  <Sparkles className="w-4 h-4 text-[#B45309]" />
                   <span>
                     {editingItemId
                       ? (isBangla ? 'মেনু তথ্য সম্পাদনা করুন' : 'Edit Menu Item')
@@ -301,7 +301,7 @@ export default function AdminMenuManagerModal({
                 <button
                   type="button"
                   onClick={cancelForm}
-                  className="p-1 rounded-lg text-[#0F766E] hover:bg-[#CCFBF1] transition cursor-pointer"
+                  className="p-1 rounded-lg text-[#92400E] hover:bg-[#FEF3C7] transition cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -318,7 +318,7 @@ export default function AdminMenuManagerModal({
                     value={formLabelBn}
                     onChange={(e) => setFormLabelBn(e.target.value)}
                     placeholder="যেমন: পরীক্ষার ফলাফল / লাইব্রেরি"
-                    className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:outline-none"
+                    className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:ring-2 focus:ring-[#B45309] focus:outline-none"
                   />
                 </div>
 
@@ -331,7 +331,7 @@ export default function AdminMenuManagerModal({
                     value={formLabelEn}
                     onChange={(e) => setFormLabelEn(e.target.value)}
                     placeholder="e.g. Exam Results / Library"
-                    className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:outline-none"
+                    className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:ring-2 focus:ring-[#B45309] focus:outline-none"
                   />
                 </div>
 
@@ -345,7 +345,7 @@ export default function AdminMenuManagerModal({
                     value={formHref}
                     onChange={(e) => setFormHref(e.target.value)}
                     placeholder="যেমন: /admin/exams বা /reports?tab=kpi"
-                    className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:outline-none"
+                    className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:ring-2 focus:ring-[#B45309] focus:outline-none"
                   />
                 </div>
 
@@ -356,7 +356,7 @@ export default function AdminMenuManagerModal({
                   <select
                     value={formSection}
                     onChange={(e) => setFormSection(e.target.value as any)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:outline-none"
+                    className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:ring-2 focus:ring-[#B45309] focus:outline-none"
                   >
                     <option value="main">{isBangla ? 'প্রধান অ্যাডমিন মেনু' : 'Main Admin Menu'}</option>
                     <option value="analytics">{isBangla ? 'অ্যানালিটিক্স ও রিপোর্টস' : 'Analytics & Reports'}</option>
@@ -380,7 +380,7 @@ export default function AdminMenuManagerModal({
                         onClick={() => setFormIcon(iconKey)}
                         className={`p-2 rounded-xl border flex items-center gap-1.5 text-xs font-semibold transition cursor-pointer ${
                           selected
-                            ? 'bg-[#0F766E] text-white border-[#0F766E] shadow-xs'
+                            ? 'bg-[#B45309] text-white border-[#B45309] shadow-xs'
                             : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
@@ -403,9 +403,9 @@ export default function AdminMenuManagerModal({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold text-white bg-[#0F766E] hover:bg-[#115E59] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 text-xs font-bold text-white bg-[#B45309] hover:bg-[#92400E] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
                 >
-                  <Check className="w-4 h-4 text-[#C1982E]" />
+                  <Check className="w-4 h-4 text-white" />
                   <span>{editingItemId ? (isBangla ? 'পরিবর্তন সংরক্ষণ করুন' : 'Update Menu') : (isBangla ? 'মেনু সংরক্ষণ করুন' : 'Save Menu')}</span>
                 </button>
               </div>
@@ -426,10 +426,10 @@ export default function AdminMenuManagerModal({
                 return (
                   <div
                     key={item.id}
-                    className="p-3.5 bg-white rounded-xl border border-[#E2E8F0] shadow-xs flex items-center justify-between gap-3 hover:border-[#0F766E]/40 transition"
+                    className="p-3.5 bg-white rounded-xl border border-[#E2E8F0] shadow-xs flex items-center justify-between gap-3 hover:border-[#B45309]/40 transition"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-[#F0FDFA] text-[#0F766E] flex items-center justify-center shrink-0 border border-[#CCFBF1]">
+                      <div className="w-9 h-9 rounded-lg bg-[#F0FDFA] text-[#0369A1] flex items-center justify-center shrink-0 border border-[#CCFBF1]">
                         <IconComp className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
@@ -440,7 +440,7 @@ export default function AdminMenuManagerModal({
                           <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#F8FAFC] text-[#475569] font-medium font-mono border border-[#E2E8F0]">
                             {item.href}
                           </span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#F0FDFA] text-[#0F766E] font-semibold border border-[#CCFBF1]">
+                          <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#F0FDFA] text-[#0369A1] font-semibold border border-[#CCFBF1]">
                             {item.section === 'main' ? (isBangla ? 'প্রধান' : 'Main') : (isBangla ? 'অ্যানালিটিক্স' : 'Analytics')}
                           </span>
                         </div>
@@ -551,9 +551,9 @@ export default function AdminMenuManagerModal({
                         <button
                           type="button"
                           onClick={() => handleToggleArchive(item.id, false)}
-                          className="px-3 py-1.5 text-xs font-bold text-[#0F766E] bg-[#F0FDFA] hover:bg-[#CCFBF1] border border-[#CCFBF1] rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                          className="px-3 py-1.5 text-xs font-bold text-[#0369A1] bg-[#F0FDFA] hover:bg-[#B45309] hover:text-white border border-[#CCFBF1] rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-2xs group"
                         >
-                          <Eye className="w-3.5 h-3.5 text-[#0F766E]" />
+                          <Eye className="w-3.5 h-3.5 text-[#0369A1] group-hover:text-white" />
                           <span>{isBangla ? 'রিস্টোর করুন / সামনে আনুন' : 'Restore to Sidebar'}</span>
                         </button>
 
@@ -595,7 +595,7 @@ export default function AdminMenuManagerModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 text-xs font-bold text-white bg-[#0F766E] hover:bg-[#115E59] rounded-xl shadow-xs transition cursor-pointer"
+            className="px-5 py-2 text-xs font-bold text-white bg-[#B45309] hover:bg-[#92400E] rounded-xl shadow-xs transition cursor-pointer"
           >
             {isBangla ? 'সম্পন্ন' : 'Done'}
           </button>

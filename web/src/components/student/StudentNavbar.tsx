@@ -46,11 +46,11 @@ export default function StudentNavbar() {
                   <span className="font-bold text-[#0F172A] text-sm tracking-tight font-heading">
                     {t('brand.name')}
                   </span>
-                  <span className="px-2 py-0.5 text-[10px] font-bold bg-[#0F766E] text-white rounded-full">
+                  <span className="px-2 py-0.5 text-[10px] font-bold bg-[#B45309] text-white rounded-full">
                     {isBangla ? 'শিক্ষার্থী পোর্টাল' : 'Student Portal'}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#0F766E] font-medium">
+                <p className="text-[11px] text-[#B45309] font-medium">
                   {t('brand.course')}
                 </p>
               </div>
@@ -62,14 +62,14 @@ export default function StudentNavbar() {
             <LanguageSwitcher />
 
             <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-[#E2E8F0]">
-              <div className="w-8 h-8 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] flex items-center justify-center text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] text-[#B45309] flex items-center justify-center text-xs font-bold">
                 {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
               </div>
               <div className="text-left text-xs">
                 <p className="font-semibold text-[#0F172A] leading-tight font-heading">
                   {user?.full_name || 'Student'}
                 </p>
-                <p className="text-[10px] text-[#0F766E] font-mono font-medium">
+                <p className="text-[10px] text-[#B45309] font-mono font-medium">
                   {user?.login_id}
                 </p>
               </div>

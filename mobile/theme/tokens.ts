@@ -3,14 +3,14 @@
 
 export const tokens = {
   colors: {
-    // Brand Teals
-    primary: '#0F766E', // --hm-teal (Deep Teal)
-    primaryHover: '#115E59',
-    teal2: '#0D9488', // --hm-teal-2 (Accent border / quotes)
-    teal3: '#14B8A6', // --hm-teal-3 (Focus / active indicator)
-    tealSoft: '#F0FDFA', // --hm-teal-soft (Soft surface)
-    tealLine: '#CCFBF1', // --hm-teal-line (Divider line)
-    tealPill: '#99F6E4', // --hm-teal-pill (Highlights)
+    // Brand Amber / Cream Palette per User Feedback
+    primary: '#B45309', // Warm Amber Primary
+    primaryHover: '#92400E',
+    teal2: '#D97706', // Warm Amber Accent 2
+    teal3: '#F59E0B', // Warm Amber Accent 3
+    tealSoft: '#F0FDFA', // Soft Sky Surface Tint (Preserved)
+    tealLine: '#CCFBF1', // Sky Border Line (Preserved)
+    tealPill: '#FEF3C7', // Warm Cream Pill
 
     // Gold & Accents
     gold: '#C1982E', // Islamic Ochre Gold
@@ -19,20 +19,20 @@ export const tokens = {
     ocean: '#016C90',
 
     // App Shell & Backgrounds
-    background: '#F8FAFC', // --hm-bg (Slate 50)
+    background: '#F8FAFC', // Slate 50
     surface: '#FFFFFF',
     surfaceSoft: '#F1F5F9',
-    border: '#E2E8F0', // --hm-line
+    border: '#E2E8F0',
 
-    // Dark Navy Shell / Footer
+    // Dark Institutional Shell
     navyDark: '#0A1420',
-    navyStart: '#0B1A2B',
-    navyPanel: '#122036',
+    navyStart: '#1E293B',
+    navyPanel: '#1E293B',
 
     // Ink / Typography
-    textPrimary: '#0F172A', // --hm-ink
+    textPrimary: '#0F172A',
     textBody: '#334155',
-    textMuted: '#475569', // --hm-muted
+    textMuted: '#475569',
     textSubtle: '#94A3B8',
     textInverse: '#FFFFFF',
 
@@ -41,7 +41,7 @@ export const tokens = {
       present: '#16A34A',
       late: '#D97706',
       absent: '#DC2626',
-      leave: '#0F766E',
+      leave: '#0284C7',
     },
 
     // 5-Level Understanding Rating Scale

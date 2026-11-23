@@ -350,18 +350,16 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-sm relative z-20">
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none rounded-2xl overflow-hidden" />
-
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FFFBEB] p-6 sm:p-7 rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] shadow-xs relative z-20">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/25 text-xs font-semibold text-[#CCFBF1] mb-2.5">
-            <FileText className="w-3.5 h-3.5 text-[#C1982E]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 border border-[#FCD34D] text-xs font-semibold text-[#92400E] mb-2.5 shadow-xs">
+            <FileText className="w-3.5 h-3.5 text-[#B45309]" />
             {isBangla ? 'অফিসিয়াল এসআরএস রিপোর্টিং সিস্টেম' : 'Official SRS Reporting Engine'}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading text-[#0F172A]">
             {isBangla ? '৯টি এসআরএস রিপোর্টস হাব' : 'SRS Reports Hub'}
           </h1>
-          <p className="text-xs sm:text-sm text-[#F0FDFA]/90 mt-1.5 max-w-2xl">
+          <p className="text-xs sm:text-sm text-[#78350F] mt-1.5 max-w-2xl">
             {isBangla
               ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটের প্রাতিষ্ঠানিক ৯টি এসআরএস রিপোর্ট প্রিভিউ ও এক ক্লিকে পিডিএফ / এক্সেল এক্সপোর্ট।'
               : 'Live on-screen previews and 1-click official PDF / Excel exports for all 9 SRS reports.'}
@@ -404,13 +402,13 @@ export default function ReportsPage() {
               onClick={() => setActiveReportKey(r.key)}
               className={`text-left p-4 rounded-2xl border transition-all flex items-start gap-3.5 cursor-pointer ${
                 isActive
-                  ? 'bg-[#0F766E] text-white border-[#0D9488] shadow-md ring-2 ring-[#C1982E]/50'
-                  : 'bg-white hover:bg-[#F0FDFA]/50 border-slate-200/90 hover:border-[#0F766E]/30 text-slate-800 shadow-xs'
+                  ? 'bg-[#FFFBEB] text-[#0F172A] border-[#FCD34D] shadow-md ring-2 ring-[#B45309]/50'
+                  : 'bg-white hover:bg-[#FFFBEB]/50 border-slate-200/90 hover:border-[#B45309]/30 text-slate-800 shadow-xs'
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  isActive ? 'bg-[#115E59] text-[#CCFBF1]' : 'bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]'
+                  isActive ? 'bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D]' : 'bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1]'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -420,26 +418,26 @@ export default function ReportsPage() {
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       isActive
-                        ? 'bg-white/20 text-[#CCFBF1] border border-white/30'
+                        ? 'bg-[#B45309] text-white border border-[#92400E]'
                         : 'bg-slate-100 text-slate-600 border border-slate-200/60'
                     }`}
                   >
                     {isBangla ? r.badgeBn : r.badgeEn}
                   </span>
                   {isActive && (
-                    <span className="w-2 h-2 rounded-full bg-[#C1982E] animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-[#B45309] animate-pulse" />
                   )}
                 </div>
                 <h3
                   className={`text-xs font-extrabold truncate leading-snug ${
-                    isActive ? 'text-white' : 'text-slate-900'
+                    isActive ? 'text-[#0F172A]' : 'text-slate-900'
                   }`}
                 >
                   {isBangla ? r.titleBn : r.titleEn}
                 </h3>
                 <p
                   className={`text-[11px] line-clamp-1 mt-0.5 ${
-                    isActive ? 'text-[#F0FDFA]/90' : 'text-slate-500'
+                    isActive ? 'text-[#78350F]' : 'text-slate-500'
                   }`}
                 >
                   {isBangla ? r.descBn : r.descEn}
@@ -454,7 +452,7 @@ export default function ReportsPage() {
       <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] flex items-center justify-center shrink-0">
               <ActiveIcon className="w-4 h-4" />
             </div>
             <div>
@@ -471,7 +469,7 @@ export default function ReportsPage() {
             <button
               onClick={loadReportData}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-[#B45309] hover:bg-[#92400E] text-white rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer active:scale-95"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#C1982E]' : ''}`} />
               <span>{isBangla ? 'রিপোর্ট রিফ্রেশ' : 'Run Report'}</span>
@@ -492,7 +490,7 @@ export default function ReportsPage() {
                 type="date"
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
               />
             </div>
           )}
@@ -511,7 +509,7 @@ export default function ReportsPage() {
                   type="date"
                   value={filterDateFrom}
                   onChange={(e) => setFilterDateFrom(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                 />
               </div>
               <div>
@@ -522,7 +520,7 @@ export default function ReportsPage() {
                   type="date"
                   value={filterDateTo}
                   onChange={(e) => setFilterDateTo(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                 />
               </div>
             </>
@@ -539,7 +537,7 @@ export default function ReportsPage() {
                   type="number"
                   value={filterYear}
                   onChange={(e) => setFilterYear(parseInt(e.target.value, 10))}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                 />
               </div>
               <div>
@@ -549,7 +547,7 @@ export default function ReportsPage() {
                 <select
                   value={filterMonth}
                   onChange={(e) => setFilterMonth(parseInt(e.target.value, 10))}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                 >
                   {[
                     'জানুয়ারি / January',
@@ -583,7 +581,7 @@ export default function ReportsPage() {
               <select
                 value={filterBatch}
                 onChange={(e) => setFilterBatch(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
               >
                 <option value="">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
                 {batches.map((b) => (
@@ -604,7 +602,7 @@ export default function ReportsPage() {
               <select
                 value={filterHelpStatus}
                 onChange={(e) => setFilterHelpStatus(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
               >
                 <option value="">{isBangla ? 'সকল স্ট্যাটাস' : 'All Status'}</option>
                 <option value="pending">{isBangla ? 'অপেক্ষমান (Pending)' : 'Pending'}</option>
@@ -628,7 +626,7 @@ export default function ReportsPage() {
                   min={1}
                   value={filterThresholdConsecutive}
                   onChange={(e) => setFilterThresholdConsecutive(parseInt(e.target.value, 10))}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                 />
               </div>
               <div>
@@ -640,7 +638,7 @@ export default function ReportsPage() {
                   min={1}
                   value={filterThresholdTotal}
                   onChange={(e) => setFilterThresholdTotal(parseInt(e.target.value, 10))}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                 />
               </div>
             </>
@@ -652,7 +650,7 @@ export default function ReportsPage() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-16 text-center text-gray-500">
-            <RefreshCw className="w-8 h-8 animate-spin mx-auto text-[#0F766E] mb-3" />
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto text-[#B45309] mb-3" />
             <p className="font-semibold text-gray-700">
               {isBangla ? 'রিপোর্ট ডাটা প্রস্তুত করা হচ্ছে...' : 'Generating report preview...'}
             </p>
@@ -685,10 +683,10 @@ export default function ReportsPage() {
                     </p>
                   </div>
                   <div className="bg-[#F0FDFA] p-4 rounded-xl border border-[#CCFBF1]">
-                    <span className="text-xs text-[#0F766E] font-medium">
+                    <span className="text-xs text-[#B45309] font-medium">
                       {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
                     </span>
-                    <p className="text-xl font-bold text-[#0F766E] mt-1">
+                    <p className="text-xl font-bold text-[#B45309] mt-1">
                       {safeFixed(reportData.attendance_percentage)}%
                     </p>
                   </div>
@@ -736,11 +734,11 @@ export default function ReportsPage() {
                               {s.start_time?.slice(0, 5)} - {s.end_time?.slice(0, 5)}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-[#0F766E] font-medium">
+                          <td className="py-2.5 px-3 text-[#B45309] font-medium">
                             {s.batch_name}
                           </td>
                           <td className="py-2.5 px-3 text-gray-700">{s.teacher_name}</td>
-                          <td className="py-2.5 px-3 font-semibold text-[#0F766E]">
+                          <td className="py-2.5 px-3 font-semibold text-[#B45309]">
                             {s.present_count}
                           </td>
                           <td className="py-2.5 px-3 font-semibold text-amber-600">
@@ -749,7 +747,7 @@ export default function ReportsPage() {
                           <td className="py-2.5 px-3 font-semibold text-rose-600">
                             {s.absent_count}
                           </td>
-                          <td className="py-2.5 px-3 text-right font-bold text-[#0F766E]">
+                          <td className="py-2.5 px-3 text-right font-bold text-[#B45309]">
                             {safeFixed(s.attendance_percentage)}%
                           </td>
                         </tr>
@@ -780,10 +778,10 @@ export default function ReportsPage() {
                     </p>
                   </div>
                   <div className="bg-[#F0FDFA] p-4 rounded-xl border border-[#CCFBF1]">
-                    <span className="text-xs text-[#0F766E] font-medium">
+                    <span className="text-xs text-[#B45309] font-medium">
                       {isBangla ? 'গড় রেটিং' : 'Average Rating'}
                     </span>
-                    <p className="text-xl font-bold text-[#0F766E] mt-1 flex items-center gap-1">
+                    <p className="text-xl font-bold text-[#B45309] mt-1 flex items-center gap-1">
                       <Star className="w-4 h-4 fill-[#C1982E] text-[#C1982E]" />
                       {safeFixed(reportData.average_rating)} / 5
                     </p>
@@ -826,7 +824,7 @@ export default function ReportsPage() {
                               {s.subject_name}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-[#0F766E] font-medium">
+                          <td className="py-2.5 px-3 text-[#B45309] font-medium">
                             {s.batch_name}
                           </td>
                           <td className="py-2.5 px-3 font-bold text-gray-700">
@@ -835,7 +833,7 @@ export default function ReportsPage() {
                           <td className="py-2.5 px-3 text-amber-700 font-bold">
                             ⭐ {safeFixed(s.average_rating)}
                           </td>
-                          <td className="py-2.5 px-3 text-right font-bold text-[#0F766E]">
+                          <td className="py-2.5 px-3 text-right font-bold text-[#B45309]">
                             {safeFixed(s.average_percentage)}%
                           </td>
                         </tr>
@@ -866,10 +864,10 @@ export default function ReportsPage() {
                     </p>
                   </div>
                   <div className="bg-[#F0FDFA] p-4 rounded-xl border border-[#CCFBF1]">
-                    <span className="text-xs text-[#0F766E] font-medium">
+                    <span className="text-xs text-[#B45309] font-medium">
                       {isBangla ? 'সাপ্তাহিক উপস্থিতি গড়' : 'Attendance Avg'}
                     </span>
-                    <p className="text-xl font-bold text-[#0F766E] mt-1">
+                    <p className="text-xl font-bold text-[#B45309] mt-1">
                       {safeFixed(reportData.attendance_summary?.attendance_percentage)}%
                     </p>
                   </div>
@@ -898,7 +896,7 @@ export default function ReportsPage() {
                         <tr key={idx} className="hover:bg-slate-50/70">
                           <td className="py-2.5 px-3 font-semibold text-gray-900">{d.date}</td>
                           <td className="py-2.5 px-3">{d.sessions_count}</td>
-                          <td className="py-2.5 px-3 font-bold text-[#0F766E]">
+                          <td className="py-2.5 px-3 font-bold text-[#B45309]">
                             {safeFixed(d.attendance_percentage)}%
                           </td>
                           <td className="py-2.5 px-3 text-right font-bold text-blue-800">
@@ -945,7 +943,7 @@ export default function ReportsPage() {
                     <tbody className="divide-y divide-gray-100">
                       {(reportData.students || []).map((st: any) => (
                         <tr key={st.student_id} className="hover:bg-slate-50/70">
-                          <td className="py-2.5 px-3 font-mono font-semibold text-[#0F766E]">
+                          <td className="py-2.5 px-3 font-mono font-semibold text-[#B45309]">
                             {st.student_id_number}
                           </td>
                           <td className="py-2.5 px-3 font-semibold text-gray-900">
@@ -963,7 +961,7 @@ export default function ReportsPage() {
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                 (st.attendance_percentage || 0) < 75
                                   ? 'bg-rose-100 text-rose-700'
-                                  : 'bg-[#CCFBF1] text-[#0F766E]'
+                                  : 'bg-[#CCFBF1] text-[#B45309]'
                               }`}
                             >
                               {(st.attendance_percentage || 0) < 75
@@ -1003,7 +1001,7 @@ export default function ReportsPage() {
                           </td>
                           <td className="py-2.5 px-3 font-semibold">{b.student_count}</td>
                           <td className="py-2.5 px-3">{b.total_classes}</td>
-                          <td className="py-2.5 px-3 font-bold text-[#0F766E]">
+                          <td className="py-2.5 px-3 font-bold text-[#B45309]">
                             {safeFixed(b.attendance_percentage)}%
                           </td>
                           <td className="py-2.5 px-3 font-bold text-blue-800">
@@ -1048,7 +1046,7 @@ export default function ReportsPage() {
                           <td className="py-2.5 px-3 text-amber-700 font-bold">
                             ⭐ {safeFixed(t.average_rating)}
                           </td>
-                          <td className="py-2.5 px-3 text-right font-bold text-[#0F766E]">
+                          <td className="py-2.5 px-3 text-right font-bold text-[#B45309]">
                             {safeFixed(t.average_percentage)}%
                           </td>
                         </tr>
@@ -1089,7 +1087,7 @@ export default function ReportsPage() {
                               className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                                 tc.pending_help_requests > 0
                                   ? 'bg-amber-100 text-amber-800'
-                                  : 'bg-[#CCFBF1] text-[#0F766E]'
+                                  : 'bg-[#CCFBF1] text-[#B45309]'
                               }`}
                             >
                               {tc.pending_help_requests} {isBangla ? 'টি' : ''}
@@ -1132,10 +1130,10 @@ export default function ReportsPage() {
                     </p>
                   </div>
                   <div className="bg-[#F0FDFA] p-4 rounded-xl border border-[#CCFBF1]">
-                    <span className="text-xs text-[#0F766E] font-medium">
+                    <span className="text-xs text-[#B45309] font-medium">
                       {isBangla ? 'সমাধানকৃত (Resolved)' : 'Resolved'}
                     </span>
-                    <p className="text-xl font-bold text-[#0F766E] mt-1">
+                    <p className="text-xl font-bold text-[#B45309] mt-1">
                       {reportData.resolved_count || 0}
                     </p>
                   </div>
@@ -1161,7 +1159,7 @@ export default function ReportsPage() {
                             </span>
                           </td>
                           <td className="py-2.5 px-3">
-                            <span className="font-medium text-[#0F766E]">{hr.batch_name}</span>
+                            <span className="font-medium text-[#B45309]">{hr.batch_name}</span>
                             <span className="block text-[11px] text-gray-500">{hr.topic_title}</span>
                           </td>
                           <td className="py-2.5 px-3 max-w-xs">
@@ -1171,7 +1169,7 @@ export default function ReportsPage() {
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                 hr.status === 'resolved'
-                                  ? 'bg-[#CCFBF1] text-[#0F766E]'
+                                  ? 'bg-[#CCFBF1] text-[#B45309]'
                                   : hr.status === 'in_progress'
                                   ? 'bg-blue-100 text-blue-800'
                                   : 'bg-amber-100 text-amber-800'

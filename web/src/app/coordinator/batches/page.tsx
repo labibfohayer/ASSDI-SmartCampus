@@ -41,18 +41,16 @@ export default function CoordinatorBatchesPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
-
+      <div className="bg-[#FFFBEB] p-6 sm:p-7 rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] shadow-xs relative overflow-hidden">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs font-semibold text-white mb-2.5">
-            <Layers className="w-3.5 h-3.5 text-[#C1982E]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5 shadow-xs">
+            <Layers className="w-3.5 h-3.5 text-[#B45309]" />
             <span>{isBangla ? 'ব্যাচ ও শিক্ষক বিশ্লেষণ' : 'Batch & Faculty Analytics'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading text-[#0F172A]">
             {isBangla ? 'সক্রিয় ব্যাচ ও শিক্ষক পারফরম্যান্স ড্যাশবোর্ড' : 'Batches & Faculty Performance'}
           </h1>
-          <p className="text-xs sm:text-sm text-teal-50 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-[#78350F] mt-1 max-w-xl">
             {isBangla
               ? 'সক্রিয় ব্যাচসমূহের উপস্থিতি, লার্নিং আউটকাম এবং শিক্ষকদের পারফরম্যান্স রেটিং পর্যালোচনা করুন।'
               : 'Review batch progress metrics and faculty effectiveness ratings.'}
@@ -63,13 +61,13 @@ export default function CoordinatorBatchesPage() {
       {/* Batches Cards Grid */}
       <div>
         <h2 className="text-base font-bold text-[#0F172A] font-heading mb-3 flex items-center gap-2">
-          <GraduationCap className="w-5 h-5 text-[#0F766E]" />
+          <GraduationCap className="w-5 h-5 text-[#B45309]" />
           <span>{isBangla ? 'সক্রিয় ব্যাচ পারফরম্যান্স কার্ড' : 'Active Batch Performance'}</span>
         </h2>
 
         {loading ? (
           <div className="py-12 text-center">
-            <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin mx-auto mb-2" />
+            <div className="w-8 h-8 border-3 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin mx-auto mb-2" />
             <p className="text-xs text-[#475569]">{t('common.loading')}</p>
           </div>
         ) : (
@@ -77,14 +75,14 @@ export default function CoordinatorBatchesPage() {
             {data?.batch_wise_performance?.map((b: any) => (
               <div
                 key={b.batch_id}
-                className="bg-white p-6 rounded-xl border border-[#E2E8F0] hover:border-[#0F766E]/40 transition shadow-xs space-y-4"
+                className="bg-white p-6 rounded-xl border border-[#E2E8F0] hover:border-[#B45309]/40 transition shadow-xs space-y-4"
               >
                 <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
                   <div>
                     <h3 className="text-lg font-bold text-[#0F172A] font-heading">{b.batch_name}</h3>
-                    <p className="text-xs text-[#0F766E] font-medium">SBMC</p>
+                    <p className="text-xs text-[#B45309] font-medium">SBMC</p>
                   </div>
-                  <span className="px-2 py-0.5 bg-[#F0FDFA] text-[#0F766E] text-[10px] font-bold rounded-full border border-[#CCFBF1]">
+                  <span className="px-2 py-0.5 bg-[#F0FDFA] text-[#0369A1] text-[10px] font-bold rounded-full border border-[#CCFBF1]">
                     {isBangla ? 'সক্রিয়' : 'Active'}
                   </span>
                 </div>
@@ -98,8 +96,8 @@ export default function CoordinatorBatchesPage() {
                   </div>
 
                   <div className="bg-[#F0FDFA] border border-[#CCFBF1] p-3 rounded-lg">
-                    <p className="text-[#0F766E] font-medium">{isBangla ? 'উপস্থিতির হার' : 'Attendance'}</p>
-                    <h4 className="text-base font-bold text-[#0F766E] font-heading mt-0.5">
+                    <p className="text-[#0369A1] font-medium">{isBangla ? 'উপস্থিতির হার' : 'Attendance'}</p>
+                    <h4 className="text-base font-bold text-[#0369A1] font-heading mt-0.5">
                       {d(safeFixed(b.attendance_percentage))}%
                     </h4>
                   </div>
@@ -123,7 +121,7 @@ export default function CoordinatorBatchesPage() {
                 <div className="pt-1">
                   <Link
                     href={`/reports?batch=${b.batch_id}`}
-                    className="w-full py-2 bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition border border-[#CCFBF1]"
+                    className="w-full py-2 bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition border border-[#FCD34D]"
                   >
                     <span>{isBangla ? 'ব্যাচ রিপোর্ট ও এক্সপোর্ট' : 'View Batch Report'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -139,7 +137,7 @@ export default function CoordinatorBatchesPage() {
       <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
         <div className="p-5 border-b border-[#E2E8F0] bg-[#F8FAFC]">
           <h2 className="text-base font-bold text-[#0F172A] font-heading flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-[#0F766E]" />
+            <UserCheck className="w-5 h-5 text-[#B45309]" />
             <span>{isBangla ? 'শিক্ষক ও প্রশিক্ষক পারফরম্যান্স সামারি' : 'Faculty Effectiveness Summary'}</span>
           </h2>
           <p className="text-xs text-[#475569] mt-0.5">
@@ -167,7 +165,7 @@ export default function CoordinatorBatchesPage() {
                   <td className="py-3 px-4 text-[#475569] font-mono">
                     {d(tItem.sessions_taken)} {isBangla ? 'টি' : ''}
                   </td>
-                  <td className="py-3 px-4 font-bold text-[#0F766E]">
+                  <td className="py-3 px-4 font-bold text-[#B45309]">
                     {d(safeFixed(tItem.attendance_percentage))}%
                   </td>
                   <td className="py-3 px-4 font-bold text-amber-700">

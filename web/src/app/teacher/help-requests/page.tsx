@@ -131,19 +131,17 @@ export default function TeacherHelpRequestsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
-
+      {/* Top Header (Madrasat-us-Sunnah Warm Banner Architecture) */}
+      <div className="bg-[#FFFBEB] p-6 sm:p-7 rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs font-semibold text-white mb-2.5">
-            <HelpCircle className="w-3.5 h-3.5 text-[#C1982E]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5">
+            <HelpCircle className="w-3.5 h-3.5 text-[#B45309]" />
             <span>{isBangla ? 'শিক্ষার্থী সাপোর্ট ডেস্ক' : 'Student Support Desk'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading text-[#0F172A]">
             {isBangla ? 'শিক্ষার্থী হেল্প রিকোয়েস্ট বোর্ড' : 'Student Help Requests Board'}
           </h1>
-          <p className="text-xs sm:text-sm text-teal-50 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1 max-w-xl">
             {isBangla
               ? 'ক্লাস শেষে শিক্ষার্থীরা যেসব প্রশ্ন বা সমস্যার সমাধান চেয়ে অনুরোধ জানিয়েছে তা তদারকি করুন।'
               : 'Review and resolve questions/requests submitted by students during daily feedback.'}
@@ -151,11 +149,11 @@ export default function TeacherHelpRequestsPage() {
         </div>
 
         {/* Tab Filter Segmented Controls */}
-        <div className="flex items-center gap-1 bg-[#0D9488] border border-teal-500/30 p-1.5 rounded-xl relative z-10">
+        <div className="flex items-center gap-1 bg-white border border-[#FCD34D] p-1.5 rounded-xl relative z-10">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              activeTab === 'all' ? 'bg-white text-[#0F766E] shadow-xs' : 'text-teal-100 hover:text-white'
+              activeTab === 'all' ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs' : 'text-[#475569] hover:text-[#B45309]'
             }`}
           >
             {isBangla ? 'সকল' : 'All'} ({d(requests.length)})
@@ -163,7 +161,7 @@ export default function TeacherHelpRequestsPage() {
           <button
             onClick={() => setActiveTab('pending')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              activeTab === 'pending' ? 'bg-amber-600 text-white shadow-xs' : 'text-amber-200 hover:text-white'
+              activeTab === 'pending' ? 'bg-amber-600 text-white shadow-xs' : 'text-[#475569] hover:text-amber-700'
             }`}
           >
             {isBangla ? 'অমীমাংসিত' : 'Pending'} ({d(pendingList.length)})
@@ -171,7 +169,7 @@ export default function TeacherHelpRequestsPage() {
           <button
             onClick={() => setActiveTab('in_progress')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              activeTab === 'in_progress' ? 'bg-[#016C90] text-white shadow-xs' : 'text-sky-200 hover:text-white'
+              activeTab === 'in_progress' ? 'bg-[#016C90] text-white shadow-xs' : 'text-[#475569] hover:text-[#016C90]'
             }`}
           >
             {isBangla ? 'চলমান' : 'In Progress'} ({d(inProgressList.length)})
@@ -179,7 +177,7 @@ export default function TeacherHelpRequestsPage() {
           <button
             onClick={() => setActiveTab('resolved')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              activeTab === 'resolved' ? 'bg-[#16A34A] text-white shadow-xs' : 'text-emerald-200 hover:text-white'
+              activeTab === 'resolved' ? 'bg-[#16A34A] text-white shadow-xs' : 'text-[#475569] hover:text-[#16A34A]'
             }`}
           >
             {isBangla ? 'সমাধানকৃত' : 'Resolved'} ({d(resolvedList.length)})
@@ -214,7 +212,7 @@ export default function TeacherHelpRequestsPage() {
                 key={req.id}
                 className={`bg-white rounded-xl p-5 border transition shadow-xs flex flex-col justify-between space-y-4 ${
                   isHighlighted
-                    ? 'border-[#0F766E] ring-2 ring-[#0F766E]/30'
+                    ? 'border-[#B45309] ring-2 ring-[#B45309]/30'
                     : req.status === 'pending'
                     ? 'border-amber-200 bg-amber-50/20'
                     : req.status === 'in_progress'
@@ -226,7 +224,7 @@ export default function TeacherHelpRequestsPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] flex items-center justify-center font-bold text-xs">
+                      <div className="w-8 h-8 rounded-full bg-[#FFFBEB] border border-[#FCD34D] text-[#B45309] flex items-center justify-center font-bold text-xs">
                         <User className="w-4 h-4" />
                       </div>
                       <div>
@@ -263,8 +261,8 @@ export default function TeacherHelpRequestsPage() {
                   </div>
 
                   {/* Subject & Topic Tag */}
-                  <div className="flex items-center gap-1.5 text-[11px] text-[#0F766E] bg-[#F0FDFA] px-2.5 py-1 rounded-lg border border-[#CCFBF1]">
-                    <BookOpen className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#92400E] bg-[#FFFBEB] px-2.5 py-1 rounded-lg border border-[#FCD34D]">
+                    <BookOpen className="w-3.5 h-3.5 text-[#B45309] shrink-0" />
                     <span className="font-semibold truncate">
                       {req.topic_title || req.subject_name || 'SBMC'}
                     </span>
@@ -280,7 +278,7 @@ export default function TeacherHelpRequestsPage() {
                   {/* Teacher Resolution Notes (If Resolved) */}
                   {req.status === 'resolved' && req.teacher_notes && (
                     <div className="p-3 bg-[#F0FDFA] rounded-xl border border-[#CCFBF1] space-y-1">
-                      <p className="text-[10px] font-bold text-[#0F766E] uppercase tracking-wide">
+                      <p className="text-[10px] font-bold text-[#92400E] uppercase tracking-wide">
                         {isBangla ? 'শিক্ষকের সমাধান নোট:' : 'Teacher Resolution Note:'}
                       </p>
                       <p className="text-xs text-[#0F172A] leading-relaxed font-medium">
@@ -313,7 +311,7 @@ export default function TeacherHelpRequestsPage() {
                       <button
                         type="button"
                         onClick={() => openResolveModal(req)}
-                        className="px-3 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
+                        className="px-3 py-1.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
                       >
                         <CheckCircle className="w-3 h-3" />
                         <span>{isBangla ? 'সমাধান সম্পন্ন' : 'Resolve'}</span>
@@ -333,7 +331,7 @@ export default function TeacherHelpRequestsPage() {
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-[#E2E8F0] border-t-4 border-t-[#C1982E] space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
               <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2 font-heading">
-                <CheckCircle className="w-5 h-5 text-[#0F766E]" />
+                <CheckCircle className="w-5 h-5 text-[#B45309]" />
                 <span>{isBangla ? 'হেল্প রিকোয়েস্ট সমাধান' : 'Resolve Help Request'}</span>
               </h3>
               <button
@@ -368,7 +366,7 @@ export default function TeacherHelpRequestsPage() {
                         ? 'যেমন: ক্লাসের পর সরাসরি ল্যাবে ফর্মুলা প্রয়োগ করে সমস্যাটি সমাধান করে দেয়া হয়েছে।'
                         : 'Explain how you resolved this question for the student...'
                     }
-                    className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:bg-white focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
+                    className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:bg-white focus:outline-none focus:border-[#B45309] focus:ring-1 focus:ring-[#B45309]"
                   />
                 </div>
 
@@ -383,7 +381,7 @@ export default function TeacherHelpRequestsPage() {
                   <button
                     type="submit"
                     disabled={submittingResolution}
-                    className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+                    className="px-5 py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
                   >
                     {submittingResolution ? (
                       isBangla ? 'সংরক্ষণ হচ্ছে...' : 'Saving...'

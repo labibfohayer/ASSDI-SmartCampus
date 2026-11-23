@@ -70,7 +70,7 @@ const BAND_COLORS = {
   '0-40%': '#DC2626', // Red
   '41-60%': '#EA580C', // Orange
   '61-80%': '#16A34A', // Green
-  '81-100%': '#0F766E', // Madrasat-us-Sunnah Deep Teal
+  '81-100%': '#B45309', // Warm amber brand accent
 };
 
 export default function TopicUnderstandingPage() {
@@ -170,19 +170,17 @@ export default function TopicUnderstandingPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Header & Session Selector */}
-      <div className="bg-[#0F766E] p-6 sm:p-7 rounded-2xl border border-[#0D9488] text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
-
+      {/* Top Header & Session Selector (Madrasat-us-Sunnah Warm Banner Architecture) */}
+      <div className="bg-[#FFFBEB] p-6 sm:p-7 rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs font-semibold text-white mb-2.5">
-            <BarChart3 className="w-3.5 h-3.5 text-[#C1982E]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5">
+            <BarChart3 className="w-3.5 h-3.5 text-[#B45309]" />
             <span>{isBangla ? 'লার্নিং আউটকাম অ্যানালিটিক্স' : 'Learning Outcomes'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading text-[#0F172A]">
             {isBangla ? 'টপিক বোঝাপড়া ও ফিডব্যাক অ্যানালিটিক্স' : 'Topic Understanding & Feedback'}
           </h1>
-          <p className="text-xs sm:text-sm text-teal-50 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1 max-w-xl">
             {isBangla
               ? 'শিক্ষার্থীদের জমা দেওয়া ১০-১৫ সেকেন্ডের রেটিং ও লার্নিং ব্যান্ডের গ্রাফিকাল বিশ্লেষণ।'
               : 'Analyze understanding band distributions and student feedback for this session.'}
@@ -193,10 +191,10 @@ export default function TopicUnderstandingPage() {
           <select
             value={selectedSessionId || ''}
             onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-            className="px-3.5 py-2.5 bg-[#0D9488] border border-teal-500/30 rounded-xl text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-[#C1982E]"
+            className="px-3.5 py-2.5 bg-white border border-[#FCD34D] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#B45309]"
           >
             {sessions.map((s) => (
-              <option key={s.id} value={s.id} className="bg-slate-900 text-white">
+              <option key={s.id} value={s.id} className="bg-white text-[#0F172A]">
                 {s.subject_name || `Session #${s.id}`} - {s.topic_title || d(s.session_date)}
               </option>
             ))}
@@ -223,19 +221,19 @@ export default function TopicUnderstandingPage() {
         </div>
 
         {/* Average Percentage */}
-        <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] hover:border-[#0F766E]/40 transition-all duration-200 shadow-xs group">
+        <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] hover:border-[#B45309]/40 transition-all duration-200 shadow-xs group">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#475569]">
               {isBangla ? 'অনুধাবন শতাংশ' : 'Comprehension'}
             </span>
-            <div className="w-9 h-9 rounded-lg bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-4 h-4 text-[#0F766E]" />
+            <div className="w-9 h-9 rounded-lg bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-4 h-4 text-[#0369A1]" />
             </div>
           </div>
           <h3 className="text-2xl font-extrabold text-[#0F172A] font-heading">
             {d(summary?.average_percentage ? summary.average_percentage.toFixed(1) : '0.0')}%
           </h3>
-          <p className="text-[11px] text-[#0F766E] font-semibold mt-1">● {isBangla ? 'ব্যান্ড অনুযায়ী অনুধাবন' : 'Overall comprehension'}</p>
+          <p className="text-[11px] text-[#B45309] font-semibold mt-1">● {isBangla ? 'ব্যান্ড অনুযায়ী অনুধাবন' : 'Overall comprehension'}</p>
         </div>
 
         {/* Total Submitted */}
@@ -255,19 +253,19 @@ export default function TopicUnderstandingPage() {
         </div>
 
         {/* Pending Feedbacks */}
-        <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] hover:border-[#0F766E]/40 transition-all duration-200 shadow-xs group">
+        <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] hover:border-[#B45309]/40 transition-all duration-200 shadow-xs group">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#475569]">
               {isBangla ? 'বাকি ফিডব্যাক' : 'Pending Feedbacks'}
             </span>
-            <div className="w-9 h-9 rounded-lg bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-lg bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <h3 className="text-2xl font-extrabold text-[#0F172A] font-heading">
             {d(summary?.pending_feedbacks || 0)} <span className="text-sm font-semibold text-[#475569]">{isBangla ? 'জন' : ''}</span>
           </h3>
-          <p className="text-[11px] text-[#0F766E] font-semibold mt-1">● {isBangla ? 'অপেক্ষমাণ শিক্ষার্থী' : 'Awaiting responses'}</p>
+          <p className="text-[11px] text-[#B45309] font-semibold mt-1">● {isBangla ? 'অপেক্ষমাণ শিক্ষার্থী' : 'Awaiting responses'}</p>
         </div>
       </div>
 
@@ -289,7 +287,7 @@ export default function TopicUnderstandingPage() {
         <div className="h-64 w-full pt-4">
           {loading ? (
             <div className="h-full flex items-center justify-center">
-              <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin" />
+              <div className="w-8 h-8 border-3 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin" />
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -301,7 +299,7 @@ export default function TopicUnderstandingPage() {
                   formatter={(value: any) => [`${value} জন শিক্ষার্থী`, 'সংখ্যা']}
                   contentStyle={{
                     borderRadius: '8px',
-                    backgroundColor: '#0B1A2B',
+                    backgroundColor: '#1E293B',
                     color: '#ffffff',
                     border: 'none',
                     fontSize: '12px',
@@ -322,7 +320,7 @@ export default function TopicUnderstandingPage() {
       <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-[#0F766E]" />
+            <MessageSquare className="w-5 h-5 text-[#B45309]" />
             <h2 className="text-base font-bold text-[#0F172A] font-heading">
               {isBangla ? 'শিক্ষার্থীদের মন্তব্য ও রেটিং' : 'Student Comments & Ratings'}
             </h2>
@@ -343,11 +341,11 @@ export default function TopicUnderstandingPage() {
             {feedbacks.map((fb) => (
               <div
                 key={fb.id}
-                className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:bg-white hover:border-[#0F766E]/40 transition space-y-2"
+                className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:bg-white hover:border-[#B45309]/40 transition space-y-2"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-full bg-[#FFFBEB] border border-[#FCD34D] text-[#B45309] flex items-center justify-center font-bold text-xs">
                       {fb.understanding_rating}
                     </div>
                     <div>

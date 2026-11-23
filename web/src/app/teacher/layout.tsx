@@ -37,7 +37,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
             <ShieldAlert className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-base font-extrabold text-[#0B2A21]">
+            <h2 className="text-base font-extrabold text-[#0F172A]">
               শুধুমাত্র শিক্ষকগণের জন্য সংরক্ষিত
             </h2>
             <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
@@ -51,9 +51,9 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
                 await logoutUser();
                 router.replace('/login');
               }}
-              className="w-full py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
             >
-              <LogOut className="w-4 h-4 text-[#C5A059]" />
+              <LogOut className="w-4 h-4 text-white" />
               <span>লগআউট করে শিক্ষক হিসেবে লগইন করুন</span>
             </button>
 

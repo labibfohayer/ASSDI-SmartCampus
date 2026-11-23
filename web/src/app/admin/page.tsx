@@ -74,7 +74,7 @@ export default function AdminOverviewPage() {
         : 'Enroll new students, assign batches, and manage active status.',
       icon: Users,
       href: '/admin/students',
-      color: 'bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]',
+      color: 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D]',
       badge: `${d(stats.totalStudents)} ${isBangla ? 'জন শিক্ষার্থী' : 'Students'}`,
     },
     {
@@ -114,7 +114,7 @@ export default function AdminOverviewPage() {
         : 'Instant on-screen preview and one-click PDF & Excel report downloads.',
       icon: FileText,
       href: '/reports',
-      color: 'bg-[#0B1A2B] text-teal-100 border border-[#0F766E]/40',
+      color: 'bg-[#FFFBEB] text-[#92400E] border border-[#FCD34D]',
       badge: isBangla ? 'পিডিএফ ও এক্সেল এক্সপোর্ট' : 'Export Hub',
     },
   ];
@@ -122,19 +122,17 @@ export default function AdminOverviewPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-[#0F766E] border border-[#0D9488] rounded-2xl p-6 sm:p-7 text-white shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#14B8A6_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
-
+      <div className="bg-[#FFFBEB] border border-[#FCD34D] border-l-4 border-l-[#D97706] rounded-2xl p-6 sm:p-7 text-[#0F172A] shadow-xs relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs font-semibold text-white mb-2.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#C1982E]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5 shadow-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#B45309]" />
               <span>{t('brand.course')}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading text-[#0F172A]">
               {isBangla ? 'সিস্টেম অ্যাডমিনিস্ট্রেশন সেন্টার' : 'System Administration Center'}
             </h1>
-            <p className="text-teal-50 text-xs sm:text-sm mt-1.5">
+            <p className="text-[#78350F] text-xs sm:text-sm mt-1.5">
               {isBangla
                 ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট (ASSDI) প্ল্যাটফর্মের সামগ্রিক ডেটা ও ইউজার নিয়ন্ত্রণ।'
                 : 'Central administrative controls for students, faculty, batches, and academic governance.'}
@@ -146,10 +144,10 @@ export default function AdminOverviewPage() {
               href="http://localhost:8001/api/docs/"
               target="_blank"
               rel="noreferrer"
-              className="px-3.5 py-2.5 bg-[#0D9488] hover:bg-[#115E59] text-white rounded-xl text-xs font-semibold border border-teal-500/30 flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
+              className="px-3.5 py-2.5 bg-white hover:bg-[#FEF3C7] text-[#92400E] rounded-xl text-xs font-semibold border border-[#FCD34D] flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
             >
               <span>{isBangla ? 'ওপেনএপিআই ডক্স (Swagger)' : 'API Docs (Swagger)'}</span>
-              <ExternalLink className="w-3.5 h-3.5 text-[#C1982E]" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#B45309]" />
             </a>
           </div>
         </div>
@@ -210,17 +208,17 @@ export default function AdminOverviewPage() {
 
       {/* KPI Stats Bento Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] hover:border-[#0F766E]/40 transition-all duration-200 shadow-xs group">
+        <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] hover:border-[#B45309]/40 transition-all duration-200 shadow-xs group">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#475569]">
               {isBangla ? 'মোট শিক্ষার্থী' : 'Students'}
             </span>
-            <div className="w-9 h-9 rounded-lg bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-lg bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Users className="w-4 h-4" />
             </div>
           </div>
           <h3 className="text-2xl font-extrabold text-[#0F172A] font-heading">{d(stats.totalStudents)} <span className="text-sm font-semibold text-[#475569]">জন</span></h3>
-          <p className="text-[11px] text-[#0F766E] font-semibold mt-1">● {isBangla ? 'নিবন্ধিত ডাটাবেস রেকর্ড' : 'Enrolled records'}</p>
+          <p className="text-[11px] text-[#0369A1] font-semibold mt-1">● {isBangla ? 'নিবন্ধিত ডাটাবেস রেকর্ড' : 'Enrolled records'}</p>
         </div>
 
         <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] hover:border-[#016C90]/40 transition-all duration-200 shadow-xs group">
@@ -275,7 +273,7 @@ export default function AdminOverviewPage() {
               <Link
                 key={i}
                 href={mod.href}
-                className="bg-white p-6 rounded-xl border border-[#E2E8F0] hover:border-[#0F766E]/40 hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-4 group cursor-pointer"
+                className="bg-white p-6 rounded-xl border border-[#E2E8F0] hover:border-[#B45309]/40 hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-4 group cursor-pointer"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -288,7 +286,7 @@ export default function AdminOverviewPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-base font-extrabold text-[#0F172A] font-heading group-hover:text-[#0F766E] transition">
+                    <h3 className="text-base font-extrabold text-[#0F172A] font-heading group-hover:text-[#B45309] transition">
                       {mod.title}
                     </h3>
                     <p className="text-xs text-[#475569] mt-1.5 leading-relaxed font-normal">
@@ -297,7 +295,7 @@ export default function AdminOverviewPage() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-bold text-[#0F766E]">
+                <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-bold text-[#B45309]">
                   <span>{isBangla ? 'মডিউলে প্রবেশ করুন' : 'Manage Module'}</span>
                   <ArrowRight className="w-4 h-4 text-[#C1982E] group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -310,8 +308,8 @@ export default function AdminOverviewPage() {
       {/* Infrastructure & Security Health Card */}
       <div className="bg-white p-6 rounded-xl border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center">
-            <Database className="w-5 h-5 text-[#0F766E]" />
+          <div className="w-10 h-10 rounded-lg bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] flex items-center justify-center">
+            <Database className="w-5 h-5 text-[#0369A1]" />
           </div>
           <div>
             <h4 className="text-sm font-extrabold text-[#0F172A] font-heading">
@@ -323,8 +321,8 @@ export default function AdminOverviewPage() {
           </div>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] rounded-xl text-xs font-bold">
-          <CheckCircle2 className="w-4 h-4 text-[#0F766E]" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] rounded-xl text-xs font-bold">
+          <CheckCircle2 className="w-4 h-4 text-[#0369A1]" />
           <span>{isBangla ? 'সকল সার্ভিস সক্রিয়' : 'System Healthy'}</span>
         </div>
       </div>

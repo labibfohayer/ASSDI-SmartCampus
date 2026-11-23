@@ -59,7 +59,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             <ShieldAlert className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-base font-extrabold text-[#0B2A21]">
+            <h2 className="text-base font-extrabold text-[#0F172A]">
               শুধুমাত্র শিক্ষার্থীদের জন্য সংরক্ষিত
             </h2>
             <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
@@ -70,9 +70,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           <div className="pt-2">
             <button
               onClick={() => router.replace(targetDashboard)}
-              className="w-full py-2.5 bg-[#0B2A21] hover:bg-[#164E3D] text-[#E5C378] text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4 text-[#C5A059]" />
+              <ArrowLeft className="w-4 h-4 text-white" />
               <span>আপনার ড্যাশবোর্ডে ফিরে যান</span>
             </button>
           </div>

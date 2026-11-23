@@ -114,11 +114,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between text-[#0F172A] relative">
-      {/* Top Institutional Header (Madrasat-us-Sunnah reference teal bar) */}
-      <header className="border-b border-[#0D9488] bg-[#0F766E] text-white shadow-xs">
+      {/* Top Institutional Header */}
+      <header className="border-b border-[#FCD34D] bg-[#FFFBEB] text-[#0F172A] shadow-xs">
         <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-sm border border-teal-200/50">
+            <div className="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-sm border border-[#FCD34D]">
               <Image
                 src="/logo.png"
                 alt="ASSDI Logo"
@@ -129,10 +129,10 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <h2 className="text-white font-bold text-sm sm:text-base leading-tight font-serif">
+              <h2 className="text-[#0F172A] font-bold text-sm sm:text-base leading-tight font-serif">
                 {t('brand.name')}
               </h2>
-              <p className="text-teal-100 text-xs font-medium">
+              <p className="text-[#78350F] text-xs font-medium">
                 {t('brand.course')}
               </p>
             </div>
@@ -146,7 +146,7 @@ export default function LoginPage() {
 
       {/* Main Login Card Container */}
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 my-8">
-        <div className="w-full max-w-md bg-white text-[#0F172A] rounded-2xl border border-[#E2E8F0] shadow-xl border-t-4 border-t-[#0F766E] p-7 sm:p-8">
+        <div className="w-full max-w-md bg-white text-[#0F172A] rounded-2xl border border-[#E2E8F0] shadow-xl border-t-4 border-t-[#B45309] p-7 sm:p-8">
           {/* Card Brand Header */}
           <div className="text-center mb-6">
             <div className="mx-auto w-16 h-16 rounded-2xl bg-[#F0FDFA] border-2 border-[#CCFBF1] p-2 mb-3.5 flex items-center justify-center shadow-xs">
@@ -166,8 +166,8 @@ export default function LoginPage() {
             <p className="text-xs text-[#475569] font-medium mt-1">
               {t('brand.systemTitle')}
             </p>
-            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] rounded-full text-xs font-bold">
-              <BookOpen className="w-3.5 h-3.5 text-[#0F766E]" />
+            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] rounded-full text-xs font-bold">
+              <BookOpen className="w-3.5 h-3.5 text-[#0369A1]" />
               <span>{t('brand.course')}</span>
             </div>
           </div>
@@ -246,7 +246,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 bg-[#0F766E] hover:bg-[#115E59] active:scale-[0.99] text-white text-sm font-bold rounded-xl shadow-md border border-[#0D9488] flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 bg-[#B45309] hover:bg-[#92400E] active:scale-[0.99] text-white text-sm font-bold rounded-xl shadow-md border border-[#D97706] flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -278,14 +278,14 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setDemoRole('coord01', 'CoordPass2026!', 'Coordinator')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] rounded-lg transition border border-[#FCD34D] cursor-pointer"
               >
                 Coordinator
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('teacher01', 'TeacherPass2026!', 'Teacher')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0D9488] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] rounded-lg transition border border-[#FCD34D] cursor-pointer"
               >
                 Teacher
               </button>
@@ -308,8 +308,8 @@ export default function LoginPage() {
         </div>
       </main>
 
-      {/* Institutional Footer (Madrasat-us-Sunnah reference dark navy footer) */}
-      <footer className="relative bg-[#0B1A2B] border-t-2 border-t-[#0F766E] py-4 text-center text-xs text-[#A9B8C9]">
+      {/* Institutional Footer */}
+      <footer className="relative bg-white border-t border-[#E2E8F0] py-4 text-center text-xs text-[#64748B]">
         <p>
           © 2026 {t('brand.name')} • {t('brand.tagline')} • ঢাকা, বাংলাদেশ
         </p>
