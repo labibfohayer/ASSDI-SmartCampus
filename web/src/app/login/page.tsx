@@ -32,6 +32,7 @@ export default function LoginPage() {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -113,67 +114,41 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between text-[#0F172A] relative">
-      {/* Ambient Sky-Blue Light Glow from Top (Locked / Fixed) */}
-      <div
-        className="fixed inset-x-0 top-0 h-[520px] pointer-events-none bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5]/80 via-[#F4FCFA]/40 to-transparent z-0"
-        aria-hidden="true"
-      />
-
-      {/* Top Institutional Header */}
-      <header className="relative z-10 border-b border-[#E2E8F0] bg-white/80 backdrop-blur-md text-[#0F172A] shadow-xs">
-        <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-[#F0FDFA] p-1.5 flex items-center justify-center shrink-0 shadow-sm border border-[#CCFBF1]">
-              <Image
-                src="/logo.png"
-                alt="ASSDI Logo"
-                width={36}
-                height={36}
-                priority
-                className="object-contain"
-              />
-            </div>
-            <div>
-              <h2 className="text-[#0F172A] font-bold text-sm sm:text-base leading-tight font-serif">
-                {t('brand.name')}
-              </h2>
-              <p className="text-[#64748B] text-xs font-medium">
-                {t('brand.course')}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-          </div>
+    <div
+      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed flex flex-col justify-between text-[#0F172A] relative"
+      style={{ backgroundImage: "url('/madrasatus-sunnah-bg.jpg')" }}
+    >
+      {/* Floating Language Switcher in top right corner */}
+      <div className="absolute top-3 right-3 sm:top-5 sm:right-5 z-20">
+        <div className="bg-white/95 hover:bg-white backdrop-blur-md px-2.5 py-1 rounded-full shadow-lg border border-white/60 transition">
+          <LanguageSwitcher />
         </div>
-      </header>
+      </div>
 
       {/* Main Login Card Container */}
-      <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 my-8">
-        <div className="w-full max-w-md bg-white text-[#0F172A] rounded-2xl border border-[#E2E8F0] shadow-xl border-t-4 border-t-[#0F766E] p-7 sm:p-8">
+      <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 my-auto pt-16 sm:pt-10 pb-8">
+        <div className="w-full max-w-md bg-white text-[#0F172A] rounded-2xl shadow-2xl p-6 sm:p-8 border border-white/80">
           {/* Card Brand Header */}
           <div className="text-center mb-6">
-            <div className="mx-auto w-16 h-16 rounded-2xl bg-[#F0FDFA] border-2 border-[#CCFBF1] p-2 mb-3.5 flex items-center justify-center shadow-xs">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-[#F0FDF4] border border-[#BBF7D0] p-2 mb-3.5 flex items-center justify-center shadow-xs">
               <Image
                 src="/logo.png"
                 alt="ASSDI Logo"
-                width={52}
-                height={52}
+                width={50}
+                height={50}
                 priority
                 className="object-contain"
               />
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight font-serif">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#14532D] tracking-tight font-serif">
               {t('brand.name')}
             </h1>
             <p className="text-xs text-[#475569] font-medium mt-1">
               {t('brand.systemTitle')}
             </p>
-            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] rounded-full text-xs font-bold">
-              <BookOpen className="w-3.5 h-3.5 text-[#0369A1]" />
+            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0] rounded-full text-xs font-semibold">
+              <BookOpen className="w-3.5 h-3.5 text-[#15803D]" />
               <span>{t('brand.course')}</span>
             </div>
           </div>
@@ -196,7 +171,7 @@ export default function LoginPage() {
                 {t('auth.loginId')}
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -206,8 +181,8 @@ export default function LoginPage() {
                   required
                   value={loginId}
                   onChange={(e) => setLoginId(e.target.value)}
-                  placeholder={t('auth.loginIdPlaceholder')}
-                  className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#14B8A6] focus:ring-4 focus:ring-[#14B8A6]/15 transition"
+                  placeholder={isBangla ? 'ইউজার আইডি / লগইন আইডি' : 'User ID / Login ID'}
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-[#CBD5E1] rounded-xl text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#16A34A] focus:ring-4 focus:ring-[#16A34A]/15 transition"
                 />
               </div>
             </div>
@@ -220,7 +195,7 @@ export default function LoginPage() {
                 {t('auth.password')}
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -231,12 +206,12 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t('auth.passwordPlaceholder')}
-                  className="w-full pl-10 pr-10 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#14B8A6] focus:ring-4 focus:ring-[#14B8A6]/15 transition"
+                  className="w-full pl-10 pr-10 py-2.5 bg-white border border-[#CBD5E1] rounded-xl text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#16A34A] focus:ring-4 focus:ring-[#16A34A]/15 transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 focus:outline-none cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#64748B] hover:text-[#0F172A] focus:outline-none cursor-pointer"
                   tabIndex={-1}
                   title={showPassword ? 'Hide password' : 'Show password'}
                 >
@@ -249,10 +224,27 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Remember Me & Forgot Password row */}
+            <div className="flex items-center justify-between text-xs pt-0.5">
+              <label className="flex items-center gap-2 cursor-pointer text-[#475569] hover:text-[#0F172A] select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-[#CBD5E1] text-[#16A34A] focus:ring-[#16A34A]/30 cursor-pointer accent-[#16A34A]"
+                />
+                <span>{isBangla ? 'মনে রাখুন' : 'Remember me'}</span>
+              </label>
+              <span className="text-[#64748B] hover:text-[#16A34A] text-xs font-medium cursor-pointer transition">
+                {isBangla ? 'পাসওয়ার্ড ভুলে গেছেন?' : 'Forgot Password?'}
+              </span>
+            </div>
+
+            {/* Submit button with Lock icon (matching Madrasatus Sunnah) */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 bg-[#0F766E] hover:bg-[#115E59] active:scale-[0.99] text-white text-sm font-bold rounded-xl shadow-md border border-[#0D9488] flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 bg-[#16A34A] hover:bg-[#15803D] active:scale-[0.99] text-white text-sm font-bold rounded-xl shadow-md border border-[#15803D] flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -261,8 +253,8 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <LogIn className="w-4 h-4 text-white" />
-                  <span>{t('auth.loginBtn')}</span>
+                  <Lock className="w-4 h-4 text-white" />
+                  <span>{isBangla ? 'লগইন' : 'Login'}</span>
                 </>
               )}
             </button>
@@ -270,53 +262,60 @@ export default function LoginPage() {
 
           {/* Quick Demo Fill Buttons for Testing */}
           <div className="mt-6 pt-5 border-t border-[#E2E8F0]">
-            <p className="text-[11px] font-bold text-[#475569] mb-2.5 text-center uppercase tracking-wider font-serif">
+            <p className="text-[11px] font-bold text-[#64748B] mb-2.5 text-center uppercase tracking-wider font-serif">
               {t('auth.quickDemo')}
             </p>
             <div className="grid grid-cols-3 gap-2 text-center">
               <button
                 type="button"
                 onClick={() => setDemoRole('admin01', 'AdminPass2026!', 'Super Admin')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F0FDFA] hover:text-[#0F766E] text-[#0F172A] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F0FDF4] hover:text-[#16A34A] hover:border-[#BBF7D0] text-[#1E293B] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
               >
                 Super Admin
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('coord01', 'CoordPass2026!', 'Coordinator')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-lg transition border border-[#BBF7D0] cursor-pointer"
               >
                 Coordinator
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('teacher01', 'TeacherPass2026!', 'Teacher')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-lg transition border border-[#BBF7D0] cursor-pointer"
               >
                 Teacher
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('observer01', 'ObserverPass2026!', 'Observer')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F0FDFA] text-[#334155] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F0FDF4] text-[#475569] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
               >
                 Observer
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('STD-2026-042-001', 'StudentPass2026!', 'Student')}
-                className="col-span-2 px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
+                className="col-span-2 px-2 py-1.5 text-[11px] font-bold bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#16A34A] rounded-lg transition border border-[#BBF7D0] cursor-pointer"
               >
                 Student (STD-2026-042-001)
               </button>
             </div>
           </div>
+
+          {/* Madrasatus Sunnah style copyright inside card */}
+          <div className="mt-5 text-center">
+            <p className="text-[11px] text-[#64748B]">
+              © 2026 As-Sunnah Skill Development Institute | All Rights Reserved
+            </p>
+          </div>
         </div>
       </main>
 
-      {/* Institutional Footer */}
-      <footer className="relative bg-white border-t border-[#E2E8F0] py-4 text-center text-xs text-[#64748B]">
-        <p>
+      {/* Subtle Bottom Ambient Bar */}
+      <footer className="relative z-10 py-3 px-4 text-center text-xs text-white/80 bg-black/40 backdrop-blur-xs">
+        <p className="max-w-2xl mx-auto leading-relaxed">
           © 2026 {t('brand.name')} • {t('brand.tagline')} • ঢাকা, বাংলাদেশ
         </p>
       </footer>
