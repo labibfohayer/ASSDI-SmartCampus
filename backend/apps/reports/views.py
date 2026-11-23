@@ -1,13 +1,16 @@
 import zoneinfo
+import datetime
 from typing import Any, Dict
 
 from django.http import HttpResponse
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import permissions, status
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.accounts.models import User, UserRole
 from apps.audit.models import AuditLog
 from apps.reports.constants import ExportFormat, ReportType
 from apps.reports.models import ReportLog
@@ -31,6 +34,7 @@ from apps.reports.services.docx_service import WordExportService
 from apps.reports.services.pptx_service import PowerPointExportService
 from apps.reports.services.csv_service import CSVExportService
 from apps.reports.services.report_service import ReportService
+from apps.reports.services.teacher_ai_summary_service import TeacherAISummaryService
 
 
 def handle_export_or_json(request, report_type: str, data: Dict[str, Any], filename_prefix: str) -> HttpResponse:
@@ -383,3 +387,90 @@ class RepeatedAbsencesReportView(APIView):
         return handle_export_or_json(
             request, ReportType.REPEATED_ABSENCES, data, "repeated_absences"
         )
+
+
+class TeacherAIWeeklySummaryView(APIView):
+    """
+    Teacher AI Weekly Teaching Summary:
+    AI-driven weekly pedagogical insights, bottleneck topics, and 2-minute actionable
+    teaching recommendations delivered for Thursday / weekly review.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        tags=["Teacher AI Summary"],
+        parameters=[
+            OpenApiParameter(
+                "date",
+                str,
+                OpenApiParameter.QUERY,
+                description="Target evaluation date (YYYY-MM-DD, defaults to today/Dhaka)",
+            ),
+            OpenApiParameter(
+                "teacher_id",
+                int,
+                OpenApiParameter.QUERY,
+                description="Teacher User ID (Super Admin / Coordinator only)",
+            ),
+            OpenApiParameter(
+                "refresh",
+                bool,
+                OpenApiParameter.QUERY,
+                description="Force re-analysis",
+            ),
+        ],
+        responses={200: dict},
+    )
+    def get(self, request):
+        user = request.user
+
+        # Strict RBAC: Students and Observers are forbidden
+        if user.role in [UserRole.STUDENT, UserRole.OBSERVER]:
+            raise PermissionDenied(
+                "Students and observers are not permitted to access AI teaching summaries."
+            )
+
+        teacher_user = user
+        if user.role in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR]:
+            teacher_id_param = request.query_params.get("teacher_id")
+            if teacher_id_param:
+                try:
+                    target_teacher = User.objects.get(id=teacher_id_param, role=UserRole.TEACHER)
+                    teacher_user = target_teacher
+                except (User.DoesNotExist, ValueError):
+                    raise NotFound({"detail": f"Teacher with ID {teacher_id_param} not found."})
+            elif user.role != UserRole.TEACHER:
+                # Default to the first active teacher for coordinator/admin preview
+                first_teacher = User.objects.filter(role=UserRole.TEACHER, is_active=True).first()
+                if first_teacher:
+                    teacher_user = first_teacher
+
+        # Parse target date if supplied
+        date_str = request.query_params.get("date")
+        target_date = None
+        if date_str:
+            try:
+                target_date = datetime.date.fromisoformat(date_str)
+            except ValueError:
+                return Response(
+                    {"detail": "Invalid date format. Use YYYY-MM-DD."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        refresh = request.query_params.get("refresh", "false").lower() in ["true", "1"]
+
+        summary = TeacherAISummaryService.get_weekly_summary(
+            teacher_user=teacher_user,
+            target_date=target_date,
+            refresh=refresh,
+        )
+
+        return Response(
+            {
+                "success": True,
+                "data": summary,
+            },
+            status=status.HTTP_200_OK,
+        )
+

@@ -8,17 +8,28 @@ from apps.reports.views import (
     MonthlyStudentPerformanceReportView,
     RepeatedAbsencesReportView,
     StudentHelpRequestsReportView,
+    TeacherAIWeeklySummaryView,
     TeacherWiseReportView,
     TopicWiseUnderstandingReportView,
     WeeklyProgressReportView,
 )
 
 urlpatterns = [
-    # Analytics Dashboard
+    # Analytics Dashboard & Teacher AI Summary
     path(
         "analytics/coordinator-dashboard/",
         CoordinatorDashboardView.as_view(),
         name="coordinator-dashboard",
+    ),
+    path(
+        "reports/teacher-ai-weekly-summary/",
+        TeacherAIWeeklySummaryView.as_view(),
+        name="report-teacher-ai-weekly-summary",
+    ),
+    path(
+        "teacher-ai-weekly-summary/",
+        TeacherAIWeeklySummaryView.as_view(),
+        name="teacher-ai-weekly-summary",
     ),
     # 9 SRS Reports
     path(
