@@ -144,7 +144,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
 
       <div className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[96vh]">
         {/* Modal Action Header (Hidden in Print) */}
-        <div className="flex items-center justify-between px-6 py-3.5 bg-gradient-to-r from-[#B45309] via-[#92400E] to-[#B45309] text-white print:hidden">
+        <div className="flex items-center justify-between px-6 py-3.5 bg-gradient-to-r from-[#0F766E] via-[#115E59] to-[#0F766E] text-white print:hidden">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#C1982E]/20 border border-[#C1982E]/40 flex items-center justify-center text-[#D4AF37]">
               <Award className="w-5 h-5" />
@@ -192,7 +192,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
           <div
             id="graduation-certificate-print-area"
             ref={certificateRef}
-            className="relative w-full aspect-[1.414/1] max-w-[960px] bg-white rounded-lg p-6 sm:p-10 shadow-lg border-[3px] border-[#B45309] flex flex-col justify-between text-slate-800 select-none overflow-hidden"
+            className="relative w-full aspect-[1.414/1] max-w-[960px] bg-white rounded-lg p-6 sm:p-10 shadow-lg border-[3px] border-[#0F766E] flex flex-col justify-between text-slate-800 select-none overflow-hidden"
             style={{
               backgroundImage: 'radial-gradient(circle at center, #FBFBF9 0%, #FFFFFF 100%)',
             }}
@@ -226,13 +226,13 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
 
               {/* Institution Logo & Emblem */}
               <div className="flex items-center justify-center gap-3 my-1">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#B45309] text-[#D4AF37] flex items-center justify-center border-2 border-[#C1982E] shadow-sm">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0F766E] text-[#D4AF37] flex items-center justify-center border-2 border-[#C1982E] shadow-sm">
                   <GraduationCap className="w-6 h-6" />
                 </div>
               </div>
 
               {/* Institute Name */}
-              <h1 className="text-xl sm:text-3xl font-extrabold text-[#B45309] tracking-tight font-serif mt-1">
+              <h1 className="text-xl sm:text-3xl font-extrabold text-[#0F766E] tracking-tight font-serif mt-1">
                 আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট
               </h1>
               <p className="text-xs sm:text-sm font-semibold tracking-wider text-[#C1982E] uppercase mt-0.5">
@@ -244,7 +244,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
 
               {/* Certificate Title Badge */}
               <div className="relative mt-3 sm:mt-4 mb-2 inline-block">
-                <div className="px-6 sm:px-10 py-1 sm:py-1.5 bg-gradient-to-r from-[#B45309] via-[#92400E] to-[#B45309] rounded-full text-[#F3E5C8] border border-[#C1982E] shadow-sm">
+                <div className="px-6 sm:px-10 py-1 sm:py-1.5 bg-gradient-to-r from-[#0F766E] via-[#115E59] to-[#0F766E] rounded-full text-[#F3E5C8] border border-[#C1982E] shadow-sm">
                   <span className="text-xs sm:text-base font-bold tracking-wide font-serif">
                     কোর্স সমাপনী ও কৃতিত্ব সনদপত্র
                   </span>
@@ -263,7 +263,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
 
               {/* Student Name */}
               <div className="inline-block relative my-1">
-                <h2 className="text-xl sm:text-3xl font-black text-[#B45309] tracking-tight font-serif border-b-2 border-[#C1982E] px-6 pb-1">
+                <h2 className="text-xl sm:text-3xl font-black text-[#0F766E] tracking-tight font-serif border-b-2 border-[#C1982E] px-6 pb-1">
                   {data.student_name}
                 </h2>
               </div>
@@ -287,7 +287,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
               <p className="text-xs sm:text-sm text-slate-700 max-w-2xl mx-auto leading-relaxed mt-2 font-serif">
                 সফলতার সাথে আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটের ৩ মাস মেয়াদী
               </p>
-              <p className="text-sm sm:text-base font-bold text-[#B45309] my-1">
+              <p className="text-sm sm:text-base font-bold text-[#0F766E] my-1">
                 {cert.course_name}
               </p>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-serif">
@@ -298,7 +298,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
               <div className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-900 text-xs sm:text-sm font-semibold">
                 <Sparkles className="w-4 h-4 text-[#C1982E]" />
                 <span>অর্জিত গ্রেড ও কৃতিত্ব:</span>
-                <span className="text-[#B45309] font-bold">{data.grade_bn}</span>
+                <span className="text-[#0F766E] font-bold">{data.grade_bn}</span>
                 <span className="text-xs text-emerald-700">({data.grade_en})</span>
               </div>
             </div>
@@ -309,7 +309,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
               <div className="flex flex-col items-center">
                 <div className="h-10 sm:h-12 flex items-end justify-center pb-1">
                   {/* Stylized Arabic / Bengali Signature Representation */}
-                  <span className="font-serif italic font-bold text-[#B45309] text-lg sm:text-xl tracking-tight opacity-90 select-none">
+                  <span className="font-serif italic font-bold text-[#0F766E] text-lg sm:text-xl tracking-tight opacity-90 select-none">
                     শায়খ আহমাদুল্লাহ
                   </span>
                 </div>
@@ -325,8 +325,8 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
               {/* Center Column: Official Embossed Seal & Serial */}
               <div className="flex flex-col items-center justify-center">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-[#C1982E] bg-gradient-to-br from-[#FBF8EF] to-[#EBDCB7] p-1 shadow-sm flex flex-col items-center justify-center text-center">
-                  <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-[#B45309]" />
-                  <span className="text-[7px] sm:text-[8px] font-bold text-[#B45309] uppercase leading-none mt-0.5">
+                  <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-[#0F766E]" />
+                  <span className="text-[7px] sm:text-[8px] font-bold text-[#0F766E] uppercase leading-none mt-0.5">
                     Official Seal
                   </span>
                 </div>
@@ -347,7 +347,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
                       size={44}
                       level="M"
                       bgColor="#FFFFFF"
-                      fgColor="#B45309"
+                      fgColor="#0F766E"
                     />
                   </div>
                 </div>
@@ -375,7 +375,7 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#B45309] hover:bg-[#92400E] text-white font-medium text-xs sm:text-sm shadow-sm transition-all"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#115E59] text-white font-medium text-xs sm:text-sm shadow-sm transition-all"
             >
               <Printer className="w-4 h-4 text-white" />
               <span>প্রিন্ট করুন</span>

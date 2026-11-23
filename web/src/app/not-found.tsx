@@ -34,7 +34,7 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/"
-            className="w-full sm:flex-1 py-2.5 px-4 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+            className="w-full sm:flex-1 py-2.5 px-4 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
           >
             <Home className="w-4 h-4" />
             <span>মূল পাতায় যান</span>

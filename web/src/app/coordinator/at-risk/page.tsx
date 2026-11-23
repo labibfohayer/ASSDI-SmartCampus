@@ -134,7 +134,7 @@ export default function CoordinatorAtRiskPage() {
                 placeholder={isBangla ? 'শিক্ষার্থীর নাম বা আইডি দিয়ে খুঁজুন...' : 'Search by student name or ID...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+                className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               />
             </div>
 
@@ -143,7 +143,7 @@ export default function CoordinatorAtRiskPage() {
                 type="button"
                 onClick={() => setFilterType('all')}
                 className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
-                  filterType === 'all' ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs' : 'text-[#475569]'
+                  filterType === 'all' ? 'bg-[#FFFBEB] text-[#0F766E] border border-[#FCD34D] shadow-xs' : 'text-[#475569]'
                 }`}
               >
                 {isBangla ? 'সকল অ্যালার্ট' : 'All Alerts'}
@@ -172,12 +172,12 @@ export default function CoordinatorAtRiskPage() {
           {/* Table */}
           {loading ? (
             <div className="py-16 text-center">
-              <div className="w-8 h-8 border-3 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin mx-auto mb-2" />
+              <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin mx-auto mb-2" />
               <p className="text-xs text-[#475569]">{t('common.loading')}</p>
             </div>
           ) : filteredStudents.length === 0 ? (
             <div className="py-16 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-[#B45309] mx-auto" />
+              <CheckCircle2 className="w-10 h-10 text-[#0F766E] mx-auto" />
               <p className="text-sm font-bold text-[#0F172A] font-heading">
                 {isBangla ? 'এই ফিল্টারে কোনো ঝুঁকিপূর্ণ শিক্ষার্থী পাওয়া যায়নি।' : 'No flagged students found.'}
               </p>
@@ -252,7 +252,7 @@ export default function CoordinatorAtRiskPage() {
                         {st.phone ? (
                           <a
                             href={`tel:${st.phone}`}
-                            className="inline-flex items-center gap-1 text-[#B45309] font-semibold hover:underline"
+                            className="inline-flex items-center gap-1 text-[#0F766E] font-semibold hover:underline"
                           >
                             <Phone className="w-3 h-3" />
                             <span>{st.phone}</span>
@@ -266,7 +266,7 @@ export default function CoordinatorAtRiskPage() {
                           type="button"
                           onClick={() => handleOpenGraduation(st.student_id)}
                           disabled={loadingGraduationId === st.student_id}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F0FDFA] hover:bg-[#B45309] text-[#0369A1] hover:text-white border border-[#CCFBF1] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F0FDFA] hover:bg-[#0F766E] text-[#0369A1] hover:text-white border border-[#CCFBF1] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
                           title={isBangla ? 'গ্র্যাজুয়েশন ও সনদপত্র ট্র্যাকার দেখুন' : 'View Graduation & Certificate'}
                         >
                           <Award className="w-3.5 h-3.5 text-[#C1982E]" />

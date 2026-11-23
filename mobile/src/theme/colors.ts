@@ -1,9 +1,9 @@
 import { tokens } from '../../theme/tokens';
 
 export const colors = {
-  primary: tokens.colors.primary, // #B45309
+  primary: tokens.colors.primary, // #0F766E
   primaryLight: tokens.colors.tealSoft, // #F0FDFA
-  primaryDark: tokens.colors.primaryHover, // #92400E
+  primaryDark: tokens.colors.primaryHover, // #115E59
   accent: tokens.colors.teal3, // #14B8A6
   gold: tokens.colors.gold, // #C1982E
   white: '#FFFFFF',
@@ -23,9 +23,9 @@ export const colors = {
   rating: {
     1: '#DC2626', // Red
     2: '#EA580C', // Orange
-    3: '#D97706', // Amber/Yellow
+    3: '#0D9488', // Amber/Yellow
     4: '#16A34A', // Light green
-    5: '#B45309', // Warm Amber Brand
+    5: '#0F766E', // Warm Amber Brand
   },
 
   status: {

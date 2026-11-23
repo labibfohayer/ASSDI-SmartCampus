@@ -4,9 +4,9 @@
 export const tokens = {
   colors: {
     // Brand Amber / Cream Palette per User Feedback
-    primary: '#B45309', // Warm Amber Primary
-    primaryHover: '#92400E',
-    teal2: '#D97706', // Warm Amber Accent 2
+    primary: '#0F766E', // Warm Amber Primary
+    primaryHover: '#115E59',
+    teal2: '#0D9488', // Warm Amber Accent 2
     teal3: '#F59E0B', // Warm Amber Accent 3
     tealSoft: '#F0FDFA', // Soft Sky Surface Tint (Preserved)
     tealLine: '#CCFBF1', // Sky Border Line (Preserved)
@@ -39,7 +39,7 @@ export const tokens = {
     // Semantic Status Colors
     status: {
       present: '#16A34A',
-      late: '#D97706',
+      late: '#0D9488',
       absent: '#DC2626',
       leave: '#0284C7',
     },
@@ -48,7 +48,7 @@ export const tokens = {
     rating: {
       1: { bg: '#FEF2F2', text: '#991B1B', border: '#FCA5A5' },
       2: { bg: '#FFF7ED', text: '#C2410C', border: '#FED7AA' },
-      3: { bg: '#FFFBEB', text: '#B45309', border: '#FDE68A' },
+      3: { bg: '#FFFBEB', text: '#0F766E', border: '#FDE68A' },
       4: { bg: '#F0FDF4', text: '#15803D', border: '#86EFAC' },
       5: { bg: '#F0FDFA', text: '#0F766E', border: '#5EEAD4' },
     },

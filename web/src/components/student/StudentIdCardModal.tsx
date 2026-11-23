@@ -221,7 +221,7 @@ export default function StudentIdCardModal({
                 {isBangla ? 'আস-সুন্নাহ প্রাতিষ্ঠানিক ডিজিটাল ডকুমেন্টস' : 'As-Sunnah Institutional Credentials'}
               </h2>
               <p className="text-[11px] text-[#64748B] font-medium">
-                {data.full_name} • <span className="font-mono text-[#B45309] font-bold">ID: {data.student_id_number}</span>
+                {data.full_name} • <span className="font-mono text-[#0F766E] font-bold">ID: {data.student_id_number}</span>
               </p>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function StudentIdCardModal({
               onClick={() => setActiveDocType('id_card')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                 activeDocType === 'id_card'
-                  ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
+                  ? 'bg-[#FFFBEB] text-[#0F766E] border border-[#FCD34D] shadow-xs'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -254,7 +254,7 @@ export default function StudentIdCardModal({
               onClick={() => setActiveDocType('admit_card')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                 activeDocType === 'admit_card'
-                  ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
+                  ? 'bg-[#FFFBEB] text-[#0F766E] border border-[#FCD34D] shadow-xs'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -299,7 +299,7 @@ export default function StudentIdCardModal({
             <button
               type="button"
               onClick={handlePrint}
-              className="px-4 py-1.5 bg-[#B45309] hover:bg-[#92400E] text-white rounded-xl text-xs font-extrabold shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+              className="px-4 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl text-xs font-extrabold shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
             >
               <Printer className="w-3.5 h-3.5 text-white" />
               <span>{isBangla ? 'প্রিন্ট করুন' : 'Print'}</span>
@@ -370,7 +370,7 @@ export default function StudentIdCardModal({
 
                     {/* Student Full Name */}
                     <div className="relative z-10 text-center px-3">
-                      <h3 className="font-extrabold text-[#B45309] text-[15px] uppercase tracking-wide truncate leading-tight">
+                      <h3 className="font-extrabold text-[#0F766E] text-[15px] uppercase tracking-wide truncate leading-tight">
                         {data.full_name}
                       </h3>
                     </div>
@@ -420,7 +420,7 @@ export default function StudentIdCardModal({
                         alt="As-Sunnah Logo"
                         className="w-11 h-11 object-contain mx-auto drop-shadow-2xs"
                       />
-                      <h4 className="text-[13px] font-black text-[#B45309] tracking-wide uppercase leading-none mt-1.5">
+                      <h4 className="text-[13px] font-black text-[#0F766E] tracking-wide uppercase leading-none mt-1.5">
                         AS-SUNNAH
                       </h4>
                       <p className="text-[9.5px] font-black text-[#65A30D] tracking-wider uppercase leading-tight mt-0.5">
@@ -520,14 +520,14 @@ export default function StudentIdCardModal({
               </div>
 
               {/* Institutional Header */}
-              <div className="p-5 sm:p-6 text-center border-b-2 border-[#B45309]">
+              <div className="p-5 sm:p-6 text-center border-b-2 border-[#0F766E]">
                 <div className="flex flex-col items-center justify-center">
                   <img
                     src="/logo.png"
                     alt="As-Sunnah Logo"
                     className="w-14 h-14 object-contain mb-1.5 drop-shadow-2xs"
                   />
-                  <h2 className="text-xl sm:text-2xl font-black text-[#B45309] tracking-wide uppercase leading-tight">
+                  <h2 className="text-xl sm:text-2xl font-black text-[#0F766E] tracking-wide uppercase leading-tight">
                     AS-SUNNAH
                   </h2>
                   <p className="text-xs sm:text-sm font-black text-[#65A30D] tracking-wider uppercase leading-tight mt-0.5">
@@ -539,7 +539,7 @@ export default function StudentIdCardModal({
                 </div>
 
                 <div className="mt-3.5 inline-block">
-                  <span className="px-5 py-1.5 bg-[#B45309] text-white text-xs font-black rounded-full uppercase tracking-wider shadow-xs border border-[#FCD34D]">
+                  <span className="px-5 py-1.5 bg-[#0F766E] text-white text-xs font-black rounded-full uppercase tracking-wider shadow-xs border border-[#FCD34D]">
                     FINAL EXAMINATION ADMIT CARD • পরীক্ষার প্রবেশপত্র
                   </span>
                 </div>
@@ -567,7 +567,7 @@ export default function StudentIdCardModal({
 
                     <div>
                       <span className="text-slate-500 font-medium block">{isBangla ? 'শিক্ষার্থী আইডি নং:' : 'Student ID Number:'}</span>
-                      <strong className="font-mono text-[#B45309] font-extrabold text-base">{data.student_id_number}</strong>
+                      <strong className="font-mono text-[#0F766E] font-extrabold text-base">{data.student_id_number}</strong>
                     </div>
 
                     <div>
@@ -628,7 +628,7 @@ export default function StudentIdCardModal({
                   {isBangla ? 'পরীক্ষার বিষয়সূচি ও সিডিউল (Subject Schedule)' : 'Registered Subject Schedule'}
                 </h4>
                 <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
-                  <thead className="bg-[#B45309] text-white">
+                  <thead className="bg-[#0F766E] text-white">
                     <tr>
                       <th className="p-2 font-bold">#</th>
                       <th className="p-2 font-bold">{isBangla ? 'বিষয় কোড' : 'Code'}</th>
@@ -640,21 +640,21 @@ export default function StudentIdCardModal({
                   <tbody className="divide-y divide-slate-100">
                     <tr className="bg-white">
                       <td className="p-2 font-mono">01</td>
-                      <td className="p-2 font-mono font-bold text-[#B45309]">ACCT-101</td>
+                      <td className="p-2 font-mono font-bold text-[#0F766E]">ACCT-101</td>
                       <td className="p-2 font-medium">Accounting & Financial Records</td>
                       <td className="p-2 font-mono text-slate-600">15 Dec 2026, 10:00 AM</td>
                       <td className="p-2 text-center text-slate-300">__________</td>
                     </tr>
                     <tr className="bg-slate-50/50">
                       <td className="p-2 font-mono">02</td>
-                      <td className="p-2 font-mono font-bold text-[#B45309]">META-MKTG</td>
+                      <td className="p-2 font-mono font-bold text-[#0F766E]">META-MKTG</td>
                       <td className="p-2 font-medium">Meta & Digital Marketing</td>
                       <td className="p-2 font-mono text-slate-600">17 Dec 2026, 10:00 AM</td>
                       <td className="p-2 text-center text-slate-300">__________</td>
                     </tr>
                     <tr className="bg-white">
                       <td className="p-2 font-mono">03</td>
-                      <td className="p-2 font-mono font-bold text-[#B45309]">ISLAMIC-GEN</td>
+                      <td className="p-2 font-mono font-bold text-[#0F766E]">ISLAMIC-GEN</td>
                       <td className="p-2 font-medium">Islamic Business Ethics & Principles</td>
                       <td className="p-2 font-mono text-slate-600">19 Dec 2026, 10:00 AM</td>
                       <td className="p-2 text-center text-slate-300">__________</td>

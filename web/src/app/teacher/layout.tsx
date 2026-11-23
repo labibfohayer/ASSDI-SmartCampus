@@ -51,7 +51,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
                 await logoutUser();
                 router.replace('/login');
               }}
-              className="w-full py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
             >
               <LogOut className="w-4 h-4 text-white" />
               <span>লগআউট করে শিক্ষক হিসেবে লগইন করুন</span>

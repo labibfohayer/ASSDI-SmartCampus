@@ -6,11 +6,11 @@
   --font-bangla: var(--font-noto-serif-bengali), var(--font-hind-siliguri), sans-serif;
   --font-arabic: var(--font-amiri), serif;
 
-  /* Primary Brand Palette from madrasatussunnah.org (Amber/Terracotta Banner Style) */
-  --color-brand-primary: #B45309;
-  --color-brand-primary-hover: #92400E;
-  --color-brand-teal-2: #D97706;
-  --color-brand-teal-3: #F59E0B;
+  /* Primary Brand Palette from madrasatussunnah.org */
+  --color-brand-primary: #0F766E;
+  --color-brand-primary-hover: #115E59;
+  --color-brand-teal-2: #0D9488;
+  --color-brand-teal-3: #14B8A6;
   --color-brand-teal-soft: #F0FDFA;
   --color-brand-teal-line: #CCFBF1;
   --color-brand-teal-pill: #99F6E4;
@@ -21,6 +21,10 @@
   --color-brand-green-dome: #00A14A;
   --color-brand-ocean: #016C90;
   --color-brand-cyan: #067A85;
+
+  /* Ambient Sky Light Palette */
+  --color-brand-sky-glow: #DCF4F1;
+  --color-brand-sky-light: #EAF8F5;
 
   /* Deep Midnight App Shell & Footer Colors */
   --color-brand-navy-dark: #0A1420;
@@ -63,20 +67,20 @@
   --color-status-info-accent: #0284C7;
 
   /* 5-Color Chart Palette */
-  --color-chart-1: #B45309;
-  --color-chart-2: #14B8A6;
-  --color-chart-3: #C1982E;
+  --color-chart-1: #0F766E;
+  --color-chart-2: #0284C7;
+  --color-chart-3: #D97706;
   --color-chart-4: #16A34A;
-  --color-chart-5: #016C90;
+  --color-chart-5: #0D9488;
 }
 
 :root {
   --background: #F8FAFC;
   --foreground: #0F172A;
-  --hm-teal: #B45309;
-  --hm-teal-hover: #92400E;
-  --hm-teal-2: #D97706;
-  --hm-teal-3: #F59E0B;
+  --hm-teal: #0F766E;
+  --hm-teal-hover: #115E59;
+  --hm-teal-2: #0D9488;
+  --hm-teal-3: #14B8A6;
   --hm-teal-soft: #F0FDFA;
   --hm-teal-line: #CCFBF1;
   --hm-teal-pill: #99F6E4;
@@ -89,11 +93,11 @@
   --hm-subtle: #94A3B8;
 
   /* Chart Colors for Recharts */
-  --chart-1: #B45309;
-  --chart-2: #14B8A6;
-  --chart-3: #C1982E;
+  --chart-1: #0F766E;
+  --chart-2: #0284C7;
+  --chart-3: #D97706;
   --chart-4: #16A34A;
-  --chart-5: #016C90;
+  --chart-5: #0D9488;
 }
 
 body {

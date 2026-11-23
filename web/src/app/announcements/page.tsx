@@ -184,7 +184,7 @@ export default function AnnouncementsPage() {
         {/* Top Header Card */}
         <div className="bg-[#FFFBEB] rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] p-6 sm:p-7 shadow-xs relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-[#0F172A]">
           <div className="flex items-center gap-3.5 relative z-10">
-            <div className="w-12 h-12 rounded-2xl bg-white/90 border border-[#FCD34D] text-[#B45309] flex items-center justify-center shrink-0 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-white/90 border border-[#FCD34D] text-[#0F766E] flex items-center justify-center shrink-0 shadow-xs">
               <Megaphone className="w-6 h-6" />
             </div>
             <div>
@@ -208,13 +208,13 @@ export default function AnnouncementsPage() {
               className="p-2.5 rounded-xl bg-white hover:bg-[#FEF3C7] text-[#92400E] border border-[#FCD34D] transition-colors cursor-pointer active:scale-95 shadow-xs"
               title={isBangla ? 'রিফ্রেশ' : 'Refresh'}
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#B45309]' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#0F766E]' : ''}`} />
             </button>
 
             {canPublish && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white rounded-xl text-xs sm:text-sm font-extrabold shadow-xs transition-colors cursor-pointer active:scale-95"
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl text-xs sm:text-sm font-extrabold shadow-xs transition-colors cursor-pointer active:scale-95"
               >
                 <Plus className="w-4 h-4 text-white" />
                 <span>{isBangla ? 'নতুন নোটিশ দিন' : 'Publish Notice'}</span>
@@ -236,7 +236,7 @@ export default function AnnouncementsPage() {
               onClick={() => setFilterScope(tab.id)}
               className={`px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 filterScope === tab.id
-                  ? 'bg-[#FFFBEB] text-[#B45309] shadow-xs border border-[#FCD34D]'
+                  ? 'bg-[#FFFBEB] text-[#0F766E] shadow-xs border border-[#FCD34D]'
                   : 'bg-white border border-slate-200/90 text-slate-600 hover:bg-[#FFFBEB]'
               }`}
             >
@@ -248,7 +248,7 @@ export default function AnnouncementsPage() {
         {/* Announcements List */}
         {loading && announcements.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 text-sm">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#B45309]" />
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#0F766E]" />
             <p>{isBangla ? 'নোটিশ লোড হচ্ছে...' : 'Loading announcements...'}</p>
           </div>
         ) : filteredList.length === 0 ? (
@@ -328,8 +328,8 @@ export default function AnnouncementsPage() {
             <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 border-t-4 border-t-[#C1982E] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] flex items-center justify-center font-bold">
-                    <Megaphone className="w-4 h-4 text-[#B45309]" />
+                  <div className="w-9 h-9 rounded-xl bg-[#FFFBEB] text-[#0F766E] border border-[#FCD34D] flex items-center justify-center font-bold">
+                    <Megaphone className="w-4 h-4 text-[#0F766E]" />
                   </div>
                   <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
                     {isBangla ? 'নতুন নোটিশ প্রকাশ করুন' : 'Publish New Notice'}
@@ -352,7 +352,7 @@ export default function AnnouncementsPage() {
                   <select
                     value={scope}
                     onChange={(e: any) => setScope(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   >
                     {user?.role === 'super_admin' && (
                       <option value="Global">{isBangla ? 'সার্বজনীন (Global - সকল শিক্ষার্থী ও শিক্ষক)' : 'Global (All Users)'}</option>
@@ -372,7 +372,7 @@ export default function AnnouncementsPage() {
                       value={targetCourse}
                       onChange={(e) => setTargetCourse(e.target.value)}
                       required
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                     >
                       <option value="">{isBangla ? '-- কোর্স বেছে নিন --' : '-- Choose Course --'}</option>
                       {courses.map((c) => (
@@ -394,7 +394,7 @@ export default function AnnouncementsPage() {
                       value={targetBatch}
                       onChange={(e) => setTargetBatch(e.target.value)}
                       required
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                     >
                       <option value="">{isBangla ? '-- ব্যাচ বেছে নিন --' : '-- Choose Batch --'}</option>
                       {batches.map((b) => (
@@ -417,7 +417,7 @@ export default function AnnouncementsPage() {
                     onChange={(e) => setTitle(e.target.value)}
                     required
                     placeholder={isBangla ? 'যেমন: আগামী রবিবার ক্লাসের বিশেষ সময়সূচি' : 'e.g., Special class schedule next Sunday'}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
 
@@ -432,7 +432,7 @@ export default function AnnouncementsPage() {
                     onChange={(e) => setContent(e.target.value)}
                     required
                     placeholder={isBangla ? 'এখানে বিস্তারিত নোটিশ বা নির্দেশনা লিখুন...' : 'Write detailed announcement here...'}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   />
                 </div>
 
@@ -448,7 +448,7 @@ export default function AnnouncementsPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-5 py-2.5 rounded-xl bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer active:scale-95"
+                    className="px-5 py-2.5 rounded-xl bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer active:scale-95"
                   >
                     {submitting ? (isBangla ? 'প্রকাশ হচ্ছে...' : 'Publishing...') : (isBangla ? 'নোটিশ প্রকাশ করুন' : 'Publish Notice')}
                   </button>

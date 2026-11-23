@@ -7,18 +7,21 @@ Methodology: Extracted directly from live CSS (`custom_style.css`, inline style 
 ---
 
 ## 1. Primary & Brand Colors (ব্র্যান্ড ও প্রাথমিক রং)
-*Updated per User Design Refresh Direction (Madrasat-us-Sunnah warm banner palette: ivory cream `#FFFBEB`, amber border `#FCD34D`, left accent border `#D97706`, primary CTA `#B45309`, while strictly preserving the soft sky tint `#F0FDFA` / `#CCFBF1`):*
+*Refined per User Design Feedback (Madrasat-us-Sunnah balanced design system: top ambient sky light glow `#DCF4F1` cascading down, warm hero banner `#FFFBEB` with `#FCD34D` border, signature teal `#0F766E` for buttons and active states, soft sky `#F0FDFA` / `#CCFBF1` for cards and badges, and subtle institutional sidebar `#F8FAFC`):*
 
 | Token Name | Hex / RGB Value | Role & Usage | Where Seen on Reference Site |
 |---|---|---|---|
-| `--color-brand-primary` | `#b45309` (rgb 180 83 9) | Primary Brand, Active Nav, Primary CTA Buttons, Hero Accents | Madrasatus Sunnah Admission Banner Action CTA Button |
-| `--color-brand-primary-hover` | `#92400e` (rgb 146 64 14) | Primary Button Hover, Active Click State | Admission Banner CTA Hover State |
-| `--color-brand-teal-2` | `#d97706` (rgb 217 119 6) | Warm Banner Thick Left Accent Border | Admission Banner Left Accent Stripe |
-| `--color-brand-teal-3` | `#f59e0b` (rgb 245 158 11) | Highlight Borders, Star Ratings, Amber Focus Rings | Admission Banner Border Accent |
+| `--color-brand-primary` | `#0f766e` (rgb 15 118 110) | Signature Teal Brand, Primary CTA Buttons, Active Highlights | Madrasat-us-Sunnah CTA Buttons & Action Accents |
+| `--color-brand-primary-hover` | `#115e59` (rgb 17 94 89) | Primary Button Hover, Active Click State | Action Buttons Hover State |
+| `--color-brand-teal-2` | `#0d9488` (rgb 13 148 136) | Secondary Accent Teal | Card Hover Accents |
+| `--color-brand-teal-3` | `#14b8a6` (rgb 20 184 166) | Border Highlights, Focus Rings | Interactive Element Borders |
+| `--color-brand-sky-glow-start` | `#dcf4f1` (rgb 220 244 241) | **Ambient Sky Light Glow:** Top gradient start behind main content | Reference Site Top Ambient Glow |
+| `--color-brand-sky-glow-mid` | `#eaf8f5` (rgb 234 248 245) | **Ambient Sky Light Glow:** Mid-depth gradient transition | Reference Site Top Ambient Glow |
 | `--color-brand-teal-soft` | `#f0fdfa` (rgb 240 253 250) | **Preserved:** Soft Sky Surface Tint, Pill Badge Backgrounds | Reference Table Header, Feature Cards Tint |
 | `--color-brand-teal-line` | `#ccfbf1` (rgb 204 251 241) | **Preserved:** Soft Sky Border Line, Dividers | Reference Table Borders, Sky Badges |
-| `--color-brand-warm-banner-bg` | `#fffbeb` (rgb 255 251 235) | Warm Ivory / Cream Banner Background | Madrasatus Sunnah Admission Notice Banner |
-| `--color-brand-warm-banner-border` | `#fcd34d` (rgb 252 211 77) | Warm Banner Border Line | Madrasatus Sunnah Admission Notice Banner Border |
+| `--color-brand-warm-banner-bg` | `#fffbeb` (rgb 255 251 235) | Warm Ivory / Cream Hero Banner Background | Madrasatus Sunnah Admission Notice Banner |
+| `--color-brand-warm-banner-border` | `#fcd34d` (rgb 252 211 77) | Warm Hero Banner Border Line | Madrasatus Sunnah Admission Notice Banner Border |
+| `--color-brand-warm-banner-accent` | `#d97706` (rgb 217 119 6) | Warm Banner Thick Left Accent Border Stripe | Admission Banner Left Accent Stripe |
 | `--color-brand-gold` | `#c1982e` | Islamic Gold / Ochre Accent (Institutional Badge & Seals) | `madrasatus-sunnah-logo.svg` (cls-2 text & decorative calligraphy) |
 | `--color-brand-green-dome` | `#00a14a` | Emerald Green (Symbolic Islamic Element) | `madrasatus-sunnah-logo.svg` gradient stop-0 |
 | `--color-brand-ocean-blue` | `#016c90` | Ocean Blue / Deep Accent | `madrasatus-sunnah-logo.svg` gradient stop-1 |

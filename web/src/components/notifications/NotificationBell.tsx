@@ -63,7 +63,7 @@ export default function NotificationBell() {
             duration: 4000,
             icon: '🔔',
             style: {
-              background: '#B45309',
+              background: '#0F766E',
               color: '#FFFFFF',
               border: '1px solid #14B8A6',
               fontWeight: 600,
@@ -282,13 +282,13 @@ export default function NotificationBell() {
         onClick={() => setIsOpen(!isOpen)}
         className={`relative p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
           isOpen
-            ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
-            : 'text-slate-600 hover:text-[#B45309] hover:bg-[#FFFBEB]'
+            ? 'bg-[#FFFBEB] text-[#0F766E] border border-[#FCD34D] shadow-xs'
+            : 'text-slate-600 hover:text-[#0F766E] hover:bg-[#FFFBEB]'
         }`}
         title={isBangla ? 'বিজ্ঞপ্তি ও নোটিফিকেশন সেন্টার' : 'Notifications Center'}
         aria-label="Notifications"
       >
-        <Bell className={`w-5 h-5 transition-transform ${unreadCount > 0 ? 'text-[#B45309]' : ''}`} />
+        <Bell className={`w-5 h-5 transition-transform ${unreadCount > 0 ? 'text-[#0F766E]' : ''}`} />
         
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-[20px] px-1 text-[10.5px] font-black text-white bg-rose-600 rounded-full border-2 border-white shadow-xs animate-pulse">
@@ -304,7 +304,7 @@ export default function NotificationBell() {
           {/* Header Bar */}
           <div className="p-3.5 bg-[#FFFBEB] border-b border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-white/90 border border-[#FCD34D] flex items-center justify-center text-[#B45309]">
+              <div className="w-7 h-7 rounded-lg bg-white/90 border border-[#FCD34D] flex items-center justify-center text-[#0F766E]">
                 <Bell className="w-4 h-4" />
               </div>
               <div>
@@ -347,7 +347,7 @@ export default function NotificationBell() {
                 onClick={() => setFilter('all')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
                   filter === 'all'
-                    ? 'bg-white text-[#B45309] shadow-2xs border border-[#FCD34D]'
+                    ? 'bg-white text-[#0F766E] shadow-2xs border border-[#FCD34D]'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -358,7 +358,7 @@ export default function NotificationBell() {
                 onClick={() => setFilter('unread')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
                   filter === 'unread'
-                    ? 'bg-white text-[#B45309] shadow-2xs border border-[#FCD34D]'
+                    ? 'bg-white text-[#0F766E] shadow-2xs border border-[#FCD34D]'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -409,7 +409,7 @@ export default function NotificationBell() {
                     className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer text-left group relative ${
                       item.is_read
                         ? 'bg-white hover:bg-[#F8FAFC]'
-                        : 'bg-[#F0FDFA] hover:bg-[#CCFBF1]/40 border-l-4 border-[#B45309]'
+                        : 'bg-[#F0FDFA] hover:bg-[#CCFBF1]/40 border-l-4 border-[#0F766E]'
                     }`}
                   >
                     {/* Category Icon */}
@@ -430,7 +430,7 @@ export default function NotificationBell() {
 
                       <p
                         className={`text-xs mt-1 leading-snug line-clamp-1 ${
-                          item.is_read ? 'font-semibold text-[#0F172A]' : 'font-extrabold text-[#B45309]'
+                          item.is_read ? 'font-semibold text-[#0F172A]' : 'font-extrabold text-[#0F766E]'
                         }`}
                       >
                         {item.title}
@@ -479,7 +479,7 @@ export default function NotificationBell() {
             <Link
               href="/announcements"
               onClick={() => setIsOpen(false)}
-              className="text-[11px] font-bold text-[#B45309] hover:text-[#92400E] hover:underline inline-flex items-center gap-1"
+              className="text-[11px] font-bold text-[#0F766E] hover:text-[#115E59] hover:underline inline-flex items-center gap-1"
             >
               <span>{isBangla ? 'সকল নোটিশ ও ঘোষণা দেখুন' : 'View all announcements'}</span>
               <ExternalLink className="w-3 h-3 text-[#C5A059]" />

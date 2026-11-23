@@ -203,7 +203,7 @@ export default function MultiFormatExportDropdown({
         type="button"
         disabled={disabled || downloadingFormat !== null}
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
       >
         {downloadingFormat ? (
           <RefreshCw className="w-4 h-4 animate-spin text-white" />
@@ -222,7 +222,7 @@ export default function MultiFormatExportDropdown({
       {dropdownOpen && (
         <div className="absolute right-0 mt-2 w-72 sm:w-80 rounded-2xl bg-white border border-[#E2E8F0] shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
           <div className="px-4 py-2 border-b border-[#E2E8F0]">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#B45309] font-serif">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#0F766E] font-serif">
               {isBangla ? 'ডাউনলোড ফরম্যাট নির্বাচন করুন:' : 'Choose Download Format:'}
             </p>
           </div>

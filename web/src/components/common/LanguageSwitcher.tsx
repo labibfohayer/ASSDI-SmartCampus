@@ -13,12 +13,12 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
       onClick={toggleLanguage}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all border shadow-xs cursor-pointer ${
         language === 'bn'
-          ? 'bg-[#FFFBEB] text-[#B45309] border-[#FCD34D] hover:bg-[#FEF3C7]'
-          : 'bg-[#B45309] text-white border-[#D97706] hover:bg-[#92400E]'
+          ? 'bg-[#FFFBEB] text-[#0F766E] border-[#FCD34D] hover:bg-[#FEF3C7]'
+          : 'bg-[#0F766E] text-white border-[#0D9488] hover:bg-[#115E59]'
       } ${className}`}
       title={language === 'bn' ? 'Switch to English' : 'বাংলায় পরিবর্তন করুন'}
     >
-      <Globe className="w-3.5 h-3.5 text-[#B45309]" />
+      <Globe className="w-3.5 h-3.5 text-[#0F766E]" />
       <span>{language === 'bn' ? 'English' : 'বাংলা'}</span>
     </button>
   );

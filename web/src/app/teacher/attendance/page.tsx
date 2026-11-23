@@ -238,8 +238,8 @@ export default function ManualAttendancePage() {
       {/* Top Header & Session Selector (Madrasat-us-Sunnah Warm Banner Architecture) */}
       <div className="bg-[#FFFBEB] p-6 sm:p-7 rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5">
-            <CheckSquare className="w-3.5 h-3.5 text-[#B45309]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#CCFBF1] rounded-full text-xs font-semibold text-[#0F766E] mb-2.5">
+            <CheckSquare className="w-3.5 h-3.5 text-[#0F766E]" />
             <span>{isBangla ? 'হাজিরা কারেকশন উইন্ডো (৪৮ ঘণ্টা)' : '48h Correction Window'}</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading text-[#0F172A]">
@@ -256,7 +256,7 @@ export default function ManualAttendancePage() {
           <select
             value={selectedSessionId || ''}
             onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-            className="px-3.5 py-2.5 bg-white border border-[#FCD34D] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+            className="px-3.5 py-2.5 bg-white border border-[#FCD34D] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           >
             {sessions.map((s) => (
               <option key={s.id} value={s.id} className="bg-white text-[#0F172A]">
@@ -268,7 +268,7 @@ export default function ManualAttendancePage() {
           <button
             onClick={handleFinalizeAttendance}
             disabled={finalizing || loading}
-            className="px-3.5 py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
+            className="px-3.5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
           >
             <Clock className="w-3.5 h-3.5" />
             <span>{isBangla ? 'হাজিরা ফাইনাল' : 'Finalize Roster'}</span>
@@ -312,9 +312,9 @@ export default function ManualAttendancePage() {
           <h3 className="text-xl font-extrabold text-[#016C90] font-heading mt-1">{d(leaveCount)}</h3>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] border-t-2 border-t-[#B45309] shadow-xs text-center">
-          <p className="text-[11px] text-[#B45309] font-bold uppercase tracking-wider">{isBangla ? 'উপস্থিতির হার' : 'Attendance'}</p>
-          <h3 className="text-xl font-extrabold text-[#B45309] font-heading mt-1">{d(attendancePercentage)}%</h3>
+        <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] border-t-2 border-t-[#0F766E] shadow-xs text-center">
+          <p className="text-[11px] text-[#0F766E] font-bold uppercase tracking-wider">{isBangla ? 'উপস্থিতির হার' : 'Attendance'}</p>
+          <h3 className="text-xl font-extrabold text-[#0F766E] font-heading mt-1">{d(attendancePercentage)}%</h3>
         </div>
       </div>
 
@@ -329,7 +329,7 @@ export default function ManualAttendancePage() {
               placeholder={isBangla ? 'শিক্ষার্থীর নাম বা রোল দিয়ে খুঁজুন...' : 'Search by name or ID...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+              className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
           </div>
 
@@ -341,7 +341,7 @@ export default function ManualAttendancePage() {
         {/* Table Body */}
         {loading ? (
           <div className="py-16 text-center">
-            <div className="w-8 h-8 border-3 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin mx-auto mb-2" />
+            <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin mx-auto mb-2" />
             <p className="text-xs text-[#475569]">{t('common.loading')}</p>
           </div>
         ) : filteredRoster.length === 0 ? (
@@ -431,7 +431,7 @@ export default function ManualAttendancePage() {
                         value={item.reason || ''}
                         onChange={(e) => setStudentReason(item.student_id, e.target.value)}
                         placeholder={isBangla ? 'সংশোধনের কারণ লিখুন...' : 'Correction note...'}
-                        className="w-full px-2.5 py-1 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#B45309]"
+                        className="w-full px-2.5 py-1 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-xs text-[#0F172A] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0F766E]"
                       />
                     </td>
                     <td className="py-3 px-4 text-center">
@@ -439,10 +439,10 @@ export default function ManualAttendancePage() {
                         type="button"
                         onClick={() => handleOpenGraduation(item.student_id)}
                         disabled={loadingGraduationId === item.student_id}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFFBEB] hover:bg-[#B45309] text-[#92400E] hover:text-white border border-[#FCD34D] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFFBEB] hover:bg-[#0F766E] text-[#0F766E] hover:text-white border border-[#FCD34D] text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
                         title={isBangla ? 'গ্র্যাজুয়েশন ও সনদপত্র ট্র্যাকার দেখুন' : 'View Graduation & Certificate'}
                       >
-                        <Award className="w-3.5 h-3.5 text-[#B45309]" />
+                        <Award className="w-3.5 h-3.5 text-[#0F766E]" />
                         <span>
                           {loadingGraduationId === item.student_id
                             ? (isBangla ? 'লোড হচ্ছে...' : 'Loading...')

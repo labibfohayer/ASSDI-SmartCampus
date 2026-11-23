@@ -82,11 +82,11 @@ export default function ReportsNavbar() {
                   <span className="font-bold text-gray-900 text-sm tracking-tight">
                     {t('brand.name')}
                   </span>
-                  <span className="px-2 py-0.5 text-[10px] font-bold bg-[#B45309] text-white rounded-full">
+                  <span className="px-2 py-0.5 text-[10px] font-bold bg-[#0F766E] text-white rounded-full">
                     {isBangla ? 'এসআরএস রিপোর্টস হাব' : 'Reports Hub'}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#B45309] font-medium">
+                <p className="text-[11px] text-[#0F766E] font-medium">
                   {t('brand.course')}
                 </p>
               </div>
@@ -97,7 +97,7 @@ export default function ReportsNavbar() {
           <div className="flex items-center gap-3">
             <Link
               href={backNav.href}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-[#F0FDFA] hover:text-[#B45309] hover:border-[#CCFBF1] transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-[#F0FDFA] hover:text-[#0F766E] hover:border-[#CCFBF1] transition-colors"
             >
               <BackIcon className="w-3.5 h-3.5 text-gray-500" />
               <span>{backNav.label}</span>
@@ -106,7 +106,7 @@ export default function ReportsNavbar() {
             <LanguageSwitcher />
 
             <div className="hidden md:flex items-center gap-2 pl-3 border-l border-gray-200">
-              <div className="w-8 h-8 rounded-full bg-[#FFFBEB] border border-[#FCD34D] text-[#B45309] flex items-center justify-center text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-[#FFFBEB] border border-[#FCD34D] text-[#0F766E] flex items-center justify-center text-xs font-bold">
                 {user?.full_name?.charAt(0) || <UserIcon className="w-3.5 h-3.5" />}
               </div>
               <div className="text-left text-xs">

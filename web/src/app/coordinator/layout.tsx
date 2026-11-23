@@ -31,7 +31,7 @@ export default function CoordinatorLayout({ children }: { children: React.ReactN
   if (!isMounted) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin" />
       </div>
     );
   }
@@ -42,14 +42,14 @@ export default function CoordinatorLayout({ children }: { children: React.ReactN
     <div className="bg-[#FFFBEB] text-[#92400E] px-4 py-2 text-xs font-medium border-b border-[#FCD34D]">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Eye className="w-4 h-4 text-[#B45309] shrink-0" />
+          <Eye className="w-4 h-4 text-[#0F766E] shrink-0" />
           <span>
             {isBangla
               ? 'পর্যবেক্ষক মোড (Observer Mode) সক্রিয়: শুধুমাত্র এগ্রিগেট মেট্রিক ও সামগ্রিক রিপোর্ট দৃশ্যমান। ব্যক্তিগত ফোন বা যোগাযোগ তথ্য গোপন রাখা হয়েছে।'
               : 'Observer Mode Active: Aggregate metrics & summary reports visible only. Personal contact details are protected.'}
           </span>
         </div>
-        <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-[#B45309] text-white text-[10px] uppercase font-bold tracking-wider">
+        <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-[#0F766E] text-white text-[10px] uppercase font-bold tracking-wider">
           Read-Only
         </span>
       </div>

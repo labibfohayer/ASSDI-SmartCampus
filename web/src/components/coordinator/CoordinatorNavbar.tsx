@@ -89,7 +89,7 @@ export default function CoordinatorNavbar() {
                     <span>{isObserver ? 'পর্যবেক্ষক মোড' : 'কোঅর্ডিনেটর পোর্টাল'}</span>
                   </span>
                 </div>
-                <p className="text-[11px] text-[#B45309] font-medium">
+                <p className="text-[11px] text-[#0F766E] font-medium">
                   {t('brand.course')}
                 </p>
               </div>
@@ -107,8 +107,8 @@ export default function CoordinatorNavbar() {
                   href={item.href}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
-                      : 'text-[#475569] hover:text-[#B45309] hover:bg-[#FFFBEB]'
+                      ? 'bg-[#FFFBEB] text-[#0F766E] border border-[#FCD34D] shadow-xs'
+                      : 'text-[#475569] hover:text-[#0F766E] hover:bg-[#FFFBEB]'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -126,7 +126,7 @@ export default function CoordinatorNavbar() {
             <div className="hidden md:flex items-center gap-2.5 pl-2 border-l border-[#E2E8F0]">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                  isObserver ? 'bg-purple-100 text-purple-800' : 'bg-[#FFFBEB] border border-[#FCD34D] text-[#B45309]'
+                  isObserver ? 'bg-purple-100 text-purple-800' : 'bg-[#FFFBEB] border border-[#FCD34D] text-[#0F766E]'
                 }`}
               >
                 {isObserver ? <Eye className="w-4 h-4" /> : <UserIcon className="w-4 h-4" />}
@@ -135,7 +135,7 @@ export default function CoordinatorNavbar() {
                 <p className="text-xs font-bold text-[#0F172A] leading-tight font-heading">
                   {user?.full_name || user?.login_id || 'Coordinator'}
                 </p>
-                <p className="text-[10px] text-[#B45309] font-mono">
+                <p className="text-[10px] text-[#0F766E] font-mono">
                   {user?.login_id}
                 </p>
               </div>
@@ -155,7 +155,7 @@ export default function CoordinatorNavbar() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-[#475569] hover:text-[#B45309] hover:bg-[#FFFBEB] rounded-lg"
+              className="lg:hidden p-2 text-[#475569] hover:text-[#0F766E] hover:bg-[#FFFBEB] rounded-lg"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -166,8 +166,8 @@ export default function CoordinatorNavbar() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-[#E2E8F0] px-4 pt-2 pb-4 space-y-1 shadow-lg">
-          <div className="pb-2 mb-2 border-b border-[#E2E8F0] flex items-center gap-2 px-2 text-xs font-semibold text-[#B45309]">
-            <UserIcon className="w-4 h-4 text-[#B45309]" />
+          <div className="pb-2 mb-2 border-b border-[#E2E8F0] flex items-center gap-2 px-2 text-xs font-semibold text-[#0F766E]">
+            <UserIcon className="w-4 h-4 text-[#0F766E]" />
             <span>
               {user?.full_name} ({user?.login_id})
             </span>
@@ -182,8 +182,8 @@ export default function CoordinatorNavbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium ${
                   isActive
-                    ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold'
-                    : 'text-[#475569] hover:bg-[#FFFBEB] hover:text-[#B45309]'
+                    ? 'bg-[#FFFBEB] text-[#0F766E] border border-[#FCD34D] font-bold'
+                    : 'text-[#475569] hover:bg-[#FFFBEB] hover:text-[#0F766E]'
                 }`}
               >
                 <Icon className="w-4 h-4" />

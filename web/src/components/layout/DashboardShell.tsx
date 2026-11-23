@@ -531,13 +531,13 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
       {/* LEFT SIDEBAR (Madrasat-us-Sunnah Light Elegant Architecture) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 lg:w-72 bg-white border-r border-[#E2E8F0] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 lg:w-72 bg-[#F8FAFC] border-r border-[#E2E8F0] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
           mobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Top: Institute Brand & Identity */}
         <div>
-          <div className="p-5 border-b border-[#E2E8F0] flex items-start justify-between bg-[#F8FAFC]">
+          <div className="p-5 border-b border-[#E2E8F0] flex items-start justify-between bg-white/70">
             <Link
               href={role === 'super_admin' ? '/admin' : role === 'teacher' ? '/teacher' : role === 'student' ? '/student' : '/coordinator'}
               className="flex items-center gap-3 group"
@@ -560,7 +560,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 </p>
                 <div className="mt-1">
                   <span
-                    className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D]"
+                    className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-[#F0FDFA] text-[#0F766E] border border-[#99F6E4]"
                   >
                     {roleBadge.label}
                   </span>
@@ -581,7 +581,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             {navSections.map((sec, secIdx) => (
               <div key={secIdx} className="space-y-1">
                 {(sec.titleBn || sec.titleEn) && (
-                  <p className="px-3 text-[10px] font-bold uppercase text-[#B45309] tracking-widest mb-2 font-serif">
+                  <p className="px-3 text-[10px] font-bold uppercase text-[#0F766E] tracking-widest mb-2 font-serif">
                     {isBangla ? sec.titleBn : sec.titleEn}
                   </p>
                 )}
@@ -598,14 +598,14 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                           onClick={() => handleNavClick(item.href)}
                           className={`relative flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-[0.98] ${
                             active
-                              ? 'bg-[#FFFBEB] text-[#B45309] shadow-xs border border-[#FCD34D] font-bold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1.5 before:bg-[#B45309] before:rounded-r'
-                              : 'text-[#475569] hover:text-[#B45309] hover:bg-[#F0FDFA]'
+                              ? 'bg-[#F0FDFA] text-[#0F766E] shadow-xs border border-[#99F6E4] font-bold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1.5 before:bg-[#0F766E] before:rounded-r'
+                              : 'text-[#334155] hover:text-[#0F766E] hover:bg-[#F0FDFA]/70'
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <Icon
                               className={`w-4 h-4 shrink-0 ${
-                                active ? 'text-[#B45309]' : 'text-[#94A3B8] group-hover:text-[#B45309]'
+                                active ? 'text-[#0F766E]' : 'text-[#64748B] group-hover:text-[#0F766E]'
                               }`}
                             />
                             <span className="truncate">
@@ -617,8 +617,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                             <span
                               className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                                 active
-                                  ? 'bg-[#B45309] text-white'
-                                  : 'bg-[#F1F5F9] text-[#64748B]'
+                                  ? 'bg-[#0F766E] text-white'
+                                  : 'bg-slate-200/80 text-[#475569]'
                               }`}
                             >
                               {item.badge}
@@ -645,9 +645,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                       ? '/student'
                       : '/coordinator'
                   }
-                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#B45309] hover:bg-[#FFFBEB] transition-colors"
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#0F766E] hover:bg-[#F0FDFA] transition-colors"
                 >
-                  <ArrowLeft className="w-4 h-4 text-[#B45309]" />
+                  <ArrowLeft className="w-4 h-4 text-[#0F766E]" />
                   <span>{isBangla ? 'ড্যাশবোর্ডে ফিরে যান' : 'Back to Dashboard'}</span>
                 </Link>
               </div>
@@ -659,14 +659,14 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 <button
                   type="button"
                   onClick={() => setMenuManagerOpen(true)}
-                  className="w-full py-2.5 px-3 rounded-xl bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D] text-xs font-bold transition flex items-center justify-between shadow-xs cursor-pointer active:scale-98"
+                  className="w-full py-2.5 px-3 rounded-xl bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] border border-[#99F6E4] text-xs font-bold transition flex items-center justify-between shadow-xs cursor-pointer active:scale-98"
                 >
                   <div className="flex items-center gap-2">
-                    <Settings className="w-4 h-4 text-[#B45309]" />
+                    <Settings className="w-4 h-4 text-[#0F766E]" />
                     <span>{isBangla ? 'মেনু এডিটর ও আর্কাইভ' : 'Menu & Archive Control'}</span>
                   </div>
                   {adminMenus.some((m) => m.isArchived) && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-[#B45309]/15 text-[#B45309] font-extrabold border border-[#B45309]/30">
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-[#0F766E]/15 text-[#0F766E] font-extrabold border border-[#0F766E]/30">
                       {adminMenus.filter((m) => m.isArchived).length} {isBangla ? 'হাইড' : 'hidden'}
                     </span>
                   )}
@@ -677,12 +677,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         </div>
 
         {/* Bottom: User Card, Language Toggle & Logout */}
-        <div className="p-3 border-t border-[#E2E8F0] bg-[#F8FAFC] space-y-2">
+        <div className="p-3 border-t border-[#E2E8F0] bg-white/70 space-y-2">
           {/* User info snippet */}
           <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
-                {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4 text-[#B45309]" />}
+              <div className="w-8 h-8 rounded-full bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
+                {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4 text-[#0F766E]" />}
               </div>
               <div className="min-w-0 text-left">
                 <p className="font-bold text-xs text-[#0F172A] truncate font-serif">
@@ -707,13 +707,13 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           <button
             type="button"
             onClick={triggerPwaInstall}
-            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0369A1] border border-[#CCFBF1] text-[11px] font-medium transition cursor-pointer"
+            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] border border-[#99F6E4] text-[11px] font-medium transition cursor-pointer"
           >
             <span className="flex items-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5 text-[#0369A1]" />
+              <Smartphone className="w-3.5 h-3.5 text-[#0F766E]" />
               <span>{isBangla ? 'হোমস্ক্রিনে অ্যাপ ইনস্টল' : 'Install PWA App'}</span>
             </span>
-            <span className="bg-[#B45309] text-[9px] text-white px-1.5 py-0.5 rounded-md font-bold">
+            <span className="bg-[#0F766E] text-[9px] text-white px-1.5 py-0.5 rounded-md font-bold">
               {isBangla ? 'যুক্ত করুন' : 'Install'}
             </span>
           </button>
@@ -721,7 +721,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           {/* Language Switcher Bar */}
           <div className="flex items-center justify-between px-2 pt-1">
             <span className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5 text-[#B45309]" />
+              <Globe className="w-3.5 h-3.5 text-[#0F766E]" />
               <span>{isBangla ? 'ভাষা / Language' : 'Language'}</span>
             </span>
             <LanguageSwitcher />
@@ -730,9 +730,15 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
       </aside>
 
       {/* RIGHT MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-w-0 md:pl-64 lg:pl-72">
+      <div className="flex-1 flex flex-col min-w-0 md:pl-64 lg:pl-72 relative bg-[#F8FAFC]">
+        {/* Ambient Sky-Blue Light Glow Cascading from Top (Madrasat-us-Sunnah reference) */}
+        <div
+          className="absolute inset-x-0 top-0 h-[520px] pointer-events-none bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5]/85 via-[#F4FCFA]/45 to-transparent z-0"
+          aria-hidden="true"
+        />
+
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-[#E2E8F0] h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#E2E8F0] h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
           {/* Left: Mobile Toggle & Page Context Breadcrumb */}
           <div className="flex items-center gap-3">
             <button
@@ -746,7 +752,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             <div className="hidden sm:flex items-center gap-2 text-xs">
               <span className="font-bold text-[#0F172A] font-serif">{t('brand.name')}</span>
               <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
-              <span className="font-bold text-[#B45309] bg-[#FFFBEB] px-2.5 py-0.5 rounded-md border border-[#FCD34D]">
+              <span className="font-bold text-[#0F766E] bg-[#F0FDFA] px-2.5 py-0.5 rounded-md border border-[#CCFBF1]">
                 {activeItemLabel || t('brand.course')}
               </span>
             </div>
@@ -754,8 +760,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
           {/* Right: Academic Cohort, Live Status, Time & Switcher */}
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F8FAFC] border border-[#E2E8F0] text-[#334155] text-xs font-semibold">
-              <span className="text-[#B45309] font-bold">SBMC</span>
+            <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 border border-[#E2E8F0] text-[#334155] text-xs font-semibold shadow-2xs">
+              <span className="text-[#0F766E] font-bold">SBMC</span>
               <span className="text-slate-400">•</span>
               <span className="text-[#475569] font-medium">{isBangla ? 'ব্যাচ ০১' : 'Batch #1'}</span>
             </div>
@@ -766,7 +772,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             </div>
 
             <div className="hidden md:flex items-center gap-1.5 text-xs text-[#475569] font-medium">
-              <Clock className="w-3.5 h-3.5 text-[#B45309]" />
+              <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
               <span suppressHydrationWarning>
                 {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
                   weekday: 'short',

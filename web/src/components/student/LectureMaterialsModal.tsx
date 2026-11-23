@@ -231,7 +231,7 @@ export default function LectureMaterialsModal({
           {/* Session Overview Bar */}
           <div className="mt-4 pt-3 border-t border-slate-200 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-600 font-medium">
             <span className="flex items-center gap-1.5 text-slate-900 font-semibold">
-              <BookOpen className="w-3.5 h-3.5 text-[#B45309]" />
+              <BookOpen className="w-3.5 h-3.5 text-[#0F766E]" />
               {session?.subject_name || current?.subject_name || 'SBMC Subject'}
             </span>
             {(session?.topic_title || current?.topic_title) && (
@@ -248,7 +248,7 @@ export default function LectureMaterialsModal({
             )}
             {(session?.session_date || current?.session_date) && (
               <span className="flex items-center gap-1.5 font-mono text-slate-600">
-                <Calendar className="w-3.5 h-3.5 text-[#B45309]" />
+                <Calendar className="w-3.5 h-3.5 text-[#0F766E]" />
                 {session?.session_date || current?.session_date}
               </span>
             )}
@@ -267,7 +267,7 @@ export default function LectureMaterialsModal({
                 onClick={() => setSelectedIndex(idx)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
                   selectedIndex === idx
-                    ? 'bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] shadow-xs'
+                    ? 'bg-[#FFFBEB] text-[#0F766E] border border-[#FCD34D] shadow-xs'
                     : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
                 }`}
               >
@@ -406,7 +406,7 @@ export default function LectureMaterialsModal({
               type="button"
               onClick={() => handleDownload(current)}
               disabled={downloadingId === current.id}
-              className="px-5 py-2.5 text-xs font-extrabold bg-[#B45309] hover:bg-[#92400E] text-white rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
+              className="px-5 py-2.5 text-xs font-extrabold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
             >
               {downloadingId === current.id ? (
                 <RefreshCw className="w-4 h-4 animate-spin text-white" />

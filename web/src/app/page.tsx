@@ -22,8 +22,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-3 border-[#FCD34D] border-t-[#B45309] rounded-full animate-spin" />
-        <p className="text-[#B45309] text-sm font-semibold tracking-wide font-serif">
+        <div className="w-10 h-10 border-3 border-[#FCD34D] border-t-[#0F766E] rounded-full animate-spin" />
+        <p className="text-[#0F766E] text-sm font-semibold tracking-wide font-serif">
           লোড হচ্ছে...
         </p>
       </div>

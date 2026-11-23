@@ -178,15 +178,15 @@ export default function CoordinatorDashboardPage() {
                 fetchDashboardData();
               }}
               disabled={refreshing}
-              className="px-3.5 py-2.5 bg-white hover:bg-[#FEF3C7] text-[#92400E] rounded-xl text-xs font-semibold border border-[#FCD34D] flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
+              className="px-3.5 py-2.5 bg-white hover:bg-[#F0FDFA] text-[#0F766E] rounded-xl text-xs font-semibold border border-[#CCFBF1] flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#B45309]' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#0F766E]' : ''}`} />
               <span>{isBangla ? 'রিফ্রেশ' : 'Refresh'}</span>
             </button>
 
             <Link
               href="/reports"
-              className="px-4 py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white font-bold rounded-xl text-xs shadow-xs flex items-center gap-2 transition cursor-pointer active:scale-95"
+              className="px-4 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl text-xs shadow-xs flex items-center gap-2 transition cursor-pointer active:scale-95"
             >
               <FileText className="w-4 h-4 text-white" />
               <span>{isBangla ? 'রিপোর্ট হাব ও এক্সপোর্ট' : 'SRS Reports Hub'}</span>
@@ -201,7 +201,7 @@ export default function CoordinatorDashboardPage() {
         className="bg-white p-4 sm:p-5 rounded-xl border border-[#E2E8F0] shadow-xs flex flex-wrap items-center gap-3"
       >
         <div className="flex items-center gap-2 text-xs font-bold text-[#475569]">
-          <Filter className="w-4 h-4 text-[#B45309]" />
+          <Filter className="w-4 h-4 text-[#0F766E]" />
           <span>{isBangla ? 'ফিল্টার কন্ট্রোল:' : 'Filter Analytics:'}</span>
         </div>
 
@@ -209,7 +209,7 @@ export default function CoordinatorDashboardPage() {
         <select
           value={selectedBatch}
           onChange={(e) => setSelectedBatch(e.target.value)}
-          className="px-3 py-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+          className="px-3 py-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
         >
           <option value="">{isBangla ? 'সকল সক্রিয় ব্যাচ' : 'All Active Batches'}</option>
           {data?.batch_wise_performance?.map((b) => (
@@ -226,7 +226,7 @@ export default function CoordinatorDashboardPage() {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="px-2.5 py-1.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+            className="px-2.5 py-1.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           />
         </div>
 
@@ -237,7 +237,7 @@ export default function CoordinatorDashboardPage() {
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="px-2.5 py-1.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#B45309]"
+            className="px-2.5 py-1.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
           />
         </div>
 
@@ -245,7 +245,7 @@ export default function CoordinatorDashboardPage() {
         <div className="flex items-center gap-2 ml-auto">
           <button
             type="submit"
-            className="px-4 py-2 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer active:scale-95"
+            className="px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer active:scale-95"
           >
             {isBangla ? 'ফিল্টার প্রয়োগ' : 'Apply Filter'}
           </button>
@@ -383,7 +383,7 @@ export default function CoordinatorDashboardPage() {
             <div className="h-64 w-full pt-2">
               {loading ? (
                 <div className="h-full flex items-center justify-center">
-                  <div className="w-8 h-8 border-3 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-3 border-[#0F766E]/30 border-t-[#0F766E] rounded-full animate-spin" />
                 </div>
               ) : batchChartData.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-xs text-[#475569]">
@@ -410,13 +410,13 @@ export default function CoordinatorDashboardPage() {
                     <Bar
                       dataKey="attendance"
                       name={isBangla ? 'উপস্থিতি %' : 'Attendance %'}
-                      fill="#B45309"
+                      fill="#0F766E"
                       radius={[4, 4, 0, 0]}
                     />
                     <Bar
                       dataKey="learning"
                       name={isBangla ? 'লার্নিং প্রগ্রেস %' : 'Learning Progress %'}
-                      fill="#D97706"
+                      fill="#0284C7"
                       radius={[4, 4, 0, 0]}
                     />
                   </BarChart>
@@ -433,7 +433,7 @@ export default function CoordinatorDashboardPage() {
               </h3>
               <Link
                 href="/coordinator/batches"
-                className="text-xs text-[#B45309] hover:text-[#92400E] font-bold flex items-center gap-1"
+                className="text-xs text-[#0F766E] hover:text-[#115E59] font-bold flex items-center gap-1"
               >
                 <span>{isBangla ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -453,10 +453,10 @@ export default function CoordinatorDashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-[#E2E8F0]">
                   {data?.batch_wise_performance?.map((b) => (
-                    <tr key={b.batch_id} className="hover:bg-[#FFFBEB] transition">
+                    <tr key={b.batch_id} className="hover:bg-[#F0FDFA] transition">
                       <td className="py-3 px-4 font-bold text-[#0F172A] font-heading">{b.batch_name}</td>
                       <td className="py-3 px-4 text-[#475569]">{d(b.student_count)} জন</td>
-                      <td className="py-3 px-4 font-bold text-[#B45309]">
+                      <td className="py-3 px-4 font-bold text-[#0F766E]">
                         {d(safeFixed(b.attendance_percentage))}%
                       </td>
                       <td className="py-3 px-4 font-bold text-amber-700">

@@ -114,11 +114,17 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between text-[#0F172A] relative">
+      {/* Ambient Sky-Blue Light Glow from Top */}
+      <div
+        className="absolute inset-x-0 top-0 h-[480px] pointer-events-none bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5]/80 via-[#F4FCFA]/40 to-transparent z-0"
+        aria-hidden="true"
+      />
+
       {/* Top Institutional Header */}
-      <header className="border-b border-[#FCD34D] bg-[#FFFBEB] text-[#0F172A] shadow-xs">
+      <header className="relative z-10 border-b border-[#E2E8F0] bg-white/80 backdrop-blur-md text-[#0F172A] shadow-xs">
         <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-sm border border-[#FCD34D]">
+            <div className="w-11 h-11 rounded-xl bg-[#F0FDFA] p-1.5 flex items-center justify-center shrink-0 shadow-sm border border-[#CCFBF1]">
               <Image
                 src="/logo.png"
                 alt="ASSDI Logo"
@@ -132,7 +138,7 @@ export default function LoginPage() {
               <h2 className="text-[#0F172A] font-bold text-sm sm:text-base leading-tight font-serif">
                 {t('brand.name')}
               </h2>
-              <p className="text-[#78350F] text-xs font-medium">
+              <p className="text-[#64748B] text-xs font-medium">
                 {t('brand.course')}
               </p>
             </div>
@@ -145,8 +151,8 @@ export default function LoginPage() {
       </header>
 
       {/* Main Login Card Container */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 my-8">
-        <div className="w-full max-w-md bg-white text-[#0F172A] rounded-2xl border border-[#E2E8F0] shadow-xl border-t-4 border-t-[#B45309] p-7 sm:p-8">
+      <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 my-8">
+        <div className="w-full max-w-md bg-white text-[#0F172A] rounded-2xl border border-[#E2E8F0] shadow-xl border-t-4 border-t-[#0F766E] p-7 sm:p-8">
           {/* Card Brand Header */}
           <div className="text-center mb-6">
             <div className="mx-auto w-16 h-16 rounded-2xl bg-[#F0FDFA] border-2 border-[#CCFBF1] p-2 mb-3.5 flex items-center justify-center shadow-xs">
@@ -246,7 +252,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 bg-[#B45309] hover:bg-[#92400E] active:scale-[0.99] text-white text-sm font-bold rounded-xl shadow-md border border-[#D97706] flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 bg-[#0F766E] hover:bg-[#115E59] active:scale-[0.99] text-white text-sm font-bold rounded-xl shadow-md border border-[#0D9488] flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -271,35 +277,35 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setDemoRole('admin01', 'AdminPass2026!', 'Super Admin')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F0FDFA] hover:text-[#0F766E] text-[#0F172A] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
               >
                 Super Admin
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('coord01', 'CoordPass2026!', 'Coordinator')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] rounded-lg transition border border-[#FCD34D] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
               >
                 Coordinator
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('teacher01', 'TeacherPass2026!', 'Teacher')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] rounded-lg transition border border-[#FCD34D] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
               >
                 Teacher
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('observer01', 'ObserverPass2026!', 'Observer')}
-                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#334155] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
+                className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F0FDFA] text-[#334155] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
               >
                 Observer
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole('STD-2026-042-001', 'StudentPass2026!', 'Student')}
-                className="col-span-2 px-2 py-1.5 text-[11px] font-bold bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] rounded-lg transition border border-[#FCD34D] cursor-pointer"
+                className="col-span-2 px-2 py-1.5 text-[11px] font-bold bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] rounded-lg transition border border-[#CCFBF1] cursor-pointer"
               >
                 Student (STD-2026-042-001)
               </button>

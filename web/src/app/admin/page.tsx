@@ -144,10 +144,10 @@ export default function AdminOverviewPage() {
               href="http://localhost:8001/api/docs/"
               target="_blank"
               rel="noreferrer"
-              className="px-3.5 py-2.5 bg-white hover:bg-[#FEF3C7] text-[#92400E] rounded-xl text-xs font-semibold border border-[#FCD34D] flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
+              className="px-3.5 py-2.5 bg-white hover:bg-[#F0FDFA] text-[#0F766E] rounded-xl text-xs font-semibold border border-[#CCFBF1] flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
             >
               <span>{isBangla ? 'ওপেনএপিআই ডক্স (Swagger)' : 'API Docs (Swagger)'}</span>
-              <ExternalLink className="w-3.5 h-3.5 text-[#B45309]" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#0F766E]" />
             </a>
           </div>
         </div>
@@ -273,7 +273,7 @@ export default function AdminOverviewPage() {
               <Link
                 key={i}
                 href={mod.href}
-                className="bg-white p-6 rounded-xl border border-[#E2E8F0] hover:border-[#B45309]/40 hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-4 group cursor-pointer"
+                className="bg-white p-6 rounded-xl border border-[#E2E8F0] hover:border-[#0D9488]/40 hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-4 group cursor-pointer"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -286,7 +286,7 @@ export default function AdminOverviewPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-base font-extrabold text-[#0F172A] font-heading group-hover:text-[#B45309] transition">
+                    <h3 className="text-base font-extrabold text-[#0F172A] font-heading group-hover:text-[#0F766E] transition">
                       {mod.title}
                     </h3>
                     <p className="text-xs text-[#475569] mt-1.5 leading-relaxed font-normal">
@@ -295,9 +295,9 @@ export default function AdminOverviewPage() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-bold text-[#B45309]">
+                <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-bold text-[#0F766E]">
                   <span>{isBangla ? 'মডিউলে প্রবেশ করুন' : 'Manage Module'}</span>
-                  <ArrowRight className="w-4 h-4 text-[#C1982E] group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 text-[#0F766E] group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             );

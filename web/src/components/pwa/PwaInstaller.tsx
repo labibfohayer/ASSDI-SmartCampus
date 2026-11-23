@@ -157,7 +157,7 @@ export function PwaInstaller() {
         <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div className="bg-white border-2 border-[#FCD34D] shadow-xl rounded-2xl p-4 sm:p-5 relative overflow-hidden">
             {/* Top decorative gradient bar */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#B45309] via-[#D97706] to-[#B45309]" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0F766E] via-[#0D9488] to-[#0F766E]" />
 
             <button
               onClick={handleDismiss}
@@ -180,11 +180,11 @@ export function PwaInstaller() {
 
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-bold text-[#B45309] font-serif">
+                  <h4 className="text-sm font-bold text-[#0F766E] font-serif">
                     {language === 'bn' ? 'আস-সুন্নাহ অ্যাপ ইনস্টল করুন' : 'Install ASSDI App'}
                   </h4>
-                  <span className="bg-[#CCFBF1] text-[#B45309] text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-[#B45309]" /> PWA
+                  <span className="bg-[#CCFBF1] text-[#0F766E] text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-[#0F766E]" /> PWA
                   </span>
                 </div>
                 <p className="text-xs text-[#475569] mt-1 leading-relaxed">
@@ -198,7 +198,7 @@ export function PwaInstaller() {
             <div className="flex items-center gap-2.5 mt-4 pt-3 border-t border-[#E2E8F0]">
               <button
                 onClick={handleInstallClick}
-                className="flex-1 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
+                className="flex-1 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>
@@ -229,10 +229,10 @@ export function PwaInstaller() {
             </button>
 
             <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] border border-[#CCFBF1] flex items-center justify-center mx-auto mb-4">
-              <Smartphone className="w-6 h-6 text-[#B45309]" />
+              <Smartphone className="w-6 h-6 text-[#0F766E]" />
             </div>
 
-            <h3 className="text-base font-bold text-center text-[#B45309] font-serif mb-2">
+            <h3 className="text-base font-bold text-center text-[#0F766E] font-serif mb-2">
               {language === 'bn' ? 'আইফোনে যেভাবে অ্যাপ যুক্ত করবেন' : 'Install on iPhone & iPad'}
             </h3>
 
@@ -245,7 +245,7 @@ export function PwaInstaller() {
             <div className="space-y-3.5 bg-[#F8FAFC] p-4 rounded-xl border border-[#E2E8F0] text-xs text-[#334155]">
               <div className="flex items-center gap-3">
                 <div className="w-7 h-7 rounded-lg bg-white border border-[#E2E8F0] flex items-center justify-center shrink-0 shadow-2xs">
-                  <Share className="w-4 h-4 text-[#B45309]" />
+                  <Share className="w-4 h-4 text-[#0F766E]" />
                 </div>
                 <div>
                   <span className="font-bold text-[#0F172A]">১. </span>
@@ -273,7 +273,7 @@ export function PwaInstaller() {
                 setShowIosModal(false);
                 handleDismiss();
               }}
-              className="w-full mt-5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold py-3 rounded-xl transition cursor-pointer shadow-xs"
+              className="w-full mt-5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold py-3 rounded-xl transition cursor-pointer shadow-xs"
             >
               {language === 'bn' ? 'বুঝেছি' : 'Got it'}
             </button>
