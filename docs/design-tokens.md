@@ -19,9 +19,9 @@ Methodology: Extracted directly from live CSS (`custom_style.css`, inline style 
 | `--color-brand-sky-glow-mid` | `#eaf8f5` (rgb 234 248 245) | **Ambient Sky Light Glow:** Mid-depth gradient transition | Reference Site Top Ambient Glow |
 | `--color-brand-teal-soft` | `#f0fdfa` (rgb 240 253 250) | **Preserved:** Soft Sky Surface Tint, Pill Badge Backgrounds | Reference Table Header, Feature Cards Tint |
 | `--color-brand-teal-line` | `#ccfbf1` (rgb 204 251 241) | **Preserved:** Soft Sky Border Line, Dividers | Reference Table Borders, Sky Badges |
-| `--color-brand-warm-banner-bg` | `#fffbeb` (rgb 255 251 235) | Warm Ivory / Cream Hero Banner Background | Madrasatus Sunnah Admission Notice Banner |
-| `--color-brand-warm-banner-border` | `#fcd34d` (rgb 252 211 77) | Warm Hero Banner Border Line | Madrasatus Sunnah Admission Notice Banner Border |
-| `--color-brand-warm-banner-accent` | `#d97706` (rgb 217 119 6) | Warm Banner Thick Left Accent Border Stripe | Admission Banner Left Accent Stripe |
+| `--color-brand-warm-banner-bg` | `#fffbeb` (rgb 255 251 235) | Warm Ivory / Cream Hero Banner & Sidebar Background | Madrasatus Sunnah Admission Notice Banner & Institutional Sidebar |
+| `--color-brand-warm-banner-border` | `#fcd34d` (rgb 252 211 77) | Warm Hero Banner & Sidebar Right Border Line | Madrasatus Sunnah Admission Notice Banner Border |
+| `--color-brand-warm-banner-accent` | `#d97706` (rgb 217 119 6) | Warm Banner Thick Left Accent Border Stripe & Sidebar Active Bar | Admission Banner Left Accent Stripe & Sidebar Active Nav |
 | `--color-brand-gold` | `#c1982e` | Islamic Gold / Ochre Accent (Institutional Badge & Seals) | `madrasatus-sunnah-logo.svg` (cls-2 text & decorative calligraphy) |
 | `--color-brand-green-dome` | `#00a14a` | Emerald Green (Symbolic Islamic Element) | `madrasatus-sunnah-logo.svg` gradient stop-0 |
 | `--color-brand-ocean-blue` | `#016c90` | Ocean Blue / Deep Accent | `madrasatus-sunnah-logo.svg` gradient stop-1 |
