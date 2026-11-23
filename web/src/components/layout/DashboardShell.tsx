@@ -660,21 +660,21 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         />
       )}
 
-      {/* LEFT SIDEBAR (Madrasat-us-Sunnah Light Elegant Architecture) */}
+      {/* LEFT SIDEBAR (Sky-Blue Light Ambient Glow Architecture) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 sm:w-80 max-w-[85vw] md:w-64 lg:w-72 bg-[#FFFBEB] border-r border-[#FCD34D] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 sm:w-80 max-w-[85vw] md:w-64 lg:w-72 bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5] to-[#F0FDFA] border-r border-[#CCFBF1] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
           mobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Top: Institute Brand & Identity */}
         <div className="flex flex-col flex-1 min-h-0">
-          <div className="p-4 sm:p-5 border-b border-[#FCD34D] flex items-start justify-between bg-[#FFFBEB] shrink-0">
+          <div className="p-4 sm:p-5 border-b border-[#CCFBF1] flex items-start justify-between bg-white/75 backdrop-blur-xs shrink-0">
             <Link
               href={role === 'super_admin' ? '/admin' : role === 'teacher' ? '/teacher' : role === 'student' ? '/student' : '/coordinator'}
               onClick={() => setMobileSidebarOpen(false)}
               className="flex items-center gap-3 group"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-xs border border-[#FCD34D] group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-xs border border-[#CCFBF1] group-hover:scale-105 transition-transform">
                 <Image
                   src="/logo.png"
                   alt="ASSDI Logo"
@@ -692,7 +692,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 </p>
                 <div className="mt-1">
                   <span
-                    className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-white text-[#B45309] border border-[#FCD34D]"
+                    className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-white text-[#0F766E] border border-[#CCFBF1] shadow-2xs"
                   >
                     {roleBadge.label}
                   </span>
@@ -702,7 +702,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
             <button
               onClick={() => setMobileSidebarOpen(false)}
-              className="p-1.5 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 border border-[#FCD34D] md:hidden cursor-pointer active:scale-95 transition shadow-2xs"
+              className="p-1.5 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 border border-[#CCFBF1] md:hidden cursor-pointer active:scale-95 transition shadow-2xs"
               aria-label="Close navigation"
             >
               <X className="w-5 h-5" />
@@ -714,7 +714,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             {navSections.map((sec, secIdx) => (
               <div key={secIdx} className="space-y-1">
                 {(sec.titleBn || sec.titleEn) && (
-                  <p className="px-3 text-[10px] font-bold uppercase text-[#B45309] tracking-widest mb-2 font-serif">
+                  <p className="px-3 text-[10px] font-bold uppercase text-[#0369A1] tracking-widest mb-2 font-serif">
                     {isBangla ? sec.titleBn : sec.titleEn}
                   </p>
                 )}
@@ -731,14 +731,14 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                           onClick={() => handleNavClick(item.href)}
                           className={`relative flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-[0.98] ${
                             active
-                              ? 'bg-white text-[#B45309] shadow-xs border border-[#FCD34D] font-bold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1.5 before:bg-[#D97706] before:rounded-r'
-                              : 'text-[#475569] hover:text-[#B45309] hover:bg-[#FEF3C7]/60'
+                              ? 'bg-white text-[#0F766E] shadow-xs border border-[#99F6E4] font-bold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1.5 before:bg-[#0284C7] before:rounded-r'
+                              : 'text-[#334155] hover:text-[#0F766E] hover:bg-white/70'
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <Icon
-                              className={`w-4 h-4 shrink-0 ${
-                                active ? 'text-[#D97706]' : 'text-[#64748B] group-hover:text-[#B45309]'
+                              className={`w-4 h-4 shrink-0 transition-colors ${
+                                active ? 'text-[#0284C7]' : 'text-[#0284C7]/80 group-hover:text-[#0284C7]'
                               }`}
                             />
                             <span className="truncate">
@@ -750,8 +750,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                             <span
                               className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                                 active
-                                  ? 'bg-[#D97706] text-white'
-                                  : 'bg-white/80 border border-[#FCD34D]/60 text-[#B45309]'
+                                  ? 'bg-[#0284C7] text-white'
+                                  : 'bg-white/90 border border-[#CCFBF1] text-[#0284C7]'
                               }`}
                             >
                               {item.badge}
@@ -767,7 +767,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
             {/* If in Reports Hub, show quick back to user dashboard */}
             {role === 'reports' && (
-              <div className="pt-2 border-t border-[#FCD34D]/70">
+              <div className="pt-2 border-t border-[#CCFBF1]">
                 <Link
                   href={
                     user?.role === 'super_admin'
@@ -778,9 +778,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                       ? '/student'
                       : '/coordinator'
                   }
-                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#B45309] hover:bg-[#FEF3C7]/60 transition-colors"
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#0F766E] hover:bg-white/70 transition-colors"
                 >
-                  <ArrowLeft className="w-4 h-4 text-[#B45309]" />
+                  <ArrowLeft className="w-4 h-4 text-[#0284C7]" />
                   <span>{isBangla ? 'ড্যাশবোর্ডে ফিরে যান' : 'Back to Dashboard'}</span>
                 </Link>
               </div>
@@ -788,18 +788,18 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
             {/* Super Admin Navigation Customizer Button */}
             {role === 'super_admin' && (
-              <div className="pt-2 border-t border-[#FCD34D]/70">
+              <div className="pt-2 border-t border-[#CCFBF1]">
                 <button
                   type="button"
                   onClick={() => setMenuManagerOpen(true)}
-                  className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D] text-xs font-bold transition flex items-center justify-between shadow-xs cursor-pointer active:scale-98"
+                  className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-[#E0F7F5] text-[#0F766E] border border-[#CCFBF1] text-xs font-bold transition flex items-center justify-between shadow-xs cursor-pointer active:scale-98"
                 >
                   <div className="flex items-center gap-2">
-                    <Settings className="w-4 h-4 text-[#B45309]" />
+                    <Settings className="w-4 h-4 text-[#0284C7]" />
                     <span>{isBangla ? 'মেনু এডিটর ও আর্কাইভ' : 'Menu & Archive Control'}</span>
                   </div>
                   {adminMenus.some((m) => m.isArchived) && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-[#B45309]/15 text-[#B45309] font-extrabold border border-[#B45309]/30">
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-[#0284C7]/15 text-[#0284C7] font-extrabold border border-[#0284C7]/30">
                       {adminMenus.filter((m) => m.isArchived).length} {isBangla ? 'হাইড' : 'hidden'}
                     </span>
                   )}
@@ -810,12 +810,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         </div>
 
         {/* Bottom: User Card, Language Toggle & Logout */}
-        <div className="p-3 border-t border-[#FCD34D] bg-[#FFFBEB] space-y-2">
+        <div className="p-3 border-t border-[#CCFBF1] bg-white/50 backdrop-blur-xs space-y-2">
           {/* User info snippet */}
-          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-[#FCD34D] shadow-2xs">
+          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-[#CCFBF1] shadow-2xs">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D] flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
-                {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4 text-[#B45309]" />}
+              <div className="w-8 h-8 rounded-full bg-[#E0F7F5] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
+                {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4 text-[#0284C7]" />}
               </div>
               <div className="min-w-0 text-left">
                 <p className="font-bold text-xs text-[#0F172A] truncate font-serif">
@@ -840,13 +840,13 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           <button
             type="button"
             onClick={triggerPwaInstall}
-            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D] text-[11px] font-medium transition cursor-pointer"
+            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#E0F7F5] text-[#0F766E] border border-[#CCFBF1] text-[11px] font-medium transition cursor-pointer"
           >
             <span className="flex items-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5 text-[#B45309]" />
+              <Smartphone className="w-3.5 h-3.5 text-[#0284C7]" />
               <span>{isBangla ? 'হোমস্ক্রিনে অ্যাপ ইনস্টল' : 'Install PWA App'}</span>
             </span>
-            <span className="bg-[#D97706] text-[9px] text-white px-1.5 py-0.5 rounded-md font-bold">
+            <span className="bg-[#0284C7] text-[9px] text-white px-1.5 py-0.5 rounded-md font-bold">
               {isBangla ? 'যুক্ত করুন' : 'Install'}
             </span>
           </button>
@@ -854,7 +854,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           {/* Language Switcher Bar */}
           <div className="flex items-center justify-between px-2 pt-1">
             <span className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5 text-[#D97706]" />
+              <Globe className="w-3.5 h-3.5 text-[#0284C7]" />
               <span>{isBangla ? 'ভাষা / Language' : 'Language'}</span>
             </span>
             <LanguageSwitcher />
@@ -995,14 +995,14 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           onClick={() => setMobileSidebarOpen(true)}
           className={`flex flex-col items-center justify-center flex-1 py-1 px-0.5 rounded-lg text-center transition-all duration-150 active:scale-95 cursor-pointer ${
             mobileSidebarOpen
-              ? 'text-[#B45309] font-bold'
+              ? 'text-[#0284C7] font-bold'
               : 'text-slate-500 hover:text-slate-800 font-medium'
           }`}
           aria-label={isBangla ? 'সব মেনু দেখুন' : 'View all menus'}
         >
           <div
             className={`p-1 rounded-lg mb-0.5 transition-colors ${
-              mobileSidebarOpen ? 'bg-amber-100 text-[#B45309]' : 'bg-transparent text-slate-500'
+              mobileSidebarOpen ? 'bg-[#E0F7F5] text-[#0284C7]' : 'bg-transparent text-slate-500'
             }`}
           >
             <Menu className="w-4 h-4" />
