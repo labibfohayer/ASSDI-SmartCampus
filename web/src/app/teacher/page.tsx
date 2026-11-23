@@ -146,7 +146,7 @@ export default function TeacherOverviewPage() {
             </button>
             <Link
               href="/teacher/qr"
-              className="px-4 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-2 transition cursor-pointer active:scale-95"
+              className="px-4 py-2.5 bg-[#B45309] hover:bg-[#92400E] text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-2 transition cursor-pointer active:scale-95 border border-[#FCD34D]"
             >
               <QrCode className="w-4 h-4 text-white" />
               <span>{isBangla ? 'লাইভ কিউআর খুলুন' : 'Open Live QR'}</span>
@@ -325,7 +325,7 @@ export default function TeacherOverviewPage() {
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     <Link
                       href={`/teacher/qr?sessionId=${session.id}`}
-                      className="px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
+                      className="px-3.5 py-2 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95 border border-[#FCD34D]"
                     >
                       <QrCode className="w-3.5 h-3.5 text-white" />
                       <span>{isBangla ? 'লাইভ কিউআর প্রজেক্টর' : 'Live QR Projector'}</span>

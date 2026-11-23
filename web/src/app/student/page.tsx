@@ -469,23 +469,23 @@ export default function StudentPortalPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => setIdCardOpen(true)}
-              className="px-4 py-2 rounded-xl bg-white hover:bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
+              className="px-4 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
               title={isBangla ? 'ডিজিটাল আইডি কার্ড ও এডমিট কার্ড' : 'Digital ID & Admit Card'}
             >
-              <CreditCard className="w-4 h-4 text-[#0F766E]" />
+              <CreditCard className="w-4 h-4 text-[#B45309]" />
               <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
             </button>
             <button
               onClick={() => setCertModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-white hover:bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
+              className="px-4 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
               title={isBangla ? 'কোর্স সনদপত্র প্রিভিউ ও প্রিন্ট' : 'Course Certificate Preview & Print'}
             >
-              <Award className="w-4 h-4 text-[#0F766E]" />
+              <Award className="w-4 h-4 text-[#B45309]" />
               <span>{isBangla ? 'সনদপত্র' : 'Certificate'}</span>
             </button>
             <button
               onClick={() => setScannerOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-md active:scale-95"
+              className="px-4 py-2 rounded-xl bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-md active:scale-95 border border-[#FCD34D]"
               title={isBangla ? 'ক্যামেরা দিয়ে কিউআর স্ক্যান করুন' : 'Scan Attendance QR'}
             >
               <QrCode className="w-4 h-4 text-white" />
@@ -494,9 +494,9 @@ export default function StudentPortalPage() {
             <button
               onClick={loadStudentData}
               title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
-              className="px-4 py-2 rounded-xl bg-white hover:bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1] transition-colors flex items-center gap-2 text-xs font-bold cursor-pointer shadow-xs"
+              className="px-4 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] transition-colors flex items-center gap-2 text-xs font-bold cursor-pointer shadow-xs"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#0F766E] ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-[#B45309] ${loading ? 'animate-spin' : ''}`} />
               <span>{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh Data'}</span>
             </button>
           </div>
