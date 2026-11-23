@@ -507,6 +507,137 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
     return false;
   };
 
+  // Define mobile bottom navigation items based on current role
+  const getBottomNavItems = () => {
+    switch (role) {
+      case 'teacher':
+        return [
+          {
+            href: '/teacher',
+            labelBn: 'হোম',
+            labelEn: 'Home',
+            icon: LayoutDashboard,
+          },
+          {
+            href: '/teacher/qr',
+            labelBn: 'কিউআর কোড',
+            labelEn: 'QR Code',
+            icon: QrCode,
+          },
+          {
+            href: '/teacher/attendance',
+            labelBn: 'হাজিরা শীট',
+            labelEn: 'Roster',
+            icon: ClipboardCheck,
+          },
+          {
+            href: '/teacher/help-requests',
+            labelBn: 'হেল্প বোর্ড',
+            labelEn: 'Help',
+            icon: HelpCircle,
+          },
+        ];
+      case 'student':
+        return [
+          {
+            href: '/student',
+            labelBn: 'হোম',
+            labelEn: 'Home',
+            icon: LayoutDashboard,
+          },
+          {
+            href: '/student?scan=true',
+            labelBn: 'স্ক্যান',
+            labelEn: 'Scan',
+            icon: QrCode,
+          },
+          {
+            href: '/student?tab=materials',
+            labelBn: 'ক্লাস স্টাডি',
+            labelEn: 'Study',
+            icon: BookOpen,
+          },
+          {
+            href: '/student?tab=graduation',
+            labelBn: 'সনদপত্র',
+            labelEn: 'Cert',
+            icon: Award,
+          },
+        ];
+      case 'coordinator':
+        return [
+          {
+            href: '/coordinator',
+            labelBn: 'ড্যাশবোর্ড',
+            labelEn: 'Dashboard',
+            icon: LayoutDashboard,
+          },
+          {
+            href: '/coordinator/attendance',
+            labelBn: 'হাজিরা মনিটর',
+            labelEn: 'Attendance',
+            icon: ClipboardCheck,
+          },
+          {
+            href: '/coordinator/students',
+            labelBn: 'শিক্ষার্থী',
+            labelEn: 'Students',
+            icon: Users,
+          },
+          {
+            href: '/coordinator/reports',
+            labelBn: 'রিপোর্ট',
+            labelEn: 'Reports',
+            icon: FileText,
+          },
+        ];
+      case 'super_admin':
+        return [
+          {
+            href: '/admin',
+            labelBn: 'ওভারভিউ',
+            labelEn: 'Overview',
+            icon: ShieldCheck,
+          },
+          {
+            href: '/admin/users',
+            labelBn: 'ইউজার',
+            labelEn: 'Users',
+            icon: Users,
+          },
+          {
+            href: '/admin/classes',
+            labelBn: 'ক্লাস সেশন',
+            labelEn: 'Classes',
+            icon: Calendar,
+          },
+          {
+            href: '/reports',
+            labelBn: 'রিপোর্ট',
+            labelEn: 'Reports',
+            icon: FileText,
+          },
+        ];
+      default: // observer or fallback
+        return [
+          {
+            href: role === 'observer' ? '/coordinator' : '/admin',
+            labelBn: 'ড্যাশবোর্ড',
+            labelEn: 'Dashboard',
+            icon: LayoutDashboard,
+          },
+          {
+            href: '/reports',
+            labelBn: 'রিপোর্ট',
+            labelEn: 'Reports',
+            icon: FileText,
+          },
+        ];
+    }
+  };
+
+  const bottomNavItems = getBottomNavItems();
+
   // Find current active item label for breadcrumbs
   let activeItemLabel = '';
   for (const section of navSections) {
@@ -525,24 +656,25 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
       {mobileSidebarOpen && (
         <div
           onClick={() => setMobileSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-black/60 md:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-xs md:hidden transition-opacity"
         />
       )}
 
       {/* LEFT SIDEBAR (Madrasat-us-Sunnah Light Elegant Architecture) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 lg:w-72 bg-[#FFFBEB] border-r border-[#FCD34D] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 sm:w-80 max-w-[85vw] md:w-64 lg:w-72 bg-[#FFFBEB] border-r border-[#FCD34D] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
           mobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Top: Institute Brand & Identity */}
-        <div>
-          <div className="p-5 border-b border-[#FCD34D] flex items-start justify-between bg-[#FFFBEB]">
+        <div className="flex flex-col flex-1 min-h-0">
+          <div className="p-4 sm:p-5 border-b border-[#FCD34D] flex items-start justify-between bg-[#FFFBEB] shrink-0">
             <Link
               href={role === 'super_admin' ? '/admin' : role === 'teacher' ? '/teacher' : role === 'student' ? '/student' : '/coordinator'}
+              onClick={() => setMobileSidebarOpen(false)}
               className="flex items-center gap-3 group"
             >
-              <div className="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-xs border border-[#FCD34D] group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-xs border border-[#FCD34D] group-hover:scale-105 transition-transform">
                 <Image
                   src="/logo.png"
                   alt="ASSDI Logo"
@@ -570,14 +702,15 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
             <button
               onClick={() => setMobileSidebarOpen(false)}
-              className="p-1 rounded-lg text-[#64748B] hover:text-[#0F172A] md:hidden cursor-pointer"
+              className="p-1.5 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 border border-[#FCD34D] md:hidden cursor-pointer active:scale-95 transition shadow-2xs"
+              aria-label="Close navigation"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Navigation Items (Serial by Serial) */}
-          <nav className="p-3 space-y-6 overflow-y-auto max-h-[calc(100vh-14rem)]">
+          <nav className="p-3 space-y-6 overflow-y-auto flex-1">
             {navSections.map((sec, secIdx) => (
               <div key={secIdx} className="space-y-1">
                 {(sec.titleBn || sec.titleEn) && (
@@ -738,16 +871,33 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         />
 
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#E2E8F0] h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
+        <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#E2E8F0] h-14 sm:h-16 flex items-center justify-between px-3 sm:px-6 lg:px-8 shadow-2xs">
           {/* Left: Mobile Toggle & Page Context Breadcrumb */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={() => setMobileSidebarOpen(true)}
-              className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 md:hidden cursor-pointer active:scale-95 transition"
+              className="p-1.5 -ml-1 rounded-xl text-slate-700 hover:bg-amber-100/70 md:hidden cursor-pointer active:scale-95 transition shrink-0"
               title="Open Navigation"
+              aria-label="মেনু খুলুন"
             >
               <Menu className="w-5 h-5" />
             </button>
+
+            {/* Mobile Brand / Page Title */}
+            <div className="flex sm:hidden items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-white p-0.5 border border-[#FCD34D] shrink-0 flex items-center justify-center shadow-2xs">
+                <Image
+                  src="/logo.png"
+                  alt="ASSDI Logo"
+                  width={22}
+                  height={22}
+                  className="object-contain"
+                />
+              </div>
+              <span className="font-bold text-xs text-[#0F172A] truncate font-serif">
+                {activeItemLabel || (isBangla ? 'আস-সুন্নাহ স্কিল' : 'ASSDI')}
+              </span>
+            </div>
 
             <div className="hidden sm:flex items-center gap-2 text-xs">
               <span className="font-bold text-[#0F172A] font-serif">{t('brand.name')}</span>
@@ -759,7 +909,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           </div>
 
           {/* Right: Academic Cohort, Live Status, Time & Switcher */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 border border-[#E2E8F0] text-[#334155] text-xs font-semibold shadow-2xs">
               <span className="text-[#0F766E] font-bold">SBMC</span>
               <span className="text-slate-400">•</span>
@@ -796,15 +946,72 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         {noticeBanner}
 
         {/* Main Body Content */}
-        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
+        <main className="flex-1 max-w-7xl w-full mx-auto p-3.5 sm:p-6 lg:p-8 relative z-10 pb-24 md:pb-8">
           {children}
         </main>
 
         {/* Institutional Footer */}
-        <footer className="border-t border-slate-200/80 bg-white py-4 text-center text-xs text-slate-500">
+        <footer className="border-t border-slate-200/80 bg-white py-4 text-center text-xs text-slate-500 pb-20 md:pb-4">
           <p>© 2026 আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট (ASSDI) • ঢাকা, বাংলাদেশ</p>
         </footer>
       </div>
+
+      {/* Mobile Bottom Navigation Bar (নেটিভ অ্যাপ স্টাইল কুইক অ্যাক্সেস) */}
+      <nav
+        aria-label="Mobile Navigation"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-1 py-1 flex items-center justify-around"
+      >
+        {bottomNavItems.map((item) => {
+          const Icon = item.icon;
+          const active = isLinkActive(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => handleNavClick(item.href)}
+              className={`flex flex-col items-center justify-center flex-1 py-1 px-0.5 rounded-lg text-center transition-all duration-150 active:scale-95 ${
+                active
+                  ? 'text-[#0F766E] font-bold'
+                  : 'text-slate-500 hover:text-slate-800 font-medium'
+              }`}
+            >
+              <div
+                className={`p-1 rounded-lg mb-0.5 transition-colors ${
+                  active ? 'bg-[#CCFBF1] text-[#0F766E]' : 'bg-transparent text-slate-500'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+              </div>
+              <span className="text-[10px] leading-tight truncate max-w-[62px]">
+                {isBangla ? item.labelBn : item.labelEn}
+              </span>
+            </Link>
+          );
+        })}
+
+        {/* 5th item: Mobile Menu Drawer Trigger */}
+        <button
+          type="button"
+          onClick={() => setMobileSidebarOpen(true)}
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-0.5 rounded-lg text-center transition-all duration-150 active:scale-95 cursor-pointer ${
+            mobileSidebarOpen
+              ? 'text-[#B45309] font-bold'
+              : 'text-slate-500 hover:text-slate-800 font-medium'
+          }`}
+          aria-label={isBangla ? 'সব মেনু দেখুন' : 'View all menus'}
+        >
+          <div
+            className={`p-1 rounded-lg mb-0.5 transition-colors ${
+              mobileSidebarOpen ? 'bg-amber-100 text-[#B45309]' : 'bg-transparent text-slate-500'
+            }`}
+          >
+            <Menu className="w-4 h-4" />
+          </div>
+          <span className="text-[10px] leading-tight truncate max-w-[62px]">
+            {isBangla ? 'সব মেনু' : 'All Menus'}
+          </span>
+        </button>
+      </nav>
 
       {/* Super Admin Navigation Customizer Modal */}
       {role === 'super_admin' && (
