@@ -27,3 +27,7 @@ super_admin, coordinator, teacher, student, observer (read-only).
 10. Make small commits with clear messages.
 11. Work on one task at a time. Do not build features that are not part of the current task.
 12. Reply to me in simple Bengali (Bangla script) when explaining things; keep code, comments and file names in English.
+
+## UNDO PROTOCOL
+If the user says 'undo', 'আনডু', 'আগের অবস্থানে ফিরিয়ে নাও', 'ভালো লাগেনি' or similar about the palette/design refresh, restore the UI to the state saved in tag `before-palette-refresh`: commit or stash any pending work on the branch `palette-refresh`, then run `git checkout design-refresh` (the branch recorded in docs/design-review/palette-refresh-undo.md). Do NOT delete the `palette-refresh` branch, so the user can come back to it later. Restart the dev server, confirm in the browser that the old look is back, and tell the user in simple Bengali that the previous state is restored and how to redo it (`git checkout palette-refresh`).
+
