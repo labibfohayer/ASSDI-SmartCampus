@@ -655,21 +655,21 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         />
       )}
 
-      {/* LEFT SIDEBAR (Sky-Blue Light Ambient Glow Architecture) */}
+      {/* LEFT SIDEBAR (Deeper Sky-Blue Ambient Architecture) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 sm:w-80 max-w-[85vw] md:w-64 lg:w-72 bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5] to-[#F0FDFA] border-r border-[#CCFBF1] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 sm:w-80 max-w-[85vw] md:w-64 lg:w-72 bg-gradient-to-b from-[#A5DFE5] via-[#B9E6EC] to-[#CCEDF2] border-r border-[#8FD3DB] flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 ${
           mobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Top: Institute Brand & Identity */}
         <div className="flex flex-col flex-1 min-h-0">
-          <div className="p-4 sm:p-5 border-b border-[#CCFBF1] flex items-start justify-between bg-white/75 backdrop-blur-xs shrink-0">
+          <div className="p-4 sm:p-5 border-b border-[#8FD3DB] flex items-start justify-between bg-white/80 backdrop-blur-xs shrink-0">
             <Link
               href={role === 'super_admin' ? '/admin' : role === 'teacher' ? '/teacher' : role === 'student' ? '/student' : '/coordinator'}
               onClick={() => setMobileSidebarOpen(false)}
               className="flex items-center gap-3 group"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-xs border border-[#CCFBF1] group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-xs border border-[#8FD3DB] group-hover:scale-105 transition-transform">
                 <Image
                   src="/logo.png"
                   alt="ASSDI Logo"
@@ -687,7 +687,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 </p>
                 <div className="mt-1">
                   <span
-                    className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-white text-[#0F766E] border border-[#CCFBF1] shadow-2xs"
+                    className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-white text-[#0F766E] border border-[#8FD3DB] shadow-2xs"
                   >
                     {roleBadge.label}
                   </span>
@@ -697,7 +697,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
             <button
               onClick={() => setMobileSidebarOpen(false)}
-              className="p-1.5 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 border border-[#CCFBF1] md:hidden cursor-pointer active:scale-95 transition shadow-2xs"
+              className="p-1.5 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 border border-[#8FD3DB] md:hidden cursor-pointer active:scale-95 transition shadow-2xs"
               aria-label="Close navigation"
             >
               <X className="w-5 h-5" />
@@ -805,11 +805,11 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         </div>
 
         {/* Bottom: User Card, Language Toggle & Logout */}
-        <div className="p-3 border-t border-[#CCFBF1] bg-white/50 backdrop-blur-xs space-y-2">
+        <div className="p-3 border-t border-[#8FD3DB] bg-white/60 backdrop-blur-xs space-y-2">
           {/* User info snippet */}
-          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-[#CCFBF1] shadow-2xs">
+          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-[#8FD3DB] shadow-2xs">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-[#E0F7F5] text-[#0F766E] border border-[#CCFBF1] flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
+              <div className="w-8 h-8 rounded-full bg-[#E0F2FE] text-[#0284C7] border border-[#BAE6FD] flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
                 {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4 text-[#0284C7]" />}
               </div>
               <div className="min-w-0 text-left">
@@ -835,7 +835,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           <button
             type="button"
             onClick={triggerPwaInstall}
-            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#E0F7F5] text-[#0F766E] border border-[#CCFBF1] text-[11px] font-medium transition cursor-pointer"
+            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#E0F2FE] text-[#0F766E] border border-[#8FD3DB] text-[11px] font-medium transition cursor-pointer"
           >
             <span className="flex items-center gap-1.5">
               <Smartphone className="w-3.5 h-3.5 text-[#0284C7]" />
