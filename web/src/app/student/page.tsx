@@ -511,12 +511,12 @@ export default function StudentPortalPage() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-[#F0FDFA] text-[#0F766E] flex items-center justify-center border border-[#CCFBF1]">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2 mt-3">
-            <span className="text-3xl font-black text-[#0F766E]">
+            <span className="text-3xl font-black text-emerald-600">
               {safeFixed(attSummary?.attendance_percentage)}%
             </span>
           </div>
@@ -524,13 +524,14 @@ export default function StudentPortalPage() {
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 (attSummary?.attendance_percentage || 0) < 75
-                  ? 'bg-rose-500'
-                  : 'bg-[#0F766E]'
+                  ? 'bg-red-500'
+                  : 'bg-emerald-600'
               }`}
               style={{ width: `${Math.min(attSummary?.attendance_percentage || 0, 100)}%` }}
             />
           </div>
-          <p className="text-[11px] font-semibold text-[#0F766E] mt-2 flex items-center gap-1">
+          <p className="text-[11px] font-semibold text-emerald-700 mt-2 flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
             {(attSummary?.attendance_percentage || 0) >= 80
               ? isBangla ? 'সন্তোষজনক ও নিয়মিত উপস্থিতি' : 'Satisfactory attendance'
               : isBangla ? 'উপস্থিতির হার বৃদ্ধি করা প্রয়োজন' : 'Needs improvement'}
@@ -543,7 +544,7 @@ export default function StudentPortalPage() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               {isBangla ? 'উপস্থিত সেশন' : 'Present Sessions'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-100">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
               <UserCheck className="w-4 h-4" />
             </div>
           </div>
@@ -553,7 +554,7 @@ export default function StudentPortalPage() {
               / {attSummary?.total_sessions || 0}
             </span>
           </p>
-          <p className="text-[11px] text-slate-500 mt-3 flex items-center gap-1">
+          <p className="text-[11px] text-emerald-700 mt-3 flex items-center gap-1 font-medium">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
             {isBangla ? 'সফলভাবে ক্লাসে সম্পন্ন' : 'Attended successfully'}
           </p>
@@ -565,18 +566,18 @@ export default function StudentPortalPage() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               {isBangla ? 'অনুপস্থিতি' : 'Absences'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100">
-              <AlertCircle className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center border border-red-200">
+              <AlertCircle className="w-4 h-4 text-red-600" />
             </div>
           </div>
-          <p className="text-3xl font-black text-rose-700 mt-3">
+          <p className="text-3xl font-black text-red-600 mt-3">
             {attSummary?.absent || 0}{' '}
-            <span className="text-sm font-semibold text-slate-400">
+            <span className="text-sm font-semibold text-red-400">
               {isBangla ? 'সেশন' : 'sessions'}
             </span>
           </p>
-          <p className="text-[11px] text-rose-600 mt-3 flex items-center gap-1 font-medium">
-            <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
+          <p className="text-[11px] text-red-600 mt-3 flex items-center gap-1 font-bold">
+            <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
             {(attSummary?.absent || 0) >= 3
               ? isBangla ? 'সতর্কবার্তা: অনুপস্থিতি বেশি' : 'Warning: High absences'
               : isBangla ? 'স্বাভাবিক সীমার মধ্যে' : 'Normal range'}
@@ -589,15 +590,15 @@ export default function StudentPortalPage() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
-              <HelpCircle className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center border border-blue-200">
+              <HelpCircle className="w-4 h-4 text-blue-900" />
             </div>
           </div>
-          <p className="text-3xl font-black text-blue-800 mt-3">
+          <p className="text-3xl font-black text-blue-950 mt-3">
             {helpRequests.length}
           </p>
-          <p className="text-[11px] text-blue-600 mt-3 flex items-center gap-1 font-medium">
-            <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+          <p className="text-[11px] text-blue-900 mt-3 flex items-center gap-1 font-bold">
+            <CheckCircle2 className="w-3.5 h-3.5 text-blue-700" />
             {helpRequests.filter((h) => h.status === 'resolved').length}{' '}
             {isBangla ? 'টি সমাধান হয়েছে' : 'resolved'}
           </p>
