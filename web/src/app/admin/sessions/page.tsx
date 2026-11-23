@@ -361,7 +361,7 @@ export default function AdminSessionsPage() {
           <select
             value={selectedBatch}
             onChange={(e) => setSelectedBatch(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E] min-w-[170px]"
           >
             <option value="all">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
             {batches.map((b) => (
@@ -374,7 +374,7 @@ export default function AdminSessionsPage() {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E] min-w-[160px]"
           >
             <option value="all">{isBangla ? 'সকল স্ট্যাটাস' : 'All Status'}</option>
             <option value="published">{isBangla ? 'পাবলিশড' : 'Published'}</option>

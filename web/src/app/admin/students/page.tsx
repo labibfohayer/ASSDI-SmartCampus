@@ -425,7 +425,7 @@ export default function AdminStudentsPage() {
             <select
               value={selectedBatch}
               onChange={(e) => setSelectedBatch(e.target.value)}
-              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 focus:outline-none"
+              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 min-w-[150px]"
             >
               <option value="">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
               {batches.map((b) => (
@@ -439,7 +439,7 @@ export default function AdminStudentsPage() {
             <select
               value={selectedAudience}
               onChange={(e) => setSelectedAudience(e.target.value)}
-              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 focus:outline-none"
+              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 min-w-[150px]"
             >
               <option value="">{isBangla ? 'সকল পটভূমি' : 'All Backgrounds'}</option>
               <option value="General">General</option>

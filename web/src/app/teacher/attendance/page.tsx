@@ -253,17 +253,31 @@ export default function ManualAttendancePage() {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap relative z-10">
-          <select
-            value={selectedSessionId || ''}
-            onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-            className="px-3.5 py-2.5 bg-white border border-[#FCD34D] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-          >
-            {sessions.map((s) => (
-              <option key={s.id} value={s.id} className="bg-white text-[#0F172A]">
-                {s.subject_name || `Session #${s.id}`} - {d(s.session_date)} ({d(s.start_time.slice(0, 5))})
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-white border border-[#FCD34D] rounded-xl shadow-xs">
+            <Calendar className="w-4 h-4 text-[#0F766E] shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">
+                {isBangla ? 'সেশন নির্বাচন করুন' : 'Select Session'}
+              </span>
+              <select
+                value={selectedSessionId || ''}
+                onChange={(e) => setSelectedSessionId(Number(e.target.value))}
+                className="bg-transparent text-xs font-bold text-[#0F172A] focus:outline-none cursor-pointer min-w-[220px] max-w-xs sm:min-w-[260px] truncate"
+              >
+                {sessions.length === 0 ? (
+                  <option value="" disabled>
+                    {isBangla ? 'কোনো সেশন পাওয়া যায়নি' : 'No sessions available'}
+                  </option>
+                ) : (
+                  sessions.map((s) => (
+                    <option key={s.id} value={s.id} className="bg-white text-[#0F172A]">
+                      {s.subject_name || `Session #${s.id}`} - {d(s.session_date)} ({d(s.start_time.slice(0, 5))})
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          </div>
 
           <button
             onClick={handleFinalizeAttendance}
