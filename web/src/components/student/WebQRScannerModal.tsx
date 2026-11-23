@@ -307,7 +307,7 @@ export default function WebQRScannerModal({
         animationFrameId.current = requestAnimationFrame(scanFrame);
       }
     } catch (err: any) {
-      console.error('Camera access error:', err);
+      console.warn('Camera access unavailable:', err?.name || err?.message);
       let msg = isBangla
         ? 'ক্যামেরা চালু করা সম্ভব হয়নি। ব্রাউজার পারমিশন নিশ্চিত করুন অথবা নিচে ম্যানুয়াল টোকেন কোড প্রবেশ করান।'
         : 'Could not access camera. Please allow camera permissions or enter the code manually below.';
@@ -315,6 +315,10 @@ export default function WebQRScannerModal({
         msg = isBangla
           ? 'ক্যামেরা ব্যবহারের অনুমতি দেওয়া হয়নি। ব্রাউজার সেটিংসে গিয়ে ক্যামেরার এক্সেস অনুমতি দিন।'
           : 'Camera permission denied. Please allow camera access in browser site settings.';
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        msg = isBangla
+          ? 'কোনো ক্যামেরা ডিভাইস পাওয়া যায়নি। আপনি নিচের ট্যাবে টোকেন কোড দিয়ে উপস্থিতি নিশ্চিত করতে পারেন।'
+          : 'No camera found. You can enter the token code in the manual tab below.';
       }
       setCameraError(msg);
       setCameraActive(false);

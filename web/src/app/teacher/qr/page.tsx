@@ -73,7 +73,8 @@ export default function LiveQrProjectorPage() {
     const endMinutes = (eH || 0) * 60 + (eM || 0);
 
     if (currentMinutes < startMinutes) return 'UPCOMING';
-    if (currentMinutes > endMinutes) return 'ENDED';
+    // QR token is active from class start time up to start_time + 15 minutes (or end_time)
+    if (currentMinutes > endMinutes || currentMinutes > startMinutes + 15) return 'ENDED';
     return 'LIVE';
   };
 
