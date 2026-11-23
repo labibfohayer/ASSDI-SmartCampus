@@ -114,9 +114,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between text-[#0F172A] relative">
-      {/* Ambient Sky-Blue Light Glow from Top */}
+      {/* Ambient Sky-Blue Light Glow from Top (Locked / Fixed) */}
       <div
-        className="absolute inset-x-0 top-0 h-[480px] pointer-events-none bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5]/80 via-[#F4FCFA]/40 to-transparent z-0"
+        className="fixed inset-x-0 top-0 h-[520px] pointer-events-none bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5]/80 via-[#F4FCFA]/40 to-transparent z-0"
         aria-hidden="true"
       />
 

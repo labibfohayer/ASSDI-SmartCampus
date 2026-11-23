@@ -731,9 +731,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
       {/* RIGHT MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 md:pl-64 lg:pl-72 relative bg-[#F8FAFC]">
-        {/* Ambient Sky-Blue Light Glow Cascading from Top (Madrasat-us-Sunnah reference) */}
+        {/* Ambient Sky-Blue Light Glow Cascading from Top (Locked / Fixed in place on scroll) */}
         <div
-          className="absolute inset-x-0 top-0 h-[520px] pointer-events-none bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5]/85 via-[#F4FCFA]/45 to-transparent z-0"
+          className="fixed top-0 right-0 left-0 md:left-64 lg:left-72 h-[560px] pointer-events-none bg-gradient-to-b from-[#DCF4F1] via-[#EAF8F5]/85 via-[#F4FCFA]/45 to-transparent z-0"
           aria-hidden="true"
         />
 
@@ -796,7 +796,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         {noticeBanner}
 
         {/* Main Body Content */}
-        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
           {children}
         </main>
 
