@@ -656,21 +656,39 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
         dhaka_tz = zoneinfo.ZoneInfo("Asia/Dhaka")
         now_dhaka = timezone.now().astimezone(dhaka_tz)
         session_start_dt = datetime.datetime.combine(session.session_date, session.start_time, tzinfo=dhaka_tz)
+        session_end_dt = datetime.datetime.combine(session.session_date, session.end_time, tzinfo=dhaka_tz)
         qr_window_mins = get_qr_window_minutes()
         session_window_end = session_start_dt + datetime.timedelta(minutes=qr_window_mins)
 
-        # Super Admin or explicit force/demo flag bypasses time window for live demos, projector previews, and testing
+        # Force mode is STRICTLY restricted to super_admin for headless testing/diagnostics.
+        # Teachers and coordinators CAN NEVER bypass the time window.
         force_mode = (
-            (user.role == UserRole.SUPER_ADMIN and request.query_params.get("strict") != "true")
-            or request.query_params.get("force") == "true"
-            or request.query_params.get("demo") == "true"
+            user.role == UserRole.SUPER_ADMIN
+            and request.query_params.get("strict") != "true"
+            and (request.query_params.get("force") == "true" or request.query_params.get("demo") == "true")
         )
 
         if not force_mode:
+            # 1. Date check: Must be today in Asia/Dhaka
+            if now_dhaka.date() != session.session_date:
+                raise ValidationError({
+                    "detail": "শুধুমাত্র ক্লাসের দিন ও নির্ধারিত সময়েই কিউআর কোড জেনারেট করা সম্ভব। ক্লাসের সময় ব্যতীত কিউআর কোড চালু করা যাবে না।"
+                })
+            # 2. Start time check: Cannot generate before class start time
             if now_dhaka < session_start_dt:
-                raise ValidationError({"detail": "QR token can only be generated starting at class start time."})
+                raise ValidationError({
+                    "detail": "QR token can only be generated starting at class start time. ক্লাসের নির্ধারিত সময়ের পূর্বে কিউআর কোড চালু করা যায় না।"
+                })
+            # 3. Class end time check: Cannot generate after class has ended
+            if now_dhaka > session_end_dt:
+                raise ValidationError({
+                    "detail": "ক্লাসের নির্ধারিত সময় সমাপ্ত হয়ে গেছে। ক্লাসের সময় ব্যতীত কিউআর কোড জেনারেট করা যাবে না।"
+                })
+            # 4. QR attendance window check
             if now_dhaka > session_window_end:
-                raise ValidationError({"detail": "QR token generation window has closed."})
+                raise ValidationError({
+                    "detail": "QR token generation window has closed. ক্লাসের নির্ধারিত কিউআর উইন্ডো সমাপ্ত হয়ে গেছে।"
+                })
 
         token_data = QRCodeService.generate_token(session.id)
         return Response(token_data, status=status.HTTP_200_OK)

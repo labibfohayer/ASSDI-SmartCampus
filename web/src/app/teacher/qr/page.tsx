@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   ArrowLeft,
+  Lock,
+  ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -44,12 +46,36 @@ export default function LiveQrProjectorPage() {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(45);
   const [loadingToken, setLoadingToken] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [reopeningWindow, setReopeningWindow] = useState<boolean>(false);
   const [attendedCount, setAttendedCount] = useState<number>(0);
   const [totalStudents, setTotalStudents] = useState<number>(0);
 
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Helper to determine if a session is currently LIVE, UPCOMING, or ENDED
+  const getSessionTimingState = (s: SessionOption | undefined): 'LIVE' | 'UPCOMING' | 'ENDED' => {
+    if (!s) return 'ENDED';
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    if (s.session_date < todayStr) return 'ENDED';
+    if (s.session_date > todayStr) return 'UPCOMING';
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const [sH, sM] = (s.start_time || '00:00').split(':').map(Number);
+    const startMinutes = (sH || 0) * 60 + (sM || 0);
+
+    const [eH, eM] = (s.end_time || '23:59').split(':').map(Number);
+    const endMinutes = (eH || 0) * 60 + (eM || 0);
+
+    if (currentMinutes < startMinutes) return 'UPCOMING';
+    if (currentMinutes > endMinutes) return 'ENDED';
+    return 'LIVE';
+  };
 
   // 1. Fetch available sessions
   useEffect(() => {
@@ -70,7 +96,13 @@ export default function LiveQrProjectorPage() {
 
         setSessions(list);
         if (!selectedSessionId && list.length > 0) {
-          setSelectedSessionId(list[0].id);
+          const live = list.find((s) => getSessionTimingState(s) === 'LIVE');
+          if (live) {
+            setSelectedSessionId(live.id);
+          } else {
+            const upcoming = list.find((s) => getSessionTimingState(s) === 'UPCOMING');
+            setSelectedSessionId(upcoming ? upcoming.id : list[0].id);
+          }
         }
       } catch (err) {
         console.error('Failed to load sessions for QR:', err);
@@ -79,20 +111,21 @@ export default function LiveQrProjectorPage() {
     loadSessions();
   }, []);
 
-  // 2. Fetch QR Token for selected session
+  // 2. Fetch QR Token for selected session (Strictly only during class time)
   const fetchQrToken = async () => {
     if (!selectedSessionId) return;
+    const current = sessions.find((s) => s.id === selectedSessionId);
+    const timing = getSessionTimingState(current);
+    if (timing !== 'LIVE') {
+      setQrToken(null);
+      return;
+    }
+
     setLoadingToken(true);
     setErrorMessage(null);
 
     try {
-      let response;
-      try {
-        response = await api.post(`/api/v1/class-sessions/${selectedSessionId}/qr-token/`);
-      } catch (firstErr: any) {
-        // Fallback with force parameter for super_admin or live interactive demonstration
-        response = await api.post(`/api/v1/class-sessions/${selectedSessionId}/qr-token/?force=true`);
-      }
+      const response = await api.post(`/api/v1/class-sessions/${selectedSessionId}/qr-token/`);
       if (response.data && response.data.data) {
         setQrToken(response.data.data.qr_token);
         const rem = response.data.data.remaining_seconds || 45;
@@ -112,58 +145,27 @@ export default function LiveQrProjectorPage() {
       );
 
       let msg = rawMsg;
-      if (rawMsg.includes('closed') || rawMsg.includes('window')) {
+      if (rawMsg.includes('closed') || rawMsg.includes('উইন্ডো')) {
         msg = isBangla
-          ? 'ক্লাস শুরুর নির্ধারিত ১৫ মিনিটের কিউআর উইন্ডোটি বন্ধ হয়ে গেছে।'
-          : 'The 15-minute QR attendance window has closed.';
-      } else if (rawMsg.includes('start time')) {
+          ? 'ক্লাসের নির্ধারিত কিউআর উইন্ডোটি সমাপ্ত হয়ে গেছে। ক্লাসের সময় ব্যতীত কিউআর কোড চালু করা যায় না।'
+          : 'The QR attendance window has closed.';
+      } else if (rawMsg.includes('start time') || rawMsg.includes('পূর্বে')) {
         msg = isBangla
-          ? 'ক্লাস শুরুর নির্ধারিত সময়ের পূর্বে কিউআর কোড চালু করা যায় না।'
+          ? 'ক্লাস শুরুর নির্ধারিত সময়ের পূর্বে কিউআর কোড চালু করা যায় না। শুধুমাত্র ক্লাসের নির্ধারিত সময়ে এটি সক্রিয় হবে।'
           : 'QR token can only be generated starting at class start time.';
+      } else if (rawMsg.includes('সমাপ্ত') || rawMsg.includes('দিন ও নির্ধারিত')) {
+        msg = isBangla
+          ? 'ক্লাসের নির্ধারিত সময় সমাপ্ত হয়ে গেছে। ক্লাসের সময় ব্যতীত অন্য কোনো সময় কিউআর কোড চালু করা যায় না।'
+          : 'Class time has ended. QR tokens can only be generated during class time.';
       } else if (!msg) {
         msg = isBangla
-          ? 'কিউআর কোড প্রস্তুত করা যায়নি। কিউআর উইন্ডোটি ক্লাস শুরুর সময় থেকে ১৫ মিনিট পর্যন্ত উন্মুক্ত থাকে।'
-          : 'Unable to generate QR token. QR window is active only within 15 minutes of class start.';
+          ? 'শুধুমাত্র ক্লাসের নির্ধারিত সময়েই কিউআর কোড চালু করা সম্ভব।'
+          : 'QR token can only be generated during scheduled class time.';
       }
       setErrorMessage(msg);
       setQrToken(null);
     } finally {
       setLoadingToken(false);
-    }
-  };
-
-  const handleReopenWindow = async () => {
-    if (!selectedSessionId) return;
-    setReopeningWindow(true);
-    try {
-      const now = new Date();
-      const hh = String(now.getHours()).padStart(2, '0');
-      const mm = String(now.getMinutes()).padStart(2, '0');
-      const ss = '00';
-      await api.patch(`/api/v1/class-sessions/${selectedSessionId}/`, {
-        start_time: `${hh}:${mm}:${ss}`,
-      });
-      toast.success(
-        isBangla
-          ? 'কিউআর উইন্ডো সফলভাবে সক্রিয় করা হয়েছে।'
-          : 'QR window reopened successfully.'
-      );
-      // Reload sessions to update start time in dropdown and fetch token
-      const res = await api.get('/api/v1/class-sessions/today/');
-      let list: SessionOption[] = [];
-      if (Array.isArray(res.data)) list = res.data;
-      else if (res.data?.results) list = res.data.results;
-      else if (res.data?.data) list = res.data.data;
-      if (list.length > 0) setSessions(list);
-      fetchQrToken();
-    } catch (err: any) {
-      toast.error(
-        isBangla
-          ? 'উইন্ডো সক্রিয় করা যায়নি।'
-          : 'Failed to reopen QR window.'
-      );
-    } finally {
-      setReopeningWindow(false);
     }
   };
 
@@ -184,9 +186,15 @@ export default function LiveQrProjectorPage() {
   // Trigger token generation when session changes
   useEffect(() => {
     if (selectedSessionId) {
-      fetchQrToken();
+      const cur = sessions.find((s) => s.id === selectedSessionId);
+      if (getSessionTimingState(cur) === 'LIVE') {
+        fetchQrToken();
+      } else {
+        setQrToken(null);
+        setErrorMessage(null);
+      }
     }
-  }, [selectedSessionId]);
+  }, [selectedSessionId, sessions]);
 
   // 3. Countdown timer: tick every second and refresh token at 0s
   useEffect(() => {
@@ -223,6 +231,7 @@ export default function LiveQrProjectorPage() {
   }, []);
 
   const activeSession = sessions.find((s) => s.id === selectedSessionId);
+  const timingState = getSessionTimingState(activeSession);
 
   // Circular timer calculation
   const circleRadius = 24;
@@ -263,8 +272,8 @@ export default function LiveQrProjectorPage() {
             </h1>
             <p className="text-xs opacity-80 mt-0.5">
               {isBangla
-                ? 'বড় স্ক্রিন বা প্রজেক্টরে প্রদর্শন করুন; প্রতি ৪৫ সেকেন্ডে টোকেন স্বয়ংক্রিয়ভাবে পরিবর্তিত হয়।'
-                : 'Project onto classroom screen. Token rotates securely every 45 seconds.'}
+                ? 'বড় স্ক্রিন বা প্রজেক্টরে প্রদর্শন করুন; শুধুমাত্র ক্লাসের সময় প্রতি ৪৫ সেকেন্ডে টোকেন স্বয়ংক্রিয়ভাবে পরিবর্তিত হয়।'
+                : 'Project onto classroom screen. Token rotates securely every 45 seconds during class time.'}
             </p>
           </div>
         </div>
@@ -280,18 +289,27 @@ export default function LiveQrProjectorPage() {
               <select
                 value={selectedSessionId || ''}
                 onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-                className="bg-transparent text-xs font-bold text-[#0F172A] dark:text-amber-100 focus:outline-none cursor-pointer min-w-[220px] max-w-xs sm:min-w-[260px] truncate"
+                className="bg-transparent text-xs font-bold text-[#0F172A] dark:text-amber-100 focus:outline-none cursor-pointer min-w-[220px] max-w-xs sm:min-w-[280px] truncate"
               >
                 {sessions.length === 0 ? (
                   <option value="" disabled>
                     {isBangla ? 'কোনো সেশন পাওয়া যায়নি' : 'No sessions available'}
                   </option>
                 ) : (
-                  sessions.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.subject_name || `Session #${s.id}`} ({d(s.start_time.slice(0, 5))} - {d(s.end_time.slice(0, 5))})
-                    </option>
-                  ))
+                  sessions.map((s) => {
+                    const st = getSessionTimingState(s);
+                    const prefix =
+                      st === 'LIVE'
+                        ? (isBangla ? '🟢 [চলমান]' : '🟢 [LIVE]')
+                        : st === 'UPCOMING'
+                        ? (isBangla ? '⏳ [আসন্ন]' : '⏳ [UPCOMING]')
+                        : (isBangla ? '🔒 [সমাপ্ত]' : '🔒 [ENDED]');
+                    return (
+                      <option key={s.id} value={s.id}>
+                        {prefix} {s.subject_name || `Session #${s.id}`} ({d(s.start_time.slice(0, 5))} - {d(s.end_time.slice(0, 5))})
+                      </option>
+                    );
+                  })
                 )}
               </select>
             </div>
@@ -323,9 +341,26 @@ export default function LiveQrProjectorPage() {
           {/* Active Session Info Banner */}
           {activeSession && (
             <div className="bg-[#FFFBEB] border border-[#FCD34D] rounded-2xl p-4">
-              <span className="px-2.5 py-0.5 bg-[#0F766E] text-white text-[11px] font-bold rounded-full uppercase tracking-wider">
-                {activeSession.audience} Session
-              </span>
+              <div className="flex items-center justify-center gap-2 flex-wrap mb-1">
+                <span className="px-2.5 py-0.5 bg-[#0F766E] text-white text-[11px] font-bold rounded-full uppercase tracking-wider">
+                  {activeSession.audience} Session
+                </span>
+                {timingState === 'LIVE' && (
+                  <span className="px-2.5 py-0.5 bg-emerald-600 text-white text-[11px] font-bold rounded-full tracking-wider animate-pulse">
+                    🟢 {isBangla ? 'ক্লাস চলমান' : 'Class Live'}
+                  </span>
+                )}
+                {timingState === 'UPCOMING' && (
+                  <span className="px-2.5 py-0.5 bg-amber-600 text-white text-[11px] font-bold rounded-full tracking-wider">
+                    ⏳ {isBangla ? 'আসন্ন ক্লাস' : 'Upcoming'}
+                  </span>
+                )}
+                {timingState === 'ENDED' && (
+                  <span className="px-2.5 py-0.5 bg-slate-600 text-white text-[11px] font-bold rounded-full tracking-wider">
+                    🔒 {isBangla ? 'ক্লাস সমাপ্ত' : 'Ended'}
+                  </span>
+                )}
+              </div>
               <h2 className="text-xl font-black text-[#0F172A] font-heading mt-2">
                 {activeSession.subject_name}
               </h2>
@@ -345,7 +380,69 @@ export default function LiveQrProjectorPage() {
 
           {/* QR Code Presentation Box */}
           <div className="flex justify-center items-center py-2">
-            {loadingToken && !qrToken ? (
+            {timingState === 'UPCOMING' ? (
+              <div className="w-full max-w-md rounded-2xl bg-amber-50/90 border-2 border-amber-300 p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-3 shadow-xs">
+                <div className="w-14 h-14 rounded-full bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-amber-700 shadow-2xs">
+                  <Clock className="w-7 h-7" />
+                </div>
+                <div>
+                  <span className="px-3 py-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                    {isBangla ? 'ক্লাস এখনও শুরু হয়নি' : 'Not Started'}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-black text-amber-950 font-heading mt-2">
+                    {isBangla ? 'শুধুমাত্র ক্লাসের সময়েই কিউআর কোড চালু হবে' : 'QR Generation Locked Until Class Start'}
+                  </h3>
+                </div>
+                <p className="text-xs font-medium text-amber-900/90 leading-relaxed max-w-sm">
+                  {isBangla
+                    ? `এই ক্লাসটি ${d(activeSession?.session_date || '')} তারিখে ${d((activeSession?.start_time || '').slice(0, 5))} থেকে ${d((activeSession?.end_time || '').slice(0, 5))} পর্যন্ত নির্ধারিত। ক্লাসের নির্ধারিত সময় শুরুর পূর্বে কিউআর কোড জেনারেট করা যাবে না।`
+                    : `This class is scheduled for ${d((activeSession?.start_time || '').slice(0, 5))} - ${d((activeSession?.end_time || '').slice(0, 5))}. QR code can only be generated during class time.`}
+                </p>
+                <div className="mt-2">
+                  <button
+                    onClick={() => {
+                      if (activeSession && getSessionTimingState(activeSession) === 'LIVE') {
+                        fetchQrToken();
+                      } else {
+                        toast(isBangla ? 'এখনও ক্লাসের সময় হয়নি।' : 'Not class time yet.');
+                      }
+                    }}
+                    className="px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 text-white" />
+                    <span>{isBangla ? 'সময় রিফ্রেশ করুন' : 'Check Live Status'}</span>
+                  </button>
+                </div>
+              </div>
+            ) : timingState === 'ENDED' ? (
+              <div className="w-full max-w-md rounded-2xl bg-slate-50 border-2 border-slate-300 p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-3 shadow-xs">
+                <div className="w-14 h-14 rounded-full bg-slate-200 border-2 border-slate-300 flex items-center justify-center text-slate-700 shadow-2xs">
+                  <Lock className="w-7 h-7" />
+                </div>
+                <div>
+                  <span className="px-3 py-0.5 bg-slate-200 text-slate-800 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                    {isBangla ? 'ক্লাসের সময় সমাপ্ত' : 'Class Ended'}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 font-heading mt-2">
+                    {isBangla ? 'ক্লাসের সময় ব্যতীত কিউআর কোড বন্ধ থাকে' : 'QR Generation Locked - Class Ended'}
+                  </h3>
+                </div>
+                <p className="text-xs font-medium text-slate-600 leading-relaxed max-w-sm">
+                  {isBangla
+                    ? `এই ক্লাসের নির্ধারিত সময় (${d((activeSession?.start_time || '').slice(0, 5))} - ${d((activeSession?.end_time || '').slice(0, 5))}) শেষ হয়ে গেছে। ক্লাসের সময় ব্যতীত অন্য কোনো সময়ে কিউআর কোড চালু করা যায় না।`
+                    : `This class ended at ${d((activeSession?.end_time || '').slice(0, 5))}. Outside class time, QR codes cannot be generated.`}
+                </p>
+                <div className="mt-2 flex flex-col sm:flex-row gap-2 w-full justify-center">
+                  <Link
+                    href="/teacher/attendance"
+                    className="px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-white" />
+                    <span>{isBangla ? 'ম্যানুয়াল হাজিরা শিট দেখুন' : 'View Attendance Sheet'}</span>
+                  </Link>
+                </div>
+              </div>
+            ) : loadingToken && !qrToken ? (
               <div className="w-72 h-72 rounded-2xl bg-[#F8FAFC] border-2 border-dashed border-[#CBD5E1] flex flex-col items-center justify-center gap-3">
                 <RefreshCw className="w-8 h-8 text-[#0F766E] animate-spin" />
                 <p className="text-xs font-bold text-[#475569]">
@@ -360,19 +457,19 @@ export default function LiveQrProjectorPage() {
                 </p>
                 <div className="flex flex-col w-full gap-2 mt-1">
                   <button
-                    onClick={handleReopenWindow}
-                    disabled={reopeningWindow}
-                    className="w-full py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl border border-transparent transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 text-white ${reopeningWindow ? 'animate-spin' : ''}`} />
-                    <span>{isBangla ? 'এখনই কিউআর উইন্ডো চালু করুন' : 'Activate QR Window Now'}</span>
-                  </button>
-                  <button
                     onClick={fetchQrToken}
-                    className="w-full py-2 bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-xs font-bold rounded-xl border border-[#E2E8F0] transition cursor-pointer"
+                    className="w-full py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    {isBangla ? 'আবার চেষ্টা করুন' : 'Retry'}
+                    <RefreshCw className="w-3.5 h-3.5 text-white" />
+                    <span>{isBangla ? 'আবার চেষ্টা করুন' : 'Retry'}</span>
                   </button>
+                  <Link
+                    href="/teacher/attendance"
+                    className="w-full py-2 bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-xs font-bold rounded-xl border border-[#E2E8F0] transition flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
+                    <span>{isBangla ? 'ম্যানুয়াল হাজিরা শিট' : 'Manual Attendance'}</span>
+                  </Link>
                 </div>
               </div>
             ) : qrToken ? (

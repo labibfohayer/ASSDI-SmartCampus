@@ -417,6 +417,23 @@ class TestAttendanceEngine:
             res_after = api_client.post(f"/api/v1/class-sessions/{session.id}/qr-token/")
             assert res_after.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_teacher_cannot_bypass_qr_window_with_force_or_demo_params(self, api_client, attendance_setup_data):
+        """Teacher can never bypass class time window using force=true or demo=true query params."""
+        data = attendance_setup_data
+        session = data["session_today"]
+        teacher = data["teacher_user"]
+        api_client.force_authenticate(user=teacher)
+
+        after_window = datetime.datetime.combine(session.session_date, datetime.time(9, 30), tzinfo=data["dhaka_tz"])
+        with patch("apps.class_sessions.views.timezone.now", return_value=after_window):
+            # Teacher tries force=true -> rejected
+            res_force = api_client.post(f"/api/v1/class-sessions/{session.id}/qr-token/?force=true")
+            assert res_force.status_code == status.HTTP_400_BAD_REQUEST
+
+            # Teacher tries demo=true -> rejected
+            res_demo = api_client.post(f"/api/v1/class-sessions/{session.id}/qr-token/?demo=true")
+            assert res_demo.status_code == status.HTTP_400_BAD_REQUEST
+
     def test_qr_token_generation_on_draft_or_cancelled_session_rejected(self, api_client, attendance_setup_data):
         """5. QR token generation on draft or cancelled session is rejected (HTTP 400)."""
         data = attendance_setup_data
