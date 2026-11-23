@@ -47,10 +47,16 @@ class AttendanceViewSet(viewsets.GenericViewSet):
         serializer = QRScanRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         token = serializer.validated_data["qr_token"]
+        is_offline_sync = serializer.validated_data.get("is_offline_sync", False)
+        offline_scanned_at = serializer.validated_data.get("offline_scanned_at")
 
         # 1. Cryptographic Token Verification
         try:
-            session_id = QRCodeService.verify_token(token)
+            if is_offline_sync:
+                session_id, token_dt = QRCodeService.verify_offline_sync_token(token)
+            else:
+                session_id = QRCodeService.verify_token(token)
+                token_dt = timezone.now()
         except (TokenExpiredError, InvalidTokenError) as e:
             raise DRFValidationError({"qr_token": str(e)})
 
@@ -78,21 +84,41 @@ class AttendanceViewSet(viewsets.GenericViewSet):
 
         # 5. Timing Window in Asia/Dhaka
         dhaka_tz = zoneinfo.ZoneInfo("Asia/Dhaka")
-        now_dhaka = timezone.now().astimezone(dhaka_tz)
         session_start_dt = datetime.datetime.combine(session.session_date, session.start_time, tzinfo=dhaka_tz)
-
-        if now_dhaka < session_start_dt:
-            raise DRFValidationError({"detail": "QR attendance scanning opens at class start time."})
-
         late_threshold_mins = get_late_threshold_minutes()
         qr_window_mins = get_qr_window_minutes()
 
-        if now_dhaka <= session_start_dt + datetime.timedelta(minutes=late_threshold_mins):
-            status_val = AttendanceStatus.PRESENT
-        elif now_dhaka <= session_start_dt + datetime.timedelta(minutes=qr_window_mins):
-            status_val = AttendanceStatus.LATE
+        if is_offline_sync:
+            effective_time = (offline_scanned_at or token_dt).astimezone(dhaka_tz)
+            if effective_time.date() != session.session_date:
+                raise DRFValidationError({"detail": "Offline QR token is not from today's session."})
+
+            if effective_time < session_start_dt:
+                raise DRFValidationError({"detail": "QR attendance scanning opens at class start time."})
+
+            if effective_time <= session_start_dt + datetime.timedelta(minutes=late_threshold_mins):
+                status_val = AttendanceStatus.PRESENT
+            elif effective_time <= session_start_dt + datetime.timedelta(minutes=qr_window_mins):
+                status_val = AttendanceStatus.LATE
+            else:
+                raise DRFValidationError({"detail": "QR attendance window had closed when token was generated."})
+
+            marked_time = effective_time
+            record_reason = "Offline QR sync"
         else:
-            raise DRFValidationError({"detail": "QR attendance window has closed."})
+            now_dhaka = timezone.now().astimezone(dhaka_tz)
+            if now_dhaka < session_start_dt:
+                raise DRFValidationError({"detail": "QR attendance scanning opens at class start time."})
+
+            if now_dhaka <= session_start_dt + datetime.timedelta(minutes=late_threshold_mins):
+                status_val = AttendanceStatus.PRESENT
+            elif now_dhaka <= session_start_dt + datetime.timedelta(minutes=qr_window_mins):
+                status_val = AttendanceStatus.LATE
+            else:
+                raise DRFValidationError({"detail": "QR attendance window has closed."})
+
+            marked_time = timezone.now()
+            record_reason = ""
 
         # 6. Duplicate Scan Protection (HTTP 409 Conflict)
         if AttendanceRecord.objects.filter(session=session, student=student).exists():
@@ -107,7 +133,8 @@ class AttendanceViewSet(viewsets.GenericViewSet):
             student=student,
             status=status_val,
             method=AttendanceMethod.QR,
-            marked_at=timezone.now(),
+            marked_at=marked_time,
+            reason=record_reason,
         )
 
         return Response(AttendanceRecordSerializer(record).data, status=status.HTTP_201_CREATED)

@@ -28,12 +28,15 @@ import {
   Award,
   FileCheck2,
   ShieldCheck,
+  WifiOff,
+  CloudUpload,
 } from 'lucide-react';
 import WebQRScannerModal from '@/components/student/WebQRScannerModal';
 import StudentIdCardModal from '@/components/student/StudentIdCardModal';
 import LectureMaterialsModal, { SessionMaterialItem } from '@/components/student/LectureMaterialsModal';
 import { GraduationCertificateModal, GraduationData } from '@/components/student/GraduationCertificateModal';
 import QuizAndHomeworkModal from '@/components/student/QuizAndHomeworkModal';
+import { getOfflineQueue, syncOfflineAttendanceQueue } from '@/lib/offlineAttendance';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -141,6 +144,36 @@ export default function StudentPortalPage() {
   const [assignmentsModalOpen, setAssignmentsModalOpen] = useState(false);
   const [selectedSessionForAssignments, setSelectedSessionForAssignments] = useState<ClassSessionItem | null>(null);
 
+  // Offline QR Attendance Sync state
+  const [offlineQueueCount, setOfflineQueueCount] = useState<number>(0);
+  const [isSyncingOffline, setIsSyncingOffline] = useState<boolean>(false);
+
+  const handleManualSyncOffline = async () => {
+    setIsSyncingOffline(true);
+    try {
+      const res = await syncOfflineAttendanceQueue(() => {
+        loadStudentData();
+      });
+      if (res.syncedCount > 0) {
+        toast.success(
+          isBangla
+            ? `আলহামদুলিল্লাহ! ${res.syncedCount}টি অফলাইন উপস্থিতি সফলভাবে সার্ভারে সিঙ্ক হয়েছে।`
+            : `Successfully synced ${res.syncedCount} offline attendance record(s)!`
+        );
+        loadStudentData();
+      } else if (res.failedCount > 0) {
+        toast.error(
+          isBangla
+            ? `সিঙ্ক ব্যর্থ হয়েছে: ${res.errors[0] || 'পুনরায় চেষ্টা করুন'}`
+            : `Sync failed: ${res.errors[0] || 'Please retry'}`
+        );
+      }
+    } finally {
+      setIsSyncingOffline(false);
+      setOfflineQueueCount(getOfflineQueue().length);
+    }
+  };
+
   // Feedback modal / card
   const [selectedSessionForFeedback, setSelectedSessionForFeedback] = useState<ClassSessionItem | null>(null);
   const [feedbackRating, setFeedbackRating] = useState<number>(5);
@@ -198,10 +231,45 @@ export default function StudentPortalPage() {
     window.addEventListener('popstate', () => handleUrlTab());
     window.addEventListener('assdi-tab-navigate', onTabNav);
     window.addEventListener('student-tab-change', onDirectTab);
+
+    // Offline Attendance Sync Listeners
+    const updateQueueCount = () => {
+      setOfflineQueueCount(getOfflineQueue().length);
+    };
+    updateQueueCount();
+
+    const handleAutoSync = async () => {
+      const queue = getOfflineQueue();
+      if (queue.length > 0) {
+        const res = await syncOfflineAttendanceQueue(() => {
+          loadStudentData();
+        });
+        if (res.syncedCount > 0) {
+          toast.success(
+            isBangla
+              ? `ইন্টারনেট সংযোগ সক্রিয় হওয়ায় ${res.syncedCount}টি অফলাইন উপস্থিতি অটো-সিঙ্ক সম্পন্ন হয়েছে!`
+              : `Connection active: auto-synced ${res.syncedCount} offline scan(s)!`
+          );
+          loadStudentData();
+        }
+      }
+    };
+
+    window.addEventListener('online', handleAutoSync);
+    window.addEventListener('assdi_offline_queue_updated', updateQueueCount);
+    window.addEventListener('assdi_attendance_synced', loadStudentData);
+
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      handleAutoSync();
+    }
+
     return () => {
       window.removeEventListener('popstate', () => handleUrlTab());
       window.removeEventListener('assdi-tab-navigate', onTabNav);
       window.removeEventListener('student-tab-change', onDirectTab);
+      window.removeEventListener('online', handleAutoSync);
+      window.removeEventListener('assdi_offline_queue_updated', updateQueueCount);
+      window.removeEventListener('assdi_attendance_synced', loadStudentData);
     };
   }, [user]);
 
@@ -694,6 +762,42 @@ export default function StudentPortalPage() {
           </p>
         </div>
       </div>
+
+      {/* Offline QR Attendance Sync Notice Banner */}
+      {offlineQueueCount > 0 && (
+        <div className="bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/5 border border-amber-300 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center text-[#B45309] shrink-0 shadow-2xs">
+              <WifiOff className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>
+                  {isBangla
+                    ? `${offlineQueueCount}টি অফলাইন কিউআর উপস্থিতি সিঙ্কের অপেক্ষায় রয়েছে`
+                    : `${offlineQueueCount} offline attendance scan(s) pending sync`}
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-900 border border-amber-300">
+                  {isBangla ? 'অফলাইন ক্যাশ' : 'Offline Cache'}
+                </span>
+              </p>
+              <p className="text-[11px] text-slate-600 mt-0.5">
+                {isBangla
+                  ? 'ক্লাসরুমে ইন্টারনেট ড্রপ করলেও কিউআর নিরাপদে ডিভাইসে সংরক্ষিত আছে। ইন্টারনেট সংযোগ পাওয়ার সাথে সাথে সার্ভারে অটো-সিঙ্ক হয়ে যাবে।'
+                  : 'Preserved locally during classroom WiFi drops. It will automatically synchronize as soon as connection is restored.'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleManualSyncOffline}
+            disabled={isSyncingOffline}
+            className="px-4 py-2 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-white ${isSyncingOffline ? 'animate-spin' : ''}`} />
+            <span>{isBangla ? 'এখনই সিঙ্ক করুন' : 'Sync Now'}</span>
+          </button>
+        </div>
+      )}
 
       {/* Modern Segmented Tabs Bar */}
       <div id="student-tab-section" className="bg-slate-200/70 p-1.5 rounded-xl inline-flex gap-1.5 border border-slate-200 max-w-full overflow-x-auto scroll-mt-24">

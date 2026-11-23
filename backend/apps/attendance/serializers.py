@@ -16,6 +16,16 @@ class QRScanRequestSerializer(serializers.Serializer):
         allow_blank=False,
         help_text="Signed cryptographic rotating QR token displayed by teacher.",
     )
+    is_offline_sync = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text="Flag indicating this scan was captured offline and is syncing upon internet reconnection.",
+    )
+    offline_scanned_at = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+        help_text="Client timestamp when the QR was scanned offline in the classroom.",
+    )
 
 
 class AttendanceRecordSerializer(serializers.ModelSerializer):

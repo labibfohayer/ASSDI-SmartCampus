@@ -13,9 +13,16 @@ import {
   FlipHorizontal,
   Sparkles,
   ShieldCheck,
+  WifiOff,
+  CloudUpload,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
+import {
+  addScanToOfflineQueue,
+  getOfflineQueue,
+  syncOfflineAttendanceQueue,
+} from '@/lib/offlineAttendance';
 
 interface WebQRScannerModalProps {
   isOpen: boolean;
@@ -42,9 +49,36 @@ export default function WebQRScannerModal({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [manualToken, setManualToken] = useState<string>('');
   const [scanResult, setScanResult] = useState<{
-    status: 'success' | 'late' | 'already' | 'error';
+    status: 'success' | 'late' | 'already' | 'error' | 'offline_queued';
     message: string;
   } | null>(null);
+
+  // Offline-first sync states
+  const [isOffline, setIsOffline] = useState<boolean>(false);
+  const [pendingOfflineCount, setPendingOfflineCount] = useState<number>(0);
+  const [syncingQueue, setSyncingQueue] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkOnline = () => {
+      setIsOffline(typeof navigator !== 'undefined' ? !navigator.onLine : false);
+    };
+    const updateQueueCount = () => {
+      setPendingOfflineCount(getOfflineQueue().length);
+    };
+
+    checkOnline();
+    updateQueueCount();
+
+    window.addEventListener('online', checkOnline);
+    window.addEventListener('offline', checkOnline);
+    window.addEventListener('assdi_offline_queue_updated', updateQueueCount);
+
+    return () => {
+      window.removeEventListener('online', checkOnline);
+      window.removeEventListener('offline', checkOnline);
+      window.removeEventListener('assdi_offline_queue_updated', updateQueueCount);
+    };
+  }, []);
 
   // Stop camera tracks cleanly
   const stopCamera = useCallback(() => {
@@ -93,6 +127,22 @@ export default function WebQRScannerModal({
       // Stop camera while processing
       stopCamera();
 
+      // Check if device is offline before calling backend
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        addScanToOfflineQueue(token);
+        if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+          navigator.vibrate([150, 50, 150]);
+        }
+        setScanResult({
+          status: 'offline_queued',
+          message: isBangla
+            ? 'ইন্টারনেট ড্রপ করায় কিউআর কোডটি অফলাইনে সুরক্ষিতভাবে জমা রাখা হয়েছে। ইন্টারনেট পাওয়ার সাথে সাথে স্বয়ংক্রিয়ভাবে সার্ভারে সিঙ্ক হয়ে যাবে।'
+            : 'Classroom network is offline. QR attendance has been saved locally and will auto-sync once connection returns.',
+        });
+        setSubmitting(false);
+        return;
+      }
+
       try {
         const response = await api.post('/api/v1/attendance/qr-scan/', {
           qr_token: token,
@@ -119,6 +169,26 @@ export default function WebQRScannerModal({
 
         onSuccess();
       } catch (err: any) {
+        const isNetworkError =
+          !err.response ||
+          err.code === 'ERR_NETWORK' ||
+          err.message?.includes('Network Error') ||
+          (typeof navigator !== 'undefined' && !navigator.onLine);
+
+        if (isNetworkError) {
+          addScanToOfflineQueue(token);
+          if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+            navigator.vibrate([150, 50, 150]);
+          }
+          setScanResult({
+            status: 'offline_queued',
+            message: isBangla
+              ? 'ইন্টারনেট ড্রপ করায় কিউআর কোডটি অফলাইনে সুরক্ষিতভাবে জমা রাখা হয়েছে। ইন্টারনেট পাওয়ার সাথে সাথে স্বয়ংক্রিয়ভাবে সার্ভারে সিঙ্ক হয়ে যাবে।'
+              : 'Classroom network is offline. QR attendance has been saved locally and will auto-sync once connection returns.',
+          });
+          return;
+        }
+
         const errorData = err.response?.data;
         const statusCode = err.response?.status;
 
@@ -148,6 +218,32 @@ export default function WebQRScannerModal({
     },
     [submitting, isBangla, stopCamera, onSuccess]
   );
+
+  // Manual Trigger to Synchronize Offline Queue
+  const handleSyncQueue = async () => {
+    setSyncingQueue(true);
+    try {
+      const res = await syncOfflineAttendanceQueue(() => {
+        onSuccess();
+      });
+      if (res.syncedCount > 0) {
+        setScanResult({
+          status: 'success',
+          message: isBangla
+            ? `আলহামদুলিল্লাহ! ${res.syncedCount}টি অফলাইন উপস্থিতি সার্ভারে সফলভাবে সিঙ্ক হয়েছে।`
+            : `Success! ${res.syncedCount} offline attendance scan(s) synced to server.`,
+        });
+        onSuccess();
+      } else if (res.errors.length > 0) {
+        setScanResult({
+          status: 'error',
+          message: res.errors[0],
+        });
+      }
+    } finally {
+      setSyncingQueue(false);
+    }
+  };
 
   // Scan frame loop using jsQR
   const scanFrame = useCallback(() => {
@@ -264,6 +360,12 @@ export default function WebQRScannerModal({
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] border border-[#FCD34D]">
                   Live
                 </span>
+                {isOffline && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-[#92400E] border border-amber-300 flex items-center gap-1">
+                    <WifiOff className="w-3 h-3 text-[#B45309]" />
+                    <span>{isBangla ? 'অফলাইন মোড' : 'Offline'}</span>
+                  </span>
+                )}
               </h3>
               <p className="text-xs text-slate-500 font-medium">
                 {isBangla
@@ -313,6 +415,31 @@ export default function WebQRScannerModal({
           </button>
         </div>
 
+        {/* Offline Queue Sync Bar */}
+        {pendingOfflineCount > 0 && (
+          <div className="mx-6 mt-3 p-3 bg-amber-50/90 border border-amber-300 rounded-xl flex items-center justify-between gap-2 text-xs text-amber-950">
+            <div className="flex items-center gap-2">
+              <CloudUpload className="w-4 h-4 text-[#B45309] shrink-0" />
+              <span>
+                {isBangla
+                  ? `${pendingOfflineCount}টি অফলাইন স্ক্যান সিঙ্কের অপেক্ষায় রয়েছে`
+                  : `${pendingOfflineCount} offline scan(s) awaiting sync`}
+              </span>
+            </div>
+            {!isOffline && (
+              <button
+                type="button"
+                onClick={handleSyncQueue}
+                disabled={syncingQueue}
+                className="px-3 py-1 bg-[#B45309] hover:bg-[#92400E] text-white text-[11px] font-bold rounded-lg flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs"
+              >
+                <RefreshCw className={`w-3 h-3 ${syncingQueue ? 'animate-spin' : ''}`} />
+                <span>{isBangla ? 'সিঙ্ক করুন' : 'Sync'}</span>
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-4">
           {/* Result Alert Message */}
@@ -323,18 +450,29 @@ export default function WebQRScannerModal({
                   ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                   : scanResult.status === 'already'
                     ? 'bg-amber-50 border-amber-200 text-amber-900'
-                    : 'bg-rose-50 border-rose-200 text-rose-900'
+                    : scanResult.status === 'offline_queued'
+                      ? 'bg-amber-50/90 border-amber-300 text-amber-950'
+                      : 'bg-rose-50 border-rose-200 text-rose-900'
               }`}
             >
               {scanResult.status === 'success' || scanResult.status === 'late' ? (
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               ) : scanResult.status === 'already' ? (
                 <ShieldCheck className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              ) : scanResult.status === 'offline_queued' ? (
+                <WifiOff className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
               ) : (
                 <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
               )}
               <div className="text-xs sm:text-sm font-semibold flex-1">
                 <p>{scanResult.message}</p>
+                {scanResult.status === 'offline_queued' && (
+                  <p className="text-xs font-normal text-amber-800 mt-1">
+                    {isBangla
+                      ? 'ইন্টারনেট ড্রপ বা ক্লাসরুমের নেটওয়ার্ক বন্ধ থাকলেও আপনার উপস্থিতি সংরক্ষিত থাকবে। ইন্টারনেট সংযোগ পেলেই স্বয়ংক্রিয়ভাবে সার্ভারে সিঙ্ক হবে।'
+                      : 'Your attendance is safely saved offline. It will auto-sync to the server as soon as internet connection is restored.'}
+                  </p>
+                )}
                 {(scanResult.status === 'success' || scanResult.status === 'late') && (
                   <p className="text-xs font-normal text-emerald-700 mt-1">
                     {isBangla
