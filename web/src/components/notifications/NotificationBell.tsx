@@ -134,6 +134,132 @@ export default function NotificationBell() {
     };
   }, [isOpen]);
 
+  const getNotificationDestination = (item: NotificationItem): string => {
+    const payload = item.data_payload || {};
+    const type = (item.notification_type || '').toLowerCase();
+    const title = (item.title || '').toLowerCase();
+    const body = (item.body || '').toLowerCase();
+
+    // 1. Explicit action_url in payload
+    if (payload.action_url && typeof payload.action_url === 'string') {
+      return payload.action_url;
+    }
+
+    // 2. Help Request or Reply
+    if (
+      type === 'help_request' ||
+      type === 'help_reply' ||
+      payload.help_request_id ||
+      title.includes('হেল্প') ||
+      title.includes('সমাধান') ||
+      title.includes('help') ||
+      body.includes('হেল্প') ||
+      body.includes('প্রশ্নের উত্তর')
+    ) {
+      if (user?.role === 'teacher') {
+        const q = payload.help_request_id ? `?highlight=${payload.help_request_id}` : '';
+        return `/teacher/help-requests${q}`;
+      }
+      return '/student?tab=help';
+    }
+
+    // 3. Announcements / Institutional Notices
+    if (
+      type === 'announcement' ||
+      payload.announcement_id ||
+      title.includes('বিজ্ঞপ্তি') ||
+      title.includes('নোটিস') ||
+      title.includes('নোটিশ') ||
+      title.includes('announcement') ||
+      title.includes('notice') ||
+      body.includes('বিজ্ঞপ্তি') ||
+      body.includes('নোটিস') ||
+      body.includes('অবগতির জন্য জানানো')
+    ) {
+      return '/announcements';
+    }
+
+    // 4. Attendance Alert / Consecutive Absence
+    if (
+      type === 'attendance_alert' ||
+      title.includes('অনুপস্থিতি') ||
+      title.includes('সতর্কতা') ||
+      title.includes('absence')
+    ) {
+      if (user?.role === 'super_admin' || user?.role === 'coordinator' || user?.role === 'observer') {
+        return '/coordinator/at-risk';
+      }
+      if (user?.role === 'teacher') {
+        return '/teacher/attendance';
+      }
+      return '/student?tab=attendance';
+    }
+
+    // 5. Class Reminder / Attendance Session
+    if (
+      type === 'class_reminder' ||
+      payload.session_id ||
+      title.includes('ক্লাস') ||
+      title.includes('সেশন') ||
+      title.includes('session')
+    ) {
+      if (user?.role === 'teacher') {
+        const q = payload.session_id ? `?session=${payload.session_id}` : '';
+        return `/teacher/attendance${q}`;
+      }
+      if (user?.role === 'student') {
+        return '/student?tab=today';
+      }
+      return '/coordinator';
+    }
+
+    // 6. Materials / Lecture Sheet
+    if (title.includes('লেকচার') || title.includes('হ্যান্ডআউট') || title.includes('material')) {
+      return '/student?tab=materials';
+    }
+
+    // 7. Certificate / Graduation
+    if (title.includes('সনদ') || title.includes('সার্টিফিকেট') || title.includes('certificate')) {
+      return '/student?tab=graduation';
+    }
+
+    // Fallback based on role
+    if (user?.role === 'super_admin') return '/admin';
+    if (user?.role === 'teacher') return '/teacher';
+    if (user?.role === 'coordinator' || user?.role === 'observer') return '/coordinator';
+    return '/student';
+  };
+
+  const handleNotificationClick = async (item: NotificationItem) => {
+    try {
+      if (!item.is_read) {
+        api.post(`/api/v1/notifications/${item.id}/mark-read/`).catch(() => {});
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === item.id ? { ...n, is_read: true } : n))
+        );
+        setUnreadCount((c) => Math.max(0, c - 1));
+      }
+
+      setIsOpen(false);
+      const destination = getNotificationDestination(item);
+
+      if (typeof window !== 'undefined') {
+        if (destination.startsWith('/student') && window.location.pathname === '/student') {
+          const url = new URL(destination, window.location.origin);
+          const tab = url.searchParams.get('tab') || 'today';
+          window.history.pushState(null, '', destination);
+          window.dispatchEvent(new CustomEvent('assdi-tab-navigate', { detail: { href: destination } }));
+          window.dispatchEvent(new CustomEvent('student-tab-change', { detail: tab }));
+          return;
+        }
+      }
+
+      router.push(destination);
+    } catch (err) {
+      console.error('Error handling notification click:', err);
+    }
+  };
+
   const handleMarkAsRead = async (id: number, payload?: Record<string, any>, navigate: boolean = true) => {
     try {
       await api.post(`/api/v1/notifications/${id}/mark-read/`);
@@ -142,25 +268,10 @@ export default function NotificationBell() {
       );
       setUnreadCount((c) => Math.max(0, c - 1));
 
-      // Smart role-based navigation based on notification payload
-      if (navigate && payload) {
-        setIsOpen(false);
-        if (payload.action_url) {
-          router.push(payload.action_url);
-        } else if (payload.help_request_id) {
-          if (user?.role === 'teacher') {
-            router.push(`/teacher/help-requests?highlight=${payload.help_request_id}`);
-          } else {
-            router.push('/student?tab=help');
-          }
-        } else if (payload.announcement_id) {
-          router.push('/announcements');
-        } else if (payload.session_id) {
-          if (user?.role === 'teacher') {
-            router.push(`/teacher/attendance?session=${payload.session_id}`);
-          } else if (user?.role === 'student') {
-            router.push('/student?tab=attendance');
-          }
+      if (navigate) {
+        const item = notifications.find((n) => n.id === id);
+        if (item) {
+          handleNotificationClick(item);
         }
       }
     } catch (err) {
@@ -405,11 +516,11 @@ export default function NotificationBell() {
                 return (
                   <div
                     key={item.id}
-                    onClick={() => handleMarkAsRead(item.id, item.data_payload, true)}
+                    onClick={() => handleNotificationClick(item)}
                     className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer text-left group relative ${
                       item.is_read
-                        ? 'bg-white hover:bg-[#F8FAFC]'
-                        : 'bg-[#F0FDFA] hover:bg-[#CCFBF1]/40 border-l-4 border-[#0F766E]'
+                        ? 'bg-white hover:bg-slate-50'
+                        : 'bg-[#FFFBEB] hover:bg-[#FEF3C7]/60 border-l-4 border-[#B45309]'
                     }`}
                   >
                     {/* Category Icon */}
@@ -430,7 +541,7 @@ export default function NotificationBell() {
 
                       <p
                         className={`text-xs mt-1 leading-snug line-clamp-1 ${
-                          item.is_read ? 'font-semibold text-[#0F172A]' : 'font-extrabold text-[#0F766E]'
+                          item.is_read ? 'font-semibold text-[#0F172A]' : 'font-extrabold text-[#B45309]'
                         }`}
                       >
                         {item.title}

@@ -169,13 +169,34 @@ export default function StudentPortalPage() {
     const onTabNav = (e: any) => {
       const href = e.detail?.href || '';
       handleUrlTab(href);
+      setTimeout(() => {
+        const tabEl = document.getElementById('student-tab-section');
+        if (tabEl) {
+          tabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 50);
+    };
+
+    const onDirectTab = (e: any) => {
+      const tab = e.detail;
+      if (['today', 'attendance', 'help', 'materials', 'graduation'].includes(tab)) {
+        setActiveTab(tab);
+        setTimeout(() => {
+          const tabEl = document.getElementById('student-tab-section');
+          if (tabEl) {
+            tabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 50);
+      }
     };
 
     window.addEventListener('popstate', () => handleUrlTab());
     window.addEventListener('assdi-tab-navigate', onTabNav);
+    window.addEventListener('student-tab-change', onDirectTab);
     return () => {
       window.removeEventListener('popstate', () => handleUrlTab());
       window.removeEventListener('assdi-tab-navigate', onTabNav);
+      window.removeEventListener('student-tab-change', onDirectTab);
     };
   }, [user]);
 
@@ -606,7 +627,7 @@ export default function StudentPortalPage() {
       </div>
 
       {/* Modern Segmented Tabs Bar */}
-      <div className="bg-slate-200/70 p-1.5 rounded-xl inline-flex gap-1.5 border border-slate-200 max-w-full overflow-x-auto">
+      <div id="student-tab-section" className="bg-slate-200/70 p-1.5 rounded-xl inline-flex gap-1.5 border border-slate-200 max-w-full overflow-x-auto scroll-mt-24">
         <button
           onClick={() => handleTabChange('today')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
