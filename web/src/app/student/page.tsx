@@ -524,15 +524,31 @@ export default function StudentPortalPage() {
         </div>
       </div>
 
-      {/* Attendance & Learning Metric Cards (Bento Style) */}
+      {/* Attendance & Learning Metric Cards (Bento Style & Clickable Shortcuts) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Attendance Rate */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => {
+            handleTabChange('attendance');
+            document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleTabChange('attendance');
+              document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+          title={isBangla ? 'উপস্থিতির বিস্তারিত হিস্ট্রি দেখতে ক্লিক করুন' : 'Click to view attendance history'}
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-700 transition-colors">
               {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 group-hover:bg-emerald-100 transition-colors">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
@@ -560,12 +576,28 @@ export default function StudentPortalPage() {
         </div>
 
         {/* Present Days */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => {
+            handleTabChange('attendance');
+            document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleTabChange('attendance');
+              document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+          title={isBangla ? 'উপস্থিত সেশনের তালিকা দেখতে ক্লিক করুন' : 'Click to view attended sessions'}
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-700 transition-colors">
               {isBangla ? 'উপস্থিত সেশন' : 'Present Sessions'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 group-hover:bg-emerald-100 transition-colors">
               <UserCheck className="w-4 h-4" />
             </div>
           </div>
@@ -582,12 +614,28 @@ export default function StudentPortalPage() {
         </div>
 
         {/* Absent Days */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => {
+            handleTabChange('attendance');
+            document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleTabChange('attendance');
+              document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+          title={isBangla ? 'অনুপস্থিতির হিস্ট্রি ও বিস্তারিত দেখতে ক্লিক করুন' : 'Click to view absence history'}
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-red-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-red-700 transition-colors">
               {isBangla ? 'অনুপস্থিতি' : 'Absences'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center border border-red-200">
+            <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center border border-red-200 group-hover:bg-red-100 transition-colors">
               <AlertCircle className="w-4 h-4 text-red-600" />
             </div>
           </div>
@@ -606,12 +654,28 @@ export default function StudentPortalPage() {
         </div>
 
         {/* Help Requests */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => {
+            handleTabChange('help');
+            document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleTabChange('help');
+              document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+          title={isBangla ? 'শিক্ষকের সমাধান ও উত্তর দেখতে ক্লিক করুন' : 'Click to view teacher solutions'}
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-blue-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-blue-900 transition-colors">
               {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center border border-blue-200">
+            <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center border border-blue-200 group-hover:bg-blue-200 transition-colors">
               <HelpCircle className="w-4 h-4 text-blue-900" />
             </div>
           </div>
