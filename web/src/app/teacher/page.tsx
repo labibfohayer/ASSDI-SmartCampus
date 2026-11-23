@@ -23,11 +23,13 @@ import {
   CheckCircle2,
   TrendingDown,
   BrainCircuit,
+  FileQuestion,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import QuizAndHomeworkManagerModal from '@/components/teacher/QuizAndHomeworkManagerModal';
 
 interface ClassSessionItem {
   id: number;
@@ -138,6 +140,10 @@ export default function TeacherOverviewPage() {
   const [aiLoading, setAiLoading] = useState(true);
   const [aiRefreshing, setAiRefreshing] = useState(false);
   const [isAiExpanded, setIsAiExpanded] = useState(true);
+
+  // Micro-Quiz & Homework Manager Modal
+  const [assignmentsManagerOpen, setAssignmentsManagerOpen] = useState(false);
+  const [selectedSessionForAssignments, setSelectedSessionForAssignments] = useState<ClassSessionItem | null>(null);
 
   const fetchAISummary = async (isManual = false) => {
     if (isManual) setAiRefreshing(true);
@@ -747,6 +753,18 @@ export default function TeacherOverviewPage() {
                       <span>{isBangla ? 'ম্যানুয়াল হাজিরা ও কারেকশন' : 'Manual Attendance'}</span>
                     </Link>
 
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSessionForAssignments(session);
+                        setAssignmentsManagerOpen(true);
+                      }}
+                      className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-[#92400E] border border-amber-300 text-xs font-bold rounded-lg flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
+                    >
+                      <FileQuestion className="w-3.5 h-3.5 text-[#B45309]" />
+                      <span>{isBangla ? 'কুইজ ও হোমওয়ার্ক পরিচালনা' : 'Quiz & Homework'}</span>
+                    </button>
+
                     <Link
                       href={`/teacher/understanding?sessionId=${session.id}${session.topic ? `&topicId=${session.topic}` : ''}`}
                       className="px-3.5 py-2 bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] border border-[#CCFBF1] text-xs font-semibold rounded-lg flex items-center gap-1.5 transition ml-auto cursor-pointer active:scale-95"
@@ -828,6 +846,16 @@ export default function TeacherOverviewPage() {
           </div>
         </div>
       </div>
+
+      {/* Quiz & Homework Manager Modal */}
+      <QuizAndHomeworkManagerModal
+        isOpen={assignmentsManagerOpen}
+        onClose={() => {
+          setAssignmentsManagerOpen(false);
+          setSelectedSessionForAssignments(null);
+        }}
+        session={selectedSessionForAssignments}
+      />
     </div>
   );
 }

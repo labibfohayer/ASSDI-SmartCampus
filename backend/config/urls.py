@@ -17,6 +17,7 @@ from apps.academic.views import (
     DepartmentViewSet,
     SubjectViewSet,
 )
+from apps.assignments.views import HomeworkViewSet, MicroQuizViewSet
 from apps.attendance.views import AttendanceViewSet
 from apps.batches.views import BatchViewSet, TeacherAssignmentViewSet
 from apps.class_sessions.views import ClassScheduleViewSet, ClassSessionViewSet, SessionMaterialViewSet
@@ -41,6 +42,8 @@ router.register(r"session-materials", SessionMaterialViewSet, basename="session-
 router.register(r"feedback", LearningFeedbackViewSet, basename="feedback")
 router.register(r"help-requests", HelpRequestViewSet, basename="help-request")
 router.register(r"attendance", AttendanceViewSet, basename="attendance")
+router.register(r"quizzes", MicroQuizViewSet, basename="quiz")
+router.register(r"homeworks", HomeworkViewSet, basename="homework")
 router.register(r"notifications", NotificationViewSet, basename="notification")
 router.register(r"announcements", AnnouncementViewSet, basename="announcement")
 

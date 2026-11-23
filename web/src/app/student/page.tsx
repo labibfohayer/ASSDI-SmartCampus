@@ -33,6 +33,7 @@ import WebQRScannerModal from '@/components/student/WebQRScannerModal';
 import StudentIdCardModal from '@/components/student/StudentIdCardModal';
 import LectureMaterialsModal, { SessionMaterialItem } from '@/components/student/LectureMaterialsModal';
 import { GraduationCertificateModal, GraduationData } from '@/components/student/GraduationCertificateModal';
+import QuizAndHomeworkModal from '@/components/student/QuizAndHomeworkModal';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -135,6 +136,10 @@ export default function StudentPortalPage() {
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState<string>('all');
   const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>('all');
   const [downloadingMatId, setDownloadingMatId] = useState<number | null>(null);
+
+  // Micro-Quiz & Homework Modal
+  const [assignmentsModalOpen, setAssignmentsModalOpen] = useState(false);
+  const [selectedSessionForAssignments, setSelectedSessionForAssignments] = useState<ClassSessionItem | null>(null);
 
   // Feedback modal / card
   const [selectedSessionForFeedback, setSelectedSessionForFeedback] = useState<ClassSessionItem | null>(null);
@@ -828,6 +833,18 @@ export default function StudentPortalPage() {
                       >
                         <BookOpen className="w-3.5 h-3.5 text-[#0F766E]" />
                         <span>{isBangla ? 'লেকচার শিট' : 'Lecture Sheet'}</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setSelectedSessionForAssignments(s);
+                          setAssignmentsModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold bg-amber-50 hover:bg-amber-100 text-[#92400E] border border-amber-300 rounded-md transition-colors cursor-pointer shadow-2xs"
+                        title={isBangla ? 'কুইজ ও বাড়ির কাজ' : 'Quiz & Homework'}
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-[#B45309]" />
+                        <span>{isBangla ? 'কুইজ ও বাড়ির কাজ' : 'Quiz & Homework'}</span>
                       </button>
 
                       {hasAttended(s.id) ? (
@@ -1868,6 +1885,16 @@ export default function StudentPortalPage() {
         isOpen={certModalOpen}
         onClose={() => setCertModalOpen(false)}
         data={graduationData}
+      />
+
+      {/* Student Micro-Quiz & Homework Submissions Modal */}
+      <QuizAndHomeworkModal
+        isOpen={assignmentsModalOpen}
+        onClose={() => {
+          setAssignmentsModalOpen(false);
+          setSelectedSessionForAssignments(null);
+        }}
+        session={selectedSessionForAssignments}
       />
     </div>
   );

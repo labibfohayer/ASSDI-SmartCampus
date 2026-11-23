@@ -17,6 +17,14 @@ from apps.academic.models import (
     SubjectAudience,
 )
 from apps.accounts.models import UserRole
+from apps.assignments.models import (
+    Homework,
+    HomeworkSubmission,
+    HomeworkSubmissionStatus,
+    MicroQuiz,
+    QuizAttempt,
+    QuizQuestion,
+)
 from apps.attendance.models import AttendanceMethod, AttendanceRecord, AttendanceStatus
 from apps.batches.models import Batch, BatchStatus, TeacherAssignment
 from apps.class_sessions.constants import (
@@ -684,6 +692,84 @@ class Command(BaseCommand):
                     )
                     if created:
                         total_attendance_seeded += 1
+
+            # 15. Seed Demo Micro-Quizzes and Homeworks for Batch 42
+            total_quizzes_seeded = 0
+            total_homeworks_seeded = 0
+            recent_b42_sessions = ClassSession.objects.filter(
+                batch=batch42, status=SessionStatus.PUBLISHED
+            ).order_by("-session_date")[:3]
+
+            for s_idx, session in enumerate(recent_b42_sessions):
+                quiz, q_created = MicroQuiz.objects.get_or_create(
+                    session=session,
+                    defaults={
+                        "topic": session.topic,
+                        "title": f"{session.subject.name}: তাৎক্ষণিক কুইক টেস্ট",
+                        "instructions": "ক্লাসে আলোচিত মূল পয়েন্টগুলোর ওপর ১-২টি ছোট প্রশ্ন। ১০-১৫ সেকেন্ডে উত্তর দিন।",
+                        "is_active": True,
+                        "created_by": session.teacher_user,
+                    },
+                )
+                if q_created:
+                    total_quizzes_seeded += 1
+                    # Add 2 questions
+                    q1 = QuizQuestion.objects.create(
+                        quiz=quiz,
+                        question_text=f"{session.subject.name}-এর মূল উদ্দেশ্য ও প্রায়োগিক কৌশল কোনটি?",
+                        options=[
+                            {"id": "A", "text": "বাস্তব কর্মক্ষেত্রে নির্ভুল ও সময়োপযোগী বাস্তবায়ন"},
+                            {"id": "B", "text": "শুধুমাত্র তাত্ত্বিক মুখস্থ বিদ্যা অর্জন"},
+                            {"id": "C", "text": "কাজের গতি ইচ্ছাকৃত হ্রাস করা"},
+                            {"id": "D", "text": "কোনো নিয়ম নীতি না মেনে কাজ করা"},
+                        ],
+                        correct_option="A",
+                        explanation="বাস্তব কর্মক্ষেত্রে নির্ভুল ও সময়োপযোগী বাস্তবায়নই এই কোর্সের মূল লক্ষ্য।",
+                        points=1,
+                    )
+                    q2 = QuizQuestion.objects.create(
+                        quiz=quiz,
+                        question_text="কোন বিষয়টি পেশাদারিত্বের প্রাথমিক ভিত্তি হিসেবে বিবেচিত হয়?",
+                        options=[
+                            {"id": "A", "text": "সময়ানুবর্তিতা ও সততা"},
+                            {"id": "B", "text": "দায়িত্ব এড়িয়ে চলা"},
+                            {"id": "C", "text": "যোগাযোগ বিচ্ছিন্ন রাখা"},
+                            {"id": "D", "text": "ভুল গোপন রাখা"},
+                        ],
+                        correct_option="A",
+                        explanation="সময়ানুবর্তিতা ও সততা প্রতিটি পেশাদার কাজের মূল স্তম্ভ।",
+                        points=1,
+                    )
+
+                # Seed a Homework for the session
+                hw, hw_created = Homework.objects.get_or_create(
+                    session=session,
+                    defaults={
+                        "title": f"{session.subject.name}: ব্যবহারিক হোমওয়ার্ক অ্যাসাইনমেন্ট",
+                        "instructions": "ক্লাসে প্রদর্শিত বাস্তব প্রজেক্টটি নিজে অনুশীলন করে গুগল ড্রাইভ বা গিটহাব লিংক জমা দিন।",
+                        "due_date": session.session_date + datetime.timedelta(days=7),
+                        "max_score": 10,
+                        "created_by": session.teacher_user,
+                    },
+                )
+                if hw_created:
+                    total_homeworks_seeded += 1
+                    # Seed submission for student 2 so student 1 can submit fresh
+                    sample_student = Student.objects.filter(student_id_number="STD-2026-042-002").first()
+                    if sample_student:
+                        HomeworkSubmission.objects.get_or_create(
+                            homework=hw,
+                            student=sample_student,
+                            defaults={
+                                "submission_text": "আসসালামু আলাইকুম স্যার, আজকের ক্লাসের নির্ধারিত ব্যবহারিক কাজটি সম্পন্ন করেছি।",
+                                "attachment_url": "https://drive.google.com/drive/folders/dummy-sbmc-42",
+                                "status": HomeworkSubmissionStatus.REVIEWED,
+                                "score": 9,
+                                "teacher_feedback": "মাশাআল্লাহ, চমৎকার কাজ হয়েছে। ধারাবাহিকতা বজায় রাখুন।",
+                                "reviewed_at": timezone.now(),
+                                "reviewed_by": session.teacher_user,
+                            },
+                        )
 
         # Output Summary & Credentials
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Teacher-to-Subject Mapping in Both Batches ==="))
