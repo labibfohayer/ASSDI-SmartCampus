@@ -262,15 +262,15 @@ export default function ManualAttendancePage() {
               <select
                 value={selectedSessionId || ''}
                 onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-                className="bg-transparent text-xs font-bold text-[#0F172A] focus:outline-none cursor-pointer min-w-[220px] max-w-xs sm:min-w-[260px] truncate"
+                className="bg-white text-xs font-bold text-[#0F172A] focus:outline-none cursor-pointer min-w-[220px] max-w-xs sm:min-w-[260px] truncate"
               >
                 {sessions.length === 0 ? (
-                  <option value="" disabled>
+                  <option value="" disabled className="bg-white text-slate-500">
                     {isBangla ? 'কোনো সেশন পাওয়া যায়নি' : 'No sessions available'}
                   </option>
                 ) : (
                   sessions.map((s) => (
-                    <option key={s.id} value={s.id} className="bg-white text-[#0F172A]">
+                    <option key={s.id} value={s.id} className="bg-white text-[#0F172A] font-medium py-1">
                       {s.subject_name || `Session #${s.id}`} - {d(s.session_date)} ({d(s.start_time.slice(0, 5))})
                     </option>
                   ))

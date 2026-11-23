@@ -281,7 +281,7 @@ export default function LiveQrProjectorPage() {
 
         <div className="flex items-center gap-3 flex-wrap">
           {/* Session Selector */}
-          <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-[#F8FAFC] dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-amber-800 rounded-xl shadow-xs">
+          <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-white border border-[#FCD34D] rounded-xl shadow-xs">
             <Clock className="w-4 h-4 text-[#0F766E] shrink-0" />
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">
@@ -290,10 +290,10 @@ export default function LiveQrProjectorPage() {
               <select
                 value={selectedSessionId || ''}
                 onChange={(e) => setSelectedSessionId(Number(e.target.value))}
-                className="bg-transparent text-xs font-bold text-[#0F172A] dark:text-amber-100 focus:outline-none cursor-pointer min-w-[220px] max-w-xs sm:min-w-[280px] truncate"
+                className="bg-white text-xs font-bold text-[#0F172A] focus:outline-none cursor-pointer min-w-[220px] max-w-xs sm:min-w-[280px] truncate"
               >
                 {sessions.length === 0 ? (
-                  <option value="" disabled>
+                  <option value="" disabled className="bg-white text-slate-500">
                     {isBangla ? 'কোনো সেশন পাওয়া যায়নি' : 'No sessions available'}
                   </option>
                 ) : (
@@ -306,7 +306,7 @@ export default function LiveQrProjectorPage() {
                         ? (isBangla ? '⏳ [আসন্ন]' : '⏳ [UPCOMING]')
                         : (isBangla ? '🔒 [সমাপ্ত]' : '🔒 [ENDED]');
                     return (
-                      <option key={s.id} value={s.id}>
+                      <option key={s.id} value={s.id} className="bg-white text-[#0F172A] font-medium py-1">
                         {prefix} {s.subject_name || `Session #${s.id}`} ({d(s.start_time.slice(0, 5))} - {d(s.end_time.slice(0, 5))})
                       </option>
                     );

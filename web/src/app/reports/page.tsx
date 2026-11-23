@@ -547,7 +547,7 @@ export default function ReportsPage() {
                 <select
                   value={filterMonth}
                   onChange={(e) => setFilterMonth(parseInt(e.target.value, 10))}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-1.5 text-xs font-semibold text-[#0F172A] bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 >
                   {[
                     'জানুয়ারি / January',
@@ -581,7 +581,7 @@ export default function ReportsPage() {
               <select
                 value={filterBatch}
                 onChange={(e) => setFilterBatch(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full px-3 py-1.5 text-xs font-semibold text-[#0F172A] bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               >
                 <option value="">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
                 {batches.map((b) => (
@@ -602,7 +602,7 @@ export default function ReportsPage() {
               <select
                 value={filterHelpStatus}
                 onChange={(e) => setFilterHelpStatus(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                className="w-full px-3 py-1.5 text-xs font-semibold text-[#0F172A] bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               >
                 <option value="">{isBangla ? 'সকল স্ট্যাটাস' : 'All Status'}</option>
                 <option value="pending">{isBangla ? 'অপেক্ষমান (Pending)' : 'Pending'}</option>

@@ -425,11 +425,11 @@ export default function AdminStudentsPage() {
             <select
               value={selectedBatch}
               onChange={(e) => setSelectedBatch(e.target.value)}
-              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 min-w-[150px]"
+              className="px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E] min-w-[150px]"
             >
-              <option value="">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
+              <option value="" className="bg-white text-[#0F172A]">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
               {batches.map((b) => (
-                <option key={b.id} value={b.id}>
+                <option key={b.id} value={b.id} className="bg-white text-[#0F172A]">
                   {b.name}
                 </option>
               ))}
@@ -439,12 +439,12 @@ export default function AdminStudentsPage() {
             <select
               value={selectedAudience}
               onChange={(e) => setSelectedAudience(e.target.value)}
-              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 min-w-[150px]"
+              className="px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E] min-w-[150px]"
             >
-              <option value="">{isBangla ? 'সকল পটভূমি' : 'All Backgrounds'}</option>
-              <option value="General">General</option>
-              <option value="Aliya">Aliya Madrasa</option>
-              <option value="Qawmi">Qawmi Madrasa</option>
+              <option value="" className="bg-white text-[#0F172A]">{isBangla ? 'সকল পটভূমি' : 'All Backgrounds'}</option>
+              <option value="General" className="bg-white text-[#0F172A]">General</option>
+              <option value="Aliya" className="bg-white text-[#0F172A]">Aliya Madrasa</option>
+              <option value="Qawmi" className="bg-white text-[#0F172A]">Qawmi Madrasa</option>
             </select>
           </div>
 

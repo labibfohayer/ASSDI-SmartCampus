@@ -361,11 +361,11 @@ export default function AdminSessionsPage() {
           <select
             value={selectedBatch}
             onChange={(e) => setSelectedBatch(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E] min-w-[170px]"
+            className="px-3 py-2 text-sm bg-white border border-[#E2E8F0] rounded-xl text-[#0F172A] font-semibold focus:outline-none focus:ring-2 focus:ring-[#0F766E] min-w-[170px]"
           >
-            <option value="all">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
+            <option value="all" className="bg-white text-[#0F172A]">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
             {batches.map((b) => (
-              <option key={b.id} value={b.id.toString()}>
+              <option key={b.id} value={b.id.toString()} className="bg-white text-[#0F172A]">
                 {b.name} ({b.code})
               </option>
             ))}
@@ -374,12 +374,12 @@ export default function AdminSessionsPage() {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E] min-w-[160px]"
+            className="px-3 py-2 text-sm bg-white border border-[#E2E8F0] rounded-xl text-[#0F172A] font-semibold focus:outline-none focus:ring-2 focus:ring-[#0F766E] min-w-[160px]"
           >
-            <option value="all">{isBangla ? 'সকল স্ট্যাটাস' : 'All Status'}</option>
-            <option value="published">{isBangla ? 'পাবলিশড' : 'Published'}</option>
-            <option value="draft">{isBangla ? 'ড্রাফট' : 'Draft'}</option>
-            <option value="cancelled">{isBangla ? 'বাতিলকৃত' : 'Cancelled'}</option>
+            <option value="all" className="bg-white text-[#0F172A]">{isBangla ? 'সকল স্ট্যাটাস' : 'All Status'}</option>
+            <option value="published" className="bg-white text-[#0F172A]">{isBangla ? 'পাবলিশড' : 'Published'}</option>
+            <option value="draft" className="bg-white text-[#0F172A]">{isBangla ? 'ড্রাফট' : 'Draft'}</option>
+            <option value="cancelled" className="bg-white text-[#0F172A]">{isBangla ? 'বাতিলকৃত' : 'Cancelled'}</option>
           </select>
 
           <input
@@ -672,11 +672,11 @@ export default function AdminSessionsPage() {
                 <select
                   value={genBatchId}
                   onChange={(e) => setGenBatchId(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  className="w-full px-3 py-2 text-sm bg-white border border-[#E2E8F0] rounded-xl text-[#0F172A] font-semibold focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 >
-                  <option value="">{isBangla ? 'সব সক্রিয় ব্যাচ' : 'All Active Batches'}</option>
+                  <option value="" className="bg-white text-[#0F172A]">{isBangla ? 'সব সক্রিয় ব্যাচ' : 'All Active Batches'}</option>
                   {batches.map((b) => (
-                    <option key={b.id} value={b.id.toString()}>
+                    <option key={b.id} value={b.id.toString()} className="bg-white text-[#0F172A]">
                       {b.name} ({b.code})
                     </option>
                   ))}
