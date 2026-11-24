@@ -34,8 +34,6 @@ import {
   Bookmark,
   Archive,
   Smartphone,
-  CreditCard,
-  MessageSquare,
 } from 'lucide-react';
 import { triggerPwaInstall } from '@/components/pwa/PwaInstaller';
 import { useAuth } from '@/contexts/AuthContext';
@@ -362,9 +360,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             titleEn: 'MAIN MENU',
             items: [
               {
-                href: '/student?tab=schedule',
-                labelBn: 'আজকের ক্লাস ও রুটিন',
-                labelEn: "Class Sessions & Routine",
+                href: '/student',
+                labelBn: 'আজকের ক্লাস ও মূল্যায়ন',
+                labelEn: "Today's Schedule & Feedback",
                 icon: Calendar,
               },
               {
@@ -373,9 +371,15 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelEn: 'Scan Attendance QR',
                 icon: QrCode,
               },
+            ],
+          },
+          {
+            titleBn: 'লার্নিং ও সাপোর্ট',
+            titleEn: 'LEARNING & SUPPORT',
+            items: [
               {
                 href: '/student?tab=materials',
-                labelBn: 'লেকচার শিট ও রিসোর্স',
+                labelBn: 'লেকচার শিট ও রিসোর্স হাব',
                 labelEn: 'Lecture Notes & Hub',
                 icon: BookOpen,
               },
@@ -386,22 +390,10 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 icon: CheckCircle2,
               },
               {
-                href: '/announcements',
-                labelBn: 'প্রাতিষ্ঠানিক নোটিশ বোর্ড',
-                labelEn: 'Notice Board',
-                icon: Megaphone,
-              },
-            ],
-          },
-          {
-            titleBn: 'অ্যানালিটিক্স ও রিপোর্টস',
-            titleEn: 'ANALYTICS & REPORTS',
-            items: [
-              {
-                href: '/student?tab=quizzes',
-                labelBn: 'কুইজ ও বাড়ির কাজ',
-                labelEn: 'Quizzes & Homework',
-                icon: FileText,
+                href: '/student?tab=help',
+                labelBn: 'শিক্ষকের সমাধান ও উত্তর',
+                labelEn: 'Teacher Help & Replies',
+                icon: HelpCircle,
               },
               {
                 href: '/student?tab=graduation',
@@ -410,28 +402,10 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 icon: Award,
               },
               {
-                href: '/student?card=true',
-                labelBn: 'আইডি ও এডমিট কার্ড',
-                labelEn: 'Student ID & Admit Card',
-                icon: CreditCard,
-              },
-            ],
-          },
-          {
-            titleBn: 'সাপোর্ট ও সহায়তা',
-            titleEn: 'SUPPORT',
-            items: [
-              {
-                href: '/student?tab=help',
-                labelBn: 'শিক্ষকের সমাধান ও উত্তর',
-                labelEn: 'Help & Support',
-                icon: HelpCircle,
-              },
-              {
-                href: '/student?tab=help&ask=true',
-                labelBn: 'সহায়তার আবেদন পাঠান',
-                labelEn: 'Submit Help Request',
-                icon: MessageSquare,
+                href: '/announcements',
+                labelBn: 'প্রাতিষ্ঠানিক নোটিশ বোর্ড',
+                labelEn: 'Notice Board',
+                icon: Megaphone,
               },
             ],
           },
@@ -694,10 +668,10 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         {/* Top: Institute Brand & Identity */}
         <div className="flex flex-col flex-1 min-h-0">
           {role === 'student' ? (
-            <div className="p-4 sm:p-5 border-b border-[#00241C] bg-[#002F25] flex flex-col items-center text-center shrink-0 relative">
+            <div className="p-3 pb-2 border-b border-[#00241C] bg-[#002F25] flex flex-col items-center text-center shrink-0 relative">
               <button
                 onClick={() => setMobileSidebarOpen(false)}
-                className="absolute top-3 right-3 p-1.5 rounded-full md:hidden cursor-pointer active:scale-95 transition bg-white/10 hover:bg-white/20 text-[#A7F3D0] border border-[#065F46]"
+                className="absolute top-2.5 right-2.5 p-1.5 rounded-full md:hidden cursor-pointer active:scale-95 transition bg-white/10 hover:bg-white/20 text-[#A7F3D0] border border-[#065F46]"
                 aria-label="Close navigation"
               >
                 <X className="w-4 h-4" />
@@ -708,23 +682,23 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 onClick={() => setMobileSidebarOpen(false)}
                 className="flex flex-col items-center group cursor-pointer"
               >
-                <div className="w-14 h-14 rounded-full bg-white p-2.5 flex items-center justify-center shadow-lg border-2 border-emerald-500/30 mb-2 group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-full bg-white p-2 flex items-center justify-center shadow-lg border-2 border-emerald-500/30 mb-1.5 group-hover:scale-105 transition-transform">
                   <Image
                     src="/logo.png"
                     alt="ASSDI Logo"
-                    width={40}
-                    height={40}
+                    width={36}
+                    height={36}
                     className="object-contain"
                   />
                 </div>
-                <span className="font-extrabold !text-white text-base tracking-tight leading-snug font-serif block">
+                <span className="font-extrabold !text-white text-sm tracking-tight leading-snug font-serif block">
                   As-Sunnah
                 </span>
-                <span className="text-[11px] font-semibold !text-[#A7F3D0] tracking-wider mt-0.5 block">
+                <span className="text-[10px] font-semibold !text-[#A7F3D0] tracking-wider mt-0.5 block">
                   Skill Development Institute
                 </span>
-                <div className="mt-1.5">
-                  <span className="inline-block px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-[#00221A] text-[#FDE68A] border border-[#065F46]">
+                <div className="mt-1">
+                  <span className="inline-block px-2 py-0.5 text-[8.5px] font-bold uppercase rounded-md tracking-wider bg-[#00221A] text-[#FDE68A] border border-[#065F46]">
                     STUDENT / শিক্ষার্থী
                   </span>
                 </div>
@@ -771,31 +745,13 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             </div>
           )}
 
-          {/* Top Primary Orange Button: Dashboard (Student only, as in Reference Image 1) */}
-          {role === 'student' && (
-            <div className="px-3 pt-3 pb-1">
-              <Link
-                href="/student"
-                onClick={() => handleNavClick('/student')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all shadow-md active:scale-98 cursor-pointer ${
-                  pathname === '/student' && (!currentSearch || currentSearch === '?tab=dashboard')
-                    ? 'bg-gradient-to-r from-[#FF8108] to-[#EA580C] text-white shadow-orange-950/40'
-                    : 'bg-[#00241C] text-[#D1FAE5] hover:bg-white/10 hover:text-white border border-[#065F46]'
-                }`}
-              >
-                <LayoutDashboard className="w-4 h-4 text-white shrink-0" />
-                <span>{isBangla ? 'ড্যাশবোর্ড' : 'Dashboard'}</span>
-              </Link>
-            </div>
-          )}
-
           {/* Navigation Items (Serial by Serial) */}
-          <nav className="p-3 space-y-6 overflow-y-auto flex-1">
+          <nav className="p-3 space-y-4 overflow-y-auto flex-1">
             {navSections.map((sec, secIdx) => (
               <div key={secIdx} className="space-y-1">
                 {(sec.titleBn || sec.titleEn) && (
                   <p
-                    className={`px-3 text-[10px] font-bold uppercase tracking-widest mb-2 font-serif ${
+                    className={`px-3 text-[10px] font-bold uppercase tracking-widest mb-1.5 font-serif ${
                       role === 'student' ? 'text-[#6EE7B7]' : 'text-[#B45309]'
                     }`}
                   >
@@ -901,18 +857,18 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               </div>
             )}
 
-            {/* Islamic Mosque Artwork Quote Card (Student Only - Ultra HD from User Image 3, placed after menu sections) */}
+            {/* Islamic Mosque Artwork Quote Card (Student Only - Pure Image with NO black border) */}
             {role === 'student' && (
-              <div className="pt-2">
-                <div className="rounded-2xl overflow-hidden border-2 border-[#D97706]/40 shadow-xl bg-[#00261E] relative group mx-0.5">
+              <div className="pt-2 px-1 flex justify-center">
+                <div className="relative group max-w-[210px]">
                   <Image
                     src="/islamic-sidebar-card.png"
-                    alt="জ্ঞানই শক্তি, দাওয়াই সফলতা"
-                    width={360}
-                    height={360}
+                    alt="জ্ঞানই শান্তি, দাওয়াই সফলতা"
+                    width={260}
+                    height={260}
                     priority
                     quality={100}
-                    className="w-full h-auto object-cover rounded-xl group-hover:scale-102 transition-transform duration-300"
+                    className="w-full h-auto max-h-[140px] object-contain group-hover:scale-102 transition-transform duration-300"
                   />
                 </div>
               </div>
@@ -922,7 +878,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
         {/* Bottom: User Card, Language Toggle & Logout */}
         <div
-          className={`p-3 border-t space-y-2.5 ${
+          className={`p-2.5 border-t space-y-2 shrink-0 ${
             role === 'student'
               ? 'border-[#00241C] bg-[#001F18]'
               : 'border-[#FCD34D] bg-[#FFFBEB]'
@@ -977,47 +933,52 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             </button>
           </div>
 
-          {/* Mobile PWA Install Trigger */}
-          <button
-            type="button"
-            onClick={triggerPwaInstall}
-            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition cursor-pointer ${
-              role === 'student'
-                ? 'bg-[#00281F] hover:bg-[#003429] text-[#D1FAE5] border border-[#065F46]'
-                : 'bg-white hover:bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D]'
-            }`}
-          >
-            <span className="flex items-center gap-1.5">
-              <Smartphone className={`w-3.5 h-3.5 ${role === 'student' ? 'text-[#FF8108]' : 'text-[#B45309]'}`} />
-              <span>{isBangla ? 'হোমস্ক্রিনে অ্যাপ ইনস্টল' : 'Install PWA App'}</span>
-            </span>
-            <span
-              className={`text-[9px] text-white px-1.5 py-0.5 rounded-md font-bold ${
-                role === 'student' ? 'bg-[#FF8108]' : 'bg-[#D97706]'
-              }`}
-            >
-              {isBangla ? 'যুক্ত করুন' : 'Install'}
-            </span>
-          </button>
+          {/* Student Compact PWA & Language Bar */}
+          {role === 'student' ? (
+            <div className="flex items-center justify-between gap-1.5 px-0.5 pt-0.5">
+              <button
+                type="button"
+                onClick={triggerPwaInstall}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-medium bg-[#00281F] hover:bg-[#003429] text-[#D1FAE5] border border-[#065F46] transition cursor-pointer"
+              >
+                <Smartphone className="w-3 h-3 text-[#FF8108]" />
+                <span>{isBangla ? 'অ্যাপ ইনস্টল' : 'Install PWA'}</span>
+              </button>
+              <LanguageSwitcher />
+            </div>
+          ) : (
+            <>
+              {/* Mobile PWA Install Trigger */}
+              <button
+                type="button"
+                onClick={triggerPwaInstall}
+                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition cursor-pointer bg-white hover:bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D]"
+              >
+                <span className="flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-[#B45309]" />
+                  <span>{isBangla ? 'হোমস্ক্রিনে অ্যাপ ইনস্টল' : 'Install PWA App'}</span>
+                </span>
+                <span className="text-[9px] text-white px-1.5 py-0.5 rounded-md font-bold bg-[#D97706]">
+                  {isBangla ? 'যুক্ত করুন' : 'Install'}
+                </span>
+              </button>
 
-          {/* Language Switcher Bar */}
-          <div className="flex items-center justify-between px-2 pt-1">
-            <span
-              className={`text-[11px] font-semibold flex items-center gap-1.5 ${
-                role === 'student' ? 'text-[#A7F3D0]' : 'text-[#64748B]'
-              }`}
-            >
-              <Globe className={`w-3.5 h-3.5 ${role === 'student' ? 'text-[#FF8108]' : 'text-[#D97706]'}`} />
-              <span>{isBangla ? 'ভাষা / Language' : 'Language'}</span>
-            </span>
-            <LanguageSwitcher />
-          </div>
+              {/* Language Switcher Bar */}
+              <div className="flex items-center justify-between px-2 pt-1">
+                <span className="text-[11px] font-semibold flex items-center gap-1.5 text-[#64748B]">
+                  <Globe className="w-3.5 h-3.5 text-[#D97706]" />
+                  <span>{isBangla ? 'ভাষা / Language' : 'Language'}</span>
+                </span>
+                <LanguageSwitcher />
+              </div>
+            </>
+          )}
 
           {/* Student Footer Copyright with Red Heart (Image 1 Style) */}
           {role === 'student' && (
-            <div className="text-center pt-2 pb-1 text-[10px] text-[#A7F3D0]/60 space-y-0.5 border-t border-[#00241C]">
+            <div className="text-center pt-1.5 pb-0.5 text-[9.5px] text-[#A7F3D0]/60 space-y-0.5 border-t border-[#00241C]">
               <p>© 2026 As-Sunnah Skill Development Institute</p>
-              <p className="flex items-center justify-center gap-1 text-[9.5px]">
+              <p className="flex items-center justify-center gap-1 text-[9px]">
                 <span>All rights reserved.</span>
                 <span className="text-rose-500 text-xs">❤️</span>
               </p>
