@@ -34,6 +34,8 @@ import {
   Bookmark,
   Archive,
   Smartphone,
+  CreditCard,
+  MessageSquare,
 } from 'lucide-react';
 import { triggerPwaInstall } from '@/components/pwa/PwaInstaller';
 import { useAuth } from '@/contexts/AuthContext';
@@ -357,12 +359,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         return [
           {
             titleBn: 'প্রধান মেনু',
-            titleEn: 'Main Menu',
+            titleEn: 'MAIN MENU',
             items: [
               {
-                href: '/student',
-                labelBn: 'আজকের ক্লাস ও মূল্যায়ন',
-                labelEn: "Today's Schedule & Feedback",
+                href: '/student?tab=schedule',
+                labelBn: 'আজকের ক্লাস ও রুটিন',
+                labelEn: "Class Sessions & Routine",
                 icon: Calendar,
               },
               {
@@ -371,15 +373,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelEn: 'Scan Attendance QR',
                 icon: QrCode,
               },
-            ],
-          },
-          {
-            titleBn: 'লার্নিং ও সাপোর্ট',
-            titleEn: 'Learning & Support',
-            items: [
               {
                 href: '/student?tab=materials',
-                labelBn: 'লেকচার শিট ও রিসোর্স হাব',
+                labelBn: 'লেকচার শিট ও রিসোর্স',
                 labelEn: 'Lecture Notes & Hub',
                 icon: BookOpen,
               },
@@ -390,10 +386,22 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 icon: CheckCircle2,
               },
               {
-                href: '/student?tab=help',
-                labelBn: 'শিক্ষকের সমাধান ও উত্তর',
-                labelEn: 'Teacher Help & Replies',
-                icon: HelpCircle,
+                href: '/announcements',
+                labelBn: 'প্রাতিষ্ঠানিক নোটিশ বোর্ড',
+                labelEn: 'Notice Board',
+                icon: Megaphone,
+              },
+            ],
+          },
+          {
+            titleBn: 'অ্যানালিটিক্স ও রিপোর্টস',
+            titleEn: 'ANALYTICS & REPORTS',
+            items: [
+              {
+                href: '/student?tab=quizzes',
+                labelBn: 'কুইজ ও বাড়ির কাজ',
+                labelEn: 'Quizzes & Homework',
+                icon: FileText,
               },
               {
                 href: '/student?tab=graduation',
@@ -402,10 +410,28 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 icon: Award,
               },
               {
-                href: '/announcements',
-                labelBn: 'প্রাতিষ্ঠানিক নোটিশ বোর্ড',
-                labelEn: 'Notice Board',
-                icon: Megaphone,
+                href: '/student?card=true',
+                labelBn: 'আইডি ও এডমিট কার্ড',
+                labelEn: 'Student ID & Admit Card',
+                icon: CreditCard,
+              },
+            ],
+          },
+          {
+            titleBn: 'সাপোর্ট ও সহায়তা',
+            titleEn: 'SUPPORT',
+            items: [
+              {
+                href: '/student?tab=help',
+                labelBn: 'শিক্ষকের সমাধান ও উত্তর',
+                labelEn: 'Help & Support',
+                icon: HelpCircle,
+              },
+              {
+                href: '/student?tab=help&ask=true',
+                labelBn: 'সহায়তার আবেদন পাঠান',
+                labelEn: 'Submit Help Request',
+                icon: MessageSquare,
               },
             ],
           },
@@ -667,74 +693,101 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
       >
         {/* Top: Institute Brand & Identity */}
         <div className="flex flex-col flex-1 min-h-0">
-          <div
-            className={`p-4 sm:p-5 border-b flex items-start justify-between shrink-0 ${
-              role === 'student'
-                ? 'bg-[#002F25] border-[#00241C]'
-                : 'bg-[#FFFBEB] border-[#FCD34D]'
-            }`}
-          >
-            <Link
-              href={role === 'super_admin' ? '/admin' : role === 'teacher' ? '/teacher' : role === 'student' ? '/student' : '/coordinator'}
-              onClick={() => setMobileSidebarOpen(false)}
-              className="flex items-center gap-3 group"
-            >
-              <div
-                className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl p-1.5 flex items-center justify-center shrink-0 shadow-xs transition-transform group-hover:scale-105 ${
-                  role === 'student'
-                    ? 'bg-white/10 border border-[#047857]'
-                    : 'bg-white border border-[#FCD34D]'
-                }`}
+          {role === 'student' ? (
+            <div className="p-4 sm:p-5 border-b border-[#00241C] bg-[#002F25] flex flex-col items-center text-center shrink-0 relative">
+              <button
+                onClick={() => setMobileSidebarOpen(false)}
+                className="absolute top-3 right-3 p-1.5 rounded-full md:hidden cursor-pointer active:scale-95 transition bg-white/10 hover:bg-white/20 text-[#A7F3D0] border border-[#065F46]"
+                aria-label="Close navigation"
               >
-                <Image
-                  src="/logo.png"
-                  alt="ASSDI Logo"
-                  width={34}
-                  height={34}
-                  className="object-contain"
-                />
-              </div>
-              <div className="min-w-0">
-                <h1
-                  className={`font-extrabold text-xs sm:text-sm tracking-tight leading-snug line-clamp-1 font-serif ${
-                    role === 'student' ? 'text-white' : 'text-[#0F172A]'
-                  }`}
-                >
-                  {t('brand.name')}
-                </h1>
-                <p
-                  className={`text-[11px] font-medium line-clamp-1 ${
-                    role === 'student' ? 'text-[#A7F3D0]/85' : 'text-[#64748B]'
-                  }`}
-                >
-                  {t('brand.course')}
-                </p>
-                <div className="mt-1">
-                  <span
-                    className={`inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider ${
-                      role === 'student'
-                        ? 'bg-[#00221A] text-[#FDE68A] border border-[#065F46]'
-                        : 'bg-white text-[#B45309] border border-[#FCD34D]'
-                    }`}
-                  >
-                    {roleBadge.label}
+                <X className="w-4 h-4" />
+              </button>
+
+              <Link
+                href="/student"
+                onClick={() => setMobileSidebarOpen(false)}
+                className="flex flex-col items-center group cursor-pointer"
+              >
+                <div className="w-14 h-14 rounded-full bg-white p-2.5 flex items-center justify-center shadow-lg border-2 border-emerald-500/30 mb-2 group-hover:scale-105 transition-transform">
+                  <Image
+                    src="/logo.png"
+                    alt="ASSDI Logo"
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                  />
+                </div>
+                <span className="font-extrabold !text-white text-base tracking-tight leading-snug font-serif block">
+                  As-Sunnah
+                </span>
+                <span className="text-[11px] font-semibold !text-[#A7F3D0] tracking-wider mt-0.5 block">
+                  Skill Development Institute
+                </span>
+                <div className="mt-1.5">
+                  <span className="inline-block px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-[#00221A] text-[#FDE68A] border border-[#065F46]">
+                    STUDENT / শিক্ষার্থী
                   </span>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </div>
+          ) : (
+            <div className="p-4 sm:p-5 border-b border-[#FCD34D] flex items-start justify-between bg-[#FFFBEB] shrink-0">
+              <Link
+                href={role === 'super_admin' ? '/admin' : role === 'teacher' ? '/teacher' : '/coordinator'}
+                onClick={() => setMobileSidebarOpen(false)}
+                className="flex items-center gap-3 group"
+              >
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-xs border border-[#FCD34D] group-hover:scale-105 transition-transform">
+                  <Image
+                    src="/logo.png"
+                    alt="ASSDI Logo"
+                    width={34}
+                    height={34}
+                    className="object-contain"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="font-extrabold text-[#0F172A] text-xs sm:text-sm tracking-tight leading-snug line-clamp-1 font-serif">
+                    {t('brand.name')}
+                  </h1>
+                  <p className="text-[11px] text-[#64748B] font-medium line-clamp-1">
+                    {t('brand.course')}
+                  </p>
+                  <div className="mt-1">
+                    <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase rounded-md tracking-wider bg-white text-[#B45309] border border-[#FCD34D]">
+                      {roleBadge.label}
+                    </span>
+                  </div>
+                </div>
+              </Link>
 
-            <button
-              onClick={() => setMobileSidebarOpen(false)}
-              className={`p-1.5 rounded-full md:hidden cursor-pointer active:scale-95 transition shadow-2xs ${
-                role === 'student'
-                  ? 'bg-white/10 hover:bg-white/20 text-[#A7F3D0] border border-[#065F46]'
-                  : 'bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 border border-[#FCD34D]'
-              }`}
-              aria-label="Close navigation"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+              <button
+                onClick={() => setMobileSidebarOpen(false)}
+                className="p-1.5 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 border border-[#FCD34D] md:hidden cursor-pointer active:scale-95 transition shadow-2xs"
+                aria-label="Close navigation"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+
+          {/* Top Primary Orange Button: Dashboard (Student only, as in Reference Image 1) */}
+          {role === 'student' && (
+            <div className="px-3 pt-3 pb-1">
+              <Link
+                href="/student"
+                onClick={() => handleNavClick('/student')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all shadow-md active:scale-98 cursor-pointer ${
+                  pathname === '/student' && (!currentSearch || currentSearch === '?tab=dashboard')
+                    ? 'bg-gradient-to-r from-[#FF8108] to-[#EA580C] text-white shadow-orange-950/40'
+                    : 'bg-[#00241C] text-[#D1FAE5] hover:bg-white/10 hover:text-white border border-[#065F46]'
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4 text-white shrink-0" />
+                <span>{isBangla ? 'ড্যাশবোর্ড' : 'Dashboard'}</span>
+              </Link>
+            </div>
+          )}
 
           {/* Navigation Items (Serial by Serial) */}
           <nav className="p-3 space-y-6 overflow-y-auto flex-1">
@@ -847,6 +900,23 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 </button>
               </div>
             )}
+
+            {/* Islamic Mosque Artwork Quote Card (Student Only - Ultra HD from User Image 3, placed after menu sections) */}
+            {role === 'student' && (
+              <div className="pt-2">
+                <div className="rounded-2xl overflow-hidden border-2 border-[#D97706]/40 shadow-xl bg-[#00261E] relative group mx-0.5">
+                  <Image
+                    src="/islamic-sidebar-card.png"
+                    alt="জ্ঞানই শক্তি, দাওয়াই সফলতা"
+                    width={360}
+                    height={360}
+                    priority
+                    quality={100}
+                    className="w-full h-auto object-cover rounded-xl group-hover:scale-102 transition-transform duration-300"
+                  />
+                </div>
+              </div>
+            )}
           </nav>
         </div>
 
@@ -858,19 +928,6 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               : 'border-[#FCD34D] bg-[#FFFBEB]'
           }`}
         >
-          {/* Islamic Mosque Artwork Quote Card (Student Only - from Reference Design) */}
-          {role === 'student' && (
-            <div className="rounded-xl overflow-hidden border border-[#065F46] shadow-md bg-[#00261E] relative group">
-              <Image
-                src="/islamic-sidebar-card.png"
-                alt="জ্ঞানই শক্তি, দাওয়াই সফলতা"
-                width={260}
-                height={130}
-                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-          )}
-
           {/* User info snippet */}
           <div
             className={`flex items-center justify-between gap-2 p-2 rounded-xl shadow-2xs ${
@@ -955,6 +1012,17 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             </span>
             <LanguageSwitcher />
           </div>
+
+          {/* Student Footer Copyright with Red Heart (Image 1 Style) */}
+          {role === 'student' && (
+            <div className="text-center pt-2 pb-1 text-[10px] text-[#A7F3D0]/60 space-y-0.5 border-t border-[#00241C]">
+              <p>© 2026 As-Sunnah Skill Development Institute</p>
+              <p className="flex items-center justify-center gap-1 text-[9.5px]">
+                <span>All rights reserved.</span>
+                <span className="text-rose-500 text-xs">❤️</span>
+              </p>
+            </div>
+          )}
         </div>
       </aside>
 
