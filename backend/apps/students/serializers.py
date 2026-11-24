@@ -59,6 +59,8 @@ class StudentSerializer(serializers.ModelSerializer):
             "campus",
             "campus_name",
             "status",
+            "status_reason",
+            "photo",
             "current_batch_id",
             "current_batch_name",
             "enrollment_history",
@@ -159,6 +161,7 @@ class StudentCreateSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=32, required=False, default="")
     email = serializers.EmailField(required=False, default=None, allow_null=True)
     batch_id = serializers.IntegerField(required=False, default=None, allow_null=True)
+    photo = serializers.CharField(required=False, default="", allow_blank=True, allow_null=True)
 
     def validate(self, attrs):
         student_id_number = attrs["student_id_number"].strip()
@@ -209,6 +212,7 @@ class StudentCreateSerializer(serializers.Serializer):
         education_background = validated_data.get("education_background", "General")
         guardian_phone = validated_data.get("guardian_phone", "")
         batch_id = validated_data.get("batch_id")
+        photo = validated_data.get("photo", "") or ""
 
         with transaction.atomic():
             # 1. Create User with login_id = student_id_number
@@ -230,6 +234,7 @@ class StudentCreateSerializer(serializers.Serializer):
                 campus_id=campus_id,
                 guardian_phone=guardian_phone,
                 status=StudentStatus.ACTIVE,
+                photo=photo,
             )
 
             # 3. Create initial active enrollment if batch provided
@@ -282,12 +287,14 @@ class CertificateInfoSerializer(serializers.Serializer):
     authorized_signatory_1 = serializers.CharField()
     authorized_signatory_2 = serializers.CharField()
     institute_reg_no = serializers.CharField()
+    photo_url = serializers.CharField(allow_null=True, required=False)
 
 
 class StudentGraduationEligibilitySerializer(serializers.Serializer):
     student_id = serializers.IntegerField()
     student_id_number = serializers.CharField()
     student_name = serializers.CharField()
+    photo_url = serializers.CharField(allow_null=True, required=False)
     batch_name = serializers.CharField()
     course_name = serializers.CharField()
     campus_name = serializers.CharField()

@@ -25,6 +25,7 @@ export interface GraduationData {
   student_name: string;
   student_id_number: string;
   registration_no: string;
+  photo_url?: string;
   batch_name: string;
   campus_name: string;
   total_sessions: number;
@@ -216,6 +217,22 @@ export const GraduationCertificateModal: React.FC<GraduationCertificateModalProp
             <OrnateCorner className="top-1.5 sm:top-2.5 right-1.5 sm:right-2.5 rotate-90" />
             <OrnateCorner className="bottom-1.5 sm:bottom-2.5 left-1.5 sm:left-2.5 -rotate-90" />
             <OrnateCorner className="bottom-1.5 sm:bottom-2.5 right-1.5 sm:right-2.5 rotate-180" />
+
+            {/* Student Verified Photo on Certificate */}
+            {data.photo_url && (
+              <div className="absolute top-3.5 right-3.5 sm:top-5 sm:right-6 z-20 hidden sm:flex flex-col items-center">
+                <div className="w-12 h-15 sm:w-14 sm:h-17 rounded-lg border-2 border-[#C1982E] p-0.5 bg-white shadow-md overflow-hidden flex items-center justify-center">
+                  <img
+                    src={data.photo_url}
+                    alt={data.student_name}
+                    className="w-full h-full object-cover rounded-[5px]"
+                  />
+                </div>
+                <span className="text-[6px] sm:text-[7px] font-bold text-[#C1982E] uppercase mt-0.5 tracking-wider font-mono">
+                  Verified Photo
+                </span>
+              </div>
+            )}
 
             {/* Watermark in background */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] z-0">

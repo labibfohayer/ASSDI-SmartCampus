@@ -6,12 +6,14 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from drf_spectacular.utils import extend_schema, OpenApiResponse
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db import transaction
 
+from apps.audit.models import AuditLog
 from .models import User, UserRole
 from .permissions import IsCoordinator, IsSuperAdmin, IsTeacher, IsStudent, IsObserverReadOnly
 from .serializers import (
@@ -20,6 +22,8 @@ from .serializers import (
     LoginSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetEmailRequestSerializer,
+    TeacherCreateSerializer,
+    TeacherListSerializer,
     UserSerializer,
 )
 from .throttling import LoginIPRateThrottle
@@ -375,3 +379,82 @@ class ObserverReadOnlyTestView(APIView):
     @extend_schema(exclude=True)
     def post(self, request):
         return Response({"success": True, "message": "Write access allowed."})
+
+
+# =========================================================================
+# Teacher Management ViewSet (Super Admin Full CRUD, Coordinator Read/Assign)
+# =========================================================================
+
+class TeacherViewSet(viewsets.ModelViewSet):
+    """
+    CRUD endpoint for Teacher faculty management.
+    - Super Admin: List, Create, Update, Deactivate/Delete teachers.
+    - Coordinator & Observer: List and Retrieve teachers.
+    """
+
+    queryset = User.objects.filter(role=UserRole.TEACHER).order_by("full_name")
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return TeacherCreateSerializer
+        return TeacherListSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "destroy", "update", "partial_update"]:
+            return [IsSuperAdmin()]
+        return [IsCoordinator()]
+
+    def create(self, request, *args, **kwargs):
+        serializer = TeacherCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        with transaction.atomic():
+            user = User.objects.create_user(
+                login_id=data["login_id"],
+                password=data.get("password") or "TeacherPass2026!",
+                full_name=data["full_name"],
+                role=UserRole.TEACHER,
+                email=data.get("email"),
+                phone=data.get("phone", ""),
+                is_active=True,
+            )
+
+            batch_id = data.get("initial_batch_id")
+            subject_id = data.get("initial_subject_id")
+            if batch_id and subject_id:
+                from apps.batches.models import TeacherAssignment
+                TeacherAssignment.objects.create(
+                    batch_id=batch_id,
+                    subject_id=subject_id,
+                    teacher_user=user,
+                    is_primary=data.get("is_primary", True),
+                )
+
+            AuditLog.objects.create(
+                actor_user=request.user,
+                action="TEACHER_CREATED",
+                entity_name="User",
+                entity_id=str(user.id),
+                new_values={"login_id": user.login_id, "full_name": user.full_name},
+                ip_address=request.META.get("REMOTE_ADDR"),
+            )
+
+        out_serializer = TeacherListSerializer(user)
+        return Response(out_serializer.data, status=status.HTTP_201_CREATED)
+
+    def perform_destroy(self, instance):
+        """Soft-deactivate teacher user account and log audit trail."""
+        with transaction.atomic():
+            instance.is_active = False
+            instance.save(update_fields=["is_active"])
+            instance.teacher_assignments.all().delete()
+            AuditLog.objects.create(
+                actor_user=self.request.user,
+                action="TEACHER_DEACTIVATED",
+                entity_name="User",
+                entity_id=str(instance.id),
+                old_values={"is_active": True},
+                new_values={"is_active": False},
+                ip_address=self.request.META.get("REMOTE_ADDR"),
+            )

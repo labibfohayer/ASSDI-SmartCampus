@@ -128,6 +128,38 @@ class StudentViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        reason = request.data.get("reason") or request.query_params.get("reason", "")
+        new_status = request.data.get("status") or request.query_params.get("status", StudentStatus.DROPPED)
+
+        valid_statuses = [c[0] for c in StudentStatus.choices]
+        if new_status not in valid_statuses:
+            new_status = StudentStatus.DROPPED
+
+        with transaction.atomic():
+            old_status = instance.status
+            instance.status = new_status
+            if reason:
+                instance.status_reason = str(reason).strip()
+            instance.save(update_fields=["status", "status_reason"])
+
+            instance.user.is_active = False
+            instance.user.save(update_fields=["is_active"])
+
+            action_name = "STUDENT_OFFBOARDED" if new_status != StudentStatus.DROPPED else "STUDENT_DEACTIVATED"
+            AuditLog.objects.create(
+                actor_user=request.user,
+                action=action_name,
+                entity_name="Student",
+                entity_id=str(instance.id),
+                old_values={"is_active": True, "status": old_status},
+                new_values={"is_active": False, "status": new_status, "reason": instance.status_reason},
+                ip_address=request.META.get("REMOTE_ADDR"),
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def perform_destroy(self, instance):
         """
         Soft-deactivate student:
@@ -149,6 +181,44 @@ class StudentViewSet(viewsets.ModelViewSet):
                 new_values={"is_active": False, "status": StudentStatus.DROPPED},
                 ip_address=self.request.META.get("REMOTE_ADDR"),
             )
+
+    @action(detail=True, methods=["post"], url_path="offboard")
+    def offboard(self, request, pk=None):
+        """
+        Explicit administrative endpoint to dismiss/offboard student with reason.
+        Allowed for Super Admin and Coordinator.
+        """
+        instance = self.get_object()
+        reason = request.data.get("reason", "").strip()
+        new_status = request.data.get("status", StudentStatus.DROPPED)
+
+        valid_statuses = [c[0] for c in StudentStatus.choices]
+        if new_status not in valid_statuses:
+            new_status = StudentStatus.DROPPED
+
+        with transaction.atomic():
+            old_status = instance.status
+            instance.status = new_status
+            instance.status_reason = reason
+            instance.save(update_fields=["status", "status_reason"])
+
+            instance.user.is_active = False
+            instance.user.save(update_fields=["is_active"])
+
+            AuditLog.objects.create(
+                actor_user=request.user,
+                action="STUDENT_OFFBOARDED",
+                entity_name="Student",
+                entity_id=str(instance.id),
+                old_values={"is_active": True, "status": old_status},
+                new_values={"is_active": False, "status": new_status, "reason": reason},
+                ip_address=request.META.get("REMOTE_ADDR"),
+            )
+
+        return Response(
+            {"success": True, "status": instance.status, "reason": instance.status_reason},
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=False, methods=["get"], url_path="me")
     def me(self, request):
@@ -485,7 +555,7 @@ class StudentViewSet(viewsets.ModelViewSet):
                 "motto": "EFFICIENCY · HONESTY · PROSPERITY",
                 "govt_reg": "Govt. Reg. #STP-DHA-000877",
                 "website": "skill.assunnahfoundation.org",
-                "photo_url": None,
+                "photo_url": student.photo or None,
                 "signature_url": "/signature-transparent.png",
             },
             status=status.HTTP_200_OK,
@@ -618,12 +688,14 @@ class StudentViewSet(viewsets.ModelViewSet):
             "authorized_signatory_1": "Shaikh Ahmadullah (Chairman)",
             "authorized_signatory_2": "Course Coordinator",
             "institute_reg_no": "Govt. Reg. #STP-DHA-000877",
+            "photo_url": student.photo or None,
         }
 
         return {
             "student_id": student.id,
             "student_id_number": student.student_id_number,
             "student_name": student.user.full_name,
+            "photo_url": student.photo or None,
             "batch_name": batch.name if batch else "SBMC Batch 42",
             "course_name": course.name if course else "Small Business Management Course",
             "campus_name": campus.name if campus else "Kazi Bari Campus",

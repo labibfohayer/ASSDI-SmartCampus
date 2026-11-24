@@ -25,6 +25,7 @@ import {
   CreditCard,
   Award,
   Trash2,
+  User as UserIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -44,6 +45,8 @@ interface StudentItem {
   email?: string;
   guardian_phone?: string;
   status: string;
+  status_reason?: string;
+  photo?: string;
   current_batch_name?: string;
   current_batch_id?: number;
   campus_name?: string;
@@ -82,6 +85,7 @@ export default function AdminStudentsPage() {
     guardian_phone: '',
     batch_id: '',
     campus_id: '1',
+    photo: '',
   });
 
   // Bulk import modal state
@@ -101,8 +105,10 @@ export default function AdminStudentsPage() {
     registration_no: '',
     education_background: 'General',
     status: 'active',
+    status_reason: '',
     campus_id: '1',
     batch_id: '',
+    photo: '',
   });
   const [updating, setUpdating] = useState(false);
   const [selectedStudentForIdCard, setSelectedStudentForIdCard] = useState<StudentItem | null>(null);
@@ -130,8 +136,10 @@ export default function AdminStudentsPage() {
       registration_no: st.registration_no || '',
       education_background: st.education_background || 'General',
       status: st.status || 'active',
+      status_reason: st.status_reason || '',
       campus_id: String(st.campus || '1'),
       batch_id: st.current_batch_id ? String(st.current_batch_id) : '',
+      photo: st.photo || '',
     });
   };
 
@@ -148,6 +156,8 @@ export default function AdminStudentsPage() {
         registration_no: editFormData.registration_no.trim(),
         education_background: editFormData.education_background,
         status: editFormData.status,
+        status_reason: editFormData.status_reason.trim(),
+        photo: editFormData.photo,
       };
 
       await api.patch(`/api/v1/students/${editingStudent.id}/`, payload);
@@ -183,27 +193,39 @@ export default function AdminStudentsPage() {
     }
   };
 
-  const [studentToDelete, setStudentToDelete] = useState<StudentItem | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  // Student Offboarding with Reason Modal state
+  const [studentToOffboard, setStudentToOffboard] = useState<StudentItem | null>(null);
+  const [offboardStatus, setOffboardStatus] = useState<string>('dropped');
+  const [offboardReason, setOffboardReason] = useState<string>('');
+  const [offboardCustomReason, setOffboardCustomReason] = useState<string>('');
+  const [offboarding, setOffboarding] = useState(false);
 
-  const handleDeleteStudent = async () => {
-    if (!studentToDelete) return;
-    setDeleting(true);
+  const handleOffboardStudent = async () => {
+    if (!studentToOffboard) return;
+    setOffboarding(true);
     try {
-      await api.delete(`/api/v1/students/${studentToDelete.id}/`);
+      const finalReason =
+        offboardReason === 'other'
+          ? offboardCustomReason.trim()
+          : offboardReason || 'Administrative dismissal';
+      await api.post(`/api/v1/students/${studentToOffboard.id}/offboard/`, {
+        status: offboardStatus,
+        reason: finalReason,
+      });
       toast.success(
         isBangla
-          ? `${studentToDelete.full_name}-কে সফলভাবে তালিকা থেকে অপসরণ করা হয়েছে।`
-          : `Student ${studentToDelete.full_name} removed successfully.`
+          ? `${studentToOffboard.full_name}-কে সফলভাবে অপসরণ / স্ট্যাটাস পরিবর্তন করা হয়েছে।`
+          : `Student ${studentToOffboard.full_name} status updated successfully.`
       );
-      setStudentToDelete(null);
-      setEditingStudent(null);
+      setStudentToOffboard(null);
+      setOffboardReason('');
+      setOffboardCustomReason('');
       fetchStudents();
     } catch (err: any) {
-      console.error('Failed to remove student:', err);
-      toast.error(isBangla ? 'শিক্ষার্থী অপসরণ ব্যর্থ হয়েছে।' : 'Failed to remove student.');
+      console.error('Failed to offboard student:', err);
+      toast.error(isBangla ? 'শিক্ষার্থী অপসরণ ব্যর্থ হয়েছে।' : 'Failed to offboard student.');
     } finally {
-      setDeleting(false);
+      setOffboarding(false);
     }
   };
 
@@ -252,6 +274,7 @@ export default function AdminStudentsPage() {
       };
       if (formData.email.trim()) payload.email = formData.email.trim();
       if (formData.batch_id) payload.batch_id = Number(formData.batch_id);
+      if (formData.photo) payload.photo = formData.photo;
 
       await api.post('/api/v1/students/', payload);
       toast.success(isBangla ? 'শিক্ষার্থী সফলভাবে নিবন্ধিত হয়েছে!' : 'Student registered successfully!');
@@ -266,6 +289,7 @@ export default function AdminStudentsPage() {
         guardian_phone: '',
         batch_id: '',
         campus_id: '1',
+        photo: '',
       });
       fetchStudents();
     } catch (err: any) {
@@ -511,7 +535,20 @@ export default function AdminStudentsPage() {
                       {st.student_id_number}
                     </td>
                     <td className="py-3.5 px-4 font-bold text-[#0F172A] font-heading">
-                      {st.full_name}
+                      <div className="flex items-center gap-2.5">
+                        {st.photo ? (
+                          <img
+                            src={st.photo}
+                            alt={st.full_name}
+                            className="w-8 h-8 rounded-full object-cover border border-amber-300 shadow-2xs shrink-0"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-amber-100 text-[#B45309] font-bold text-xs flex items-center justify-center shrink-0 border border-amber-300">
+                            {st.full_name?.charAt(0) || 'S'}
+                          </div>
+                        )}
+                        <span className="truncate">{st.full_name}</span>
+                      </div>
                     </td>
                     <td className="py-3.5 px-4 font-mono text-[#475569]">
                       {st.registration_no}
@@ -538,26 +575,33 @@ export default function AdminStudentsPage() {
                       {st.phone || '-'}
                     </td>
                     <td className="py-3.5 px-4">
-                      {st.status === 'active' ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-[#F0FDF4] text-[#16A34A] text-[10px] font-extrabold border border-[#DCFCE7] flex items-center gap-1 w-fit">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
-                          {isBangla ? 'সক্রিয়' : 'Active'}
-                        </span>
-                      ) : st.status === 'expelled' ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-extrabold border border-rose-200 flex items-center gap-1 w-fit">
-                          <Ban className="w-3 h-3 text-rose-600" />
-                          {isBangla ? 'বহিষ্কৃত' : 'Expelled'}
-                        </span>
-                      ) : st.status === 'dropped' ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold border border-amber-200 flex items-center gap-1 w-fit">
-                          <UserX className="w-3 h-3 text-amber-600" />
-                          {isBangla ? 'ড্রপ / বাদ' : 'Dropped'}
-                        </span>
-                      ) : (
-                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-extrabold border border-slate-200 flex items-center gap-1 w-fit">
-                          {isBangla ? 'নিষ্ক্রিয়' : 'Inactive'}
-                        </span>
-                      )}
+                      <div className="flex flex-col gap-0.5">
+                        {st.status === 'active' ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-[#F0FDF4] text-[#16A34A] text-[10px] font-extrabold border border-[#DCFCE7] flex items-center gap-1 w-fit">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
+                            {isBangla ? 'সক্রিয়' : 'Active'}
+                          </span>
+                        ) : st.status === 'expelled' ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-extrabold border border-rose-200 flex items-center gap-1 w-fit">
+                            <Ban className="w-3 h-3 text-rose-600" />
+                            {isBangla ? 'বহিষ্কৃত' : 'Expelled'}
+                          </span>
+                        ) : st.status === 'dropped' ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold border border-amber-200 flex items-center gap-1 w-fit">
+                            <UserX className="w-3 h-3 text-amber-600" />
+                            {isBangla ? 'ড্রপ / বাদ' : 'Dropped'}
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-extrabold border border-slate-200 flex items-center gap-1 w-fit">
+                            {isBangla ? 'নিষ্ক্রিয়' : 'Inactive'}
+                          </span>
+                        )}
+                        {st.status_reason && (
+                          <span className="text-[10px] text-slate-500 italic max-w-[140px] truncate" title={st.status_reason}>
+                            {st.status_reason}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
@@ -595,9 +639,14 @@ export default function AdminStudentsPage() {
                           <span>{isBangla ? 'সম্পাদনা' : 'Edit'}</span>
                         </button>
                         <button
-                          onClick={() => setStudentToDelete(st)}
+                          onClick={() => {
+                            setStudentToOffboard(st);
+                            setOffboardStatus('dropped');
+                            setOffboardReason(isBangla ? 'স্বেচ্ছায় কোর্স ত্যাগ / ড্রপআউট' : 'Voluntary Withdrawal / Dropped Out');
+                            setOffboardCustomReason('');
+                          }}
                           className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
-                          title={isBangla ? 'শিক্ষার্থী তালিকা থেকে রিমুভ / বাদ দিন' : 'Remove Student'}
+                          title={isBangla ? 'শিক্ষার্থী অপসরণ / বিদায় নিশ্চিতকরণ' : 'Offboard / Remove Student'}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span>{isBangla ? 'রিমুভ' : 'Remove'}</span>
@@ -749,6 +798,66 @@ export default function AdminStudentsPage() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 />
+              </div>
+
+              {/* Student Photo for ID Card & Certificate */}
+              <div>
+                <label className="block font-bold text-gray-700 mb-1 flex items-center justify-between">
+                  <span>{isBangla ? 'শিক্ষার্থীর ছবি (আইডি কার্ড ও সনদের জন্য)' : 'Student Photo (for ID card & certificate)'}</span>
+                  <span className="text-[10px] text-slate-500">{isBangla ? 'পাসপোর্ট সাইজ ছবি' : 'Passport size recommended'}</span>
+                </label>
+                <div className="flex items-center gap-3 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                  {formData.photo ? (
+                    <div className="relative group shrink-0">
+                      <img
+                        src={formData.photo}
+                        alt="Student Preview"
+                        className="w-14 h-16 object-cover rounded-lg border-2 border-emerald-500 shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, photo: '' })}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center shadow-xs cursor-pointer"
+                        title={isBangla ? 'ছবি মুছে ফেলুন' : 'Remove photo'}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-14 h-16 bg-slate-100 rounded-lg border border-slate-200 flex flex-col items-center justify-center text-slate-400 shrink-0">
+                      <UserIcon className="w-6 h-6 stroke-[1.5]" />
+                      <span className="text-[8px] font-bold mt-0.5">{isBangla ? 'ছবি নেই' : 'No Photo'}</span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#FCD34D] text-[#B45309] hover:bg-amber-50 text-xs font-bold transition cursor-pointer shadow-2xs active:scale-95">
+                      <UploadCloud className="w-3.5 h-3.5" />
+                      <span>{formData.photo ? (isBangla ? 'ছবি পরিবর্তন করুন' : 'Change Photo') : (isBangla ? 'ছবি আপলোড করুন' : 'Upload Photo')}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 2 * 1024 * 1024) {
+                              toast.error(isBangla ? 'ছবির সাইজ সর্বোচ্চ ২ মেগাবাইট হতে পারবে।' : 'Max image size is 2MB.');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              setFormData((prev) => ({ ...prev, photo: reader.result as string }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      {isBangla ? 'JPG, PNG ফরম্যাট (আইডি কার্ড ও ডিজিটাল সনদে স্বয়ংক্রিয়ভাবে যুক্ত হবে)' : 'JPG, PNG format (will appear on official ID card & certificate)'}
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
@@ -1255,6 +1364,80 @@ export default function AdminStudentsPage() {
                 </p>
               </div>
 
+              {/* Status Reason / Note */}
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">
+                  {isBangla ? 'স্ট্যাটাস পরিবর্তন বা প্রশাসনিক নোট / কারণ' : 'Status Reason / Administrative Note'}
+                </label>
+                <input
+                  type="text"
+                  placeholder={isBangla ? 'যেমন: নিয়মভঙ্গের কারণে সাময়িক অব্যাহতি বা কোর্স সমাপ্ত' : 'e.g. Course completed, disciplinary note, or transfer'}
+                  value={editFormData.status_reason}
+                  onChange={(e) => setEditFormData({ ...editFormData, status_reason: e.target.value })}
+                  className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs"
+                />
+              </div>
+
+              {/* Student Photo for ID Card & Certificate */}
+              <div>
+                <label className="block font-bold text-gray-700 mb-1 flex items-center justify-between">
+                  <span>{isBangla ? 'শিক্ষার্থীর ছবি (আইডি কার্ড ও সনদের জন্য)' : 'Student Photo (for ID card & certificate)'}</span>
+                  <span className="text-[10px] text-slate-500">{isBangla ? 'পাসপোর্ট সাইজ ছবি' : 'Passport size recommended'}</span>
+                </label>
+                <div className="flex items-center gap-3 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                  {editFormData.photo ? (
+                    <div className="relative group shrink-0">
+                      <img
+                        src={editFormData.photo}
+                        alt="Student Preview"
+                        className="w-14 h-16 object-cover rounded-lg border-2 border-emerald-500 shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setEditFormData({ ...editFormData, photo: '' })}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center shadow-xs cursor-pointer"
+                        title={isBangla ? 'ছবি মুছে ফেলুন' : 'Remove photo'}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-14 h-16 bg-slate-100 rounded-lg border border-slate-200 flex flex-col items-center justify-center text-slate-400 shrink-0">
+                      <UserIcon className="w-6 h-6 stroke-[1.5]" />
+                      <span className="text-[8px] font-bold mt-0.5">{isBangla ? 'ছবি নেই' : 'No Photo'}</span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#FCD34D] text-[#B45309] hover:bg-amber-50 text-xs font-bold transition cursor-pointer shadow-2xs active:scale-95">
+                      <UploadCloud className="w-3.5 h-3.5" />
+                      <span>{editFormData.photo ? (isBangla ? 'ছবি পরিবর্তন করুন' : 'Change Photo') : (isBangla ? 'ছবি আপলোড করুন' : 'Upload Photo')}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 2 * 1024 * 1024) {
+                              toast.error(isBangla ? 'ছবির সাইজ সর্বোচ্চ ২ মেগাবাইট হতে পারবে।' : 'Max image size is 2MB.');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              setEditFormData((prev) => ({ ...prev, photo: reader.result as string }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      {isBangla ? 'JPG, PNG ফরম্যাট (আইডি কার্ড ও ডিজিটাল সনদে স্বয়ংক্রিয়ভাবে আপডেট হবে)' : 'JPG, PNG format (will appear on official ID card & certificate)'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                 <button
@@ -1304,6 +1487,7 @@ export default function AdminStudentsPage() {
             guardian_phone: selectedStudentForIdCard.guardian_phone,
             education_background: selectedStudentForIdCard.education_background,
             status: selectedStudentForIdCard.status,
+            photo_url: selectedStudentForIdCard.photo,
             batch_name: selectedStudentForIdCard.current_batch_name,
             campus_name: selectedStudentForIdCard.campus_name,
           }}
@@ -1319,50 +1503,167 @@ export default function AdminStudentsPage() {
         />
       )}
 
-      {/* Remove / Delete Student Confirmation Modal */}
-      {studentToDelete && (
+      {/* Student Offboarding & Dismissal with Reason Modal */}
+      {studentToOffboard && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-rose-200 border-t-4 border-t-rose-600 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
-                <Trash2 className="w-5 h-5 text-rose-600" />
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-rose-200 border-t-4 border-t-rose-600 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                  <UserX className="w-5 h-5 text-rose-600" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-[#0F172A]">
+                    {isBangla ? 'শিক্ষার্থী অপসরণ / বিদায় নিশ্চিতকরণ' : 'Student Offboarding & Dismissal'}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-mono mt-0.5">
+                    {studentToOffboard.student_id_number} • {studentToOffboard.full_name}
+                  </p>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={() => setStudentToOffboard(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3.5 text-xs">
               <div>
-                <h3 className="text-base font-extrabold text-[#0F172A]">
-                  {isBangla ? 'শিক্ষার্থী অপসরণ নিশ্চিত করুন' : 'Confirm Student Removal'}
-                </h3>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">
-                  {studentToDelete.student_id_number} • {studentToDelete.full_name}
+                <label className="block font-bold text-gray-800 mb-1.5">
+                  {isBangla ? 'অপসরণ বা বাতিলের কারণ নির্ধারণ করুন *' : 'Select Offboarding / Removal Reason *'}
+                </label>
+                <div className="space-y-2">
+                  {[
+                    {
+                      status: 'inactive',
+                      reason: isBangla ? 'কোর্স সফলভাবে সম্পন্ন হয়েছে (গ্র্যাজুয়েট)' : 'Course Completed / Graduated',
+                      label: isBangla ? 'কোর্স সম্পন্ন (গ্র্যাজুয়েট)' : 'Course Completed',
+                      desc: isBangla ? 'শিক্ষার্থীর মেয়াদ ও সিলেবাস সফলভাবে সমাপ্ত' : 'Completed all academic requirements',
+                      color: 'border-emerald-200 bg-emerald-50/50 text-emerald-900',
+                      badge: 'bg-emerald-100 text-emerald-800',
+                    },
+                    {
+                      status: 'expelled',
+                      reason: isBangla ? 'শৃঙ্খলা ভঙ্গ / অসদাচরণের দায়ে বহিষ্কৃত' : 'Expelled for Disciplinary Violation',
+                      label: isBangla ? 'শৃঙ্খলা ভঙ্গ / বহিষ্কৃত' : 'Expelled / Disciplinary',
+                      desc: isBangla ? 'ইনস্টিটিউটের নিয়মভঙ্গ বা অশোভন আচরণের কারণে স্থায়ী বহিষ্কার' : 'Violated institute rules or policy',
+                      color: 'border-rose-200 bg-rose-50/50 text-rose-900',
+                      badge: 'bg-rose-100 text-rose-800',
+                    },
+                    {
+                      status: 'dropped',
+                      reason: isBangla ? 'স্বেচ্ছায় কোর্স ত্যাগ / ড্রপআউট' : 'Voluntary Withdrawal / Dropped Out',
+                      label: isBangla ? 'স্বেচ্ছায় কোর্স ত্যাগ / ড্রপআউট' : 'Voluntary Withdrawal / Dropped',
+                      desc: isBangla ? 'ব্যক্তিগত বা কর্মসংস্থানজনিত কারণে কোর্স ত্যাগ' : 'Left course voluntarily due to personal reasons',
+                      color: 'border-amber-200 bg-amber-50/50 text-amber-900',
+                      badge: 'bg-amber-100 text-amber-800',
+                    },
+                    {
+                      status: 'inactive',
+                      reason: isBangla ? 'দীর্ঘদিন ক্লাসে অনুপস্থিত / অনিয়মিত' : 'Prolonged Inactivity / Irregular',
+                      label: isBangla ? 'অনুপস্থিত বা অনিয়মিত' : 'Prolonged Absence / Inactive',
+                      desc: isBangla ? 'অনুমতি ব্যতীত একাধিক সেশনে অনুপস্থিতি' : 'Consecutive absences without prior leave',
+                      color: 'border-slate-200 bg-slate-50 text-slate-900',
+                      badge: 'bg-slate-200 text-slate-800',
+                    },
+                    {
+                      status: 'dropped',
+                      reason: 'other',
+                      label: isBangla ? 'অন্যান্য নির্দিষ্ট কারণ...' : 'Other Custom Reason...',
+                      desc: isBangla ? 'নিচে প্রশাসনিক বিবরণ লিখুন' : 'Specify custom reason below',
+                      color: 'border-blue-200 bg-blue-50/50 text-blue-900',
+                      badge: 'bg-blue-100 text-blue-800',
+                    },
+                  ].map((opt, idx) => (
+                    <label
+                      key={idx}
+                      className={`flex items-start gap-3 p-3 rounded-xl border transition cursor-pointer ${
+                        offboardReason === opt.reason
+                          ? `${opt.color} ring-2 ring-[#0F766E]`
+                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="offboard_reason"
+                        value={opt.reason}
+                        checked={offboardReason === opt.reason}
+                        onChange={() => {
+                          setOffboardReason(opt.reason);
+                          setOffboardStatus(opt.status);
+                        }}
+                        className="mt-1 text-[#0F766E] focus:ring-[#0F766E]"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs">{opt.label}</span>
+                          <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full ${opt.badge}`}>
+                            {opt.status.toUpperCase()}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5">{opt.desc}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {offboardReason === 'other' && (
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">
+                    {isBangla ? 'অন্যান্য কারণের সুনির্দিষ্ট বিবরণ লিখুন *' : 'Specify Detailed Reason *'}
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={offboardCustomReason}
+                    onChange={(e) => setOffboardCustomReason(e.target.value)}
+                    placeholder={isBangla ? 'বাতিলের কারণ বা প্রশাসনিক নোট লিখুন...' : 'Enter administrative offboarding remarks...'}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  />
+                </div>
+              )}
+
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p>
+                  {isBangla
+                    ? 'সতর্কবার্তা: অপসরণের সাথে সাথেই শিক্ষার্থীর লগইন অ্যাক্সেস বন্ধ হয়ে যাবে এবং অডিট লগে প্রশাসনিক কারণসহ সংরক্ষিত থাকবে।'
+                    : 'Notice: Student login access will be disabled immediately, and the action will be recorded in the institutional audit log.'}
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              {isBangla
-                ? 'আপনি কি নিশ্চিত যে এই শিক্ষার্থীকে সিস্টেম থেকে অপসরণ করতে চান? এর ফলে শিক্ষার্থীর অ্যাকাউন্ট নিষ্ক্রিয় হবে এবং স্ট্যাটাস ড্রপ হয়ে যাবে।'
-                : 'Are you sure you want to remove this student? Their account login will be disabled and status marked as dropped.'}
-            </p>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
               <button
                 type="button"
-                onClick={() => setStudentToDelete(null)}
+                onClick={() => setStudentToOffboard(null)}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition cursor-pointer"
               >
                 {isBangla ? 'বাতিল' : 'Cancel'}
               </button>
               <button
                 type="button"
-                onClick={handleDeleteStudent}
-                disabled={deleting}
+                onClick={handleOffboardStudent}
+                disabled={offboarding || !offboardReason || (offboardReason === 'other' && !offboardCustomReason.trim())}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
-                {deleting ? (
+                {offboarding ? (
                   <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
                 ) : (
-                  <Trash2 className="w-3.5 h-3.5 text-white" />
+                  <UserX className="w-3.5 h-3.5 text-white" />
                 )}
-                <span>{deleting ? (isBangla ? 'অপসরণ হচ্ছে...' : 'Removing...') : (isBangla ? 'হ্যাঁ, রিমুভ করুন' : 'Confirm Remove')}</span>
+                <span>
+                  {offboarding
+                    ? isBangla
+                      ? 'কার্যকর হচ্ছে...'
+                      : 'Processing...'
+                    : isBangla
+                    ? 'হ্যাঁ, অপসরণ নিশ্চিত করুন'
+                    : 'Confirm Offboarding'}
+                </span>
               </button>
             </div>
           </div>

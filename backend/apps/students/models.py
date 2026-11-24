@@ -67,6 +67,17 @@ class Student(models.Model):
         default=StudentStatus.ACTIVE,
         db_index=True,
     )
+    status_reason = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Reason for student status change (e.g. Course Completed, Expelled, Dropped Out, etc.).",
+    )
+    photo = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Student portrait photo base64 data URI or image URL for ID card & certificate.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

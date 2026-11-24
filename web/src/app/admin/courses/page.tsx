@@ -14,6 +14,13 @@ import {
   Trash2,
   RefreshCw,
   GraduationCap,
+  UserPlus,
+  UserMinus,
+  ShieldAlert,
+  Phone,
+  Mail,
+  BookMarked,
+  User,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -25,6 +32,9 @@ export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [batches, setBatches] = useState<any[]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
+  const [faculty, setFaculty] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [facultyTab, setFacultyTab] = useState<'roster' | 'assignments'>('roster');
   const [loading, setLoading] = useState(true);
 
   // New batch modal state
@@ -39,6 +49,34 @@ export default function AdminCoursesPage() {
     end_date: '',
     capacity: '40',
   });
+
+  // Add teacher modal state
+  const [showAddTeacherModal, setShowAddTeacherModal] = useState(false);
+  const [addingTeacher, setAddingTeacher] = useState(false);
+  const [teacherForm, setTeacherForm] = useState({
+    full_name: '',
+    login_id: '',
+    email: '',
+    phone: '',
+    password: 'TeacherPass2026!',
+    initial_batch_id: '',
+    initial_subject_id: '',
+    is_primary: true,
+  });
+
+  // Assign teacher to batch modal state
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [assigningTeacher, setAssigningTeacher] = useState(false);
+  const [assignForm, setAssignForm] = useState({
+    teacher_user: '',
+    batch: '',
+    subject: '',
+    is_primary: true,
+  });
+
+  // Teacher deactivation modal state
+  const [teacherToDeactivate, setTeacherToDeactivate] = useState<any | null>(null);
+  const [deactivatingTeacher, setDeactivatingTeacher] = useState(false);
 
   const [selectedBatchFilter, setSelectedBatchFilter] = useState('all');
   const [teacherToDelete, setTeacherToDelete] = useState<any | null>(null);
@@ -64,13 +102,122 @@ export default function AdminCoursesPage() {
     }
   };
 
+  const handleCreateTeacher = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddingTeacher(true);
+    try {
+      const payload: any = {
+        full_name: teacherForm.full_name.trim(),
+        login_id: teacherForm.login_id.trim(),
+        password: teacherForm.password || 'TeacherPass2026!',
+      };
+      if (teacherForm.email.trim()) payload.email = teacherForm.email.trim();
+      if (teacherForm.phone.trim()) payload.phone = teacherForm.phone.trim();
+      if (teacherForm.initial_batch_id) payload.initial_batch_id = Number(teacherForm.initial_batch_id);
+      if (teacherForm.initial_subject_id) payload.initial_subject_id = Number(teacherForm.initial_subject_id);
+      payload.is_primary = teacherForm.is_primary;
+
+      await api.post('/api/v1/teachers/', payload);
+      toast.success(
+        isBangla
+          ? 'নতুন শিক্ষক সফলভাবে সিস্টেমে যুক্ত হয়েছেন!'
+          : 'New faculty teacher added successfully!'
+      );
+      setShowAddTeacherModal(false);
+      setTeacherForm({
+        full_name: '',
+        login_id: '',
+        email: '',
+        phone: '',
+        password: 'TeacherPass2026!',
+        initial_batch_id: '',
+        initial_subject_id: '',
+        is_primary: true,
+      });
+      fetchData();
+    } catch (err: any) {
+      console.error('Failed to create teacher:', err);
+      const errData = err.response?.data;
+      const msg =
+        errData?.login_id?.[0] ||
+        errData?.email?.[0] ||
+        errData?.detail ||
+        (isBangla ? 'শিক্ষক যোগ করতে সমস্যা হয়েছে।' : 'Failed to add teacher.');
+      toast.error(msg);
+    } finally {
+      setAddingTeacher(false);
+    }
+  };
+
+  const handleAssignTeacher = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!assignForm.teacher_user || !assignForm.batch || !assignForm.subject) {
+      toast.error(isBangla ? 'অনুগ্রহ করে শিক্ষক, ব্যাচ ও বিষয় নির্বাচন করুন।' : 'Please select teacher, batch and subject.');
+      return;
+    }
+    setAssigningTeacher(true);
+    try {
+      await api.post('/api/v1/teacher-assignments/', {
+        teacher_user: assignForm.teacher_user,
+        batch: Number(assignForm.batch),
+        subject: Number(assignForm.subject),
+        is_primary: assignForm.is_primary,
+      });
+      toast.success(
+        isBangla
+          ? 'শিক্ষক সফলভাবে ব্যাচ ও বিষয়ে নিয়োগপ্রাপ্ত হয়েছেন!'
+          : 'Teacher assigned to batch successfully!'
+      );
+      setShowAssignModal(false);
+      setAssignForm({
+        teacher_user: '',
+        batch: '',
+        subject: '',
+        is_primary: true,
+      });
+      fetchData();
+    } catch (err: any) {
+      console.error('Failed to assign teacher:', err);
+      const errData = err.response?.data;
+      const msg =
+        errData?.non_field_errors?.[0] ||
+        errData?.detail ||
+        (isBangla ? 'শিক্ষক নিয়োগ করতে সমস্যা হয়েছে।' : 'Failed to assign teacher.');
+      toast.error(msg);
+    } finally {
+      setAssigningTeacher(false);
+    }
+  };
+
+  const handleDeactivateTeacher = async () => {
+    if (!teacherToDeactivate) return;
+    setDeactivatingTeacher(true);
+    try {
+      await api.delete(`/api/v1/teachers/${teacherToDeactivate.id}/`);
+      toast.success(
+        isBangla
+          ? `${teacherToDeactivate.full_name}-কে শিক্ষক তালিকা থেকে সফলভাবে নিষ্ক্রিয় / অপসরণ করা হয়েছে।`
+          : `Teacher ${teacherToDeactivate.full_name} deactivated successfully.`
+      );
+      setTeacherToDeactivate(null);
+      fetchData();
+    } catch (err: any) {
+      console.error('Failed to deactivate teacher:', err);
+      toast.error(isBangla ? 'শিক্ষক অপসরণ ব্যর্থ হয়েছে।' : 'Failed to deactivate teacher.');
+    } finally {
+      setDeactivatingTeacher(false);
+    }
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [coursesRes, batchesRes, teachersRes] = await Promise.all([
+      const [coursesRes, batchesRes, teachersRes, facultyRes, subjectsRes] = await Promise.all([
         api.get('/api/v1/courses/'),
         api.get('/api/v1/batches/'),
         api.get('/api/v1/teacher-assignments/').catch(() => ({ data: [] })),
+        api.get('/api/v1/teachers/').catch(() => ({ data: [] })),
+        api.get('/api/v1/subjects/').catch(() => ({ data: [] })),
       ]);
 
       const courseList = Array.isArray(coursesRes.data)
@@ -82,10 +229,18 @@ export default function AdminCoursesPage() {
       const teacherList = Array.isArray(teachersRes.data)
         ? teachersRes.data
         : teachersRes.data?.results || [];
+      const facultyList = Array.isArray(facultyRes.data)
+        ? facultyRes.data
+        : facultyRes.data?.results || [];
+      const subjectList = Array.isArray(subjectsRes.data)
+        ? subjectsRes.data
+        : subjectsRes.data?.results || [];
 
       setCourses(courseList);
       setBatches(batchList);
       setTeachers(teacherList);
+      setFaculty(facultyList);
+      setSubjects(subjectList);
 
       if (courseList.length > 0 && !batchForm.course_id) {
         setBatchForm((prev) => ({ ...prev, course_id: String(courseList[0].id) }));
@@ -274,96 +429,252 @@ export default function AdminCoursesPage() {
 
       {/* Teacher Assignments & Faculty Governance */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="p-5 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2 font-heading">
               <GraduationCap className="w-5 h-5 text-[#0F766E]" />
-              <span>{isBangla ? 'শিক্ষক নিয়োগ ও অনুষদ ব্যবস্থাপনা' : 'Teacher Assignments & Faculty Roster'}</span>
+              <span>{isBangla ? 'অনুষদ ও শিক্ষক ব্যবস্থাপনা' : 'Faculty Governance & Teacher Assignments'}</span>
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
               {isBangla
-                ? 'বিষয়ভিত্তিক শিক্ষক অ্যাসাইনমেন্ট পর্যালোচনা ও শিক্ষক রিমুভ / পরিবর্তনের নিয়ন্ত্রণ।'
-                : 'Manage faculty assignments per batch and revoke or remove teachers.'}
+                ? 'ইনস্টিটিউটের নতুন শিক্ষক নিবন্ধন, ব্যাচে পাঠদান নিয়োগ এবং ফ্যাকাল্টি পরিচালনা।'
+                : 'Register faculty teachers, assign to batch subjects, and manage roster.'}
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <select
-              value={selectedBatchFilter}
-              onChange={(e) => setSelectedBatchFilter(e.target.value)}
-              className="px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              onClick={() => setShowAddTeacherModal(true)}
+              className="px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95"
             >
-              <option value="all" className="bg-white text-[#0F172A]">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
-              {batches.map((b) => (
-                <option key={b.id} value={b.id.toString()} className="bg-white text-[#0F172A]">
-                  {b.name}
-                </option>
-              ))}
-            </select>
-            <span className="text-xs font-bold text-[#0369A1] px-3 py-1 bg-[#F0FDFA] rounded-full border border-[#CCFBF1] shrink-0">
-              {d(filteredTeachers.length)} {isBangla ? 'টি নিয়োগ' : 'Assignments'}
-            </span>
+              <UserPlus className="w-4 h-4 text-[#FCD34D]" />
+              <span>{isBangla ? 'নতুন শিক্ষক যোগ করুন' : 'Add New Teacher'}</span>
+            </button>
+            <button
+              onClick={() => setShowAssignModal(true)}
+              className="px-3.5 py-2 bg-white hover:bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D] rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+            >
+              <PlusCircle className="w-4 h-4 text-[#D97706]" />
+              <span>{isBangla ? 'ব্যাচে নিয়োগ দিন' : 'Assign to Batch'}</span>
+            </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
-              <tr>
-                <th className="py-3 px-4">{isBangla ? 'শিক্ষকের নাম' : 'Teacher Name'}</th>
-                <th className="py-3 px-4">{isBangla ? 'লগইন আইডি' : 'Login ID'}</th>
-                <th className="py-3 px-4">{isBangla ? 'বিষয়' : 'Subject'}</th>
-                <th className="py-3 px-4">{isBangla ? 'ব্যাচ' : 'Batch'}</th>
-                <th className="py-3 px-4">{isBangla ? 'ভূমিকা' : 'Role'}</th>
-                <th className="py-3 px-4 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredTeachers.length === 0 ? (
+        {/* Tab Switcher & Batch Filter */}
+        <div className="px-5 py-3 bg-slate-50/70 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setFacultyTab('roster')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                facultyTab === 'roster'
+                  ? 'bg-white text-[#0F766E] shadow-2xs border border-[#CCFBF1]'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>{isBangla ? 'অনুষদ সদস্য তালিকা' : 'Faculty Roster'}</span>
+              <span className="ml-1.5 px-1.5 py-0.2 bg-teal-100 text-teal-800 rounded-full text-[10px]">
+                {d(faculty.length)}
+              </span>
+            </button>
+            <button
+              onClick={() => setFacultyTab('assignments')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                facultyTab === 'assignments'
+                  ? 'bg-white text-[#0F766E] shadow-2xs border border-[#CCFBF1]'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>{isBangla ? 'ব্যাচভিত্তিক নিয়োগ' : 'Batch Assignments'}</span>
+              <span className="ml-1.5 px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded-full text-[10px]">
+                {d(filteredTeachers.length)}
+              </span>
+            </button>
+          </div>
+
+          {facultyTab === 'assignments' && (
+            <div className="flex items-center gap-2.5">
+              <span className="text-[11px] font-bold text-slate-500">{isBangla ? 'ব্যাচ ফিল্টার:' : 'Filter Batch:'}</span>
+              <select
+                value={selectedBatchFilter}
+                onChange={(e) => setSelectedBatchFilter(e.target.value)}
+                className="px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              >
+                <option value="all" className="bg-white text-[#0F172A]">{isBangla ? 'সকল ব্যাচ' : 'All Batches'}</option>
+                {batches.map((b) => (
+                  <option key={b.id} value={b.id.toString()} className="bg-white text-[#0F172A]">
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+
+        {/* Tab 1: Faculty Members Roster */}
+        {facultyTab === 'roster' && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500 font-medium">
-                    {isBangla ? 'কোনো শিক্ষক নিয়োগ পাওয়া যায়নি।' : 'No teacher assignments found.'}
-                  </td>
+                  <th className="py-3 px-4">{isBangla ? 'শিক্ষকের নাম' : 'Teacher Name'}</th>
+                  <th className="py-3 px-4">{isBangla ? 'লগইন আইডি' : 'Login ID'}</th>
+                  <th className="py-3 px-4">{isBangla ? 'যোগাযোগ' : 'Contact'}</th>
+                  <th className="py-3 px-4">{isBangla ? 'বর্তমান নিয়োগ' : 'Active Assignments'}</th>
+                  <th className="py-3 px-4">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
+                  <th className="py-3 px-4 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
                 </tr>
-              ) : (
-                filteredTeachers.map((ta) => (
-                  <tr key={ta.id} className="hover:bg-[#F0FDFA]/50 transition">
-                    <td className="py-3.5 px-4 font-bold text-gray-900 flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-[#E0F2FE] text-[#0284C7] font-extrabold flex items-center justify-center text-xs shrink-0">
-                        {ta.teacher_name?.charAt(0) || 'T'}
-                      </div>
-                      <span>{ta.teacher_name}</span>
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-gray-600">
-                      {ta.teacher_login_id}
-                    </td>
-                    <td className="py-3.5 px-4 font-bold text-[#0F766E]">
-                      {ta.subject_name}
-                    </td>
-                    <td className="py-3.5 px-4 text-gray-800 font-medium">
-                      {ta.batch_name}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2 py-0.5 rounded-full bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] text-[10px] font-bold">
-                        {ta.is_primary ? (isBangla ? 'প্রধান শিক্ষক' : 'Primary') : (isBangla ? 'সহকারী' : 'Associate')}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <button
-                        onClick={() => setTeacherToDelete(ta)}
-                        className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 text-xs font-bold transition inline-flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
-                        title={isBangla ? 'শিক্ষক অ্যাসাইনমেন্ট অপসরণ / রিমুভ করুন' : 'Remove Teacher Assignment'}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>{isBangla ? 'রিমুভ' : 'Remove'}</span>
-                      </button>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {faculty.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-slate-500 font-medium">
+                      {isBangla ? 'কোনো শিক্ষক নিবন্ধিত পাওয়া যায়নি।' : 'No faculty members registered.'}
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  faculty.map((f) => (
+                    <tr key={f.id} className="hover:bg-[#F0FDFA]/50 transition">
+                      <td className="py-3.5 px-4 font-bold text-gray-900 flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-teal-100 text-teal-800 font-extrabold flex items-center justify-center text-xs shrink-0 border border-teal-300">
+                          {f.full_name?.charAt(0) || 'T'}
+                        </div>
+                        <div>
+                          <p className="font-heading text-[#0F172A]">{f.full_name}</p>
+                          <p className="text-[10px] text-slate-500 font-normal">
+                            {isBangla ? 'অনুষদ সদস্য' : 'Faculty Teacher'}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-gray-700 font-semibold">
+                        {f.login_id}
+                      </td>
+                      <td className="py-3.5 px-4 text-gray-600">
+                        <div className="flex flex-col gap-0.5">
+                          {f.phone && <span className="font-mono text-[11px]">{f.phone}</span>}
+                          {f.email && <span className="text-[10px] text-slate-500 truncate max-w-[150px]">{f.email}</span>}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {f.assignments && f.assignments.length > 0 ? (
+                          <div className="flex flex-wrap gap-1 max-w-xs">
+                            {f.assignments.map((asg: any) => (
+                              <span
+                                key={asg.id}
+                                className="px-2 py-0.5 rounded-md bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] text-[10px] font-bold"
+                              >
+                                {asg.subject_name} ({asg.batch_name})
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 italic text-[11px]">
+                            {isBangla ? 'কোনো নিয়োগ নেই' : 'No assignments'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {f.is_active ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold border border-emerald-200">
+                            {isBangla ? 'সক্রিয়' : 'Active'}
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-extrabold border border-rose-200">
+                            {isBangla ? 'নিষ্ক্রিয়' : 'Inactive'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => {
+                              setAssignForm((prev) => ({ ...prev, teacher_user: f.id }));
+                              setShowAssignModal(true);
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-[#0F766E] hover:text-white text-[#0F766E] border border-teal-200 text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
+                            title={isBangla ? 'এই শিক্ষককে নতুন ব্যাচে নিয়োগ দিন' : 'Assign to batch'}
+                          >
+                            <BookMarked className="w-3.5 h-3.5" />
+                            <span>{isBangla ? 'নিয়োগ দিন' : 'Assign'}</span>
+                          </button>
+                          <button
+                            onClick={() => setTeacherToDeactivate(f)}
+                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
+                            title={isBangla ? 'শিক্ষক অ্যাকাউন্ট অপসরণ / নিষ্ক্রিয় করুন' : 'Deactivate Teacher'}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>{isBangla ? 'রিমুভ' : 'Remove'}</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Tab 2: Batch Assignments */}
+        {facultyTab === 'assignments' && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                <tr>
+                  <th className="py-3 px-4">{isBangla ? 'শিক্ষকের নাম' : 'Teacher Name'}</th>
+                  <th className="py-3 px-4">{isBangla ? 'লগইন আইডি' : 'Login ID'}</th>
+                  <th className="py-3 px-4">{isBangla ? 'বিষয়' : 'Subject'}</th>
+                  <th className="py-3 px-4">{isBangla ? 'ব্যাচ' : 'Batch'}</th>
+                  <th className="py-3 px-4">{isBangla ? 'ভূমিকা' : 'Role'}</th>
+                  <th className="py-3 px-4 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredTeachers.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-slate-500 font-medium">
+                      {isBangla ? 'কোনো শিক্ষক নিয়োগ পাওয়া যায়নি।' : 'No teacher assignments found.'}
+                    </td>
+                  </tr>
+                ) : (
+                  filteredTeachers.map((ta) => (
+                    <tr key={ta.id} className="hover:bg-[#F0FDFA]/50 transition">
+                      <td className="py-3.5 px-4 font-bold text-gray-900 flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-[#E0F2FE] text-[#0284C7] font-extrabold flex items-center justify-center text-xs shrink-0">
+                          {ta.teacher_name?.charAt(0) || 'T'}
+                        </div>
+                        <span>{ta.teacher_name}</span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-gray-600">
+                        {ta.teacher_login_id}
+                      </td>
+                      <td className="py-3.5 px-4 font-bold text-[#0F766E]">
+                        {ta.subject_name}
+                      </td>
+                      <td className="py-3.5 px-4 text-gray-800 font-medium">
+                        {ta.batch_name}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="px-2 py-0.5 rounded-full bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] text-[10px] font-bold">
+                          {ta.is_primary ? (isBangla ? 'প্রধান শিক্ষক' : 'Primary') : (isBangla ? 'সহকারী' : 'Associate')}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <button
+                          onClick={() => setTeacherToDelete(ta)}
+                          className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 text-xs font-bold transition inline-flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
+                          title={isBangla ? 'শিক্ষক অ্যাসাইনমেন্ট অপসরণ / রিমুভ করুন' : 'Remove Teacher Assignment'}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>{isBangla ? 'রিমুভ' : 'Remove'}</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Teacher Assignment Deletion Confirmation Modal */}
@@ -549,6 +860,377 @@ export default function AdminCoursesPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Teacher Modal */}
+      {showAddTeacherModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#0F766E] space-y-4 max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center">
+                  <UserPlus className="w-5 h-5 text-[#0F766E]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-[#0F172A] font-heading">
+                    {isBangla ? 'নতুন শিক্ষক নিবন্ধন ও নিয়োগ' : 'Register New Faculty Teacher'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    {isBangla ? 'শিক্ষক প্রোফাইল তৈরি ও ক্লাসরুম অ্যাকাউন্টে অন্তর্ভুক্তি' : 'Create faculty credentials and optional batch assignment'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddTeacherModal(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTeacher} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">
+                  {isBangla ? 'শিক্ষকের পূর্ণ নাম *' : 'Teacher Full Name *'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder={isBangla ? 'যেমন: মোহাম্মদ মাসুদ রানা' : 'e.g. Mohammad Masud Rana'}
+                  value={teacherForm.full_name}
+                  onChange={(e) => {
+                    const name = e.target.value;
+                    const autoId = teacherForm.login_id
+                      ? teacherForm.login_id
+                      : `tch_${name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10)}`;
+                    setTeacherForm({ ...teacherForm, full_name: name });
+                  }}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">
+                    {isBangla ? 'লগইন আইডি / ব্যবহারকারী নাম *' : 'Login ID / Username *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="tch_masud01"
+                    value={teacherForm.login_id}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, login_id: e.target.value })}
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-mono focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">
+                    {isBangla ? 'পাসওয়ার্ড *' : 'Initial Password *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={teacherForm.password}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })}
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-mono focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">
+                    {isBangla ? 'মোবাইল নম্বর (ঐচ্ছিক)' : 'Phone Number (Optional)'}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="01700000000"
+                    value={teacherForm.phone}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })}
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">
+                    {isBangla ? 'ইমেইল ঠিকানা (ঐচ্ছিক)' : 'Email Address (Optional)'}
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="teacher@assdi.local"
+                    value={teacherForm.email}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  />
+                </div>
+              </div>
+
+              {/* Initial Assignment Section */}
+              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-2.5">
+                <span className="font-bold text-[#B45309] block text-[11px]">
+                  {isBangla ? 'প্রাথমিক ব্যাচ ও বিষয় অ্যাসাইনমেন্ট (ঐচ্ছিক)' : 'Initial Batch & Subject Assignment (Optional)'}
+                </span>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-semibold text-slate-700 text-[10px] mb-1">
+                      {isBangla ? 'ব্যাচ নির্বাচন' : 'Assign to Batch'}
+                    </label>
+                    <select
+                      value={teacherForm.initial_batch_id}
+                      onChange={(e) => setTeacherForm({ ...teacherForm, initial_batch_id: e.target.value })}
+                      className="w-full p-2 bg-white border border-amber-200 rounded-lg text-[#0F172A] text-xs focus:outline-none"
+                    >
+                      <option value="">{isBangla ? 'পরবর্তীতে নির্ধারণ' : 'Assign Later'}</option>
+                      {batches.map((b) => (
+                        <option key={b.id} value={b.id}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 text-[10px] mb-1">
+                      {isBangla ? 'বিষয় নির্বাচন' : 'Assign Subject'}
+                    </label>
+                    <select
+                      value={teacherForm.initial_subject_id}
+                      onChange={(e) => setTeacherForm({ ...teacherForm, initial_subject_id: e.target.value })}
+                      className="w-full p-2 bg-white border border-amber-200 rounded-lg text-[#0F172A] text-xs focus:outline-none"
+                    >
+                      <option value="">{isBangla ? 'বিষয় নির্বাচন করুন' : 'Select Subject'}</option>
+                      {subjects.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} ({s.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-2 cursor-pointer pt-1">
+                  <input
+                    type="checkbox"
+                    checked={teacherForm.is_primary}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, is_primary: e.target.checked })}
+                    className="accent-[#0F766E] rounded"
+                  />
+                  <span className="text-[11px] font-semibold text-slate-700">
+                    {isBangla ? 'প্রধান প্রশিক্ষক (Primary Faculty)' : 'Primary Faculty Lead'}
+                  </span>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddTeacherModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl"
+                >
+                  {isBangla ? 'বাতিল' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={addingTeacher}
+                  className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-50"
+                >
+                  {addingTeacher
+                    ? isBangla
+                      ? 'সংরক্ষণ হচ্ছে...'
+                      : 'Saving...'
+                    : isBangla
+                    ? 'শিক্ষক যুক্ত করুন'
+                    : 'Confirm Add Teacher'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Teacher to Batch Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 border-t-4 border-t-[#C1982E] space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#B45309] border border-amber-200 flex items-center justify-center">
+                  <PlusCircle className="w-5 h-5 text-[#D97706]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-[#0F172A] font-heading">
+                    {isBangla ? 'ব্যাচে শিক্ষক নিয়োগ' : 'Assign Faculty to Batch'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    {isBangla ? 'নির্দিষ্ট ব্যাচে বিষয়ভিত্তিক শিক্ষক নির্ধারণ করুন' : 'Assign subject faculty for classroom sessions'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAssignModal(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAssignTeacher} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">
+                  {isBangla ? 'শিক্ষক নির্বাচন *' : 'Select Faculty Teacher *'}
+                </label>
+                <select
+                  required
+                  value={assignForm.teacher_user}
+                  onChange={(e) => setAssignForm({ ...assignForm, teacher_user: e.target.value })}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                >
+                  <option value="">{isBangla ? 'শিক্ষক বাছাই করুন...' : 'Select Teacher...'}</option>
+                  {faculty.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.full_name} ({f.login_id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">
+                  {isBangla ? 'ব্যাচ নির্বাচন *' : 'Select Batch *'}
+                </label>
+                <select
+                  required
+                  value={assignForm.batch}
+                  onChange={(e) => setAssignForm({ ...assignForm, batch: e.target.value })}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                >
+                  <option value="">{isBangla ? 'ব্যাচ বাছাই করুন...' : 'Select Batch...'}</option>
+                  {batches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">
+                  {isBangla ? 'বিষয় নির্বাচন *' : 'Select Subject *'}
+                </label>
+                <select
+                  required
+                  value={assignForm.subject}
+                  onChange={(e) => setAssignForm({ ...assignForm, subject: e.target.value })}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                >
+                  <option value="">{isBangla ? 'বিষয় বাছাই করুন...' : 'Select Subject...'}</option>
+                  {subjects.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} ({s.code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-slate-50 border border-slate-200">
+                <input
+                  type="checkbox"
+                  checked={assignForm.is_primary}
+                  onChange={(e) => setAssignForm({ ...assignForm, is_primary: e.target.checked })}
+                  className="accent-[#0F766E] rounded"
+                />
+                <span className="text-[11px] font-semibold text-slate-700">
+                  {isBangla ? 'প্রধান প্রশিক্ষক (Primary Faculty)' : 'Designate as Primary Faculty'}
+                </span>
+              </label>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAssignModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl"
+                >
+                  {isBangla ? 'বাতিল' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={assigningTeacher}
+                  className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-50"
+                >
+                  {assigningTeacher
+                    ? isBangla
+                      ? 'নিয়োগ হচ্ছে...'
+                      : 'Assigning...'
+                    : isBangla
+                    ? 'নিয়োগ চূড়ান্ত করুন'
+                    : 'Confirm Assignment'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Teacher Account Deactivation Modal */}
+      {teacherToDeactivate && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-rose-200 border-t-4 border-t-rose-600 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-[#0F172A]">
+                  {isBangla ? 'শিক্ষক অপসরণ / নিষ্ক্রিয়করণ' : 'Deactivate Teacher Account'}
+                </h3>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                  {teacherToDeactivate.full_name} ({teacherToDeactivate.login_id})
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {isBangla
+                ? `আপনি কি নিশ্চিত যে ${teacherToDeactivate.full_name}-কে অনুষদ তালিকা থেকে অপসরণ করতে চান? এর ফলে শিক্ষকের অ্যাকাউন্টে লগইন বন্ধ হবে এবং সকল ব্যাচ অ্যাসাইনমেন্ট বাতিল হবে।`
+                : `Are you sure you want to deactivate ${teacherToDeactivate.full_name}? Their login will be blocked and all course assignments revoked.`}
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setTeacherToDeactivate(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition cursor-pointer"
+              >
+                {isBangla ? 'বাতিল' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeactivateTeacher}
+                disabled={deactivatingTeacher}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {deactivatingTeacher ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
+                ) : (
+                  <Trash2 className="w-3.5 h-3.5 text-white" />
+                )}
+                <span>
+                  {deactivatingTeacher
+                    ? isBangla
+                      ? 'অপসরণ হচ্ছে...'
+                      : 'Deactivating...'
+                    : isBangla
+                    ? 'হ্যাঁ, শিক্ষক অপসরণ করুন'
+                    : 'Confirm Deactivation'}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       )}

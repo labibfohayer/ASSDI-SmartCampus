@@ -422,3 +422,104 @@ class TestAcademicStructureAndRBAC:
         # Clean up
         u_std2.delete()
         super_admin.delete()
+
+    def test_student_photo_and_offboard_with_reason(self, api_client, academic_setup):
+        """Verify student photo persistence and offboarding with administrative reason."""
+        super_admin = User.objects.create_user(
+            login_id="admin_test_photo",
+            full_name="Admin Test Photo",
+            role=UserRole.SUPER_ADMIN,
+            password="AdminPassword123!",
+        )
+        api_client.force_authenticate(user=super_admin)
+
+        # 1. Create student with photo
+        sample_photo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+        create_res = api_client.post(
+            reverse("student-list"),
+            {
+                "student_id_number": "STD-PHOTO-001",
+                "registration_no": "REG-PHOTO-001",
+                "full_name": "Photo Student",
+                "education_background": "General",
+                "campus_id": academic_setup["campus_dhaka"].id,
+                "batch_id": academic_setup["batch_sbmc_42"].id,
+                "photo": sample_photo,
+            },
+        )
+        assert create_res.status_code == status.HTTP_201_CREATED
+        student_id = create_res.data["data"]["id"]
+
+        # 2. Verify photo in ID card endpoint
+        id_card_res = api_client.get(f"/api/v1/students/{student_id}/id-card/")
+        assert id_card_res.status_code == status.HTTP_200_OK
+        assert id_card_res.data["photo_url"] == sample_photo
+
+        # 3. Offboard student with status=expelled and custom reason
+        offboard_res = api_client.post(
+            f"/api/v1/students/{student_id}/offboard/",
+            {
+                "status": "expelled",
+                "reason": "Repeated disciplinary violation in classroom",
+            },
+        )
+        assert offboard_res.status_code == status.HTTP_200_OK
+        assert offboard_res.data["status"] == "expelled"
+        assert offboard_res.data["reason"] == "Repeated disciplinary violation in classroom"
+
+        # Verify database state
+        st = Student.objects.get(id=student_id)
+        assert st.status == "expelled"
+        assert st.status_reason == "Repeated disciplinary violation in classroom"
+        assert st.user.is_active is False
+
+        # Clean up
+        st.user.delete()
+        super_admin.delete()
+
+    def test_teacher_management_api(self, api_client, academic_setup):
+        """Verify Super Admin can list, create, and deactivate teachers."""
+        super_admin = User.objects.create_user(
+            login_id="admin_test_teachers",
+            full_name="Admin Test Teachers",
+            role=UserRole.SUPER_ADMIN,
+            password="AdminPassword123!",
+        )
+        api_client.force_authenticate(user=super_admin)
+
+        # 1. Create a new teacher
+        subject = Subject.objects.first()
+        create_res = api_client.post(
+            "/api/v1/teachers/",
+            {
+                "login_id": "tch_new_01",
+                "full_name": "Md. Rafiqul Teacher",
+                "email": "rafiq.teacher@assdi.edu.bd",
+                "phone": "+8801700000099",
+                "password": "TeacherPass2026!",
+                "initial_batch_id": academic_setup["batch_sbmc_42"].id,
+                "initial_subject_id": subject.id,
+            },
+        )
+        assert create_res.status_code == status.HTTP_201_CREATED
+        teacher_id = create_res.data["id"]
+        assert create_res.data["login_id"] == "tch_new_01"
+        assert create_res.data["assignments_count"] == 1
+
+        # 2. List teachers
+        list_res = api_client.get("/api/v1/teachers/")
+        assert list_res.status_code == status.HTTP_200_OK
+        teacher_ids = [t["id"] for t in (list_res.data if isinstance(list_res.data, list) else list_res.data.get("results", []))]
+        assert teacher_id in teacher_ids
+
+        # 3. Soft-deactivate teacher
+        del_res = api_client.delete(f"/api/v1/teachers/{teacher_id}/")
+        assert del_res.status_code == status.HTTP_204_NO_CONTENT
+
+        t_user = User.objects.get(id=teacher_id)
+        assert t_user.is_active is False
+
+        # Clean up
+        t_user.teacher_assignments.all().delete()
+        t_user.delete()
+        super_admin.delete()
