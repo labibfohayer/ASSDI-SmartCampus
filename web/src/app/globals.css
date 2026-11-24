@@ -72,6 +72,19 @@
   --color-chart-3: #D97706;
   --color-chart-4: #16A34A;
   --color-chart-5: #0D9488;
+
+  /* Islamic Modern Luxury Palette (Reference Design Tokens) */
+  --color-islamic-forest: #002F25;
+  --color-islamic-forest-dark: #00231B;
+  --color-islamic-emerald: #064E3B;
+  --color-islamic-emerald-light: #059669;
+  --color-islamic-orange: #FF8108;
+  --color-islamic-orange-dark: #EA580C;
+  --color-islamic-amber: #F59E0B;
+  --color-islamic-canvas: #F8FDF7;
+  --color-islamic-banner-bg: #F5F4D6;
+  --color-islamic-border: #E2ECE6;
+  --color-islamic-mint: #A7F3D0;
 }
 
 :root {
@@ -98,6 +111,14 @@
   --chart-3: #D97706;
   --chart-4: #16A34A;
   --chart-5: #0D9488;
+
+  /* Islamic Modern Canvas & Accent Tokens */
+  --islamic-forest: #002F25;
+  --islamic-forest-dark: #00231B;
+  --islamic-emerald: #064E3B;
+  --islamic-orange: #FF8108;
+  --islamic-canvas: #F8FDF7;
+  --islamic-banner: #F5F4D6;
 }
 
 body {
