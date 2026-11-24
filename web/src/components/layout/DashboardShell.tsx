@@ -746,133 +746,118 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           )}
 
           {/* Navigation Items (Serial by Serial) */}
-          <nav className="p-3 space-y-4 overflow-y-auto flex-1">
-            {navSections.map((sec, secIdx) => (
-              <div key={secIdx} className="space-y-1">
-                {(sec.titleBn || sec.titleEn) && (
-                  <p
-                    className={`px-3 text-[10px] font-bold uppercase tracking-widest mb-1.5 font-serif ${
-                      role === 'student' ? 'text-[#6EE7B7]' : 'text-[#B45309]'
-                    }`}
-                  >
-                    {isBangla ? sec.titleBn : sec.titleEn}
-                  </p>
-                )}
-
-                <ul className="space-y-1">
-                  {sec.items.map((item) => {
-                    const Icon = item.icon;
-                    const active = isLinkActive(item.href);
-
-                    return (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={() => handleNavClick(item.href)}
-                          className={`relative flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-[0.98] ${
-                            active
-                              ? role === 'student'
-                                ? 'bg-gradient-to-r from-[#FF8108] to-[#EA580C] text-white font-bold shadow-md shadow-orange-950/30'
-                                : 'bg-white text-[#B45309] shadow-xs border border-[#FCD34D] font-bold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1.5 before:bg-[#D97706] before:rounded-r'
-                              : role === 'student'
-                              ? 'text-[#D1FAE5]/80 hover:text-white hover:bg-white/10'
-                              : 'text-[#475569] hover:text-[#B45309] hover:bg-[#FEF3C7]/60'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <Icon
-                              className={`w-4 h-4 shrink-0 ${
-                                active
-                                  ? 'text-white'
-                                  : role === 'student'
-                                  ? 'text-[#6EE7B7]'
-                                  : 'text-[#64748B] group-hover:text-[#B45309]'
-                              }`}
-                            />
-                            <span className="truncate">
-                              {isBangla ? item.labelBn : item.labelEn}
-                            </span>
-                          </div>
-
-                          {item.badge && (
-                            <span
-                              className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                                active
-                                  ? 'bg-white text-[#EA580C]'
-                                  : role === 'student'
-                                  ? 'bg-[#00221A] border border-[#065F46] text-[#6EE7B7]'
-                                  : 'bg-white/90 border border-[#FCD34D] text-[#B45309]'
-                              }`}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-
-            {/* If in Reports Hub, show quick back to user dashboard */}
-            {role === 'reports' && (
-              <div className="pt-2 border-t border-[#FCD34D]/70">
-                <Link
-                  href={
-                    user?.role === 'super_admin'
-                      ? '/admin'
-                      : user?.role === 'teacher'
-                      ? '/teacher'
-                      : user?.role === 'student'
-                      ? '/student'
-                      : '/coordinator'
-                  }
-                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#B45309] hover:bg-[#FEF3C7]/60 transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4 text-[#B45309]" />
-                  <span>{isBangla ? 'ড্যাশবোর্ডে ফিরে যান' : 'Back to Dashboard'}</span>
-                </Link>
-              </div>
-            )}
-
-            {/* Super Admin Navigation Customizer Button */}
-            {role === 'super_admin' && (
-              <div className="pt-2 border-t border-[#FCD34D]/70">
-                <button
-                  type="button"
-                  onClick={() => setMenuManagerOpen(true)}
-                  className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D] text-xs font-bold transition flex items-center justify-between shadow-xs cursor-pointer active:scale-98"
-                >
-                  <div className="flex items-center gap-2">
-                    <Settings className="w-4 h-4 text-[#B45309]" />
-                    <span>{isBangla ? 'মেনু এডিটর ও আর্কাইভ' : 'Menu & Archive Control'}</span>
-                  </div>
-                  {adminMenus.some((m) => m.isArchived) && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-[#B45309]/15 text-[#B45309] font-extrabold border border-[#B45309]/30">
-                      {adminMenus.filter((m) => m.isArchived).length} {isBangla ? 'হাইড' : 'hidden'}
-                    </span>
+          <nav className="p-3 overflow-y-auto flex-1 flex flex-col justify-between">
+            <div className="space-y-4">
+              {navSections.map((sec, secIdx) => (
+                <div key={secIdx} className="space-y-1">
+                  {(sec.titleBn || sec.titleEn) && (
+                    <p
+                      className={`px-3 text-[10px] font-bold uppercase tracking-widest mb-1.5 font-serif ${
+                        role === 'student' ? 'text-[#6EE7B7]' : 'text-[#B45309]'
+                      }`}
+                    >
+                      {isBangla ? sec.titleBn : sec.titleEn}
+                    </p>
                   )}
-                </button>
-              </div>
-            )}
 
-            {/* Islamic Mosque Artwork Quote Card (Student Only - Pure Image with NO black border) */}
-            {role === 'student' && (
-              <div className="pt-2 px-1 flex justify-center">
-                <div className="relative group max-w-[210px]">
-                  <Image
-                    src="/islamic-sidebar-card.png"
-                    alt="জ্ঞানই শান্তি, দাওয়াই সফলতা"
-                    width={260}
-                    height={260}
-                    priority
-                    quality={100}
-                    className="w-full h-auto max-h-[140px] object-contain group-hover:scale-102 transition-transform duration-300"
-                  />
+                  <ul className="space-y-1">
+                    {sec.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = isLinkActive(item.href);
+
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={() => handleNavClick(item.href)}
+                            className={`relative flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-[0.98] ${
+                              active
+                                ? role === 'student'
+                                  ? 'bg-gradient-to-r from-[#FF8108] to-[#EA580C] text-white font-bold shadow-md shadow-orange-950/30'
+                                  : 'bg-white text-[#B45309] shadow-xs border border-[#FCD34D] font-bold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1.5 before:bg-[#D97706] before:rounded-r'
+                                : role === 'student'
+                                ? 'text-[#D1FAE5]/80 hover:text-white hover:bg-white/10'
+                                : 'text-[#475569] hover:text-[#B45309] hover:bg-[#FEF3C7]/60'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <Icon
+                                className={`w-4 h-4 shrink-0 ${
+                                  active
+                                    ? 'text-white'
+                                    : role === 'student'
+                                    ? 'text-[#6EE7B7]'
+                                    : 'text-[#64748B] group-hover:text-[#B45309]'
+                                }`}
+                              />
+                              <span className="truncate">
+                                {isBangla ? item.labelBn : item.labelEn}
+                              </span>
+                            </div>
+
+                            {item.badge && (
+                              <span
+                                className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                  active
+                                    ? 'bg-white text-[#EA580C]'
+                                    : role === 'student'
+                                    ? 'bg-[#00221A] border border-[#065F46] text-[#6EE7B7]'
+                                    : 'bg-white/90 border border-[#FCD34D] text-[#B45309]'
+                                }`}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
-              </div>
-            )}
+              ))}
+
+              {/* If in Reports Hub, show quick back to user dashboard */}
+              {role === 'reports' && (
+                <div className="pt-2 border-t border-[#FCD34D]/70">
+                  <Link
+                    href={
+                      user?.role === 'super_admin'
+                        ? '/admin'
+                        : user?.role === 'teacher'
+                        ? '/teacher'
+                        : user?.role === 'student'
+                        ? '/student'
+                        : '/coordinator'
+                    }
+                    className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#B45309] hover:bg-[#FEF3C7]/60 transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-[#B45309]" />
+                    <span>{isBangla ? 'ড্যাশবোর্ডে ফিরে যান' : 'Back to Dashboard'}</span>
+                  </Link>
+                </div>
+              )}
+
+              {/* Super Admin Navigation Customizer Button */}
+              {role === 'super_admin' && (
+                <div className="pt-2 border-t border-[#FCD34D]/70">
+                  <button
+                    type="button"
+                    onClick={() => setMenuManagerOpen(true)}
+                    className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D] text-xs font-bold transition flex items-center justify-between shadow-xs cursor-pointer active:scale-98"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-4 h-4 text-[#B45309]" />
+                      <span>{isBangla ? 'মেনু এডিটর ও আর্কাইভ' : 'Menu & Archive Control'}</span>
+                    </div>
+                    {adminMenus.some((m) => m.isArchived) && (
+                      <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-[#B45309]/15 text-[#B45309] font-extrabold border border-[#B45309]/30">
+                        {adminMenus.filter((m) => m.isArchived).length} {isBangla ? 'হাইড' : 'hidden'}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
 
@@ -884,6 +869,23 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               : 'border-[#FCD34D] bg-[#FFFBEB]'
           }`}
         >
+          {/* Islamic Mosque Artwork Quote Card (Student Only - Prominent & Beautifully Balanced) */}
+          {role === 'student' && (
+            <div className="pt-0.5 pb-1 px-1 flex justify-center">
+              <div className="relative group w-full max-w-[230px]">
+                <Image
+                  src="/islamic-sidebar-card.png"
+                  alt="জ্ঞানই শান্তি, দাওয়াই সফলতা"
+                  width={320}
+                  height={320}
+                  priority
+                  quality={100}
+                  className="w-full h-auto object-contain drop-shadow-md group-hover:scale-102 transition-transform duration-300"
+                />
+              </div>
+            </div>
+          )}
+
           {/* User info snippet */}
           <div
             className={`flex items-center justify-between gap-2 p-2 rounded-xl shadow-2xs ${
