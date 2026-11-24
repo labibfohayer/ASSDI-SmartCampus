@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   GraduationCap,
   Calendar,
@@ -42,6 +43,31 @@ import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUser } from '@/lib/auth';
+
+function SparklineWave({ color = '#10B981', gradientId = 'green-wave' }: { color?: string; gradientId?: string }) {
+  return (
+    <div className="w-full h-8 overflow-hidden mt-1.5 pointer-events-none">
+      <svg className="w-full h-full" viewBox="0 0 200 32" fill="none" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.28" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.0" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M 0 24 C 25 18, 45 28, 70 16 C 95 6, 120 20, 145 10 C 165 4, 185 8, 200 5 L 200 32 L 0 32 Z"
+          fill={`url(#${gradientId})`}
+        />
+        <path
+          d="M 0 24 C 25 18, 45 28, 70 16 C 95 6, 120 20, 145 10 C 165 4, 185 8, 200 5"
+          stroke={color}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    </div>
+  );
+}
 
 interface StudentProfile {
   id: number;
@@ -524,82 +550,116 @@ export default function StudentPortalPage() {
 
   return (
     <div className="space-y-6">
-      {/* Student Profile Hero Card (Madrasat-us-Sunnah Warm Amber Banner Architecture) */}
-      <div className="bg-[#FFFBEB] rounded-2xl border border-[#FCD34D] border-l-4 border-l-[#D97706] shadow-xs p-6 sm:p-7 text-[#0F172A] relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
-          <div className="flex items-center gap-4 sm:gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] flex items-center justify-center font-bold text-2xl shadow-xs shrink-0">
-              <GraduationCap className="w-8 h-8 text-[#0F766E]" />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-white border border-[#CCFBF1] text-[#0F766E]">
-                  {profile?.current_batch_name || 'SBMC Batch 42'}
-                </span>
-                <span className="text-xs font-mono font-bold bg-white text-[#0F766E] px-2.5 py-0.5 rounded-md border border-[#CCFBF1]">
-                  {profile?.student_id_number || 'STD-2026-042-001'}
-                </span>
-                <span className="text-[11px] font-semibold bg-[#F0FDFA] text-[#0369A1] px-2 py-0.5 rounded-md border border-[#CCFBF1] flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0284C7] animate-pulse" />
-                  {isBangla ? 'নিয়মিত শিক্ষার্থী' : 'Active Student'}
-                </span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] mt-2 tracking-tight font-serif">
-                {profile?.full_name || 'Abdullah Student'}
-              </h1>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#64748B] mt-1.5 font-medium">
-                <span className="flex items-center gap-1.5">
-                  <Building className="w-3.5 h-3.5 text-[#0F766E]" />
-                  {profile?.campus_name || 'Kazi Bari Campus'}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-[#0F766E]" />
-                  {isBangla ? 'ব্যাকগ্রাউন্ড:' : 'Background:'} {profile?.education_background || 'General'}
-                </span>
-              </div>
-            </div>
+      {/* Islamic Modern Student Hero Welcome Banner (Reference Design Architecture) */}
+      <div className="bg-gradient-to-r from-[#FFFDF8] via-[#FDF8EC] to-[#F7EFCF] rounded-2xl sm:rounded-3xl border border-[#FDE68A] shadow-xs p-5 sm:p-7 relative overflow-hidden">
+        {/* Decorative Mosque Artwork on the Right (Seamless blend with Calligraphy & Green Skyline) */}
+        <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-auto h-full pointer-events-none select-none">
+          <Image
+            src="/islamic-banner-art.png"
+            alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
+            width={377}
+            height={144}
+            priority
+            className="h-full w-auto object-cover object-right"
+          />
+        </div>
+
+        {/* Top-Right Decorative Amber/Emerald Curve Accent (Matching Reference Design on small screens) */}
+        <div
+          className="lg:hidden absolute -top-8 -right-8 w-28 h-28 rounded-full border-4 border-emerald-700/30 bg-amber-100/40 pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Content on the Left */}
+        <div className="relative z-10 max-w-2xl">
+          {/* Welcome Heading */}
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#002F25] tracking-tight font-serif">
+              {isBangla ? 'স্বাগতম' : 'Welcome back'}, {profile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || (isBangla ? 'শিক্ষার্থী' : 'Student')}!
+            </h1>
+            <span className="text-2xl sm:text-3xl" role="img" aria-label="wave">
+              👋
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              onClick={() => setIdCardOpen(true)}
-              className="px-4 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
-              title={isBangla ? 'ডিজিটাল আইডি কার্ড ও এডমিট কার্ড' : 'Digital ID & Admit Card'}
-            >
-              <CreditCard className="w-4 h-4 text-[#B45309]" />
-              <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
-            </button>
-            <button
-              onClick={() => setCertModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
-              title={isBangla ? 'কোর্স সনদপত্র প্রিভিউ ও প্রিন্ট' : 'Course Certificate Preview & Print'}
-            >
-              <Award className="w-4 h-4 text-[#B45309]" />
-              <span>{isBangla ? 'সনদপত্র' : 'Certificate'}</span>
-            </button>
+          <p className="text-xs sm:text-sm text-[#475569] font-medium mt-1.5 leading-relaxed">
+            {isBangla
+              ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটে আজকের শিক্ষণ ও ক্লাসের কার্যক্রম দেখে নিন।'
+              : "Here's what's happening at As-Sunnah Skill Development Institute today."}
+          </p>
+
+          {/* Date, Batch, Student ID Badges */}
+          <div className="mt-3.5 flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6F4EA] border border-[#A7F3D0] text-[#065F46] text-xs font-semibold shadow-2xs">
+              <Calendar className="w-3.5 h-3.5 text-[#059669]" />
+              <span suppressHydrationWarning>
+                {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </span>
+            </div>
+
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-white/90 border border-[#FCD34D] text-[#B45309] shadow-2xs">
+              {profile?.current_batch_name || 'SBMC Batch 42'}
+            </span>
+
+            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-white/90 border border-slate-200 text-[#334155] shadow-2xs">
+              {profile?.student_id_number || 'STD-2026-042-001'}
+            </span>
+
+            <span className="text-[11px] font-semibold bg-[#F0FDFA] text-[#0F766E] px-2.5 py-1 rounded-full border border-[#CCFBF1] flex items-center gap-1 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0D9488] animate-pulse" />
+              {isBangla ? 'নিয়মিত শিক্ষার্থী' : 'Active Student'}
+            </span>
+          </div>
+
+          {/* Quick Action Buttons */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               onClick={() => setScannerOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-md active:scale-95 border border-[#FCD34D]"
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#FF8108] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-orange-950/20 active:scale-95"
               title={isBangla ? 'ক্যামেরা দিয়ে কিউআর স্ক্যান করুন' : 'Scan Attendance QR'}
             >
-              <QrCode className="w-4 h-4 text-white" />
-              <span>{isBangla ? 'কিউআর দিয়ে উপস্থিতি' : 'Scan Attendance QR'}</span>
+              <QrCode className="w-3.5 h-3.5 text-white" />
+              <span>{isBangla ? 'কিউআর দিয়ে উপস্থিতি' : 'Scan QR'}</span>
             </button>
+
+            <button
+              onClick={() => setIdCardOpen(true)}
+              className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+              title={isBangla ? 'ডিজিটাল আইডি কার্ড' : 'Digital Student ID'}
+            >
+              <CreditCard className="w-3.5 h-3.5 text-[#B45309]" />
+              <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
+            </button>
+
+            <button
+              onClick={() => setCertModalOpen(true)}
+              className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+              title={isBangla ? 'কোর্স সনদপত্র' : 'Course Certificate'}
+            >
+              <Award className="w-3.5 h-3.5 text-[#B45309]" />
+              <span>{isBangla ? 'সনদপত্র' : 'Certificate'}</span>
+            </button>
+
             <button
               onClick={loadStudentData}
-              title={isBangla ? 'রিফ্রেশ করুন' : 'Refresh'}
-              className="px-4 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] transition-colors flex items-center gap-2 text-xs font-bold cursor-pointer shadow-xs"
+              title={isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh'}
+              className="px-3 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#64748B] hover:text-[#0F172A] border border-slate-200/90 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer shadow-xs active:scale-95"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#B45309] ${loading ? 'animate-spin' : ''}`} />
-              <span>{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh Data'}</span>
+              <RefreshCw className={`w-3.5 h-3.5 text-[#0F766E] ${loading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh'}</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Attendance & Learning Metric Cards (Bento Style & Clickable Shortcuts) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Attendance Rate */}
+      {/* Attendance & Learning Metric Cards (Bento Wave Style & Clickable Shortcuts) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Card 1: Attendance Rate */}
         <div
           role="button"
           tabIndex={0}
@@ -615,40 +675,42 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'উপস্থিতির বিস্তারিত হিস্ট্রি দেখতে ক্লিক করুন' : 'Click to view attendance history'}
-          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none"
+          className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none flex flex-col justify-between"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-700 transition-colors">
-              {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 group-hover:bg-emerald-100 transition-colors">
-              <CheckCircle2 className="w-4 h-4" />
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200/60 shadow-2xs group-hover:scale-105 transition-transform">
+                <CheckCircle2 className="w-5 h-5 text-emerald-700" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-serif truncate">
+                  {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-serif">
+                    {safeFixed(attSummary?.attendance_percentage)}%
+                  </span>
+                  <span className="text-[11px] font-bold text-emerald-600 inline-flex items-center">
+                    ↑ 12%
+                  </span>
+                </div>
+              </div>
             </div>
+
+            <SparklineWave color="#10B981" gradientId="wave-attendance" />
           </div>
-          <div className="flex items-baseline gap-2 mt-3">
-            <span className="text-3xl font-black text-emerald-600">
-              {safeFixed(attSummary?.attendance_percentage)}%
-            </span>
-          </div>
-          <div className="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                (attSummary?.attendance_percentage || 0) < 75
-                  ? 'bg-red-500'
-                  : 'bg-emerald-600'
-              }`}
-              style={{ width: `${Math.min(attSummary?.attendance_percentage || 0, 100)}%` }}
-            />
-          </div>
-          <p className="text-[11px] font-semibold text-emerald-700 mt-2 flex items-center gap-1">
+
+          <p className="text-[11px] font-semibold text-emerald-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            {(attSummary?.attendance_percentage || 0) >= 80
-              ? isBangla ? 'সন্তোষজনক ও নিয়মিত উপস্থিতি' : 'Satisfactory attendance'
-              : isBangla ? 'উপস্থিতির হার বৃদ্ধি করা প্রয়োজন' : 'Needs improvement'}
+            <span className="truncate">
+              {(attSummary?.attendance_percentage || 0) >= 80
+                ? isBangla ? 'সন্তোষজনক ও নিয়মিত উপস্থিতি' : 'Satisfactory attendance'
+                : isBangla ? 'উপস্থিতির হার বৃদ্ধি প্রয়োজন' : 'Needs improvement'}
+            </span>
           </p>
         </div>
 
-        {/* Present Days */}
+        {/* Card 2: Present Days */}
         <div
           role="button"
           tabIndex={0}
@@ -664,29 +726,41 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'উপস্থিত সেশনের তালিকা দেখতে ক্লিক করুন' : 'Click to view attended sessions'}
-          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none"
+          className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none flex flex-col justify-between"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-700 transition-colors">
-              {isBangla ? 'উপস্থিত সেশন' : 'Present Sessions'}
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 group-hover:bg-emerald-100 transition-colors">
-              <UserCheck className="w-4 h-4" />
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-sky-100/80 text-sky-700 flex items-center justify-center shrink-0 border border-sky-200/60 shadow-2xs group-hover:scale-105 transition-transform">
+                <UserCheck className="w-5 h-5 text-sky-700" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-serif truncate">
+                  {isBangla ? 'উপস্থিত সেশন' : 'Present Sessions'}
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-serif">
+                    {attSummary?.present || 0}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-400">
+                    / {attSummary?.total_sessions || 0}
+                  </span>
+                  <span className="text-[11px] font-bold text-sky-600 inline-flex items-center ml-1">
+                    ↑ 0%
+                  </span>
+                </div>
+              </div>
             </div>
+
+            <SparklineWave color="#0284C7" gradientId="wave-present" />
           </div>
-          <p className="text-3xl font-black text-slate-900 mt-3">
-            {attSummary?.present || 0}{' '}
-            <span className="text-sm font-semibold text-slate-400">
-              / {attSummary?.total_sessions || 0}
-            </span>
-          </p>
-          <p className="text-[11px] text-emerald-700 mt-3 flex items-center gap-1 font-medium">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            {isBangla ? 'সফলভাবে ক্লাসে সম্পন্ন' : 'Attended successfully'}
+
+          <p className="text-[11px] font-semibold text-emerald-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span className="truncate">{isBangla ? 'সফলভাবে ক্লাসে সম্পন্ন' : 'Attended successfully'}</span>
           </p>
         </div>
 
-        {/* Absent Days */}
+        {/* Card 3: Absent Days */}
         <div
           role="button"
           tabIndex={0}
@@ -702,31 +776,47 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'অনুপস্থিতির হিস্ট্রি ও বিস্তারিত দেখতে ক্লিক করুন' : 'Click to view absence history'}
-          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-red-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none"
+          className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none flex flex-col justify-between"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-red-700 transition-colors">
-              {isBangla ? 'অনুপস্থিতি' : 'Absences'}
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center border border-red-200 group-hover:bg-red-100 transition-colors">
-              <AlertCircle className="w-4 h-4 text-red-600" />
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-100/80 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200/60 shadow-2xs group-hover:scale-105 transition-transform">
+                <AlertCircle className="w-5 h-5 text-amber-700" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-serif truncate">
+                  {isBangla ? 'অনুপস্থিতি' : 'Absences'}
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className={`text-2xl sm:text-3xl font-black ${(attSummary?.absent || 0) >= 3 ? 'text-amber-600' : 'text-[#0F172A]'} tracking-tight font-serif`}>
+                    {attSummary?.absent || 0}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-400">
+                    {isBangla ? 'সেশন' : 'sessions'}
+                  </span>
+                  <span className="text-[11px] font-bold text-amber-600 inline-flex items-center ml-1">
+                    ↑ 1%
+                  </span>
+                </div>
+              </div>
             </div>
+
+            <SparklineWave color="#F59E0B" gradientId="wave-absent" />
           </div>
-          <p className="text-3xl font-black text-red-600 mt-3">
-            {attSummary?.absent || 0}{' '}
-            <span className="text-sm font-semibold text-red-400">
-              {isBangla ? 'সেশন' : 'sessions'}
+
+          <p className={`text-[11px] font-bold mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2 ${
+            (attSummary?.absent || 0) >= 3 ? 'text-amber-600' : 'text-slate-600'
+          }`}>
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">
+              {(attSummary?.absent || 0) >= 3
+                ? isBangla ? 'সতর্কবার্তা: অনুপস্থিতি বেশি' : 'Warning: High absences'
+                : isBangla ? 'স্বাভাবিক সীমার মধ্যে' : 'Normal range'}
             </span>
-          </p>
-          <p className="text-[11px] text-red-600 mt-3 flex items-center gap-1 font-bold">
-            <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
-            {(attSummary?.absent || 0) >= 3
-              ? isBangla ? 'সতর্কবার্তা: অনুপস্থিতি বেশি' : 'Warning: High absences'
-              : isBangla ? 'স্বাভাবিক সীমার মধ্যে' : 'Normal range'}
           </p>
         </div>
 
-        {/* Help Requests */}
+        {/* Card 4: Help Requests */}
         <div
           role="button"
           tabIndex={0}
@@ -742,23 +832,40 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'শিক্ষকের সমাধান ও উত্তর দেখতে ক্লিক করুন' : 'Click to view teacher solutions'}
-          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-blue-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none"
+          className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none flex flex-col justify-between"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-blue-900 transition-colors">
-              {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center border border-blue-200 group-hover:bg-blue-200 transition-colors">
-              <HelpCircle className="w-4 h-4 text-blue-900" />
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-100/80 text-purple-700 flex items-center justify-center shrink-0 border border-purple-200/60 shadow-2xs group-hover:scale-105 transition-transform">
+                <HelpCircle className="w-5 h-5 text-purple-700" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-serif truncate">
+                  {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-serif">
+                    {helpRequests.length}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-400">
+                    {isBangla ? 'টি' : 'total'}
+                  </span>
+                  <span className="text-[11px] font-bold text-purple-600 inline-flex items-center ml-1">
+                    ↑ 5%
+                  </span>
+                </div>
+              </div>
             </div>
+
+            <SparklineWave color="#A855F7" gradientId="wave-help" />
           </div>
-          <p className="text-3xl font-black text-blue-950 mt-3">
-            {helpRequests.length}
-          </p>
-          <p className="text-[11px] text-blue-900 mt-3 flex items-center gap-1 font-bold">
-            <CheckCircle2 className="w-3.5 h-3.5 text-blue-700" />
-            {helpRequests.filter((h) => h.status === 'resolved').length}{' '}
-            {isBangla ? 'টি সমাধান হয়েছে' : 'resolved'}
+
+          <p className="text-[11px] font-bold text-purple-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+            <span className="truncate">
+              {helpRequests.filter((h) => h.status === 'resolved').length}{' '}
+              {isBangla ? 'টি সমাধান হয়েছে' : 'resolved'}
+            </span>
           </p>
         </div>
       </div>
