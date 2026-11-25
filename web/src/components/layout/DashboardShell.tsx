@@ -1159,7 +1159,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           className={`flex-1 w-full relative z-10 ${
             role === 'student'
               ? 'flex flex-col px-4 sm:px-6 pt-3 pb-24 md:pb-3'
-              : 'w-full px-4 sm:px-6 lg:px-8 py-3.5 sm:py-5 pb-24 md:pb-8'
+              : 'w-full px-3 sm:px-5 lg:px-6 py-2 sm:py-2.5 pb-20 md:pb-2'
           }`}
         >
           {children}
@@ -1170,7 +1170,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           className={`border-t border-slate-200/80 bg-white text-center text-slate-500 ${
             role === 'student'
               ? 'py-2 text-[11px] pb-20 md:pb-2'
-              : 'py-4 text-xs pb-20 md:pb-4'
+              : 'py-1.5 text-[10.5px] pb-20 md:pb-1.5'
           }`}
         >
           <p>© 2026 আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট (ASSDI) • ঢাকা, বাংলাদেশ</p>
