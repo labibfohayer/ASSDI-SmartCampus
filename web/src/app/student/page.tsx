@@ -773,9 +773,9 @@ export default function StudentPortalPage() {
   })();
 
   return (
-    <div className="space-y-3">
-      {/* Slim Islamic Modern Student Hero Welcome Card (Fits 100% Without Scrolling) */}
-      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[124px] lg:min-h-[136px] flex items-center">
+    <div className="flex-1 flex flex-col gap-3.5">
+      {/* Slim Islamic Modern Student Hero Welcome Card (Balanced Height & Full Screen Fit) */}
+      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[138px] lg:min-h-[146px] flex items-center">
         <Image
           src="/islamic-hero-banner-slim.png"
           alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
@@ -865,8 +865,8 @@ export default function StudentPortalPage() {
         </div>
       </div>
 
-      {/* 5 Clean Student KPI Metric Cards (Compact Single-Screen Height) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+      {/* 5 Clean Student KPI Metric Cards (Balanced Height & Clean Proportions) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
         {/* Card 1: Attendance Rate */}
         <div
           role="button"
@@ -879,22 +879,22 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'উপস্থিতির বিস্তারিত হিস্ট্রি দেখতে ক্লিক করুন' : 'Click to view attendance history'}
-          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
+          className="bg-white px-4 py-3.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2.5"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-full bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Calendar className="w-4.5 h-4.5 text-[#0284C7]" />
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Calendar className="w-5 h-5 text-[#0284C7]" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5 flex-wrap sm:flex-nowrap">
-                <span className="text-lg 2xl:text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif whitespace-nowrap">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif whitespace-nowrap">
                   {safeFixed(attSummary?.attendance_percentage)}%
                 </span>
                 <span
-                  className={`text-[10.5px] font-bold inline-flex items-center whitespace-nowrap ${
+                  className={`text-[11px] font-bold inline-flex items-center whitespace-nowrap ${
                     attDeltaVsTarget >= 0 ? 'text-emerald-600' : 'text-red-600'
                   }`}
                 >
@@ -904,7 +904,7 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 attPct < 75 ? 'bg-red-500' : 'bg-[#16A34A]'
@@ -926,28 +926,28 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'সম্পন্ন ক্লাসের তালিকা দেখতে ক্লিক করুন' : 'Click to view completed classes'}
-          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
+          className="bg-white px-4 py-3.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2.5"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-full bg-[#FFEDD5] text-[#EA580C] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-4.5 h-4.5 text-[#EA580C]" />
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#FFEDD5] text-[#EA580C] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-5 h-5 text-[#EA580C]" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'সম্পন্ন ক্লাস' : 'Completed Classes'}
               </span>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {presentCount}
                 </span>
-                <span className="text-[11px] font-semibold text-slate-400">
+                <span className="text-xs font-semibold text-slate-400">
                   / {totalSessCount}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[10.5px]">
+          <div className="flex items-center justify-between text-[11px]">
             <span className="font-semibold text-[#D97706] truncate">
               {isBangla ? 'এই কোর্সে উপস্থিত' : 'Attended'}
             </span>
@@ -973,25 +973,25 @@ export default function StudentPortalPage() {
               ? `উপস্থিতি (${safeFixed(attPct)}%) ও পাঠ বোঝার মূল্যায়ন (${safeFixed(avgUnderstandingPct)}%) অনুযায়ী সার্বিক অগ্রগতি`
               : `Overall progress combining attendance (${safeFixed(attPct)}%) & lesson understanding (${safeFixed(avgUnderstandingPct)}%)`
           }
-          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
+          className="bg-white px-4 py-3.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2.5"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-full bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Award className="w-4.5 h-4.5 text-[#9333EA]" />
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Award className="w-5 h-5 text-[#9333EA]" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'ওভারঅল প্রগ্রেস' : 'Overall Progress'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {overallProgressScore.toFixed(1)}%
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full bg-[#16A34A] transition-all duration-500"
               style={{ width: `${Math.min(Math.max(overallProgressScore, 0), 100)}%` }}
@@ -1011,28 +1011,28 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'শিক্ষকের সমাধান ও উত্তর দেখতে ক্লিক করুন' : 'Click to view help requests'}
-          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
+          className="bg-white px-4 py-3.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2.5"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-full bg-[#DCFCE7] text-[#15803D] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <HelpCircle className="w-4.5 h-4.5 text-[#15803D]" />
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#DCFCE7] text-[#15803D] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <HelpCircle className="w-5 h-5 text-[#15803D]" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {helpRequests.length}
                 </span>
-                <span className="text-[10.5px] font-bold text-[#15803D]">
+                <span className="text-[11px] font-bold text-[#15803D]">
                   {resolvedHelpCount} {isBangla ? 'সমাধান' : 'Resolved'}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[10.5px]">
+          <div className="flex items-center justify-between text-[11px]">
             <span className={`font-semibold truncate ${pendingHelpCount > 0 ? 'text-[#D97706]' : 'text-emerald-600'}`}>
               {pendingHelpCount > 0
                 ? isBangla ? `${pendingHelpCount}টি অপেক্ষমান` : `${pendingHelpCount} Pending`
@@ -1056,25 +1056,25 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'মূল্যায়ন ও কুইজের ফলাফল দেখতে ক্লিক করুন' : 'Click to view quiz & evaluation results'}
-          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
+          className="bg-white px-4 py-3.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2.5"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-full bg-[#CCFBF1] text-[#0F766E] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <FileCheck2 className="w-4.5 h-4.5 text-[#0F766E]" />
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#CCFBF1] text-[#0F766E] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <FileCheck2 className="w-5 h-5 text-[#0F766E]" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'মূল্যায়ন ফলাফল' : 'Exam Results'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {examResultScore.toFixed(1)}%
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[10.5px]">
+          <div className="flex items-center justify-between text-[11px]">
             <span className="font-semibold text-slate-500 truncate">
               {attemptedQuizzes.length > 0
                 ? isBangla ? `${attemptedQuizzes.length}টি কুইজ সম্পন্ন` : `${attemptedQuizzes.length} Quiz(zes)`
@@ -1123,21 +1123,21 @@ export default function StudentPortalPage() {
         </div>
       )}
 
-      {/* DASHBOARD OVERVIEW VIEW: Middle 3-Column Row + Bottom 3-Column Row (Fits 100% in 1 Single Page) */}
+      {/* DASHBOARD OVERVIEW VIEW: Middle 3-Column Row + Bottom 3-Column Row (Fills 100% Viewport Height With Zero Bottom Void) */}
       {isDashboardHome && (
-        <div className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1.42fr_1fr_1.33fr] gap-3.5 items-stretch">
+        <div className="flex-1 flex flex-col gap-3.5">
+        <div className="xl:flex-[1.35] grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1.42fr_1fr_1.33fr] gap-3.5 items-stretch min-h-[245px]">
           {/* 1. Compact Attendance Overview Chart Card */}
-          <div className="lg:col-span-2 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-3.5 sm:p-4 flex flex-col justify-between">
+          <div className="lg:col-span-2 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 flex flex-col justify-between">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <svg className="w-5.5 h-5.5 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <rect x="2" y="13" width="4.5" height="9" rx="1.5" fill="#86EFAC" />
                     <rect x="9.5" y="8" width="4.5" height="14" rx="1.5" fill="#22C55E" />
                     <rect x="17" y="3" width="4.5" height="19" rx="1.5" fill="#15803D" />
                   </svg>
-                  <h2 className="text-[14.5px] sm:text-[15px] font-extrabold text-[#0F172A] font-serif">
+                  <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
                     {isBangla ? 'উপস্থিতির সংক্ষিপ্ত চিত্র' : 'Attendance Overview'}
                   </h2>
                 </div>
@@ -1157,7 +1157,7 @@ export default function StudentPortalPage() {
               </div>
 
               {/* Compact Chart Legend */}
-              <div className="flex items-center justify-end gap-3 mt-1 mb-0.5 text-[10.5px] font-semibold">
+              <div className="flex items-center justify-end gap-3 mt-1 mb-0.5 text-[11px] font-semibold">
                 <span className="inline-flex items-center gap-1.5 text-slate-700">
                   <span className="w-2 h-2 rounded-full bg-[#16A34A]" />
                   <span>{isBangla ? 'উপস্থিতি %' : 'Attendance %'}</span>
@@ -1170,8 +1170,8 @@ export default function StudentPortalPage() {
               </div>
             </div>
 
-            {/* Recharts Compact Area Chart */}
-            <div className="w-full h-[154px]">
+            {/* Recharts Fluid Area Chart (Grows seamlessly on taller screens) */}
+            <div className="w-full flex-1 min-h-[168px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={attendanceOverviewData} margin={{ top: 22, right: 18, left: -14, bottom: 0 }}>
                   <defs>
@@ -1380,14 +1380,14 @@ export default function StudentPortalPage() {
               </button>
             </div>
 
-            <div className="space-y-1.5 mt-2.5 flex-1 flex flex-col justify-center">
+            <div className="flex-1 flex flex-col justify-evenly gap-2 mt-2.5">
               {upcomingDisplaySessions.length > 0 ? (
                 upcomingDisplaySessions.map((sess) => {
                   const badge = formatSessionDateBadge(sess.session_date);
                   return (
                     <div
                       key={sess.id}
-                      className="flex items-center justify-between gap-2 bg-white hover:bg-[#F0FDF4]/60 border border-slate-200/80 shadow-2xs rounded-xl px-2.5 py-1.5 transition-colors"
+                      className="flex items-center justify-between gap-2.5 bg-white hover:bg-[#F0FDF4]/60 border border-slate-200/80 shadow-2xs rounded-xl px-3 py-2 transition-colors"
                     >
                       {/* Reference-Matched Mint-Green Date Card with Green Border & Shadow */}
                       <div className="w-11 shrink-0 rounded-lg bg-[#E3F5EB] border border-[#6EE7B7] py-0.5 text-center leading-[1.1] shadow-[0_2px_6px_rgba(16,185,129,0.22)]">
@@ -1442,42 +1442,42 @@ export default function StudentPortalPage() {
         </div>
 
         {/* Bottom 3-Column Row: My Learning Progress + Recent Activities + Keep Learning HD Banner */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-[1.15fr_1.32fr_1.48fr] gap-3.5 items-stretch">
+        <div className="xl:flex-1 grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-[1.15fr_1.32fr_1.48fr] gap-3.5 items-stretch min-h-[186px]">
           {/* Bottom Col 1: My Learning Progress Donut Card */}
-          <div className="lg:col-span-6 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-3.5 sm:p-4 flex flex-col justify-between">
+          <div className="lg:col-span-6 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 flex flex-col justify-between">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <svg className="w-5.5 h-5.5 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <rect x="2" y="14" width="4" height="7" rx="1" fill="#86EFAC" />
                   <rect x="8" y="10" width="4" height="11" rx="1" fill="#22C55E" />
                   <rect x="14" y="6" width="4" height="15" rx="1" fill="#059669" />
                   <path d="M4 9L10.5 4.5L15 7.5L21 3M21 3H16.5M21 3V7.5" stroke="#15803D" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <h2 className="text-[14.5px] sm:text-[15px] font-extrabold text-[#0F172A] font-serif truncate">
+                <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif truncate">
                   {isBangla ? 'আমার শিখন প্রগতি' : 'My Learning Progress'}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => handleTabChange('graduation')}
-                className="text-[11px] font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+                className="text-xs font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
               >
                 <span>{isBangla ? 'বিস্তারিত →' : 'View Details →'}</span>
               </button>
             </div>
 
-            <div className="flex items-center justify-between gap-4 mt-2.5 flex-1">
+            <div className="flex items-center justify-between gap-4 sm:gap-5 mt-2 flex-1">
               {/* Compact Reference-Matched Glossy Emerald Gradient Donut Ring */}
               <div
-                className="relative w-[108px] h-[108px] shrink-0 flex items-center justify-center"
+                className="relative w-[120px] h-[120px] shrink-0 flex items-center justify-center"
                 title={`${isBangla ? 'সম্পন্ন:' : 'Completed:'} ${learningProgressBreakdown.completed.toFixed(1)}%`}
               >
                 {(() => {
-                  const r = 42;
+                  const r = 46;
                   const circ = 2 * Math.PI * r;
                   const dashOffset = circ * (1 - learningProgressBreakdown.completed / 100);
                   return (
-                    <svg className="w-full h-full" viewBox="0 0 116 116" aria-hidden="true">
+                    <svg className="w-full h-full" viewBox="0 0 124 124" aria-hidden="true">
                       <defs>
                         <linearGradient id="studentLearningDonutGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" stopColor="#34D399" />
@@ -1485,33 +1485,33 @@ export default function StudentPortalPage() {
                           <stop offset="100%" stopColor="#047857" />
                         </linearGradient>
                       </defs>
-                      <circle cx="58" cy="58" r={r} fill="none" stroke="#E2E8F0" strokeWidth="13" />
+                      <circle cx="62" cy="62" r={r} fill="none" stroke="#E2E8F0" strokeWidth="14" />
                       <circle
-                        cx="58"
-                        cy="58"
+                        cx="62"
+                        cy="62"
                         r={r}
                         fill="none"
                         stroke="url(#studentLearningDonutGrad)"
-                        strokeWidth="13"
+                        strokeWidth="14"
                         strokeDasharray={circ}
                         strokeDashoffset={dashOffset}
                         strokeLinecap="round"
-                        transform="rotate(-90 58 58)"
+                        transform="rotate(-90 62 62)"
                         style={{ filter: 'drop-shadow(0 2px 5px rgba(5, 150, 105, 0.25))' }}
                       />
                     </svg>
                   );
                 })()}
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[17px] font-black text-[#0F172A] tracking-tight font-serif">
+                  <span className="text-[19px] font-black text-[#0F172A] tracking-tight font-serif">
                     {learningProgressBreakdown.completed.toFixed(1)}%
                   </span>
                 </div>
               </div>
 
               {/* Progress Breakdown Legend */}
-              <div className="flex-1 space-y-2.5 min-w-0">
-                <div className="flex items-center justify-between gap-2 text-xs">
+              <div className="flex-1 space-y-3 min-w-0">
+                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
                   <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] shrink-0" />
                     <span>{isBangla ? 'সম্পন্ন' : 'Completed'}</span>
@@ -1521,7 +1521,7 @@ export default function StudentPortalPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 text-xs">
+                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
                   <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FB923C] shrink-0" />
                     <span>{isBangla ? 'চলমান' : 'In Progress'}</span>
@@ -1531,7 +1531,7 @@ export default function StudentPortalPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 text-xs">
+                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
                   <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#CBD5E1] shrink-0" />
                     <span>{isBangla ? 'শুরু হয়নি' : 'Not Started'}</span>
@@ -1545,53 +1545,53 @@ export default function StudentPortalPage() {
           </div>
 
           {/* Bottom Col 2: Recent Activities Card */}
-          <div className="lg:col-span-6 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-3.5 sm:p-4 flex flex-col justify-between">
+          <div className="lg:col-span-6 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 flex flex-col justify-between">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-6 h-6 rounded-full bg-[#E3F5EB] text-[#059669] flex items-center justify-center shrink-0">
-                  <Clock className="w-3.5 h-3.5 stroke-[2.4]" />
+                <div className="w-6.5 h-6.5 rounded-full bg-[#E3F5EB] text-[#059669] flex items-center justify-center shrink-0">
+                  <Clock className="w-4 h-4 stroke-[2.4]" />
                 </div>
-                <h2 className="text-[14.5px] sm:text-[15px] font-extrabold text-[#0F172A] font-serif truncate">
+                <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif truncate">
                   {isBangla ? 'সাম্প্রতিক কার্যক্রম' : 'Recent Activities'}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => handleTabChange('attendance')}
-                className="text-[11px] font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+                className="text-xs font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
               >
                 <span>{isBangla ? 'সব দেখুন →' : 'View All →'}</span>
               </button>
             </div>
 
-            <div className="space-y-2 mt-2.5 flex-1 flex flex-col justify-center">
+            <div className="flex-1 flex flex-col justify-evenly gap-1.5 mt-2">
               {recentActivityItems.map((act) => (
                 <button
                   key={act.id}
                   type="button"
                   onClick={act.onClick}
-                  className="w-full flex items-center gap-2.5 text-left rounded-xl px-2 py-1 hover:bg-slate-50 transition-colors cursor-pointer group"
+                  className="w-full flex items-center gap-2.5 text-left rounded-xl px-2 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group"
                 >
                   {act.type === 'feedback' && (
-                    <div className="w-7 h-7 rounded-full bg-emerald-100 text-[#059669] flex items-center justify-center shrink-0">
+                    <div className="w-7.5 h-7.5 rounded-full bg-emerald-100 text-[#059669] flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-4 h-4" />
                     </div>
                   )}
                   {act.type === 'notice' && (
-                    <div className="w-7 h-7 rounded-full bg-sky-100 text-[#0284C7] flex items-center justify-center shrink-0">
+                    <div className="w-7.5 h-7.5 rounded-full bg-sky-100 text-[#0284C7] flex items-center justify-center shrink-0">
                       <Info className="w-4 h-4" />
                     </div>
                   )}
                   {act.type === 'result' && (
-                    <div className="w-7 h-7 rounded-full bg-amber-100 text-[#D97706] flex items-center justify-center shrink-0">
-                      <Trophy className="w-3.5 h-3.5" />
+                    <div className="w-7.5 h-7.5 rounded-full bg-amber-100 text-[#D97706] flex items-center justify-center shrink-0">
+                      <Trophy className="w-4 h-4" />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#0F766E] transition-colors">
+                    <p className="text-xs sm:text-[12.5px] font-bold text-[#0F172A] truncate group-hover:text-[#0F766E] transition-colors">
                       {act.title}
                     </p>
-                    <p className="text-[10.5px] text-slate-500 truncate">
+                    <p className="text-[11px] text-slate-500 truncate">
                       {act.subtitle}
                     </p>
                   </div>
@@ -1612,7 +1612,7 @@ export default function StudentPortalPage() {
               }
             }}
             title={isBangla ? 'শিখন অগ্রগতি ও সনদপত্র দেখতে ক্লিক করুন' : 'View your learning journey and certificate readiness'}
-            className="lg:col-span-12 xl:col-span-1 relative overflow-hidden rounded-2xl shadow-xs border border-[#064E3B]/30 min-h-[154px] h-full cursor-pointer group select-none"
+            className="lg:col-span-12 xl:col-span-1 relative overflow-hidden rounded-2xl shadow-xs border border-[#064E3B]/30 min-h-[186px] h-full cursor-pointer group select-none"
             style={{
               background:
                 'linear-gradient(90deg, #00461c 0%, #00461c 48%, #0d541e 72%, #8c6e22 92%, #bd8d25 100%)',
@@ -1623,7 +1623,7 @@ export default function StudentPortalPage() {
               alt="Keep Learning... Keep Growing... With As-Sunnah"
               fill
               priority
-              className="object-contain 2xl:object-cover object-center group-hover:scale-[1.02] transition-transform duration-300"
+              className="object-contain object-center group-hover:scale-[1.02] transition-transform duration-300"
             />
           </div>
         </div>

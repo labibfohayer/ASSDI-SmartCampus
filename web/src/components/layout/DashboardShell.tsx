@@ -1326,11 +1326,11 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         {/* Notice Banner (e.g. Observer Read-Only Notice) */}
         {noticeBanner}
 
-        {/* Main Body Content (Full width & compact single-screen fit on Student role) */}
+        {/* Main Body Content (Full width & flex-stretch single-screen fit on Student role) */}
         <main
           className={`flex-1 w-full relative z-10 ${
             role === 'student'
-              ? 'px-4 sm:px-6 pt-3 pb-24 md:pb-3'
+              ? 'flex flex-col px-4 sm:px-6 pt-3 pb-24 md:pb-3'
               : 'max-w-7xl mx-auto p-3.5 sm:p-6 lg:p-8 pb-24 md:pb-8'
           }`}
         >
