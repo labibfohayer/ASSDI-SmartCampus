@@ -40,7 +40,7 @@ export default function CoordinatorLayout({ children }: { children: React.ReactN
 
   const noticeBanner = isObserver ? (
     <div className="bg-[#FFFBEB] text-[#92400E] px-4 py-2 text-xs font-medium border-b border-[#FCD34D]">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+      <div className="w-full px-2 sm:px-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Eye className="w-4 h-4 text-[#0F766E] shrink-0" />
           <span>
