@@ -1482,22 +1482,23 @@ export default function AdminOverviewPage() {
           </div>
         </div>
 
-        {/* Right: Building Skills Promo Banner (4 cols - Matching Student Promo Card Scale) */}
-        <div className="lg:col-span-4 relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00382B] via-[#002B21] to-[#001D16] border border-[#064E3B]/40 p-4 sm:p-5 text-white shadow-xs flex flex-col justify-between min-h-[120px] group">
-          <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-35 pointer-events-none select-none">
-            <Image
-              src="/islamic-banner-mosque.png"
-              alt="Mosque Silhouette"
-              fill
-              className="object-cover object-right"
-            />
-          </div>
+        {/* Right: Building Skills Promo Banner with Islamic Artwork (4 cols) */}
+        <div className="lg:col-span-4 relative overflow-hidden rounded-2xl border border-emerald-800/40 p-4 sm:p-5 text-white shadow-xs flex flex-col justify-between min-h-[140px] group">
+          <Image
+            src="/coordinator-promo-banner.jpg"
+            alt="Islamic Skills Banner"
+            fill
+            priority
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          />
+          {/* Gentle translucent dark overlay to ensure 100% text readability while keeping artwork vibrant */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/35 pointer-events-none" />
 
           <div className="relative z-10">
-            <h3 className="text-base sm:text-lg font-black text-white font-serif tracking-tight leading-tight">
+            <h3 className="text-base sm:text-lg font-black !text-white font-serif tracking-tight leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
               {isBangla ? 'দক্ষতা অর্জন' : 'Building Skills'}
             </h3>
-            <p className="text-xs font-semibold text-[#FDE68A] mt-1">
+            <p className="text-xs font-bold !text-[#FDE68A] mt-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]">
               {isBangla ? 'উম্মাহর উন্নয়ন ও সেবায় নিয়োজিত' : 'Building a Better Ummah'}
             </p>
           </div>
@@ -1505,7 +1506,7 @@ export default function AdminOverviewPage() {
           <div className="relative z-10 mt-3">
             <Link
               href="/reports"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-lg shadow-xs transition group-hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-lg shadow-md transition group-hover:scale-105 active:scale-95"
             >
               <span>{isBangla ? 'রিপোর্ট হাব দেখুন' : 'View Reports'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
