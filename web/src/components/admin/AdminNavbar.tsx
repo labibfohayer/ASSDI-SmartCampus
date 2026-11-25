@@ -88,7 +88,7 @@ export default function AdminNavbar() {
                     {t('brand.name')}
                   </span>
                   <span className="px-2 py-0.5 text-[10px] font-bold bg-[#0F766E] text-white rounded-full">
-                    {isBangla ? 'সুপার অ্যাডমিন' : 'Super Admin'}
+                    {isBangla ? 'কোর্স কোঅর্ডিনেটর' : 'Course Coordinator'}
                   </span>
                 </div>
                 <p className="text-[11px] text-[#0F766E] font-medium">
@@ -131,7 +131,7 @@ export default function AdminNavbar() {
               </div>
               <div className="text-left">
                 <p className="text-xs font-bold text-[#0F172A] leading-tight font-heading">
-                  {user?.full_name || 'Super Admin'}
+                  {user?.full_name || (isBangla ? 'কোর্স কোঅর্ডিনেটর' : 'Course Coordinator')}
                 </p>
                 <p className="text-[10px] text-[#0F766E] font-mono">
                   {user?.login_id}

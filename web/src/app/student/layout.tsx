@@ -22,11 +22,11 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     // Strict role check: ONLY students are allowed on /student
     if (user && user.role !== 'student') {
       const targetDashboard =
-        user.role === 'super_admin'
+        user.role === 'super_admin' || user.role === 'coordinator'
           ? '/admin'
           : user.role === 'teacher'
           ? '/teacher'
-          : user.role === 'coordinator'
+          : user.role === 'observer'
           ? '/coordinator'
           : '/login';
       router.replace(targetDashboard);
@@ -44,11 +44,11 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   // If user is logged in as non-student, do NOT render student dashboard
   if (user && user.role !== 'student') {
     const targetDashboard =
-      user.role === 'super_admin'
+      user.role === 'super_admin' || user.role === 'coordinator'
         ? '/admin'
         : user.role === 'teacher'
         ? '/teacher'
-        : user.role === 'coordinator'
+        : user.role === 'observer'
         ? '/coordinator'
         : '/login';
 

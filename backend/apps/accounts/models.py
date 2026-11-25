@@ -6,7 +6,7 @@ from .managers import CustomUserManager
 
 
 class UserRole(models.TextChoices):
-    SUPER_ADMIN = "super_admin", "Super Admin"
+    SUPER_ADMIN = "super_admin", "Course Coordinator"
     COORDINATOR = "coordinator", "Course Coordinator"
     TEACHER = "teacher", "Teacher"
     STUDENT = "student", "Student"

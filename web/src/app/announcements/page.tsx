@@ -264,7 +264,10 @@ export default function AnnouncementsPage() {
         ) : (
           <div className="space-y-4">
             {filteredList.map((item) => {
-              const canDelete = user?.role === 'super_admin' || user?.login_id === item.author_login_id;
+              const canDelete =
+                user?.role === 'super_admin' ||
+                user?.role === 'coordinator' ||
+                user?.login_id === item.author_login_id;
 
               return (
                 <article
@@ -354,7 +357,7 @@ export default function AnnouncementsPage() {
                     onChange={(e: any) => setScope(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                   >
-                    {user?.role === 'super_admin' && (
+                    {(user?.role === 'super_admin' || user?.role === 'coordinator') && (
                       <option value="Global">{isBangla ? 'সার্বজনীন (Global - সকল শিক্ষার্থী ও শিক্ষক)' : 'Global (All Users)'}</option>
                     )}
                     <option value="Course">{isBangla ? 'কোর্স ভিত্তিক (Course)' : 'Course Specific'}</option>

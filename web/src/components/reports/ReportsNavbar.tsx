@@ -30,9 +30,10 @@ export default function ReportsNavbar() {
     }
     switch (user.role) {
       case 'super_admin':
+      case 'coordinator':
         return {
           href: '/admin',
-          label: isBangla ? 'অ্যাডমিন প্যানেল' : 'Admin Panel',
+          label: isBangla ? 'কোঅর্ডিনেশন প্যানেল' : 'Coordinator Panel',
           icon: ShieldAlert,
         };
       case 'teacher':
@@ -42,7 +43,6 @@ export default function ReportsNavbar() {
           icon: BookOpen,
         };
       case 'observer':
-      case 'coordinator':
       default:
         return {
           href: '/coordinator',

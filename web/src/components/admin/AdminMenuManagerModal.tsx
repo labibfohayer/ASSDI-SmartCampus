@@ -208,7 +208,7 @@ export default function AdminMenuManagerModal({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight font-heading">
-                {isBangla ? 'সুপার অ্যাডমিন মেনু ম্যানেজার ও আর্কাইভ কন্ট্রোল' : 'Sidebar Navigation Menu & Archive Manager'}
+                {isBangla ? 'কোর্স কোঅর্ডিনেটর মেনু ম্যানেজার ও আর্কাইভ কন্ট্রোল' : 'Sidebar Navigation Menu & Archive Manager'}
               </h2>
               <p className="text-xs text-[#78350F]">
                 {isBangla

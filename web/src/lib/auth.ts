@@ -53,10 +53,10 @@ export const getDefaultRouteForRole = (role?: UserRole): string => {
     case 'teacher':
       return '/teacher';
     case 'coordinator':
-    case 'observer':
-      return '/coordinator';
     case 'super_admin':
       return '/admin';
+    case 'observer':
+      return '/coordinator';
     case 'student':
       return '/student';
     default:

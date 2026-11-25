@@ -268,10 +268,10 @@ export default function LoginPage() {
             <div className="grid grid-cols-3 gap-2 text-center">
               <button
                 type="button"
-                onClick={() => setDemoRole('admin01', 'AdminPass2026!', 'Super Admin')}
+                onClick={() => setDemoRole('admin01', 'AdminPass2026!', isBangla ? 'কোর্স কোঅর্ডিনেটর' : 'Coordinator')}
                 className="px-2 py-1.5 text-[11px] font-bold bg-[#F8FAFC] hover:bg-[#F0FDF4] hover:text-[#16A34A] hover:border-[#BBF7D0] text-[#1E293B] rounded-lg transition border border-[#E2E8F0] cursor-pointer"
               >
-                Super Admin
+                {isBangla ? 'কোর্স কোঅর্ডিনেটর' : 'Coordinator'}
               </button>
               <button
                 type="button"

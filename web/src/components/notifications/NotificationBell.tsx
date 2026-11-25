@@ -224,9 +224,9 @@ export default function NotificationBell() {
     }
 
     // Fallback based on role
-    if (user?.role === 'super_admin') return '/admin';
+    if (user?.role === 'super_admin' || user?.role === 'coordinator') return '/admin';
     if (user?.role === 'teacher') return '/teacher';
-    if (user?.role === 'coordinator' || user?.role === 'observer') return '/coordinator';
+    if (user?.role === 'observer') return '/coordinator';
     return '/student';
   };
 

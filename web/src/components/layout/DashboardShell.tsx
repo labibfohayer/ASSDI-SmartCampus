@@ -52,7 +52,7 @@ const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
   {
     id: 'overview',
     href: '/admin',
-    labelBn: 'অ্যাডমিন ওভারভিউ',
+    labelBn: 'কোঅর্ডিনেশন ওভারভিউ',
     labelEn: 'System Overview',
     iconName: 'ShieldCheck',
     section: 'main',
@@ -249,7 +249,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   // Pre-configured role-specific navigation menus (Serial-by-serial vertical list)
   const getNavSections = (): NavSection[] => {
     switch (role) {
-      case 'super_admin': {
+      case 'super_admin':
+      case 'coordinator': {
         const activeOnly = adminMenus.filter((m) => !m.isArchived);
         const mainItems = activeOnly
           .filter((m) => m.section === 'main')
@@ -271,8 +272,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
         return [
           {
-            titleBn: 'প্রধান অ্যাডমিন মেনু',
-            titleEn: 'Main Admin Menu',
+            titleBn: 'প্রধান কোঅর্ডিনেশন মেনু',
+            titleEn: 'Main Coordination Menu',
             items: mainItems,
           },
           {
@@ -283,7 +284,6 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         ];
       }
 
-      case 'coordinator':
       case 'observer':
         return [
           {
@@ -470,13 +470,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const getRoleBadge = () => {
     switch (user?.role || role) {
       case 'super_admin':
-        return {
-          label: isBangla ? 'সুপার অ্যাডমিন' : 'Super Admin',
-          color: 'bg-slate-800 text-white',
-        };
       case 'coordinator':
         return {
-          label: isBangla ? 'কোর্স কো-অর্ডিনেটর' : 'Coordinator',
+          label: isBangla ? 'কোর্স কো-অর্ডিনেটর' : 'Course Coordinator',
           color: 'bg-[#1B4D3E] text-white',
         };
       case 'teacher':
@@ -507,10 +503,10 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const getRoleHomeHref = () => {
     switch (role) {
       case 'super_admin':
+      case 'coordinator':
         return '/admin';
       case 'teacher':
         return '/teacher';
-      case 'coordinator':
       case 'observer':
         return '/coordinator';
       case 'student':
@@ -522,11 +518,10 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const getRoleBadgeLabel = () => {
     switch (role) {
       case 'super_admin':
-        return isBangla ? 'SUPER ADMIN / অ্যাডমিন' : 'SUPER ADMIN';
-      case 'teacher':
-        return isBangla ? 'TEACHER / শিক্ষক' : 'TEACHER';
       case 'coordinator':
         return isBangla ? 'COORDINATOR / কোঅর্ডিনেটর' : 'COORDINATOR';
+      case 'teacher':
+        return isBangla ? 'TEACHER / শিক্ষক' : 'TEACHER';
       case 'observer':
         return isBangla ? 'OBSERVER / পর্যবেক্ষক' : 'OBSERVER';
       case 'student':
@@ -653,6 +648,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           },
         ];
       case 'super_admin':
+      case 'coordinator':
         return [
           {
             href: '/admin',
@@ -860,8 +856,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 </div>
               )}
 
-              {/* Super Admin Navigation Customizer Button */}
-              {role === 'super_admin' && (
+              {/* Coordinator Navigation Customizer Button */}
+              {(role === 'super_admin' || role === 'coordinator') && (
                 <div className="pt-2 border-t border-[#00241C]">
                   <button
                     type="button"
@@ -958,8 +954,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                   ? isBangla ? 'ব্যাচ ৪২' : 'Batch #42'
                   : role === 'teacher'
                   ? isBangla ? 'অনুষদ শিক্ষক' : 'Faculty'
-                  : role === 'super_admin'
-                  ? isBangla ? 'সুপার অ্যাডমিন' : 'Super Admin'
+                  : (role === 'super_admin' || role === 'coordinator')
+                  ? isBangla ? 'কোর্স কোঅর্ডিনেটর' : 'Course Coordinator'
                   : isBangla ? 'সিস্টেম সক্রিয়' : 'System Active'}
               </span>
             </div>
@@ -1108,7 +1104,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                       </>
                     )}
 
-                    {role === 'super_admin' && (
+                    {(role === 'super_admin' || role === 'coordinator') && (
                       <>
                         <Link
                           href="/admin"
@@ -1116,7 +1112,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                           className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-[#002F25] transition-colors cursor-pointer"
                         >
                           <LayoutDashboard className="w-4 h-4 text-[#0F766E]" />
-                          <span>{isBangla ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Admin Dashboard'}</span>
+                          <span>{isBangla ? 'কোঅর্ডিনেশন সেন্টার' : 'Coordination Center'}</span>
                         </Link>
                         <Link
                           href="/admin/students"
@@ -1268,8 +1264,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         </button>
       </nav>
 
-      {/* Super Admin Navigation Customizer Modal */}
-      {role === 'super_admin' && (
+      {/* Coordinator Navigation Customizer Modal */}
+      {(role === 'super_admin' || role === 'coordinator') && (
         <AdminMenuManagerModal
           isOpen={menuManagerOpen}
           onClose={() => setMenuManagerOpen(false)}

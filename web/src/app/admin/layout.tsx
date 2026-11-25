@@ -28,14 +28,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Role check: Only super_admin
-  if (user && user.role !== 'super_admin') {
+  // Role check: Only coordinator / super_admin
+  if (user && user.role !== 'super_admin' && user.role !== 'coordinator') {
     const userDashboard =
       user.role === 'student'
         ? '/student'
         : user.role === 'teacher'
         ? '/teacher'
-        : user.role === 'coordinator'
+        : user.role === 'observer'
         ? '/coordinator'
         : '/login';
 
@@ -47,10 +47,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <div>
             <h2 className="text-base font-extrabold text-[#0F766E] font-heading">
-              শুধুমাত্র সুপার অ্যাডমিনের জন্য সংরক্ষিত
+              শুধুমাত্র কোর্স কোঅর্ডিনেটরের জন্য সংরক্ষিত
             </h2>
             <p className="text-xs text-[#475569] mt-1.5 leading-relaxed">
-              এই পোর্টালটি শুধুমাত্র সুপার অ্যাডমিন অ্যাকাউন্টের জন্য নির্ধারিত। আপনি বর্তমানে{' '}
+              এই পোর্টালটি শুধুমাত্র কোর্স কোঅর্ডিনেটর অ্যাকাউন্টের জন্য নির্ধারিত। আপনি বর্তমানে{' '}
               <strong className="text-[#0F172A]">{user.full_name} ({user.role})</strong> অ্যাকাউন্টে লগইন অবস্থায় আছেন।
             </p>
           </div>

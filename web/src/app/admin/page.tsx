@@ -124,7 +124,7 @@ export default function AdminOverviewPage() {
 
   return (
     <div className="space-y-6">
-      {/* Slim Islamic Modern Super Admin Hero Welcome Card */}
+      {/* Slim Islamic Modern Coordinator Hero Welcome Card */}
       <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[138px] lg:min-h-[146px] flex items-center">
         <Image
           src="/islamic-hero-banner-slim.png"
@@ -150,13 +150,13 @@ export default function AdminOverviewPage() {
           </p>
 
           <h1 className="text-lg sm:text-xl lg:text-[22px] font-black text-[#0F172A] tracking-tight font-serif leading-tight">
-            {isBangla ? 'স্বাগতম' : 'Welcome back'}, {user?.full_name?.split(' ')[0] || (isBangla ? 'অ্যাডমিন' : 'Admin')}!
+            {isBangla ? 'স্বাগতম' : 'Welcome back'}, {user?.full_name?.split(' ')[0] || (isBangla ? 'কোঅর্ডিনেটর' : 'Coordinator')}!
           </h1>
 
           <p className="text-[11px] text-[#334155] font-medium mt-0.5 leading-snug">
             {isBangla
-              ? 'আল্লাহ আপনার প্রশাসনিক দায়িত্ব ও ব্যবস্থাপনা কার্যক্রমে বরকত দান করুন — কেন্দ্রীয় নিয়ন্ত্রণ কেন্দ্র।'
-              : 'May Allah bless your administrative leadership and institutional governance.'}
+              ? 'আল্লাহ আপনার সার্বিক দায়িত্ব ও কোর্স কোঅর্ডিনেশন কার্যক্রমে বরকত দান করুন — কেন্দ্রীয় কোঅর্ডিনেশন কেন্দ্র।'
+              : 'May Allah bless your leadership, student management, and academic coordination.'}
           </p>
 
           {/* Compact Single Strip: Date, Role & Quick Actions */}
@@ -173,9 +173,9 @@ export default function AdminOverviewPage() {
               </span>
             </div>
 
-            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-[11px] font-bold shadow-2xs">
-              <ShieldCheck className="w-3 h-3 text-[#D97706]" />
-              <span>{isBangla ? 'সুপার অ্যাডমিন' : 'Super Admin'}</span>
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E6F4EA] border border-[#A7F3D0] text-[#065F46] text-[11px] font-bold shadow-2xs">
+              <ShieldCheck className="w-3 h-3 text-[#059669]" />
+              <span>{isBangla ? 'কোর্স কোঅর্ডিনেটর' : 'Course Coordinator'}</span>
             </div>
 
             <Link

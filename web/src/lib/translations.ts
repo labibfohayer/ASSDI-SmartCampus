@@ -87,8 +87,8 @@ export const TRANSLATIONS: Record<string, { bn: string; en: string }> = {
 
   // Roles
   'role.super_admin': {
-    bn: 'সুপার অ্যাডমিন',
-    en: 'Super Admin',
+    bn: 'কোর্স কোঅর্ডিনেটর',
+    en: 'Course Coordinator',
   },
   'role.coordinator': {
     bn: 'কোর্স কোঅর্ডিনেটর',

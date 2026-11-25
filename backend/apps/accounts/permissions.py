@@ -14,10 +14,13 @@ class BaseRolePermission(BasePermission):
 
 
 class IsSuperAdmin(BaseRolePermission):
-    """Allows access exclusively to Super Administrators."""
+    """Allows access to Course Coordinators and Super Administrators."""
 
     def has_permission(self, request, view):
-        return self.is_valid_user(request) and request.user.role == UserRole.SUPER_ADMIN
+        return self.is_valid_user(request) and request.user.role in [
+            UserRole.SUPER_ADMIN,
+            UserRole.COORDINATOR,
+        ]
 
 
 class IsCoordinator(BaseRolePermission):

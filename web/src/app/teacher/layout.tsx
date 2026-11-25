@@ -28,8 +28,8 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
     );
   }
 
-  // Role guard: Only teacher can view the teacher dashboard. Super admin stays in /admin
-  if (user && user.role === 'super_admin') {
+  // Role guard: Only teacher can view the teacher dashboard. Coordinator stays in /admin
+  if (user && (user.role === 'super_admin' || user.role === 'coordinator')) {
     router.replace('/admin');
     return (
       <div className="min-h-screen bg-[#F8FAF9] flex items-center justify-center">

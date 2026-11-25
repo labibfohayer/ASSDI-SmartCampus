@@ -660,10 +660,9 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
         qr_window_mins = get_qr_window_minutes()
         session_window_end = session_start_dt + datetime.timedelta(minutes=qr_window_mins)
 
-        # Force mode is STRICTLY restricted to super_admin for headless testing/diagnostics.
-        # Teachers and coordinators CAN NEVER bypass the time window.
+        # Force mode is restricted to coordinator and super_admin for headless testing/diagnostics.
         force_mode = (
-            user.role == UserRole.SUPER_ADMIN
+            user.role in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR]
             and request.query_params.get("strict") != "true"
             and (request.query_params.get("force") == "true" or request.query_params.get("demo") == "true")
         )
