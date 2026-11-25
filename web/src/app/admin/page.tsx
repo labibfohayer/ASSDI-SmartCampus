@@ -33,6 +33,8 @@ import {
   X,
   Bell,
   RefreshCw,
+  ClipboardCheck,
+  CheckCircle2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -309,28 +311,37 @@ export default function AdminOverviewPage() {
     },
   ];
 
-  // Upcoming classes matching reference mockup
-  const upcomingClasses = [
+  // Today's classes & attendance monitoring for Coordinator (replaces student Join button)
+  const todayClassesMonitoring = [
     {
       title: isBangla ? 'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস' : 'Graphic Design & Brand Assets',
-      instructor: isBangla ? 'জুবায়ের আহমেদ' : 'Zubair Ahmed',
-      dateBadge: isBangla ? 'নভে ২৫' : 'Nov 25',
-      time: isBangla ? '২৫ নভে, ২০২৬ • ০৯:০০ - ১০:০০ সকাল' : 'Nov 25, 2026 • 09:00 - 10:00 AM',
-      joinHref: '/admin/sessions',
+      batch: isBangla ? 'ব্যাচ ৪২' : 'Batch 42',
+      instructor: isBangla ? 'জুবায়ের আহমেদ' : 'Zubair Ahmed',
+      room: isBangla ? 'ল্যাব ১' : 'Lab 1',
+      time: isBangla ? '০৯:০০ - ১০:০০ সকাল' : '09:00 - 10:00 AM',
+      status: 'live',
+      statusLabel: isBangla ? 'চলমান' : 'Live',
+      attendanceHref: '/teacher/attendance',
     },
     {
       title: isBangla ? 'ইসলামিক বেসিকস (মাদরাসা)' : 'Islamic Basics (Madrasa)',
+      batch: isBangla ? 'ব্যাচ ৪২' : 'Batch 42',
       instructor: isBangla ? 'কাওসার হোসেন' : 'Kawsar Hossain',
-      dateBadge: isBangla ? 'নভে ২৫' : 'Nov 25',
-      time: isBangla ? '২৫ নভে, ২০২৬ • ১০:৩০ - ১১:৩০ সকাল' : 'Nov 25, 2026 • 10:30 - 11:30 AM',
-      joinHref: '/admin/sessions',
+      room: isBangla ? 'রুম ১০২' : 'Room 102',
+      time: isBangla ? '১০:৩০ - ১১:৩০ সকাল' : '10:30 - 11:30 AM',
+      status: 'upcoming',
+      statusLabel: isBangla ? 'অপেক্ষমাণ' : 'Upcoming',
+      attendanceHref: '/teacher/attendance',
     },
     {
       title: isBangla ? 'ডিজিটাল ভিডিও এডিটিং ও রিলস' : 'Digital Video Editing & Reels',
+      batch: isBangla ? 'ব্যাচ ৪১' : 'Batch 41',
       instructor: isBangla ? 'কাওসার হোসেন' : 'Kawsar Hossain',
-      dateBadge: isBangla ? 'নভে ২৫' : 'Nov 25',
-      time: isBangla ? '২৫ নভে, ২০২৬ • ০১:০০ - ০২:০০ দুপুর' : 'Nov 25, 2026 • 01:00 - 02:00 PM',
-      joinHref: '/admin/sessions',
+      room: isBangla ? 'ল্যাব ২' : 'Lab 2',
+      time: isBangla ? '০১:০০ - ০২:০০ দুপুর' : '01:00 - 02:00 PM',
+      status: 'completed',
+      statusLabel: isBangla ? 'হাজিরা সম্পন্ন' : 'Completed',
+      attendanceHref: '/teacher/attendance',
     },
   ];
 
@@ -953,53 +964,80 @@ export default function AdminOverviewPage() {
           </div>
         </div>
 
-        {/* Col 2: Upcoming Classes (5 cols) */}
+        {/* Col 2: Today's Classes & Monitoring (5 cols - Coordinator Attendance Oversight) */}
         <div className="md:col-span-12 lg:col-span-5 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-amber-500" />
+                <ClipboardCheck className="w-4 h-4 text-emerald-600" />
                 <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
-                  {isBangla ? 'আসন্ন ক্লাসসমূহ' : 'Upcoming Classes'}
+                  {isBangla ? 'আজকের ক্লাস ও তদারকি' : "Today's Classes & Monitoring"}
                 </h3>
               </div>
               <Link
                 href="/admin/sessions"
                 className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline"
               >
-                <span>{isBangla ? 'সব দেখুন' : 'View All'}</span>
+                <span>{isBangla ? 'রুটিন দেখুন' : 'View Routine'}</span>
                 <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
 
             <div className="space-y-2 mt-2">
-              {upcomingClasses.map((cls, idx) => (
+              {todayClassesMonitoring.map((cls, idx) => (
                 <div
                   key={idx}
                   className="flex items-center justify-between gap-2 p-2 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-slate-50/50 transition"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="px-2 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-center shrink-0 border border-emerald-100">
-                      <span className="block text-[10px] font-bold leading-tight">
-                        {cls.dateBadge}
+                      <span className="block text-[10px] font-bold leading-tight whitespace-nowrap">
+                        {cls.time.split('•')[0] || cls.time}
                       </span>
                     </div>
                     <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-[#0F172A] truncate">
-                        {cls.title}
-                      </h4>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-xs font-bold text-[#0F172A] truncate">
+                          {cls.title}
+                        </h4>
+                        <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                          {cls.batch}
+                        </span>
+                      </div>
                       <p className="text-[10px] text-slate-500 truncate mt-0.5">
-                        {cls.instructor} • {cls.time}
+                        {cls.instructor} • {cls.room}
                       </p>
                     </div>
                   </div>
 
-                  <Link
-                    href={cls.joinHref}
-                    className="inline-flex items-center justify-center px-3 py-1 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold transition shrink-0 shadow-2xs cursor-pointer"
-                  >
-                    {isBangla ? 'যুক্ত হোন' : 'Join'}
-                  </Link>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {cls.status === 'live' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                        {cls.statusLabel}
+                      </span>
+                    )}
+                    {cls.status === 'completed' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                        <CheckCircle2 className="w-2.5 h-2.5 text-sky-600" />
+                        {cls.statusLabel}
+                      </span>
+                    )}
+                    {cls.status === 'upcoming' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        <Clock className="w-2.5 h-2.5 text-amber-600" />
+                        {cls.statusLabel}
+                      </span>
+                    )}
+
+                    <Link
+                      href={cls.attendanceHref}
+                      className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-[10.5px] font-bold transition shadow-2xs cursor-pointer active:scale-95"
+                      title={isBangla ? 'হাজিরা শিট তদারকি করুন' : 'View Attendance Sheet'}
+                    >
+                      {isBangla ? 'হাজিরা' : 'Attendance'}
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
