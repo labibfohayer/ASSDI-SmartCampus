@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   BarChart,
   Bar,
@@ -153,44 +154,80 @@ export default function CoordinatorDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner / Hero Header */}
-      <div className="bg-[#FFFBEB] rounded-2xl p-6 sm:p-7 border border-[#FCD34D] border-l-4 border-l-[#D97706] text-[#0F172A] shadow-xs relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5 shadow-xs">
-              <BarChart3 className="w-3.5 h-3.5 text-[#B45309]" />
-              <span>{t('brand.course')}</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading text-[#0F172A]">
-              {isBangla ? 'কোঅর্ডিনেশন ও ম্যানেজমেন্ট অ্যানালিটিক্স' : 'Academic & Management Analytics'}
-            </h1>
-            <p className="text-[#78350F] text-xs sm:text-sm mt-1.5">
-              {isBangla
-                ? 'রিয়েল-টাইম উপস্থিতি হার, লার্নিং প্রগ্রেস, ব্যাচভিত্তিক পারফরম্যান্স ও অ্যাট-রিস্ক অ্যালার্ট।'
-                : 'Real-time metrics for student attendance, learning progress, batch comparisons, and student alerts.'}
-            </p>
-          </div>
+      {/* Slim Islamic Modern Coordinator Hero Welcome Card */}
+      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[138px] lg:min-h-[146px] flex items-center">
+        <Image
+          src="/islamic-hero-banner-slim.png"
+          alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
+          fill
+          priority
+          className="object-cover object-right pointer-events-none select-none"
+        />
 
-          <div className="flex items-center gap-2.5">
+        {/* Subtle mobile/tablet left scrim so text remains crisp over narrower screens */}
+        <div
+          className="lg:hidden absolute inset-0 bg-gradient-to-r from-[#FFFDF8]/92 via-[#FDF8EC]/80 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Compact Left Content */}
+        <div className="relative z-10 px-4 py-2.5 sm:px-5 lg:max-w-[62%] w-full">
+          <p className="text-xs sm:text-[13.5px] font-extrabold text-[#064E3B] tracking-tight flex items-center gap-1.5 leading-none mb-0.5">
+            <span>{isBangla ? 'আসসালামু আলাইকুম!' : 'Assalamu Alaikum!'}</span>
+            <span className="text-sm sm:text-base" role="img" aria-label="wave">
+              👋
+            </span>
+          </p>
+
+          <h1 className="text-lg sm:text-xl lg:text-[22px] font-black text-[#0F172A] tracking-tight font-serif leading-tight">
+            {isBangla ? 'স্বাগতম' : 'Welcome back'}, {user?.full_name?.split(' ')[0] || (isBangla ? 'কোঅর্ডিনেটর' : 'Coordinator')}!
+          </h1>
+
+          <p className="text-[11px] text-[#334155] font-medium mt-0.5 leading-snug">
+            {isBangla
+              ? 'আল্লাহ আপনার তদারকি ও একাডেমিক সমন্বয় প্রচেষ্টায় বরকত দান করুন — কেন্দ্রীয় কোঅর্ডিনেশন সেন্টার।'
+              : 'May Allah bless your academic coordination, attendance oversight, and progress monitoring.'}
+          </p>
+
+          {/* Compact Single Strip: Date, Role & Quick Actions */}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E6F4EA]/95 border border-[#A7F3D0] text-[#065F46] text-[11px] font-semibold shadow-2xs">
+              <Calendar className="w-3 h-3 text-[#059669]" />
+              <span suppressHydrationWarning>
+                {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E0F2FE] border border-[#BAE6FD] text-[#0369A1] text-[11px] font-bold shadow-2xs">
+              <BarChart3 className="w-3 h-3 text-[#0284C7]" />
+              <span>{isBangla ? 'একাডেমিক কোঅর্ডিনেটর' : 'Coordinator'}</span>
+            </div>
+
+            <Link
+              href="/reports"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
+            >
+              <FileText className="w-3 h-3 text-[#0F766E]" />
+              <span>{isBangla ? 'রিপোর্ট হাব' : 'Reports Hub'}</span>
+            </Link>
+
             <button
               onClick={() => {
                 setRefreshing(true);
                 fetchDashboardData();
               }}
               disabled={refreshing}
-              className="px-3.5 py-2.5 bg-white hover:bg-[#F0FDFA] text-[#0F766E] rounded-xl text-xs font-semibold border border-[#CCFBF1] flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
+              title="রিফ্রেশ"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#0F766E]' : ''}`} />
+              <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin text-[#0F766E]' : 'text-slate-500'}`} />
               <span>{isBangla ? 'রিফ্রেশ' : 'Refresh'}</span>
             </button>
-
-            <Link
-              href="/reports"
-              className="px-4 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl text-xs shadow-xs flex items-center gap-2 transition cursor-pointer active:scale-95"
-            >
-              <FileText className="w-4 h-4 text-white" />
-              <span>{isBangla ? 'রিপোর্ট হাব ও এক্সপোর্ট' : 'SRS Reports Hub'}</span>
-            </Link>
           </div>
         </div>
       </div>

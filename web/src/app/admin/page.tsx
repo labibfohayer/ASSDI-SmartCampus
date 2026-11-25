@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -19,6 +20,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Megaphone,
+  RefreshCw,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -122,33 +124,92 @@ export default function AdminOverviewPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-[#FFFBEB] border border-[#FCD34D] border-l-4 border-l-[#D97706] rounded-2xl p-6 sm:p-7 text-[#0F172A] shadow-xs relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5 shadow-xs">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#B45309]" />
-              <span>{t('brand.course')}</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading text-[#0F172A]">
-              {isBangla ? 'সিস্টেম অ্যাডমিনিস্ট্রেশন সেন্টার' : 'System Administration Center'}
-            </h1>
-            <p className="text-[#78350F] text-xs sm:text-sm mt-1.5">
-              {isBangla
-                ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট (ASSDI) প্ল্যাটফর্মের সামগ্রিক ডেটা ও ইউজার নিয়ন্ত্রণ।'
-                : 'Central administrative controls for students, faculty, batches, and academic governance.'}
-            </p>
-          </div>
+      {/* Slim Islamic Modern Super Admin Hero Welcome Card */}
+      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[138px] lg:min-h-[146px] flex items-center">
+        <Image
+          src="/islamic-hero-banner-slim.png"
+          alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
+          fill
+          priority
+          className="object-cover object-right pointer-events-none select-none"
+        />
 
-          <div className="flex items-center gap-2">
+        {/* Subtle mobile/tablet left scrim so text remains crisp over narrower screens */}
+        <div
+          className="lg:hidden absolute inset-0 bg-gradient-to-r from-[#FFFDF8]/92 via-[#FDF8EC]/80 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Compact Left Content */}
+        <div className="relative z-10 px-4 py-2.5 sm:px-5 lg:max-w-[62%] w-full">
+          <p className="text-xs sm:text-[13.5px] font-extrabold text-[#064E3B] tracking-tight flex items-center gap-1.5 leading-none mb-0.5">
+            <span>{isBangla ? 'আসসালামু আলাইকুম!' : 'Assalamu Alaikum!'}</span>
+            <span className="text-sm sm:text-base" role="img" aria-label="wave">
+              👋
+            </span>
+          </p>
+
+          <h1 className="text-lg sm:text-xl lg:text-[22px] font-black text-[#0F172A] tracking-tight font-serif leading-tight">
+            {isBangla ? 'স্বাগতম' : 'Welcome back'}, {user?.full_name?.split(' ')[0] || (isBangla ? 'অ্যাডমিন' : 'Admin')}!
+          </h1>
+
+          <p className="text-[11px] text-[#334155] font-medium mt-0.5 leading-snug">
+            {isBangla
+              ? 'আল্লাহ আপনার প্রশাসনিক দায়িত্ব ও ব্যবস্থাপনা কার্যক্রমে বরকত দান করুন — কেন্দ্রীয় নিয়ন্ত্রণ কেন্দ্র।'
+              : 'May Allah bless your administrative leadership and institutional governance.'}
+          </p>
+
+          {/* Compact Single Strip: Date, Role & Quick Actions */}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E6F4EA]/95 border border-[#A7F3D0] text-[#065F46] text-[11px] font-semibold shadow-2xs">
+              <Calendar className="w-3 h-3 text-[#059669]" />
+              <span suppressHydrationWarning>
+                {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-[11px] font-bold shadow-2xs">
+              <ShieldCheck className="w-3 h-3 text-[#D97706]" />
+              <span>{isBangla ? 'সুপার অ্যাডমিন' : 'Super Admin'}</span>
+            </div>
+
+            <Link
+              href="/admin/students"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
+            >
+              <Users className="w-3 h-3 text-[#0F766E]" />
+              <span>{isBangla ? 'শিক্ষার্থী তালিকা' : 'Students'}</span>
+            </Link>
+
+            <Link
+              href="/admin/batches"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
+            >
+              <Layers className="w-3 h-3 text-[#059669]" />
+              <span>{isBangla ? 'ব্যাচ ও কোর্স' : 'Batches'}</span>
+            </Link>
+
+            <Link
+              href="/reports"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
+            >
+              <FileText className="w-3 h-3 text-[#D97706]" />
+              <span>{isBangla ? '৯টি SRS রিপোর্ট' : 'Reports'}</span>
+            </Link>
+
             <a
-              href="http://localhost:8001/api/docs/"
+              href="https://assdi-backend-egu4.onrender.com/api/docs/"
               target="_blank"
               rel="noreferrer"
-              className="px-3.5 py-2.5 bg-white hover:bg-[#F0FDFA] text-[#0F766E] rounded-xl text-xs font-semibold border border-[#CCFBF1] flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
             >
-              <span>{isBangla ? 'ওপেনএপিআই ডক্স (Swagger)' : 'API Docs (Swagger)'}</span>
-              <ExternalLink className="w-3.5 h-3.5 text-[#0F766E]" />
+              <span>{isBangla ? 'Swagger ডক্স' : 'Swagger'}</span>
+              <ExternalLink className="w-3 h-3 text-[#64748B]" />
             </a>
           </div>
         </div>
