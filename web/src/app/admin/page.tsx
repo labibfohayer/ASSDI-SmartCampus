@@ -27,10 +27,29 @@ import {
   CreditCard,
   UserCheck,
   ShieldCheck,
+  Megaphone,
+  Plus,
+  Trash2,
+  X,
+  Bell,
+  RefreshCw,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+interface AnnouncementItem {
+  id: number;
+  author_name: string;
+  scope: 'Global' | 'Course' | 'Batch';
+  target_course_name?: string;
+  target_batch_name?: string;
+  title: string;
+  content: string;
+  published_at: string;
+  created_at: string;
+}
 
 export default function AdminOverviewPage() {
   const { user } = useAuth();
@@ -44,47 +63,116 @@ export default function AdminOverviewPage() {
     totalSessions: 20,
   });
   const [repeatedAbsences, setRepeatedAbsences] = useState<any[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState('This Month');
+  const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
+  const [coursesList, setCoursesList] = useState<any[]>([]);
+  const [batchesList, setBatchesList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Notice Create Modal state
+  const [showNoticeModal, setShowNoticeModal] = useState(false);
+  const [noticeForm, setNoticeForm] = useState({
+    title: '',
+    content: '',
+    scope: 'Course' as 'Global' | 'Course' | 'Batch',
+    target_course: '',
+    target_batch: '',
+  });
+  const [publishingNotice, setPublishingNotice] = useState(false);
+
+  const fetchDashboardData = async () => {
+    try {
+      const [dashRes, sessionsRes, coursesRes, batchesRes, noticesRes] = await Promise.all([
+        api.get('/api/v1/analytics/coordinator-dashboard/').catch(() => ({ data: {} })),
+        api.get('/api/v1/class-sessions/').catch(() => ({ data: [] })),
+        api.get('/api/v1/courses/').catch(() => ({ data: [] })),
+        api.get('/api/v1/batches/').catch(() => ({ data: [] })),
+        api.get('/api/v1/announcements/').catch(() => ({ data: [] })),
+      ]);
+
+      const dashData = dashRes.data?.data || dashRes.data || {};
+      const sessions = Array.isArray(sessionsRes.data) ? sessionsRes.data : sessionsRes.data?.results || [];
+      const courses = Array.isArray(coursesRes.data) ? coursesRes.data : coursesRes.data?.results || [];
+      const batches = Array.isArray(batchesRes.data) ? batchesRes.data : batchesRes.data?.results || [];
+      const notices = Array.isArray(noticesRes.data) ? noticesRes.data : noticesRes.data?.results || [];
+
+      setStats({
+        totalStudents: dashData.total_students || 67,
+        totalBatches: dashData.total_active_batches || batches.length || 3,
+        totalTeachers: dashData.total_teachers || 0,
+        totalCourses: courses.length || 9,
+        totalSessions: sessions.length || 20,
+      });
+      setRepeatedAbsences(dashData.repeated_absences_list || []);
+      setCoursesList(courses);
+      setBatchesList(batches);
+      setAnnouncements(notices);
+    } catch (err) {
+      console.error('Failed to load admin stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAdminStats = async () => {
-      try {
-        const [dashRes, sessionsRes, coursesRes, batchesRes] = await Promise.all([
-          api.get('/api/v1/analytics/coordinator-dashboard/').catch(() => ({ data: {} })),
-          api.get('/api/v1/class-sessions/').catch(() => ({ data: [] })),
-          api.get('/api/v1/courses/').catch(() => ({ data: [] })),
-          api.get('/api/v1/batches/').catch(() => ({ data: [] })),
-        ]);
-
-        const dashData = dashRes.data?.data || dashRes.data || {};
-        const sessionsList = Array.isArray(sessionsRes.data)
-          ? sessionsRes.data
-          : sessionsRes.data?.results || [];
-        const coursesList = Array.isArray(coursesRes.data)
-          ? coursesRes.data
-          : coursesRes.data?.results || [];
-        const batchesList = Array.isArray(batchesRes.data)
-          ? batchesRes.data
-          : batchesRes.data?.results || [];
-
-        setStats({
-          totalStudents: dashData.total_students || 67,
-          totalBatches: dashData.total_active_batches || batchesList.length || 3,
-          totalTeachers: dashData.total_teachers || 0,
-          totalCourses: coursesList.length || 9,
-          totalSessions: sessionsList.length || 20,
-        });
-        setRepeatedAbsences(dashData.repeated_absences_list || []);
-      } catch (err) {
-        console.error('Failed to load admin stats:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAdminStats();
+    fetchDashboardData();
   }, []);
+
+  // Handle Create Announcement
+  const handleCreateNotice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!noticeForm.title.trim() || !noticeForm.content.trim()) {
+      toast.error(isBangla ? 'শিরোনাম ও বিস্তারিত বিষয় পূরণ করুন।' : 'Title and content are required.');
+      return;
+    }
+
+    setPublishingNotice(true);
+    try {
+      const payload: any = {
+        title: noticeForm.title.trim(),
+        content: noticeForm.content.trim(),
+        scope: noticeForm.scope,
+      };
+
+      if (noticeForm.scope === 'Course' && noticeForm.target_course) {
+        payload.target_course = parseInt(noticeForm.target_course);
+      }
+      if (noticeForm.scope === 'Batch' && noticeForm.target_batch) {
+        payload.target_batch = parseInt(noticeForm.target_batch);
+      }
+
+      await api.post('/api/v1/announcements/', payload);
+      toast.success(isBangla ? 'নতুন নোটিশ সফলভাবে প্রকাশ করা হয়েছে!' : 'Notice published successfully!');
+      setShowNoticeModal(false);
+      setNoticeForm({
+        title: '',
+        content: '',
+        scope: 'Course',
+        target_course: '',
+        target_batch: '',
+      });
+      fetchDashboardData();
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || (isBangla ? 'নোটিশ প্রকাশ করা যায়নি।' : 'Failed to publish notice.');
+      toast.error(msg);
+    } finally {
+      setPublishingNotice(false);
+    }
+  };
+
+  // Handle Delete / Discard Notice
+  const handleDeleteNotice = async (id: number) => {
+    if (!confirm(isBangla ? 'আপনি কি নিশ্চিত এই নোটিশটি বাদ দিতে চান?' : 'Are you sure you want to delete this notice?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/v1/announcements/${id}/`);
+      toast.success(isBangla ? 'নোটিশ সফলভাবে বাদ দেওয়া হয়েছে।' : 'Notice deleted successfully.');
+      setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+    } catch (err) {
+      toast.error(isBangla ? 'নোটিশ বাদ দেওয়া সম্ভব হয়নি।' : 'Failed to delete notice.');
+    }
+  };
 
   // Recent Reports dataset matching reference mockup
   const recentReports = [
@@ -245,11 +333,11 @@ export default function AdminOverviewPage() {
             </Link>
 
             <Link
-              href="/admin/batches"
+              href="/admin/teachers"
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
             >
-              <Layers className="w-3 h-3 text-[#059669]" />
-              <span>{isBangla ? 'ব্যাচসমূহ' : 'Batches'}</span>
+              <UserCheck className="w-3 h-3 text-[#059669]" />
+              <span>{isBangla ? 'শিক্ষক' : 'Teachers'}</span>
             </Link>
 
             <Link
@@ -260,15 +348,22 @@ export default function AdminOverviewPage() {
               <span>{isBangla ? 'রিপোর্ট হাব' : 'Reports'}</span>
             </Link>
 
-            <a
-              href="https://assdi-backend-egu4.onrender.com/api/docs/"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
+            <button
+              onClick={() => {
+                setNoticeForm({
+                  title: '',
+                  content: '',
+                  scope: 'Course',
+                  target_course: coursesList[0]?.id ? String(coursesList[0].id) : '',
+                  target_batch: '',
+                });
+                setShowNoticeModal(true);
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-[11px] font-bold transition cursor-pointer shadow-2xs active:scale-95"
             >
-              <span>Swagger</span>
-              <ExternalLink className="w-3 h-3 text-[#64748B]" />
-            </a>
+              <Megaphone className="w-3 h-3" />
+              <span>{isBangla ? '+ নতুন নোটিশ' : '+ New Notice'}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -543,7 +638,6 @@ export default function AdminOverviewPage() {
 
         {/* Right: Quick Actions Card (5 cols) */}
         <div className="lg:col-span-5 relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#025033] via-[#013C24] to-[#012918] p-5 text-white shadow-sm flex flex-col justify-between">
-          {/* Bottom-Right Vivid Orange Corner Curves Matching Mockup */}
           <svg
             className="pointer-events-none absolute -bottom-1 -right-1 w-28 h-24"
             viewBox="0 0 120 100"
@@ -564,7 +658,7 @@ export default function AdminOverviewPage() {
                 </h2>
               </div>
               <p className="text-[11.5px] !text-emerald-100/90 mt-0.5 truncate">
-                {isBangla ? 'সহজেই ইনস্টিটিউটের কার্যক্রম পরিচালনা করুন' : 'Manage your institute easily'}
+                {isBangla ? 'সহজেই ইনস্টিটিউটের সার্বিক কার্যক্রম পরিচালনা করুন' : 'Manage your institute easily'}
               </p>
             </div>
             <Link
@@ -589,24 +683,33 @@ export default function AdminOverviewPage() {
             </Link>
 
             <Link
-              href="/admin/batches"
+              href="/admin/teachers"
               className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <Users className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
+              <BookOpen className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
               <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'ব্যাচ অ্যাসাইন' : 'Assign to Batch'}
+                {isBangla ? 'বিষয় বরাদ্দ' : 'Assign Subject'}
               </span>
             </Link>
 
-            <Link
-              href="/reports"
+            <button
+              onClick={() => {
+                setNoticeForm({
+                  title: '',
+                  content: '',
+                  scope: 'Course',
+                  target_course: coursesList[0]?.id ? String(coursesList[0].id) : '',
+                  target_batch: '',
+                });
+                setShowNoticeModal(true);
+              }}
               className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <Download className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
+              <Megaphone className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
               <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'রিপোর্ট এক্সপোর্ট' : 'Export Report'}
+                {isBangla ? 'নোটিশ দিন' : 'Post Notice'}
               </span>
-            </Link>
+            </button>
 
             <Link
               href="/reports"
@@ -619,12 +722,12 @@ export default function AdminOverviewPage() {
             </Link>
 
             <Link
-              href="/admin/courses"
+              href="/admin/students"
               className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <BookOpen className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
+              <Users className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
               <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'কোর্স পরিচালনা' : 'Manage Courses'}
+                {isBangla ? 'ছাত্র বহিষ্কার/ভর্তি' : 'Students Hub'}
               </span>
             </Link>
 
@@ -748,11 +851,9 @@ export default function AdminOverviewPage() {
               </h3>
             </div>
 
-            {/* Circular Donut Visual */}
             <div className="flex flex-col items-center justify-center my-4">
               <div className="relative w-32 h-32 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  {/* Background Circle */}
                   <circle
                     cx="50"
                     cy="50"
@@ -761,7 +862,6 @@ export default function AdminOverviewPage() {
                     strokeWidth="9"
                     fill="none"
                   />
-                  {/* Completed Segment (72.4%) */}
                   <circle
                     cx="50"
                     cy="50"
@@ -773,7 +873,6 @@ export default function AdminOverviewPage() {
                     strokeLinecap="round"
                     fill="none"
                   />
-                  {/* In Progress Segment (18.2%) */}
                   <circle
                     cx="50"
                     cy="50"
@@ -798,7 +897,6 @@ export default function AdminOverviewPage() {
                 </div>
               </div>
 
-              {/* Legend */}
               <div className="w-full space-y-1.5 mt-2 text-xs">
                 <div className="flex items-center justify-between text-slate-600">
                   <span className="flex items-center gap-1.5">
@@ -846,7 +944,6 @@ export default function AdminOverviewPage() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-              {/* Stat 1: Students */}
               <div className="bg-[#F8FAFC] rounded-xl p-3.5 border border-slate-100 text-center flex flex-col items-center justify-center">
                 <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1.5">
                   <Users className="w-4 h-4" />
@@ -857,7 +954,6 @@ export default function AdminOverviewPage() {
                 </p>
               </div>
 
-              {/* Stat 2: Batches */}
               <div className="bg-[#F8FAFC] rounded-xl p-3.5 border border-slate-100 text-center flex flex-col items-center justify-center">
                 <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-1.5">
                   <BookOpen className="w-4 h-4" />
@@ -868,7 +964,6 @@ export default function AdminOverviewPage() {
                 </p>
               </div>
 
-              {/* Stat 3: Courses */}
               <div className="bg-[#F8FAFC] rounded-xl p-3.5 border border-slate-100 text-center flex flex-col items-center justify-center">
                 <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-1.5">
                   <GraduationCap className="w-4 h-4" />
@@ -879,7 +974,6 @@ export default function AdminOverviewPage() {
                 </p>
               </div>
 
-              {/* Stat 4: Sessions */}
               <div className="bg-[#F8FAFC] rounded-xl p-3.5 border border-slate-100 text-center flex flex-col items-center justify-center">
                 <div className="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mb-1.5">
                   <Calendar className="w-4 h-4" />
@@ -895,7 +989,6 @@ export default function AdminOverviewPage() {
 
         {/* Right: Building Skills Promo Banner (4 cols) */}
         <div className="lg:col-span-4 relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00382B] via-[#002B21] to-[#001D16] border border-[#064E3B]/40 p-5 text-white shadow-sm flex flex-col justify-between min-h-[140px] group">
-          {/* Subtle Mosque Silhouette Overlay on Right */}
           <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-30 pointer-events-none select-none">
             <Image
               src="/islamic-banner-mosque.png"
@@ -925,6 +1018,226 @@ export default function AdminOverviewPage() {
           </div>
         </div>
       </div>
+
+      {/* 6. ROW 6: NOTICE & ANNOUNCEMENT MANAGEMENT BOARD (USER EXPLICIT REQUIREMENT) */}
+      <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200">
+              <Megaphone className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-base font-extrabold text-[#0F172A] font-serif">
+                {isBangla ? 'নোটিশ ও প্রাতিষ্ঠানিক যোগাযোগ বোর্ড' : 'Campus Notices & Announcements'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                {isBangla
+                  ? 'নতুন নোটিশ জারি করুন, নোটিশ দেখুন অথবা পূর্ববর্তী বাতিল নোটিশ বাদ দিন।'
+                  : 'Publish notices, view campus circulars, or delete expired notices.'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              setNoticeForm({
+                title: '',
+                content: '',
+                scope: 'Course',
+                target_course: coursesList[0]?.id ? String(coursesList[0].id) : '',
+                target_batch: '',
+              });
+              setShowNoticeModal(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#059669] hover:bg-[#047857] text-white text-xs font-extrabold rounded-xl shadow-xs transition cursor-pointer self-start sm:self-auto"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{isBangla ? 'নতুন নোটিশ যোগ করুন' : 'Add New Notice'}</span>
+          </button>
+        </div>
+
+        {/* Notices Grid */}
+        {announcements.length === 0 ? (
+          <div className="text-center py-8">
+            <Megaphone className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+            <p className="text-xs text-slate-500">
+              {isBangla ? 'বর্তমানে কোনো সক্রিয় নোটিশ নেই।' : 'No active notices found.'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {announcements.slice(0, 6).map((notice) => (
+              <div
+                key={notice.id}
+                className="p-4 rounded-xl border border-slate-200 hover:border-emerald-300 bg-[#FBFDFB] flex flex-col justify-between space-y-3 shadow-2xs group transition"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#E6F4EA] text-[#065F46] border border-[#A7F3D0]">
+                      {notice.scope === 'Global'
+                        ? isBangla
+                          ? 'সার্বজনীন'
+                          : 'Global'
+                        : notice.target_course_name || notice.target_batch_name || notice.scope}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      {new Date(notice.published_at || notice.created_at).toLocaleDateString(
+                        isBangla ? 'bn-BD' : 'en-US',
+                        { month: 'short', day: 'numeric', year: 'numeric' }
+                      )}
+                    </span>
+                  </div>
+
+                  <h4 className="text-xs font-bold text-[#0F172A] leading-snug line-clamp-2">
+                    {notice.title}
+                  </h4>
+                  <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-3">
+                    {notice.content}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400 font-medium">
+                    {notice.author_name || (isBangla ? 'অ্যাডমিন' : 'Admin')}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteNotice(notice.id)}
+                    className="inline-flex items-center gap-1 text-rose-600 hover:text-rose-800 font-bold transition p-1 hover:bg-rose-50 rounded"
+                    title={isBangla ? 'নোটিশ বাদ দিন' : 'Delete Notice'}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>{isBangla ? 'বাদ দিন' : 'Delete'}</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* NOTICE PUBLISH MODAL */}
+      {showNoticeModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <Megaphone className="w-4 h-4" />
+                </div>
+                <h3 className="font-extrabold text-base text-[#0F172A] font-serif">
+                  {isBangla ? 'নতুন নোটিশ জারি ও প্রকাশ করুন' : 'Publish New Notice'}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowNoticeModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateNotice} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  {isBangla ? 'নোটিশের শিরোনাম *' : 'Notice Title *'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={noticeForm.title}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, title: e.target.value })}
+                  placeholder={isBangla ? 'উদাঃ আগামী শুক্রবার বিশেষ ক্লাস সেশন অনুষ্ঠিত হবে' : 'e.g. Special workshop schedule'}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-[#059669]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isBangla ? 'নোটিশের আওতা (Scope)' : 'Notice Scope'}
+                  </label>
+                  <select
+                    value={noticeForm.scope}
+                    onChange={(e: any) => setNoticeForm({ ...noticeForm, scope: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white"
+                  >
+                    <option value="Course">{isBangla ? 'কোর্স নির্দিষ্ট' : 'Course Specific'}</option>
+                    <option value="Batch">{isBangla ? 'ব্যাচ নির্দিষ্ট' : 'Batch Specific'}</option>
+                    <option value="Global">{isBangla ? 'সার্বজনীন (সবার জন্য)' : 'Global'}</option>
+                  </select>
+                </div>
+
+                {noticeForm.scope === 'Course' && (
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      {isBangla ? 'টার্গেট কোর্স' : 'Target Course'}
+                    </label>
+                    <select
+                      value={noticeForm.target_course}
+                      onChange={(e) => setNoticeForm({ ...noticeForm, target_course: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white"
+                    >
+                      <option value="">{isBangla ? '-- কোর্স নির্বাচন করুন --' : '-- Select Course --'}</option>
+                      {coursesList.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {noticeForm.scope === 'Batch' && (
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      {isBangla ? 'টার্গেট ব্যাচ' : 'Target Batch'}
+                    </label>
+                    <select
+                      value={noticeForm.target_batch}
+                      onChange={(e) => setNoticeForm({ ...noticeForm, target_batch: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white"
+                    >
+                      <option value="">{isBangla ? '-- ব্যাচ নির্বাচন করুন --' : '-- Select Batch --'}</option>
+                      {batchesList.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  {isBangla ? 'নোটিশের বিস্তারিত বিবরণ *' : 'Notice Details / Content *'}
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  value={noticeForm.content}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content: e.target.value })}
+                  placeholder={isBangla ? 'নোটিশের মূল বক্তব্য এবং প্রয়োজনীয় নির্দেশনা লিখুন...' : 'Write notice details...'}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-[#059669]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowNoticeModal(false)}
+                  className="px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold"
+                >
+                  {isBangla ? 'বাতিল' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={publishingNotice}
+                  className="px-4 py-2 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold transition disabled:opacity-50"
+                >
+                  {publishingNotice ? (isBangla ? 'প্রকাশ হচ্ছে...' : 'Publishing...') : (isBangla ? 'নোটিশ প্রকাশ করুন' : 'Publish Notice')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

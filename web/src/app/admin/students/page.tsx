@@ -25,6 +25,9 @@ import {
   CreditCard,
   Award,
   Trash2,
+  Layers,
+  BookOpen,
+  ArrowRight,
   User as UserIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -71,6 +74,7 @@ export default function AdminStudentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBatch, setSelectedBatch] = useState('');
   const [selectedAudience, setSelectedAudience] = useState('');
+  const [activeTab, setActiveTab] = useState<'students' | 'batches' | 'academics'>('students');
 
   // Add modal state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -453,7 +457,53 @@ export default function AdminStudentsPage() {
         </div>
       </div>
 
-      {/* Roster Table Card */}
+      {/* 3 Unified Tabs: 1. Directory & Admission, 2. Batches & Allocation, 3. Learning & Academics */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('students')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            activeTab === 'students'
+              ? 'bg-[#0F766E] text-white shadow-xs'
+              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>{isBangla ? 'শিক্ষার্থী তালিকা, ভর্তি ও বহিষ্কার' : 'Students Directory, Admission & Dismissal'}</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10.5px] ${activeTab === 'students' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>
+            {d(students.length)}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('batches')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            activeTab === 'batches'
+              ? 'bg-[#0F766E] text-white shadow-xs'
+              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          <span>{isBangla ? 'ব্যাচ ও শিক্ষার্থী বণ্টন' : 'Batches & Student Allocation'}</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10.5px] ${activeTab === 'batches' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>
+            {d(batches.length)}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('academics')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            activeTab === 'academics'
+              ? 'bg-[#0F766E] text-white shadow-xs'
+              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          <GraduationCap className="w-4 h-4" />
+          <span>{isBangla ? 'শিক্ষার্থীদের পড়াশোনা ও অগ্রগতি' : 'Student Learning & Progress'}</span>
+        </button>
+      </div>
+
+      {/* TAB 1: Roster Table Card */}
+      {activeTab === 'students' && (
       <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
         {/* Search & Filter Bar */}
         <div className="p-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
@@ -646,10 +696,10 @@ export default function AdminStudentsPage() {
                             setOffboardCustomReason('');
                           }}
                           className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
-                          title={isBangla ? 'শিক্ষার্থী অপসরণ / বিদায় নিশ্চিতকরণ' : 'Offboard / Remove Student'}
+                          title={isBangla ? 'ছাত্র বহিষ্কার / অব্যাহতি নিশ্চিতকরণ' : 'Expel / Offboard Student'}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>{isBangla ? 'রিমুভ' : 'Remove'}</span>
+                          <UserX className="w-3.5 h-3.5" />
+                          <span>{isBangla ? 'বহিষ্কার' : 'Expel'}</span>
                         </button>
                       </div>
                     </td>
@@ -660,6 +710,256 @@ export default function AdminStudentsPage() {
           </div>
         )}
       </div>
+      )}
+
+      {/* TAB 2: BATCHES & STUDENT ALLOCATION */}
+      {activeTab === 'batches' && (
+        <div className="space-y-4">
+          <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div>
+              <h3 className="font-extrabold text-[#0F172A] text-sm">
+                {isBangla ? 'ব্যাচভিত্তিক শিক্ষার্থী সংখ্যা ও বণ্টন' : 'Batches & Student Allocation Overview'}
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {isBangla
+                  ? 'প্রতিটি ব্যাচের বর্তমান সক্রিয় শিক্ষার্থী সংখ্যা দেখুন এবং যেকোনো ব্যাচে দ্রুত ছাত্র বণ্টন করুন।'
+                  : 'View student enrollments per batch and manage cohort allocation.'}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setShowAddModal(true);
+              }}
+              className="px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>{isBangla ? 'নতুন শিক্ষার্থী এনরোল করুন' : 'Enroll Student'}</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {batches.map((b) => {
+              const enrolledCount = students.filter((s) => s.current_batch_id === b.id).length;
+              return (
+                <div
+                  key={b.id}
+                  className="bg-white rounded-2xl border border-slate-200 hover:border-emerald-300 p-5 shadow-xs flex flex-col justify-between space-y-4 group transition"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#E6F4EA] text-[#065F46] border border-[#A7F3D0]">
+                        {isBangla ? 'ব্যাচ নং' : 'Batch'} {b.batch_number || b.id}
+                      </span>
+                      <span className="text-xs font-bold text-slate-400">
+                        {isBangla ? 'ক্যাম্পাস:' : 'Campus:'} {b.campus || 'Main'}
+                      </span>
+                    </div>
+
+                    <h4 className="font-extrabold text-sm text-[#0F172A] group-hover:text-[#0F766E] transition">
+                      {b.name}
+                    </h4>
+
+                    <div className="flex items-center gap-2 pt-2">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                        <Users className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">
+                          {d(enrolledCount)} {isBangla ? 'জন শিক্ষার্থী ভর্তি' : 'Students Enrolled'}
+                        </p>
+                        <p className="text-[11px] text-slate-400">
+                          {isBangla ? 'সক্রিয় শিক্ষণ ব্যাচ' : 'Active Learning Cohort'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedBatch(String(b.id));
+                        setActiveTab('students');
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      <span>{isBangla ? 'এই ব্যাচের ছাত্র দেখুন' : 'View Students'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setFormData((prev) => ({ ...prev, batch_id: String(b.id) }));
+                        setShowAddModal(true);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
+                    >
+                      {isBangla ? '+ ভর্তি' : '+ Enroll'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: STUDENT LEARNING & ACADEMICS */}
+      {activeTab === 'academics' && (
+        <div className="space-y-5">
+          {/* Academic KPIs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-500">
+                  {isBangla ? 'গড় ক্লাসের উপস্থিতি' : 'Avg Attendance Rate'}
+                </p>
+                <h3 className="text-2xl font-black text-[#059669] mt-0.5">81.3%</h3>
+                <p className="text-[11px] text-emerald-700 font-semibold mt-0.5">↑ 4.2% {isBangla ? 'গত সপ্তাহের চেয়ে বৃদ্ধি' : 'vs last week'}</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-500">
+                  {isBangla ? 'সম্পন্ন ক্লাস সেশন' : 'Completed Sessions'}
+                </p>
+                <h3 className="text-2xl font-black text-[#0F172A] mt-0.5">13 <span className="text-sm font-normal text-slate-500">/ 16</span></h3>
+                <p className="text-[11px] text-blue-700 font-semibold mt-0.5">81% {isBangla ? 'সিলেবাস কভার্ড' : 'syllabus covered'}</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <BookOpen className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-500">
+                  {isBangla ? 'সামগ্রিক শিক্ষা অগ্রগতি' : 'Overall Progress'}
+                </p>
+                <h3 className="text-2xl font-black text-[#0F172A] mt-0.5">73.0%</h3>
+                <p className="text-[11px] text-amber-700 font-semibold mt-0.5">● {isBangla ? 'অগ্রগতি সন্তোষজনক' : 'On Track'}</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <GraduationCap className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-500">
+                  {isBangla ? 'গড় পরীক্ষার স্কোর' : 'Avg Exam Score'}
+                </p>
+                <h3 className="text-2xl font-black text-[#0F172A] mt-0.5">74.7%</h3>
+                <p className="text-[11px] text-purple-700 font-semibold mt-0.5">15 {isBangla ? 'টি ক্লাস মূল্যায়ন' : 'class evals'}</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <Award className="w-5 h-5" />
+              </div>
+            </div>
+          </div>
+
+          {/* Academic Reports Hub Links */}
+          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3">
+            <h4 className="text-sm font-extrabold text-[#0F172A] font-serif">
+              {isBangla ? 'শিক্ষার্থীর পড়াশোনা ও একাডেমিক রিপোর্ট লিংক' : 'Academic Learning Reports Hub'}
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <a
+                href="/reports?tab=daily-attendance"
+                className="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 transition flex items-center justify-between group"
+              >
+                <div>
+                  <p className="font-bold text-xs text-[#0F172A] group-hover:text-emerald-700">
+                    {isBangla ? '১. দৈনিক ক্লাসে উপস্থিতি রিপোর্ট' : '1. Daily Attendance Report'}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {isBangla ? 'উপস্থিতি ও অনুপস্থিতির পূর্ণাঙ্গ তালিকা' : 'Full attendance & absence logs'}
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-transform group-hover:translate-x-1" />
+              </a>
+
+              <a
+                href="/reports?tab=daily-learning-progress"
+                className="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 transition flex items-center justify-between group"
+              >
+                <div>
+                  <p className="font-bold text-xs text-[#0F172A] group-hover:text-emerald-700">
+                    {isBangla ? '২. দৈনিক শিক্ষা অগ্রগতি ও ফিডব্যাক' : '2. Daily Learning Progress'}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {isBangla ? 'ছাত্রদের আত্মবিশ্বাস ও ফিডব্যাক রেটিং' : 'Confidence & rating summary'}
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-transform group-hover:translate-x-1" />
+              </a>
+
+              <a
+                href="/reports?tab=monthly-student-performance"
+                className="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 transition flex items-center justify-between group"
+              >
+                <div>
+                  <p className="font-bold text-xs text-[#0F172A] group-hover:text-emerald-700">
+                    {isBangla ? '৩. মাসিক শিক্ষার্থী পারফরম্যান্স' : '3. Monthly Performance'}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {isBangla ? 'র‌্যাংকিং ও ধারাবাহিক অগ্রগতি' : 'Ranks & progress breakdown'}
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-transform group-hover:translate-x-1" />
+              </a>
+
+              <a
+                href="/reports?tab=topic-wise-understanding"
+                className="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 transition flex items-center justify-between group"
+              >
+                <div>
+                  <p className="font-bold text-xs text-[#0F172A] group-hover:text-emerald-700">
+                    {isBangla ? '৪. টপিকভিত্তিক বোঝার হার' : '4. Topic Understanding'}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {isBangla ? 'কোন বিষয়ে ছাত্ররা দুর্বল তা নির্ণয়' : 'Subject mastery & gaps'}
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-transform group-hover:translate-x-1" />
+              </a>
+
+              <a
+                href="/reports?tab=student-help-requests"
+                className="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 transition flex items-center justify-between group"
+              >
+                <div>
+                  <p className="font-bold text-xs text-[#0F172A] group-hover:text-emerald-700">
+                    {isBangla ? '৫. শিক্ষার্থী সাহায্য ও হেল্প রিকোয়েস্ট' : '5. Student Help Requests'}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {isBangla ? 'শিক্ষকের সহায়তা আবেদন মনিটরিং' : 'Teacher assistance queues'}
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 transition-transform group-hover:translate-x-1" />
+              </a>
+
+              <a
+                href="/reports?tab=repeated-absences"
+                className="p-3.5 rounded-xl border border-slate-200 hover:border-rose-300 hover:bg-rose-50/40 transition flex items-center justify-between group"
+              >
+                <div>
+                  <p className="font-bold text-xs text-rose-900 group-hover:text-rose-700">
+                    {isBangla ? '৬. টানা ৩+ দিন অনুপস্থিত ছাত্র (ঝুঁকিপূর্ণ)' : '6. At-Risk Absence Alert'}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {isBangla ? 'ড্রপআউট রোধে জরুরি হস্তক্ষেপ' : 'Urgent dropout prevention'}
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-rose-700 transition-transform group-hover:translate-x-1" />
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Student Modal */}
       {showAddModal && (
