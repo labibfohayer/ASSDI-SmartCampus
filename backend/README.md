@@ -10,6 +10,13 @@ Django 5.2 LTS + Django REST Framework + PostgreSQL + SimpleJWT
 - **Documentation:** OpenAPI 3.0 via `drf-spectacular`
 - **Environment Management:** `python-decouple` with settings split (`base`, `dev`, `prod`)
 
+## 🌐 Production & Cloud Deployment
+- **Live Base URL:** [https://assdi-backend-egu4.onrender.com](https://assdi-backend-egu4.onrender.com)
+- **Live Health Check:** [https://assdi-backend-egu4.onrender.com/api/v1/health/](https://assdi-backend-egu4.onrender.com/api/v1/health/)
+- **Live OpenAPI Swagger UI:** [https://assdi-backend-egu4.onrender.com/api/docs/](https://assdi-backend-egu4.onrender.com/api/docs/)
+- **Live OpenAPI Redoc:** [https://assdi-backend-egu4.onrender.com/api/redoc/](https://assdi-backend-egu4.onrender.com/api/redoc/)
+- **Hosted Database:** Neon.tech PostgreSQL 16 (AWS Singapore, `ap-southeast-1`)
+
 ---
 
 ## 🚀 Quickstart Guide

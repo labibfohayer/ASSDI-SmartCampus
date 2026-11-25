@@ -3,6 +3,26 @@
 Comprehensive Academic ERP, Attendance & Learning Progress Management Platform  
 Developed for As-Sunnah Skill Development Institute (Dhaka, Bangladesh).
 
+[![Frontend: Cloudflare Pages](https://img.shields.io/badge/Frontend-Cloudflare_Pages-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://assdi-smartcampus.pages.dev)
+[![Backend: Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://assdi-backend-egu4.onrender.com)
+[![Database: Neon PostgreSQL](https://img.shields.io/badge/Database-Neon_PostgreSQL-00E599?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech)
+[![API Docs: Swagger](https://img.shields.io/badge/OpenAPI-Swagger_3.0-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://assdi-backend-egu4.onrender.com/api/docs/)
+
+---
+
+## 🌐 Live Cloud Deployment
+
+The entire system is deployed live in production:
+
+| Component | Platform | Live URL | Status & Description |
+| :--- | :--- | :--- | :--- |
+| **Web Portal (SPA)** | Cloudflare Pages | **[https://assdi-smartcampus.pages.dev](https://assdi-smartcampus.pages.dev)** | Modern Islamic UI, Zero-scroll Student Dashboard, Admin & Teacher Portals (Bangla-first) |
+| **Backend API** | Render Cloud | **[https://assdi-backend-egu4.onrender.com](https://assdi-backend-egu4.onrender.com)** | Django 5.2 LTS + Gunicorn Production REST API |
+| **API Documentation** | Render Cloud | **[https://assdi-backend-egu4.onrender.com/api/docs/](https://assdi-backend-egu4.onrender.com/api/docs/)** | Interactive Swagger OpenAPI 3.0 Explorer |
+| **ReDoc Reference** | Render Cloud | **[https://assdi-backend-egu4.onrender.com/api/redoc/](https://assdi-backend-egu4.onrender.com/api/redoc/)** | Human-readable API Schema Reference |
+| **Health Check** | Render Cloud | **[https://assdi-backend-egu4.onrender.com/api/v1/health/](https://assdi-backend-egu4.onrender.com/api/v1/health/)** | Live probe endpoint (`{"status": "ok"}`) |
+| **Database** | Neon.tech | PostgreSQL 16 (AWS Singapore) | Serverless PostgreSQL with connection pooling |
+
 ---
 
 ## Overview
@@ -265,16 +285,17 @@ CORS_ALLOW_ALL_ORIGINS=True
 
 ## Pre-Seeded Demo Credentials
 
-The `seed_demo` command provisions ready-to-test accounts across all roles. The login page provides one-click credentials filling for convenience.
+You can test the system live immediately at **[https://assdi-smartcampus.pages.dev/login](https://assdi-smartcampus.pages.dev/login)** (or locally) using any of the pre-configured accounts:
 
-| Role | Username | Password | Dashboard Route |
-| :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin01` | `AdminPass2026!` | `/admin` |
-| **Coordinator** | `coord01` | `CoordPass2026!` | `/coordinator` |
-| **Teacher (Accounting)** | `teacher_acct` | `TeacherPass2026!` | `/teacher` |
-| **Teacher (Graphic Design)** | `teacher_gdve_lead`| `TeacherPass2026!` | `/teacher` |
-| **Student** | `std_2026_001_001` | `StudentPass2026!` | `/student` |
-| **Observer (Auditor)** | `observer01` | `ObserverPass2026!` | `/reports` |
+| Role | Username / Login ID | Password | Live Route | Access & Privileges |
+| :--- | :--- | :--- | :--- | :--- |
+| **Student** | `STD-2026-042-001` *(or `std_2026_001_001`)* | `StudentPass2026!` | [`/student`](https://assdi-smartcampus.pages.dev/student) | Zero-scroll modern dashboard, live attendance, QR feedback |
+| **Teacher** | `TCH-2026-001` *(or `teacher_acct`)* | `TeacherPass2026!` | [`/teacher`](https://assdi-smartcampus.pages.dev/teacher) | Dynamic QR projector, attendance roster, topic rating analytics |
+| **Super Admin** | `ADM-2026-001` *(or `admin01`)* | `AdminPass2026!` | [`/admin`](https://assdi-smartcampus.pages.dev/admin) | Full administrative access, faculty rosters, audit logs |
+| **Coordinator** | `coord01` | `CoordPass2026!` | [`/coordinator`](https://assdi-smartcampus.pages.dev/coordinator) | Real-time batch KPIs, at-risk student intervention |
+| **Observer (Auditor)** | `observer01` | `ObserverPass2026!` | [`/reports`](https://assdi-smartcampus.pages.dev/reports) | Read-only access to all 9 official analytical reports |
+
+> ℹ️ **Cold Start Note (Render Free Tier):** On free hosting tiers, web services spin down after periods of inactivity. If the service is asleep, your first request or login may take 30–50 seconds while the backend resumes.
 
 ---
 
