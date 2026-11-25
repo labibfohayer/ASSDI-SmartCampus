@@ -31,7 +31,21 @@ import {
   ShieldCheck,
   WifiOff,
   CloudUpload,
+  BarChart3,
+  ChevronDown,
+  ArrowLeft,
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+  LabelList,
+} from 'recharts';
 import WebQRScannerModal from '@/components/student/WebQRScannerModal';
 import StudentIdCardModal from '@/components/student/StudentIdCardModal';
 import LectureMaterialsModal, { SessionMaterialItem } from '@/components/student/LectureMaterialsModal';
@@ -124,7 +138,10 @@ export default function StudentPortalPage() {
   const { user } = useAuth();
   const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>([]);
   const [helpRequests, setHelpRequests] = useState<HelpRequestItem[]>([]);
+  const [quizzes, setQuizzes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDashboardHome, setIsDashboardHome] = useState<boolean>(true);
+  const [attendanceRange, setAttendanceRange] = useState<'month' | 'all'>('month');
   const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help' | 'materials' | 'graduation'>('today');
   const [scannerOpen, setScannerOpen] = useState(false);
   const [idCardOpen, setIdCardOpen] = useState(false);
@@ -195,8 +212,9 @@ export default function StudentPortalPage() {
         const tab = params.get('tab');
         if (tab === 'attendance' || tab === 'help' || tab === 'today' || tab === 'materials' || tab === 'graduation') {
           setActiveTab(tab as any);
+          setIsDashboardHome(false);
         } else if (!tab && !params.get('scan')) {
-          setActiveTab('today');
+          setIsDashboardHome(true);
         }
         if (params.get('scan') === 'true') {
           setScannerOpen(true);
@@ -212,6 +230,7 @@ export default function StudentPortalPage() {
       const href = e.detail?.href || '';
       handleUrlTab(href);
       if (href === '/student') {
+        setIsDashboardHome(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -229,6 +248,7 @@ export default function StudentPortalPage() {
       const tab = e.detail;
       if (['today', 'attendance', 'help', 'materials', 'graduation'].includes(tab)) {
         setActiveTab(tab);
+        setIsDashboardHome(false);
         setTimeout(() => {
           const tabEl = document.getElementById('student-tab-section');
           if (tabEl) {
@@ -283,10 +303,20 @@ export default function StudentPortalPage() {
     };
   }, [user]);
 
+  const handleBackToDashboard = () => {
+    setIsDashboardHome(true);
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', '/student');
+      window.dispatchEvent(new CustomEvent('assdi-nav-change', { detail: { href: '/student' } }));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleTabChange = (tab: 'today' | 'attendance' | 'help' | 'materials' | 'graduation') => {
     setActiveTab(tab);
+    setIsDashboardHome(false);
     if (typeof window !== 'undefined') {
-      const href = tab === 'today' ? '/student' : `/student?tab=${tab}`;
+      const href = `/student?tab=${tab}`;
       window.history.pushState(null, '', href);
       window.dispatchEvent(new CustomEvent('assdi-nav-change', { detail: { href } }));
     }
@@ -303,7 +333,7 @@ export default function StudentPortalPage() {
     setLoading(true);
     try {
       // Normal student loading with graceful individual error handling
-      const [profRes, attRes, sessRes, fbRes, helpRes, matRes, gradRes] = await Promise.all([
+      const [profRes, attRes, sessRes, fbRes, helpRes, matRes, gradRes, quizRes] = await Promise.all([
         api.get('/api/v1/students/me/').catch(() => ({ data: null })),
         api.get('/api/v1/attendance/mine/').catch(() => ({ data: null })),
         api.get('/api/v1/class-sessions/?status=published').catch(() => ({ data: [] })),
@@ -311,6 +341,7 @@ export default function StudentPortalPage() {
         api.get('/api/v1/help-requests/').catch(() => ({ data: [] })),
         api.get('/api/v1/session-materials/').catch(() => ({ data: [] })),
         api.get('/api/v1/students/me/graduation-eligibility/').catch(() => ({ data: null })),
+        api.get('/api/v1/quizzes/').catch(() => ({ data: [] })),
       ]);
 
       if (gradRes.data) {
@@ -344,6 +375,11 @@ export default function StudentPortalPage() {
         ? helpRes.data
         : helpRes.data?.results || [];
       setHelpRequests(helpList);
+
+      const quizList = Array.isArray(quizRes.data)
+        ? quizRes.data
+        : quizRes.data?.results || [];
+      setQuizzes(quizList);
     } catch (err) {
       console.warn('Error loading student portal data:', err);
     } finally {
@@ -532,7 +568,7 @@ export default function StudentPortalPage() {
     return true;
   });
 
-  // Real data calculations for KPI cards (Attendance Rate, Completed Classes, Overall Progress, Help Requests)
+  // Real data calculations for KPI cards & Attendance Overview chart
   const totalSessCount = attSummary?.total_sessions || attRecords.length || 0;
   const presentCount = attSummary?.present || 0;
   const attPct = Number(attSummary?.attendance_percentage ?? 0);
@@ -540,7 +576,7 @@ export default function StudentPortalPage() {
   const resolvedHelpCount = helpRequests.filter((h) => h.status === 'resolved').length;
   const pendingHelpCount = helpRequests.filter((h) => h.status !== 'resolved').length;
 
-  // Overall Progress composite score: Attendance (50%) + Class Understanding Feedback (30%) + Help Request Resolution (20%)
+  // Overall Progress composite score: Attendance (50%) + Class Understanding Feedback (30%) + Help Resolution (20%)
   const avgUnderstandingPct = (() => {
     if (graduationData?.average_understanding_percentage !== undefined) {
       return Number(graduationData.average_understanding_percentage);
@@ -558,12 +594,62 @@ export default function StudentPortalPage() {
     return Math.round(Math.min(100, attPct * 0.5 + avgUnderstandingPct * 0.3 + helpScore * 0.2) * 10) / 10;
   })();
 
+  // Exam / Quiz Results score from real attempted quizzes or class evaluation understanding
+  const attemptedQuizzes = quizzes.filter((q) => q?.has_attempted && q?.my_attempt?.percentage !== undefined);
+  const examResultScore = (() => {
+    if (attemptedQuizzes.length > 0) {
+      const avgQuiz =
+        attemptedQuizzes.reduce((acc, q) => acc + Number(q.my_attempt.percentage || 0), 0) / attemptedQuizzes.length;
+      return Math.round(avgQuiz * 10) / 10;
+    }
+    return avgUnderstandingPct;
+  })();
+
+  // Attendance Overview weekly/checkpoint data derived directly from student attendance records
+  const attendanceOverviewData = (() => {
+    const chrono = [...attRecords].reverse();
+    const scopedRecords = attendanceRange === 'month' ? chrono.slice(-16) : chrono;
+    if (scopedRecords.length === 0) {
+      return [
+        { label: isBangla ? 'সপ্তাহ ১' : 'Week 1', attendance: attPct, labelPct: `${attPct.toFixed(0)}%`, sessionsText: `0/0` },
+      ];
+    }
+
+    const bucketCount = Math.min(4, scopedRecords.length);
+    const chunkSize = Math.ceil(scopedRecords.length / bucketCount);
+    const points: { label: string; attendance: number; labelPct: string; sessionsText: string }[] = [];
+
+    let cumPresent = 0;
+    let cumTotal = 0;
+
+    for (let b = 0; b < bucketCount; b++) {
+      const chunk = scopedRecords.slice(b * chunkSize, (b + 1) * chunkSize);
+      if (chunk.length === 0) continue;
+      chunk.forEach((rec) => {
+        cumTotal += 1;
+        if (rec.status === 'present' || rec.status === 'late' || rec.status === 'approved_leave') {
+          cumPresent += 1;
+        }
+      });
+      const pct = Math.round((cumPresent / cumTotal) * 1000) / 10;
+      const bnDigits = ['১', '২', '৩', '৪', '৫', '৬'];
+      const numLabel = isBangla ? `সপ্তাহ ${bnDigits[b] || b + 1}` : `Week ${b + 1}`;
+      points.push({
+        label: numLabel,
+        attendance: pct,
+        labelPct: Number.isInteger(pct) ? `${pct}%` : `${pct.toFixed(1)}%`,
+        sessionsText: `${cumPresent}/${cumTotal}`,
+      });
+    }
+    return points;
+  })();
+
   return (
-    <div className="space-y-6">
-      {/* Islamic Modern Student Hero Welcome Card (Full Seamless Widescreen Background Artwork) */}
-      <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[245px] lg:min-h-[290px] flex items-center">
+    <div className="space-y-4 sm:space-y-5">
+      {/* Slim Islamic Modern Student Hero Welcome Card (Matching Reference Height) */}
+      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[152px] lg:min-h-[172px] flex items-center">
         <Image
-          src="/islamic-hero-banner-bg.png"
+          src="/islamic-hero-banner-slim.png"
           alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
           fill
           priority
@@ -576,127 +662,109 @@ export default function StudentPortalPage() {
           aria-hidden="true"
         />
 
-        {/* Content Positioned Cleanly on the Left Side */}
-        <div className="relative z-10 p-5 sm:p-7 pb-8 lg:max-w-[50%] w-full">
-          {/* Welcome Heading */}
+        {/* Compact Left Content */}
+        <div className="relative z-10 px-5 py-4 sm:px-6 pb-5 lg:max-w-[62%] w-full">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl lg:text-[28px] font-extrabold text-[#002F25] tracking-tight font-serif leading-tight">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-extrabold text-[#002F25] tracking-tight font-serif leading-tight">
               {isBangla ? 'স্বাগতম' : 'Welcome back'}, {profile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || (isBangla ? 'শিক্ষার্থী' : 'Student')}!
             </h1>
-            <span className="text-2xl sm:text-3xl shrink-0" role="img" aria-label="wave">
+            <span className="text-xl sm:text-2xl shrink-0" role="img" aria-label="wave">
               👋
             </span>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#334155] font-medium mt-1.5 leading-relaxed">
+          <p className="text-[11px] sm:text-xs text-[#334155] font-medium mt-0.5 leading-snug">
             {isBangla
               ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটে আজকের শিক্ষণ ও ক্লাসের কার্যক্রম দেখে নিন।'
               : "Here's what's happening at As-Sunnah Skill Development Institute today."}
           </p>
 
-          {/* Date, Batch, Student ID Badges */}
-          <div className="mt-3.5 flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6F4EA]/95 border border-[#A7F3D0] text-[#065F46] text-xs font-semibold shadow-2xs">
-              <Calendar className="w-3.5 h-3.5 text-[#059669]" />
+          {/* Compact Single Strip: Date, Batch & Quick Actions */}
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E6F4EA]/95 border border-[#A7F3D0] text-[#065F46] text-[11px] font-semibold shadow-2xs">
+              <Calendar className="w-3 h-3 text-[#059669]" />
               <span suppressHydrationWarning>
                 {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
-                  weekday: 'long',
+                  weekday: 'short',
                   year: 'numeric',
-                  month: 'long',
+                  month: 'short',
                   day: 'numeric',
                 })}
               </span>
             </div>
 
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-white/90 border border-[#FCD34D] text-[#B45309] shadow-2xs">
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-white/90 border border-[#FCD34D] text-[#B45309] shadow-2xs">
               {profile?.current_batch_name || 'SBMC Batch 42'}
             </span>
 
-            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-white/90 border border-slate-200 text-[#334155] shadow-2xs">
-              {profile?.student_id_number || 'STD-2026-042-001'}
-            </span>
-
-            <span className="text-[11px] font-semibold bg-[#F0FDFA]/95 text-[#0F766E] px-2.5 py-1 rounded-full border border-[#CCFBF1] flex items-center gap-1 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0D9488] animate-pulse" />
-              {isBangla ? 'নিয়মিত শিক্ষার্থী' : 'Active Student'}
-            </span>
-          </div>
-
-          {/* Quick Action Buttons */}
-          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               onClick={() => setScannerOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#FF8108] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-orange-950/20 active:scale-95"
+              className="px-3 py-1 rounded-lg bg-gradient-to-r from-[#FF8108] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white font-bold text-[11px] transition-all flex items-center gap-1 cursor-pointer shadow-xs active:scale-95"
               title={isBangla ? 'ক্যামেরা দিয়ে কিউআর স্ক্যান করুন' : 'Scan Attendance QR'}
             >
-              <QrCode className="w-3.5 h-3.5 text-white" />
-              <span>{isBangla ? 'কিউআর দিয়ে উপস্থিতি' : 'Scan QR'}</span>
+              <QrCode className="w-3 h-3 text-white" />
+              <span>{isBangla ? 'কিউআর স্ক্যান' : 'Scan QR'}</span>
             </button>
 
             <button
               onClick={() => setIdCardOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-white/95 hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+              className="px-2.5 py-1 rounded-lg bg-white/90 hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-[11px] transition-all flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
               title={isBangla ? 'ডিজিটাল আইডি কার্ড' : 'Digital Student ID'}
             >
-              <CreditCard className="w-3.5 h-3.5 text-[#B45309]" />
+              <CreditCard className="w-3 h-3 text-[#B45309]" />
               <span>{isBangla ? 'আইডি কার্ড' : 'ID Card'}</span>
             </button>
 
             <button
               onClick={() => setCertModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-white/95 hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+              className="px-2.5 py-1 rounded-lg bg-white/90 hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-[11px] transition-all flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
               title={isBangla ? 'কোর্স সনদপত্র' : 'Course Certificate'}
             >
-              <Award className="w-3.5 h-3.5 text-[#B45309]" />
+              <Award className="w-3 h-3 text-[#B45309]" />
               <span>{isBangla ? 'সনদপত্র' : 'Certificate'}</span>
             </button>
 
             <button
               onClick={loadStudentData}
               title={isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh'}
-              className="px-3 py-2 rounded-xl bg-white/95 hover:bg-[#FFFBEB] text-[#64748B] hover:text-[#0F172A] border border-slate-200/90 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer shadow-xs active:scale-95"
+              className="p-1.5 rounded-lg bg-white/90 hover:bg-[#FFFBEB] text-[#0F766E] border border-slate-200/90 transition-colors cursor-pointer shadow-2xs active:scale-95"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#0F766E] ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh'}</span>
+              <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Clean Student KPI Metric Cards (Attendance Rate, Completed Classes, Overall Progress, Help Requests) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      {/* 5 Clean Student KPI Metric Cards (Attendance Rate, Completed Classes, Overall Progress, Help Requests, Exam Results) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 sm:gap-4">
         {/* Card 1: Attendance Rate */}
         <div
           role="button"
           tabIndex={0}
-          onClick={() => {
-            handleTabChange('attendance');
-            document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
-          }}
+          onClick={() => handleTabChange('attendance')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               handleTabChange('attendance');
-              document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
             }
           }}
           title={isBangla ? 'উপস্থিতির বিস্তারিত হিস্ট্রি দেখতে ক্লিক করুন' : 'Click to view attendance history'}
-          className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3.5"
+          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
         >
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Calendar className="w-5 h-5 text-[#0284C7]" />
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
               </span>
-              <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-2xl sm:text-[28px] font-black text-[#0F172A] tracking-tight leading-none font-serif">
+              <div className="flex items-baseline gap-1.5 mt-0.5 flex-wrap sm:flex-nowrap">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif whitespace-nowrap">
                   {safeFixed(attSummary?.attendance_percentage)}%
                 </span>
                 <span
-                  className={`text-[11px] font-bold inline-flex items-center ${
+                  className={`text-[11px] font-bold inline-flex items-center whitespace-nowrap ${
                     attDeltaVsTarget >= 0 ? 'text-emerald-600' : 'text-red-600'
                   }`}
                 >
@@ -706,7 +774,7 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 attPct < 75 ? 'bg-red-500' : 'bg-[#16A34A]'
@@ -720,30 +788,26 @@ export default function StudentPortalPage() {
         <div
           role="button"
           tabIndex={0}
-          onClick={() => {
-            handleTabChange('attendance');
-            document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
-          }}
+          onClick={() => handleTabChange('attendance')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               handleTabChange('attendance');
-              document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
             }
           }}
           title={isBangla ? 'সম্পন্ন ক্লাসের তালিকা দেখতে ক্লিক করুন' : 'Click to view completed classes'}
-          className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3.5"
+          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
         >
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-[#FFEDD5] text-[#EA580C] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#FFEDD5] text-[#EA580C] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <BookOpen className="w-5 h-5 text-[#EA580C]" />
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'সম্পন্ন ক্লাস' : 'Completed Classes'}
               </span>
-              <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-2xl sm:text-[28px] font-black text-[#0F172A] tracking-tight leading-none font-serif">
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {presentCount}
                 </span>
                 <span className="text-xs font-semibold text-slate-400">
@@ -753,9 +817,9 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs pt-0.5">
+          <div className="flex items-center justify-between text-[11px]">
             <span className="font-semibold text-[#D97706] truncate">
-              {isBangla ? 'এই কোর্সে উপস্থিত' : 'Attended so far'}
+              {isBangla ? 'এই কোর্সে উপস্থিত' : 'Attended'}
             </span>
             <span className="font-bold text-[#0F766E] group-hover:underline inline-flex items-center gap-0.5 shrink-0">
               {isBangla ? 'বিস্তারিত →' : 'View Details →'}
@@ -763,19 +827,15 @@ export default function StudentPortalPage() {
           </div>
         </div>
 
-        {/* Card 3: Overall Progress (Attendance + Class Understanding Feedback + Help Resolution) */}
+        {/* Card 3: Overall Progress */}
         <div
           role="button"
           tabIndex={0}
-          onClick={() => {
-            handleTabChange('graduation');
-            document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
-          }}
+          onClick={() => handleTabChange('graduation')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               handleTabChange('graduation');
-              document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
             }
           }}
           title={
@@ -783,10 +843,10 @@ export default function StudentPortalPage() {
               ? `উপস্থিতি (${safeFixed(attPct)}%) ও পাঠ বোঝার মূল্যায়ন (${safeFixed(avgUnderstandingPct)}%) অনুযায়ী সার্বিক অগ্রগতি`
               : `Overall progress combining attendance (${safeFixed(attPct)}%) & lesson understanding (${safeFixed(avgUnderstandingPct)}%)`
           }
-          className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3.5"
+          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
         >
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Award className="w-5 h-5 text-[#9333EA]" />
             </div>
             <div className="min-w-0">
@@ -794,14 +854,14 @@ export default function StudentPortalPage() {
                 {isBangla ? 'ওভারঅল প্রগ্রেস' : 'Overall Progress'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-2xl sm:text-[28px] font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {overallProgressScore.toFixed(1)}%
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full bg-[#16A34A] transition-all duration-500"
               style={{ width: `${Math.min(Math.max(overallProgressScore, 0), 100)}%` }}
@@ -813,40 +873,36 @@ export default function StudentPortalPage() {
         <div
           role="button"
           tabIndex={0}
-          onClick={() => {
-            handleTabChange('help');
-            document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
-          }}
+          onClick={() => handleTabChange('help')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               handleTabChange('help');
-              document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
             }
           }}
           title={isBangla ? 'শিক্ষকের সমাধান ও উত্তর দেখতে ক্লিক করুন' : 'Click to view help requests'}
-          className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3.5"
+          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
         >
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-[#CCFBF1] text-[#0F766E] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <HelpCircle className="w-5 h-5 text-[#0F766E]" />
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#DCFCE7] text-[#15803D] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <HelpCircle className="w-5 h-5 text-[#15803D]" />
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
               </span>
-              <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-2xl sm:text-[28px] font-black text-[#0F172A] tracking-tight leading-none font-serif">
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {helpRequests.length}
                 </span>
-                <span className="text-[11px] font-bold text-[#0F766E]">
+                <span className="text-[11px] font-bold text-[#15803D]">
                   {resolvedHelpCount} {isBangla ? 'সমাধান' : 'Resolved'}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs pt-0.5">
+          <div className="flex items-center justify-between text-[11px]">
             <span className={`font-semibold truncate ${pendingHelpCount > 0 ? 'text-[#D97706]' : 'text-emerald-600'}`}>
               {pendingHelpCount > 0
                 ? isBangla ? `${pendingHelpCount}টি অপেক্ষমান` : `${pendingHelpCount} Pending`
@@ -854,6 +910,48 @@ export default function StudentPortalPage() {
             </span>
             <span className="font-bold text-[#0F766E] group-hover:underline inline-flex items-center gap-0.5 shrink-0">
               {isBangla ? 'বিস্তারিত →' : 'View Requests →'}
+            </span>
+          </div>
+        </div>
+
+        {/* Card 5: Exam Results */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => handleTabChange('today')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleTabChange('today');
+            }
+          }}
+          title={isBangla ? 'মূল্যায়ন ও কুইজের ফলাফল দেখতে ক্লিক করুন' : 'Click to view quiz & evaluation results'}
+          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#CCFBF1] text-[#0F766E] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <FileCheck2 className="w-5 h-5 text-[#0F766E]" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+                {isBangla ? 'মূল্যায়ন ফলাফল' : 'Exam Results'}
+              </span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                  {examResultScore.toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="font-semibold text-slate-500 truncate">
+              {attemptedQuizzes.length > 0
+                ? isBangla ? `${attemptedQuizzes.length}টি কুইজ সম্পন্ন` : `${attemptedQuizzes.length} Quiz(zes)`
+                : isBangla ? `${feedbacks.length}টি ক্লাস মূল্যায়ন` : `${feedbacks.length} Class evals`}
+            </span>
+            <span className="font-bold text-[#0F766E] group-hover:underline inline-flex items-center gap-0.5 shrink-0">
+              {isBangla ? 'ফলাফল →' : 'View Results →'}
             </span>
           </div>
         </div>
@@ -895,8 +993,153 @@ export default function StudentPortalPage() {
         </div>
       )}
 
-      {/* Modern Segmented Tabs Bar */}
-      <div id="student-tab-section" className="bg-slate-200/70 p-1.5 rounded-xl inline-flex gap-1.5 border border-slate-200 max-w-full overflow-x-auto scroll-mt-24">
+      {/* DASHBOARD OVERVIEW VIEW: Attendance Overview Chart (More cards coming step-by-step) */}
+      {isDashboardHome && (
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#16A34A]">
+                <BarChart3 className="w-4 h-4" />
+              </div>
+              <h2 className="text-base sm:text-lg font-extrabold text-[#0F172A] font-serif">
+                {isBangla ? 'উপস্থিতির সংক্ষিপ্ত চিত্র' : 'Attendance Overview'}
+              </h2>
+            </div>
+
+            <div className="relative">
+              <select
+                value={attendanceRange}
+                onChange={(e) => setAttendanceRange(e.target.value as 'month' | 'all')}
+                aria-label={isBangla ? 'সময়সীমা নির্বাচন' : 'Select time range'}
+                className="appearance-none bg-white border border-slate-200 hover:border-slate-300 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              >
+                <option value="month">{isBangla ? 'এই মাস' : 'This Month'}</option>
+                <option value="all">{isBangla ? 'সব সেশন' : 'All Sessions'}</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Chart Legend */}
+          <div className="flex items-center justify-end gap-4 mt-2 mb-3 text-xs font-semibold">
+            <span className="inline-flex items-center gap-1.5 text-slate-700">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#16A34A]" />
+              <span>{isBangla ? 'উপস্থিতি %' : 'Attendance %'}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-slate-700">
+              <span className="w-3.5 border-t-2 border-dashed border-[#F59E0B] inline-block" />
+              <span className="w-2 h-2 rounded-full bg-[#F59E0B] -ml-1" />
+              <span>{isBangla ? 'লক্ষ্যমাত্রা (৮০%)' : 'Target (80%)'}</span>
+            </span>
+          </div>
+
+          {/* Recharts Area Chart */}
+          <div className="w-full h-[250px] sm:h-[275px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={attendanceOverviewData} margin={{ top: 28, right: 26, left: -2, bottom: 4 }}>
+                <defs>
+                  <linearGradient id="studentAttOverviewGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#16A34A" stopOpacity={0.22} />
+                    <stop offset="95%" stopColor="#16A34A" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <XAxis
+                  dataKey="label"
+                  padding={{ left: 26, right: 16 }}
+                  axisLine={{ stroke: '#CBD5E1' }}
+                  tickLine={false}
+                  tick={{ fill: '#64748B', fontSize: 12, fontWeight: 600 }}
+                  dy={8}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  ticks={[0, 25, 50, 75, 100]}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748B', fontSize: 11, fontWeight: 500 }}
+                  tickFormatter={(v) => `${v}%`}
+                />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload || payload.length === 0) return null;
+                    const item = payload[0].payload;
+                    return (
+                      <div className="bg-white border border-slate-200 rounded-xl shadow-lg px-3.5 py-2.5 text-xs">
+                        <p className="font-bold text-[#0F172A]">{label}</p>
+                        <p className="text-[#16A34A] font-extrabold mt-0.5">
+                          {isBangla ? 'উপস্থিতি হার:' : 'Attendance:'} {item.labelPct}
+                        </p>
+                        <p className="text-slate-500 text-[11px] mt-0.5">
+                          {isBangla ? 'উপস্থিত সেশন:' : 'Attended:'} {item.sessionsText}
+                        </p>
+                      </div>
+                    );
+                  }}
+                />
+                <ReferenceLine y={80} stroke="#F59E0B" strokeDasharray="6 4" strokeWidth={1.8} />
+                <Area
+                  type="monotone"
+                  dataKey="attendance"
+                  stroke="#16A34A"
+                  strokeWidth={2.5}
+                  fill="url(#studentAttOverviewGrad)"
+                  dot={{ r: 5, fill: '#FFFFFF', stroke: '#16A34A', strokeWidth: 2.5 }}
+                  activeDot={{ r: 6.5, fill: '#16A34A', stroke: '#FFFFFF', strokeWidth: 2 }}
+                >
+                  <LabelList
+                    dataKey="labelPct"
+                    position="top"
+                    content={(props: any) => {
+                      const { x, y, value } = props;
+                      if (x === undefined || y === undefined || !value) return null;
+                      return (
+                        <g transform={`translate(${x},${Math.max(18, y - 10)})`}>
+                          <rect
+                            x={-21}
+                            y={-15}
+                            width={42}
+                            height={18}
+                            rx={5}
+                            fill="#16A34A"
+                          />
+                          <text
+                            x={0}
+                            y={-3}
+                            textAnchor="middle"
+                            fill="#FFFFFF"
+                            fontSize={10.5}
+                            fontWeight={700}
+                          >
+                            {value}
+                          </text>
+                        </g>
+                      );
+                    }}
+                  />
+                </Area>
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {/* DEDICATED SIDEBAR TAB VIEWS (Visible only when user navigates to a specific menu/tab) */}
+      {!isDashboardHome && (
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* Back to Clean Dashboard Overview Button */}
+            <button
+              type="button"
+              onClick={handleBackToDashboard}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-50 text-[#0F766E] border border-slate-200 text-xs font-bold transition cursor-pointer shadow-2xs"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>{isBangla ? 'ড্যাশবোর্ডে ফিরুন' : 'Back to Dashboard'}</span>
+            </button>
+
+            {/* Modern Segmented Tabs Bar */}
+            <div id="student-tab-section" className="bg-slate-200/70 p-1.5 rounded-xl inline-flex gap-1.5 border border-slate-200 max-w-full overflow-x-auto scroll-mt-24">
         <button
           onClick={() => handleTabChange('today')}
           className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
@@ -975,7 +1218,8 @@ export default function StudentPortalPage() {
             </span>
           )}
         </button>
-      </div>
+            </div>
+          </div>
 
       {/* TAB 1: Today's Classes & Feedback */}
       {activeTab === 'today' && (
@@ -1855,6 +2099,8 @@ export default function StudentPortalPage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
         </div>
       )}
 
