@@ -47,9 +47,6 @@ import {
   Tooltip,
   ReferenceLine,
   LabelList,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
 import WebQRScannerModal from '@/components/student/WebQRScannerModal';
 import StudentIdCardModal from '@/components/student/StudentIdCardModal';
@@ -700,8 +697,8 @@ export default function StudentPortalPage() {
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      {/* Slim Islamic Modern Student Hero Welcome Card (Matching Reference Height) */}
-      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[152px] lg:min-h-[172px] flex items-center">
+      {/* Slim Islamic Modern Student Hero Welcome Card (Matching Reference Height & Assalamu Alaikum Greeting) */}
+      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[168px] lg:min-h-[184px] flex items-center">
         <Image
           src="/islamic-hero-banner-slim.png"
           alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
@@ -717,20 +714,22 @@ export default function StudentPortalPage() {
         />
 
         {/* Compact Left Content */}
-        <div className="relative z-10 px-5 py-4 sm:px-6 pb-5 lg:max-w-[62%] w-full">
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-extrabold text-[#002F25] tracking-tight font-serif leading-tight">
-              {isBangla ? 'স্বাগতম' : 'Welcome back'}, {profile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || (isBangla ? 'শিক্ষার্থী' : 'Student')}!
-            </h1>
-            <span className="text-xl sm:text-2xl shrink-0" role="img" aria-label="wave">
+        <div className="relative z-10 px-5 py-4 sm:px-6 lg:max-w-[62%] w-full">
+          <p className="text-sm sm:text-[15px] font-extrabold text-[#064E3B] tracking-tight flex items-center gap-1.5 mb-0.5">
+            <span>{isBangla ? 'আসসালামু আলাইকুম!' : 'Assalamu Alaikum!'}</span>
+            <span className="text-base sm:text-lg" role="img" aria-label="wave">
               👋
             </span>
-          </div>
+          </p>
+
+          <h1 className="text-lg sm:text-xl lg:text-[25px] font-black text-[#0F172A] tracking-tight font-serif leading-tight">
+            {isBangla ? 'স্বাগতম' : 'Welcome back'}, {profile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || (isBangla ? 'শিক্ষার্থী' : 'Student')}!
+          </h1>
 
           <p className="text-[11px] sm:text-xs text-[#334155] font-medium mt-0.5 leading-snug">
             {isBangla
-              ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটে আজকের শিক্ষণ ও ক্লাসের কার্যক্রম দেখে নিন।'
-              : "Here's what's happening at As-Sunnah Skill Development Institute today."}
+              ? 'আল্লাহ আপনার শিক্ষার যাত্রাকে সফল করুন — আজকের কার্যক্রম দেখে নিন।'
+              : 'May Allah make your learning journey successful.'}
           </p>
 
           {/* Compact Single Strip: Date, Batch & Quick Actions */}
@@ -1184,12 +1183,28 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          {/* 2. Quick Actions Dark Emerald Card */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#064E3B] via-[#043927] to-[#022C22] p-4 sm:p-5 text-white shadow-sm flex flex-col justify-between">
-            {/* Subtle Gold & Emerald Ambient Accents */}
-            <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full bg-emerald-400/15 blur-2xl" aria-hidden="true" />
-            <div className="pointer-events-none absolute -bottom-7 -right-5 w-20 h-20 rounded-tl-[26px] bg-amber-500/35 rotate-12" aria-hidden="true" />
-            <div className="pointer-events-none absolute -bottom-8 -left-6 w-20 h-20 rounded-full bg-amber-400/20" aria-hidden="true" />
+          {/* 2. Quick Actions Deep Forest Green Card with Vivid Dark-Orange Corner Curves */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#025033] via-[#013C24] to-[#012918] p-4 sm:p-5 text-white shadow-sm flex flex-col justify-between">
+            {/* Reference-Matched Bottom-Right & Bottom-Left Deep Orange Corner Waves */}
+            <svg
+              className="pointer-events-none absolute -bottom-1 -right-1 w-28 h-24"
+              viewBox="0 0 120 100"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M120 100H20C48 70 72 52 120 26V100Z" fill="#C2410C" fillOpacity="0.95" />
+              <path d="M120 100H52C74 78 96 62 120 42V100Z" fill="#EA580C" />
+              <path d="M120 100H82C96 86 108 75 120 62V100Z" fill="#F59E0B" fillOpacity="0.9" />
+            </svg>
+            <svg
+              className="pointer-events-none absolute -bottom-1 -left-1 w-24 h-20"
+              viewBox="0 0 100 84"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M0 84H68C48 64 26 48 0 28V84Z" fill="#B45309" fillOpacity="0.85" />
+              <path d="M0 84H42C28 70 14 58 0 46V84Z" fill="#EA580C" fillOpacity="0.92" />
+            </svg>
 
             <div className="relative z-10 flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -1303,17 +1318,17 @@ export default function StudentPortalPage() {
                   return (
                     <div
                       key={sess.id}
-                      className="flex items-center justify-between gap-2.5 bg-[#F8FAFC] hover:bg-[#F0FDF4]/70 border border-slate-100 rounded-xl px-3 py-2 transition-colors"
+                      className="flex items-center justify-between gap-2.5 bg-white hover:bg-[#F0FDF4]/60 border border-slate-200/80 shadow-2xs rounded-xl px-3 py-2 transition-colors"
                     >
-                      {/* Date Badge */}
-                      <div className="w-11 shrink-0 rounded-lg bg-white border border-emerald-100/90 py-1 text-center leading-[1.15] shadow-2xs">
-                        <span className="block text-[9.5px] font-semibold text-slate-500">
+                      {/* Reference-Matched Mint-Green Date Card with Green Border & Shadow */}
+                      <div className="w-12 shrink-0 rounded-lg bg-[#E3F5EB] border border-[#6EE7B7] py-1 text-center leading-[1.15] shadow-[0_2px_8px_rgba(16,185,129,0.24)]">
+                        <span className="block text-[9.5px] font-bold text-[#065F46]">
                           {badge.weekday}
                         </span>
                         <span className="block text-[9.5px] font-bold text-[#047857]">
                           {badge.month}
                         </span>
-                        <span className="block text-[13px] font-black text-[#0F172A]">
+                        <span className="block text-[13.5px] font-black text-[#022C22]">
                           {badge.day}
                         </span>
                       </div>
@@ -1382,48 +1397,52 @@ export default function StudentPortalPage() {
             </div>
 
             <div className="flex items-center justify-between gap-4 sm:gap-6 mt-4 flex-1">
-              {/* Donut Ring Chart */}
-              <div className="relative w-[132px] h-[132px] shrink-0 flex items-center justify-center">
-                <PieChart width={132} height={132}>
-                  <Pie
-                    data={[
-                      {
-                        name: isBangla ? 'সম্পন্ন' : 'Completed',
-                        value: learningProgressBreakdown.completed,
-                        color: '#059669',
-                      },
-                      {
-                        name: isBangla ? 'চলমান ও বাকি' : 'Remaining',
-                        value: Math.max(0, 100 - learningProgressBreakdown.completed),
-                        color: '#E2E8F0',
-                      },
-                    ]}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    startAngle={90}
-                    endAngle={-270}
-                    innerRadius={44}
-                    outerRadius={59}
-                    paddingAngle={learningProgressBreakdown.completed < 100 ? 1.5 : 0}
-                    stroke="none"
-                    isAnimationActive={false}
-                  >
-                    <Cell fill="#059669" />
-                    <Cell fill="#E2E8F0" />
-                  </Pie>
-                  <Tooltip
-                    formatter={(val: any, name: any) => [`${Number(val).toFixed(1)}%`, name]}
-                    contentStyle={{
-                      borderRadius: '10px',
-                      border: '1px solid #E2E8F0',
-                      fontSize: '11px',
-                      padding: '6px 10px',
-                    }}
-                  />
-                </PieChart>
+              {/* Reference-Matched Glossy Emerald Gradient Donut Ring */}
+              <div
+                className="relative w-[136px] h-[136px] shrink-0 flex items-center justify-center"
+                title={`${isBangla ? 'সম্পন্ন:' : 'Completed:'} ${learningProgressBreakdown.completed.toFixed(1)}%`}
+              >
+                {(() => {
+                  const r = 52;
+                  const circ = 2 * Math.PI * r;
+                  const dashOffset = circ * (1 - learningProgressBreakdown.completed / 100);
+                  return (
+                    <svg className="w-full h-full" viewBox="0 0 140 140" aria-hidden="true">
+                      <defs>
+                        <linearGradient id="studentLearningDonutGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#34D399" />
+                          <stop offset="45%" stopColor="#10B981" />
+                          <stop offset="100%" stopColor="#047857" />
+                        </linearGradient>
+                      </defs>
+                      {/* Light Slate Track */}
+                      <circle
+                        cx="70"
+                        cy="70"
+                        r={r}
+                        fill="none"
+                        stroke="#E2E8F0"
+                        strokeWidth="15"
+                      />
+                      {/* Glossy Emerald Progress Arc with Rounded Ends */}
+                      <circle
+                        cx="70"
+                        cy="70"
+                        r={r}
+                        fill="none"
+                        stroke="url(#studentLearningDonutGrad)"
+                        strokeWidth="15"
+                        strokeDasharray={circ}
+                        strokeDashoffset={dashOffset}
+                        strokeLinecap="round"
+                        transform="rotate(-90 70 70)"
+                        style={{ filter: 'drop-shadow(0 3px 6px rgba(5, 150, 105, 0.25))' }}
+                      />
+                    </svg>
+                  );
+                })()}
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[20px] font-black text-[#0F172A] tracking-tight font-serif">
+                  <span className="text-[21px] font-black text-[#0F172A] tracking-tight font-serif">
                     {learningProgressBreakdown.completed.toFixed(1)}%
                   </span>
                 </div>
