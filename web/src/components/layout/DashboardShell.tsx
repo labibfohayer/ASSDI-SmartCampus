@@ -50,16 +50,6 @@ import AdminMenuManagerModal, {
 
 const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
   {
-    id: 'overview',
-    href: '/admin',
-    labelBn: 'সিস্টেম ওভারভিউ',
-    labelEn: 'System Overview',
-    iconName: 'ShieldCheck',
-    section: 'main',
-    isArchived: false,
-    isSystemDefault: true,
-  },
-  {
     id: 'students',
     href: '/admin/students',
     labelBn: 'স্টুডেন্ট',
@@ -194,7 +184,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('assdi_admin_nav_menus_v3');
+        const saved = localStorage.getItem('assdi_admin_nav_menus_v4');
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -203,7 +193,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               (m: any) => m.id !== 'coordinator_analytics' && m.href !== '/coordinator'
             );
             setAdminMenus(sanitized);
-            localStorage.setItem('assdi_admin_nav_menus_v3', JSON.stringify(sanitized));
+            localStorage.setItem('assdi_admin_nav_menus_v4', JSON.stringify(sanitized));
           }
         }
       } catch (e) {
@@ -215,14 +205,14 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const handleSaveAdminMenus = (updated: CustomNavItem[]) => {
     setAdminMenus(updated);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('assdi_admin_nav_menus_v3', JSON.stringify(updated));
+      localStorage.setItem('assdi_admin_nav_menus_v4', JSON.stringify(updated));
     }
   };
 
   const handleResetAdminMenus = () => {
     setAdminMenus(DEFAULT_ADMIN_MENUS);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('assdi_admin_nav_menus_v3');
+      localStorage.removeItem('assdi_admin_nav_menus_v4');
     }
   };
 
