@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -8,6 +9,11 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from rest_framework.routers import DefaultRouter
+
+
+def health_check(request):
+    """Lightweight unauthenticated health probe for Render and uptime monitors."""
+    return JsonResponse({"status": "ok", "service": "assdi-backend"})
 
 from apps.academic.views import (
     CampusViewSet,
@@ -50,6 +56,10 @@ router.register(r"notifications", NotificationViewSet, basename="notification")
 router.register(r"announcements", AnnouncementViewSet, basename="announcement")
 
 urlpatterns = [
+    # Health Check Endpoints
+    path("", health_check, name="root-health"),
+    path("api/v1/health/", health_check, name="api-health"),
+
     # Django Administration
     path("admin/", admin.site.urls),
 
