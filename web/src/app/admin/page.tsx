@@ -1029,62 +1029,62 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* 4. ROW 4: AT-RISK ALERTS (4 COLS) + UPCOMING CLASSES (5 COLS) + COURSE PROGRESS (3 COLS) - SLIM & COMPACT */}
+      {/* 4. ROW 4: AT-RISK ALERTS (4 COLS) + UPCOMING CLASSES (5 COLS) + COURSE PROGRESS (3 COLS) - GENTLY SLIMMED */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-stretch">
-        {/* Col 1: At-Risk & Repeated Absence Alerts (4 cols) - Slim & Compact */}
-        <div className="md:col-span-12 lg:col-span-4 bg-white rounded-2xl p-3.5 sm:px-4 sm:py-3 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Col 1: At-Risk & Repeated Absence Alerts (4 cols) - Moderately Slim */}
+        <div className="md:col-span-12 lg:col-span-4 bg-white rounded-2xl p-2.5 sm:px-3.5 sm:py-2.5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4.5 h-4.5 text-rose-600 shrink-0" />
-                <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
+            <div className="flex items-center justify-between pb-1 border-b border-slate-100">
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                <h3 className="text-sm sm:text-[15px] font-extrabold text-[#0F172A] font-serif">
                   {isBangla ? 'ঝুঁকিপূর্ণ শিক্ষার্থী অ্যালার্ট' : 'At-Risk Student Alerts'}
                 </h3>
-                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-rose-100 text-rose-700 border border-rose-200">
+                <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-black bg-rose-100 text-rose-700 border border-rose-200">
                   {isBangla ? '৪ জন' : '4'}
                 </span>
               </div>
               <Link
                 href="/coordinator/at-risk"
-                className="text-xs font-bold text-rose-700 hover:text-rose-800 flex items-center gap-0.5 hover:underline"
+                className="text-[11px] font-bold text-rose-700 hover:text-rose-800 flex items-center gap-0.5 hover:underline"
               >
                 <span>{isBangla ? 'সব দেখুন' : 'View All'}</span>
                 <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="space-y-1.5 mt-1.5">
+            <div className="space-y-1 mt-1">
               {atRiskStudentsAlerts.map((st) => (
                 <div
                   key={st.id}
-                  className="flex items-center justify-between gap-2 p-1.5 rounded-lg border border-slate-100 hover:border-rose-200 hover:bg-rose-50/20 transition group"
+                  className="flex items-center justify-between gap-1.5 py-1 px-2 rounded-lg border border-slate-100 hover:border-rose-200 hover:bg-rose-50/20 transition group"
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <div
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold ${
+                      className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 text-[10.5px] font-bold ${
                         st.severity === 'high' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'
                       }`}
                     >
                       {st.name.charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="text-xs font-bold text-[#0F172A] truncate">
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <h4 className="text-[11.5px] font-bold text-[#0F172A] truncate">
                           {st.name}
                         </h4>
-                        <span className="px-1 py-0.2 rounded text-[8.5px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                        <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
                           {st.batch}
                         </span>
                       </div>
-                      <p className="text-[9.5px] text-slate-500 font-mono mt-0.5">
+                      <p className="text-[9px] text-slate-500 font-mono">
                         {st.roll} • {st.phone}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0 text-right">
+                  <div className="flex items-center gap-1 shrink-0 text-right">
                     <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold border ${
+                      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold border ${
                         st.severity === 'high'
                           ? 'bg-rose-50 text-rose-700 border-rose-200'
                           : 'bg-amber-50 text-amber-700 border-amber-200'
@@ -1100,13 +1100,13 @@ export default function AdminOverviewPage() {
           </div>
         </div>
 
-        {/* Col 2: Today's Classes & Monitoring (5 cols) - Slim & Compact */}
-        <div className="md:col-span-12 lg:col-span-5 bg-white rounded-2xl p-3.5 sm:px-4 sm:py-3 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Col 2: Today's Classes & Monitoring (5 cols) - Moderately Slim */}
+        <div className="md:col-span-12 lg:col-span-5 bg-white rounded-2xl p-2.5 sm:px-3.5 sm:py-2.5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between pb-1 border-b border-slate-100">
+              <div className="flex items-center gap-1.5">
                 <ClipboardCheck className="w-4 h-4 text-emerald-600" />
-                <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
+                <h3 className="text-sm sm:text-[15px] font-extrabold text-[#0F172A] font-serif">
                   {isBangla ? 'আজকের ক্লাস ও হাজিরা তদারকি' : "Today's Classes & Attendance"}
                 </h3>
               </div>
@@ -1118,55 +1118,55 @@ export default function AdminOverviewPage() {
                   setSelectedAttendanceBatch(todayClassesMonitoring[0].batchCode || 'all');
                   setShowAttendanceModal(true);
                 }}
-                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline cursor-pointer"
+                className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline cursor-pointer"
               >
                 <span>{isBangla ? 'হাজিরা ড্যাশবোর্ড' : 'Attendance Hub'}</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
             </div>
 
-            <div className="space-y-1.5 mt-1.5">
+            <div className="space-y-1 mt-1">
               {todayClassesMonitoring.map((cls, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between gap-2 p-1.5 rounded-lg border border-slate-100 hover:border-emerald-200 hover:bg-slate-50/50 transition"
+                  className="flex items-center justify-between gap-1.5 py-1 px-2 rounded-lg border border-slate-100 hover:border-emerald-200 hover:bg-slate-50/50 transition"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-center shrink-0 border border-emerald-100">
-                      <span className="block text-[9.5px] font-bold leading-tight whitespace-nowrap">
+                    <div className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 text-center shrink-0 border border-emerald-100">
+                      <span className="block text-[9px] font-bold leading-tight whitespace-nowrap">
                         {cls.time.split('•')[0] || cls.time}
                       </span>
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="text-xs font-bold text-[#0F172A] truncate">
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <h4 className="text-[11.5px] font-bold text-[#0F172A] truncate">
                           {cls.title}
                         </h4>
-                        <span className="px-1 py-0.2 rounded text-[8.5px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
                           {cls.batch}
                         </span>
                       </div>
-                      <p className="text-[9.5px] text-slate-500 truncate mt-0.5">
+                      <p className="text-[9px] text-slate-500 truncate">
                         {cls.instructor} • {cls.room}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0">
                     {cls.status === 'live' && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                         {cls.statusLabel}
                       </span>
                     )}
                     {cls.status === 'completed' && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                         <CheckCircle2 className="w-2.5 h-2.5 text-sky-600" />
                         {cls.statusLabel}
                       </span>
                     )}
                     {cls.status === 'upcoming' && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                         <Clock className="w-2.5 h-2.5 text-amber-600" />
                         {cls.statusLabel}
                       </span>
@@ -1180,7 +1180,7 @@ export default function AdminOverviewPage() {
                         setSelectedAttendanceBatch(cls.batchCode || 'all');
                         setShowAttendanceModal(true);
                       }}
-                      className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white text-[10px] font-bold transition shadow-2xs cursor-pointer active:scale-95"
+                      className="inline-flex items-center justify-center px-2 py-0.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-[9.5px] font-bold transition shadow-2xs cursor-pointer active:scale-95"
                       title={isBangla ? 'হাজিরা শিট তদারকি করুন' : 'View Attendance Sheet'}
                     >
                       {isBangla ? 'হাজিরা' : 'Attendance'}
@@ -1192,18 +1192,18 @@ export default function AdminOverviewPage() {
           </div>
         </div>
 
-        {/* Col 3: Course Progress Circular Donut (3 cols) - Slim, compact & balanced */}
-        <div className="md:col-span-12 lg:col-span-3 bg-white rounded-2xl p-3.5 sm:px-4 sm:py-3 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Col 3: Course Progress Circular Donut (3 cols) - Moderately Slim */}
+        <div className="md:col-span-12 lg:col-span-3 bg-white rounded-2xl p-2.5 sm:px-3.5 sm:py-2.5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 pb-1.5 border-b border-slate-100">
-              <Clock className="w-5 h-5 text-emerald-700 shrink-0" strokeWidth={2.7} />
-              <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
+            <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100">
+              <Clock className="w-4.5 h-4.5 text-emerald-700 shrink-0" strokeWidth={2.7} />
+              <h3 className="text-sm sm:text-[15px] font-extrabold text-[#0F172A] font-serif">
                 {isBangla ? 'কোর্স অগ্রগতি' : 'Course Progress'}
               </h3>
             </div>
 
-            <div className="flex flex-col items-center justify-center my-1.5">
-              <div className="relative w-28 h-28 sm:w-30 sm:h-30 flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center my-1">
+              <div className="relative w-22 h-22 sm:w-24 sm:h-24 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle
                     cx="50"
@@ -1239,40 +1239,40 @@ export default function AdminOverviewPage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight leading-none">
+                  <span className="text-lg sm:text-xl font-black text-[#0F172A] tracking-tight leading-none">
                     72.4%
                   </span>
-                  <span className="text-[8.5px] text-slate-500 font-bold mt-0.5 tracking-wider uppercase">
+                  <span className="text-[8px] text-slate-500 font-bold mt-0.5 tracking-wider uppercase">
                     {isBangla ? 'অগ্রগতি' : 'Progress'}
                   </span>
                 </div>
               </div>
 
-              <span className="text-[10px] font-bold text-slate-500 text-center mt-1 block tracking-tight">
+              <span className="text-[9.5px] font-bold text-slate-500 text-center mt-0.5 block tracking-tight">
                 {isBangla ? 'সার্বিক অগ্রগতি' : 'Overall Progress'}
               </span>
 
-              <div className="w-full space-y-1 mt-1.5 pt-1.5 border-t border-slate-100 text-xs">
+              <div className="w-full space-y-0.5 mt-1 pt-1 border-t border-slate-100 text-[11px]">
                 <div className="flex items-center justify-between text-slate-600">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#059669] shrink-0" />
-                    <span className="font-medium text-[11px]">{isBangla ? 'সম্পন্ন' : 'Completed'}</span>
+                    <span className="font-medium">{isBangla ? 'সম্পন্ন' : 'Completed'}</span>
                   </span>
-                  <span className="font-extrabold text-[#0F172A] text-xs">72.4%</span>
+                  <span className="font-extrabold text-[#0F172A] text-[11.5px]">72.4%</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#F59E0B] shrink-0" />
-                    <span className="font-medium text-[11px]">{isBangla ? 'চলমান' : 'In Progress'}</span>
+                    <span className="font-medium">{isBangla ? 'চলমান' : 'In Progress'}</span>
                   </span>
-                  <span className="font-extrabold text-[#0F172A] text-xs">18.2%</span>
+                  <span className="font-extrabold text-[#0F172A] text-[11.5px]">18.2%</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-slate-300 shrink-0" />
-                    <span className="font-medium text-[11px]">{isBangla ? 'শুরু হয়নি' : 'Not Started'}</span>
+                    <span className="font-medium">{isBangla ? 'শুরু হয়নি' : 'Not Started'}</span>
                   </span>
-                  <span className="font-extrabold text-[#0F172A] text-xs">9.4%</span>
+                  <span className="font-extrabold text-[#0F172A] text-[11.5px]">9.4%</span>
                 </div>
               </div>
             </div>
