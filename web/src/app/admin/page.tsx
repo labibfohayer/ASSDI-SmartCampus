@@ -40,6 +40,11 @@ import {
   AlertTriangle,
   UserX,
   Phone,
+  HelpCircle,
+  Send,
+  Star,
+  Check,
+  MessageSquare,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -166,6 +171,17 @@ export default function AdminOverviewPage() {
   const [selectedAttendanceCourse, setSelectedAttendanceCourse] = useState('all');
   const [selectedAttendanceBatch, setSelectedAttendanceBatch] = useState('all');
   const [selectedAttendanceSession, setSelectedAttendanceSession] = useState('all');
+
+  // Help Requests Notification state for Coordinator
+  const [notifiedTeachers, setNotifiedTeachers] = useState<Record<number, boolean>>({});
+  const handleNotifyTeacher = (requestId: number, teacherName: string, studentName: string) => {
+    setNotifiedTeachers((prev) => ({ ...prev, [requestId]: true }));
+    toast.success(
+      isBangla
+        ? `শিক্ষক ${teacherName}-কে "${studentName}"-এর সহায়তা আবেদনের তাগিদ নোটিফিকেশন পাঠানো হয়েছে!`
+        : `Notification sent to ${teacherName} regarding help request from ${studentName}.`
+    );
+  };
 
   // Dynamically compute authentic sparkline curves based on live state values
   const studentSparkline = useMemo(
@@ -967,32 +983,52 @@ export default function AdminOverviewPage() {
           {/* 6 White Action Tiles Grid - Exact Reference Icons & Actions */}
           <div className="relative z-10 grid grid-cols-3 gap-2 mt-1">
             <Link
+              href="/admin/courses"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
+            >
+              <Layers className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-[#0F172A] leading-tight">
+                {isBangla ? 'ব্যাচ পরিচালনা' : 'Manage Batches'}
+              </span>
+            </Link>
+
+            <Link
+              href="/admin/sessions"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
+            >
+              <Calendar className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-[#0F172A] leading-tight">
+                {isBangla ? 'ক্লাস তদারকি' : 'Manage Classes'}
+              </span>
+            </Link>
+
+            <Link
               href="/admin/teachers"
               className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
               <UserPlus className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
               <span className="text-xs font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'শিক্ষক যোগ' : 'Add Teacher'}
+                {isBangla ? 'শিক্ষক বরাদ্দ' : 'Assign Teacher'}
               </span>
             </Link>
 
-            <Link
-              href="/admin/students?tab=batches"
+            <button
+              onClick={() => setShowAttendanceModal(true)}
               className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
-              <Users className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <CheckCircle2 className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
               <span className="text-xs font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'ব্যাচ বরাদ্দ' : 'Assign to Batch'}
+                {isBangla ? 'হাজিরা হাব' : 'Attendance Hub'}
               </span>
-            </Link>
+            </button>
 
             <Link
-              href="/reports"
+              href="/admin/students?tab=progress"
               className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
-              <Download className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <BookOpen className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
               <span className="text-xs font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'রিপোর্ট এক্সপোর্ট' : 'Export Report'}
+                {isBangla ? 'কোর্স অগ্রগতি' : 'Course Progress'}
               </span>
             </Link>
 
@@ -1003,26 +1039,6 @@ export default function AdminOverviewPage() {
               <BarChart3 className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
               <span className="text-xs font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'রিপোর্ট দেখুন' : 'View Reports'}
-              </span>
-            </Link>
-
-            <Link
-              href="/admin/students?tab=progress"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
-            >
-              <BookOpen className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'কোর্স পরিচালনা' : 'Manage Courses'}
-              </span>
-            </Link>
-
-            <Link
-              href="/admin/menu-control"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
-            >
-              <Settings className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'সেটিংস' : 'Settings'}
               </span>
             </Link>
           </div>
@@ -1280,64 +1296,188 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* 5. ROW 5: SYSTEM STATISTICS (8 COLS) + BUILDING SKILLS PROMO BANNER (4 COLS) */}
+      {/* 5. ROW 5: STUDENT HELP REQUESTS & UNDERSTANDING PULSE (8 COLS) + BUILDING SKILLS PROMO BANNER (4 COLS) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-        {/* Left: System Statistics (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Left: Student Help Requests & Understanding Pulse (8 cols) */}
+        <div className="lg:col-span-8 bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <BarChart2 className="w-4 h-4 text-emerald-600" />
+                <HelpCircle className="w-5 h-5 text-amber-600" />
                 <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
-                  {isBangla ? 'সিস্টেম পরিসংখ্যান' : 'System Statistics'}
+                  {isBangla ? 'শিক্ষার্থী সহায়তা আবেদন ও ক্লাস বোঝাপড়া' : 'Student Help Requests & Understanding Pulse'}
                 </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
+                  {isBangla ? '৩টি পেন্ডিং' : '3 Pending'}
+                </span>
               </div>
-              <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg cursor-pointer transition">
-                <span>{isBangla ? 'এই মাসে' : 'This Month'}</span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
+              <Link
+                href="/teacher/help-requests"
+                className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 hover:text-emerald-900 hover:underline transition"
+              >
+                <span>{isBangla ? 'সব আবেদন দেখুন' : 'View All'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* 4 KPI Metric Summary Pills */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2.5">
+              <div className="bg-amber-50/70 rounded-xl p-2.5 border border-amber-100/90 text-left">
+                <span className="text-[10px] font-bold text-amber-700 block uppercase tracking-wider">
+                  {isBangla ? 'পেন্ডিং আবেদন' : 'Pending Requests'}
+                </span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-lg font-black text-amber-900 leading-none">৩ জন</span>
+                  <span className="text-[10px] text-amber-600 font-semibold">(তাগিদযোগ্য)</span>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50/70 rounded-xl p-2.5 border border-emerald-100/90 text-left">
+                <span className="text-[10px] font-bold text-emerald-700 block uppercase tracking-wider">
+                  {isBangla ? 'আজকের সমাধান' : 'Resolved Today'}
+                </span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-lg font-black text-emerald-900 leading-none">৮ জন</span>
+                  <span className="text-[10px] text-emerald-600 font-semibold">(১০০%)</span>
+                </div>
+              </div>
+
+              <div className="bg-sky-50/70 rounded-xl p-2.5 border border-sky-100/90 text-left">
+                <span className="text-[10px] font-bold text-sky-700 block uppercase tracking-wider">
+                  {isBangla ? 'গড় ক্লাস বোঝাপড়া' : 'Avg Understanding'}
+                </span>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-lg font-black text-sky-900 leading-none">৪.৩</span>
+                  <div className="flex items-center text-amber-400">
+                    <Star className="w-3 h-3 fill-amber-400" />
+                  </div>
+                  <span className="text-[10px] text-sky-600 font-semibold">/ ৫.০</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-200/80 text-left">
+                <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">
+                  {isBangla ? 'সবচেয়ে চাহিদাসম্পন্ন টপিক' : 'Top Focus Subject'}
+                </span>
+                <span className="text-xs font-bold text-[#0F172A] mt-0.5 block truncate" title="অ্যাকাউন্টিং (লেজার ও জার্নাল)">
+                  {isBangla ? 'হিসাববিজ্ঞান (লেজার)' : 'Accounting Ledger'}
+                </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-2.5 mt-2">
-              <div className="bg-[#F8FAFC] rounded-xl p-3 border border-slate-100 text-center flex flex-col items-center justify-center">
-                <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1">
-                  <Users className="w-4 h-4" />
-                </div>
-                <h4 className="text-xl font-black text-[#0F172A] leading-tight">{d(stats.totalStudents)}</h4>
-                <p className="text-xs font-semibold text-slate-500 mt-0.5">
-                  {isBangla ? 'শিক্ষার্থী' : 'Students'}
-                </p>
-              </div>
+            {/* List of Recent Help Requests with Teacher Follow-up Notification Action */}
+            <div className="space-y-1.5 mt-2.5">
+              {[
+                {
+                  id: 101,
+                  studentName: isBangla ? 'আব্দুল্লাহ আল মামুন' : 'Abdullah Al Mamun',
+                  studentRoll: 'SBMC-42-008',
+                  batch: isBangla ? 'ব্যাচ ৪২' : 'Batch 42',
+                  subject: isBangla ? 'হিসাববিজ্ঞান' : 'Accounting',
+                  topic: isBangla ? 'লেজার ও জার্নাল পোস্টিং' : 'Ledger & Journal',
+                  teacher: isBangla ? 'কাওসার হোসেন' : 'Kawsar Hossain',
+                  message: isBangla
+                    ? 'ট্রায়াল ব্যালেন্সের ডেবিট-ক্রেডিট মেলাতে পারছি না, অতিরিক্ত ক্লাস দরকার।'
+                    : 'Struggling with trial balance debit-credit reconciliation.',
+                  timeAgo: isBangla ? '১০ মিনিট আগে' : '10m ago',
+                  status: 'pending',
+                },
+                {
+                  id: 102,
+                  studentName: isBangla ? 'মোহাম্মদ জুবায়ের' : 'Mohammad Zubair',
+                  studentRoll: 'SBMC-41-014',
+                  batch: isBangla ? 'ব্যাচ ৪১' : 'Batch 41',
+                  subject: isBangla ? 'গ্রাফিক ডিজাইন' : 'Graphic Design',
+                  topic: isBangla ? 'পেন টুল ও ভেক্টর পাথ' : 'Pen Tool & Paths',
+                  teacher: isBangla ? 'জুবায়ের আহমেদ' : 'Zubair Ahmed',
+                  message: isBangla
+                    ? 'অ্যাঙ্কর পয়েন্ট ও হ্যান্ডেল কন্ট্রোল করতে গিয়ে শেপ নষ্ট হয়ে যাচ্ছে।'
+                    : 'Difficulty handling Bezier handles and anchor points.',
+                  timeAgo: isBangla ? '২৫ মিনিট আগে' : '25m ago',
+                  status: 'pending',
+                },
+                {
+                  id: 103,
+                  studentName: isBangla ? 'তানভীর আহমেদ' : 'Tanvir Ahmed',
+                  studentRoll: 'SBMC-42-022',
+                  batch: isBangla ? 'ব্যাচ ৪২' : 'Batch 42',
+                  subject: isBangla ? 'মেটা মার্কেটিং' : 'Meta Marketing',
+                  topic: isBangla ? 'পিক্সেল ও ইভেন্ট ট্র্যাকিং' : 'Pixel Tracking',
+                  teacher: isBangla ? 'কাওসার হোসেন' : 'Kawsar Hossain',
+                  message: isBangla
+                    ? 'ইভেন্ট ম্যানেজার টেস্ট ইভেন্টসে ডেটা আসছে না।'
+                    : 'Event manager test events not receiving data.',
+                  timeAgo: isBangla ? '১ ঘণ্টা আগে' : '1h ago',
+                  status: 'resolved',
+                },
+              ].map((req) => {
+                const isNotified = !!notifiedTeachers[req.id];
+                return (
+                  <div
+                    key={req.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/50 transition"
+                  >
+                    <div className="flex items-start gap-2.5 min-w-0">
+                      <div
+                        className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold ${
+                          req.status === 'resolved'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {req.studentName.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-bold text-[#0F172A]">{req.studentName}</span>
+                          <span className="px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                            {req.batch}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">({req.studentRoll})</span>
+                          <span className="px-1.5 py-0.2 rounded text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            {req.subject}: {req.topic}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-1 italic">
+                          "{req.message}"
+                        </p>
+                      </div>
+                    </div>
 
-              <div className="bg-[#F8FAFC] rounded-xl p-3 border border-slate-100 text-center flex flex-col items-center justify-center">
-                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
-                  <BookOpen className="w-4 h-4" />
-                </div>
-                <h4 className="text-xl font-black text-[#0F172A] leading-tight">{d(stats.totalBatches)}</h4>
-                <p className="text-xs font-semibold text-slate-500 mt-0.5">
-                  {isBangla ? 'ব্যাচ' : 'Batches'}
-                </p>
-              </div>
-
-              <div className="bg-[#F8FAFC] rounded-xl p-3 border border-slate-100 text-center flex flex-col items-center justify-center">
-                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-1">
-                  <GraduationCap className="w-4 h-4" />
-                </div>
-                <h4 className="text-xl font-black text-[#0F172A] leading-tight">{d(stats.totalCourses)}</h4>
-                <p className="text-xs font-semibold text-slate-500 mt-0.5">
-                  {isBangla ? 'কোর্স' : 'Courses'}
-                </p>
-              </div>
-
-              <div className="bg-[#F8FAFC] rounded-xl p-3 border border-slate-100 text-center flex flex-col items-center justify-center">
-                <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mb-1">
-                  <Calendar className="w-4 h-4" />
-                </div>
-                <h4 className="text-xl font-black text-[#0F172A] leading-tight">{d(stats.totalSessions)}</h4>
-                <p className="text-xs font-semibold text-slate-500 mt-0.5">
-                  {isBangla ? 'সেশন' : 'Sessions'}
-                </p>
-              </div>
+                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                      <span className="text-[10.5px] text-slate-400 font-medium">{req.timeAgo}</span>
+                      {req.status === 'resolved' ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          <Check className="w-3 h-3 text-emerald-700" />
+                          <span>{isBangla ? 'সমাধানকৃত' : 'Resolved'}</span>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleNotifyTeacher(req.id, req.teacher, req.studentName)}
+                          disabled={isNotified}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10.5px] font-bold shadow-2xs transition active:scale-95 cursor-pointer ${
+                            isNotified
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
+                              : 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white'
+                          }`}
+                        >
+                          {isNotified ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-700" />
+                              <span>{isBangla ? 'তাগিদ পাঠানো হয়েছে' : 'Notified'}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-3 h-3" />
+                              <span>{isBangla ? 'শিক্ষককে তাগিদ দিন' : 'Notify Teacher'}</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

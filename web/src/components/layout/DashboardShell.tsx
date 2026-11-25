@@ -60,8 +60,28 @@ const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
     isSystemDefault: true,
   },
   {
-    id: 'teachers',
+    id: 'batches',
     href: '/admin/courses',
+    labelBn: 'ব্যাচ ও কোর্স পরিচালনা',
+    labelEn: 'Batches & Courses',
+    iconName: 'Layers',
+    section: 'main',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
+    id: 'sessions',
+    href: '/admin/sessions',
+    labelBn: 'ক্লাস সেশন ও রুটিন',
+    labelEn: 'Class Sessions & Schedule',
+    iconName: 'Calendar',
+    section: 'main',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
+    id: 'teachers',
+    href: '/admin/teachers',
     labelBn: 'টিচার্স',
     labelEn: 'Teachers',
     iconName: 'GraduationCap',
@@ -184,7 +204,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('assdi_admin_nav_menus_v4');
+        const saved = localStorage.getItem('assdi_admin_nav_menus_v6');
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -193,8 +213,11 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               (m: any) => m.id !== 'coordinator_analytics' && m.href !== '/coordinator'
             );
             setAdminMenus(sanitized);
-            localStorage.setItem('assdi_admin_nav_menus_v4', JSON.stringify(sanitized));
+            localStorage.setItem('assdi_admin_nav_menus_v6', JSON.stringify(sanitized));
           }
+        } else {
+          setAdminMenus(DEFAULT_ADMIN_MENUS);
+          localStorage.setItem('assdi_admin_nav_menus_v6', JSON.stringify(DEFAULT_ADMIN_MENUS));
         }
       } catch (e) {
         console.error('Failed to load custom admin menus:', e);
@@ -205,14 +228,14 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const handleSaveAdminMenus = (updated: CustomNavItem[]) => {
     setAdminMenus(updated);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('assdi_admin_nav_menus_v4', JSON.stringify(updated));
+      localStorage.setItem('assdi_admin_nav_menus_v6', JSON.stringify(updated));
     }
   };
 
   const handleResetAdminMenus = () => {
     setAdminMenus(DEFAULT_ADMIN_MENUS);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('assdi_admin_nav_menus_v4');
+      localStorage.removeItem('assdi_admin_nav_menus_v6');
     }
   };
 
