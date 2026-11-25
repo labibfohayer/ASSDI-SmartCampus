@@ -397,171 +397,211 @@ export default function AdminOverviewPage() {
         </div>
       )}
 
-      {/* 2. ROW 2: 4 KPI CARDS WITH WAVE SPARKLINES */}
+      {/* 2. ROW 2: 4 KPI CARDS WITH WAVE SPARKLINES (MATCHING REFERENCE MOCKUP) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Total Students */}
-        <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-xs flex flex-col justify-between overflow-hidden relative group hover:border-emerald-300 transition-all">
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-[#E6F4EA] text-[#059669] flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5" />
-              </div>
-              <span className="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                ↑ 12%
-              </span>
+        <div className="bg-white rounded-2xl pt-4 sm:pt-4.5 px-4 sm:px-4.5 pb-0 border border-slate-200/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex flex-col justify-between overflow-hidden relative group hover:border-emerald-300 transition-all">
+          <div className="flex items-center gap-3.5 sm:gap-4 relative z-10">
+            <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-[#DDF5E7] flex items-center justify-center shrink-0 shadow-2xs">
+              <Users className="w-6 h-6 sm:w-7 sm:h-7 text-[#059669]" />
             </div>
-            <p className="text-xs font-semibold text-slate-500 mt-3">
-              {isBangla ? 'মোট শিক্ষার্থী' : 'Total Students'}
-            </p>
-            <h3 className="text-2xl font-black text-[#0F172A] tracking-tight mt-0.5 font-sans">
-              {d(stats.totalStudents)}
-            </h3>
+            <div className="min-w-0">
+              <p className="text-[13px] sm:text-sm font-bold text-[#0F172A] tracking-tight leading-tight truncate">
+                {isBangla ? 'মোট শিক্ষার্থী' : 'Total Students'}
+              </p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl sm:text-[27px] font-black text-[#0F172A] tracking-tight leading-none font-sans">
+                  {d(stats.totalStudents)}
+                </span>
+                <span className="text-xs sm:text-[13px] font-bold text-[#10B981] flex items-center gap-0.5">
+                  <span>↑</span>
+                  <span>12%</span>
+                </span>
+              </div>
+            </div>
           </div>
-          {/* Smooth Green Wave Sparkline */}
-          <div className="w-full mt-2 -mb-1">
-            <svg className="w-full h-10 overflow-visible" viewBox="0 0 100 24" preserveAspectRatio="none">
+
+          {/* Undulating Wave Sparkline with Full Bottom Shadow */}
+          <div className="w-full mt-2 sm:mt-3">
+            <svg
+              className="w-full h-12 sm:h-14 block overflow-visible"
+              viewBox="0 0 300 65"
+              preserveAspectRatio="none"
+            >
               <defs>
                 <linearGradient id="wave-green-grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.28" />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.45" />
+                  <stop offset="55%" stopColor="#10B981" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#10B981" stopOpacity="0.01" />
                 </linearGradient>
               </defs>
               <path
-                d="M0,19 C15,21 25,13 40,16 C55,19 70,9 85,14 C92,16 97,11 100,8 L100,24 L0,24 Z"
+                d="M 0,56 C 10,50 14,48 22,48 C 30,48 34,54 42,54 C 50,54 54,44 62,44 C 70,44 74,50 82,50 C 90,50 94,39 102,39 C 110,39 114,46 122,46 C 130,46 134,34 142,34 C 150,34 154,41 162,41 C 170,41 174,29 182,29 C 190,29 194,36 202,36 C 210,36 214,23 222,23 C 230,23 234,30 242,30 C 250,30 254,18 262,18 C 270,18 274,24 282,24 C 290,24 294,12 300,12 L 300,65 L 0,65 Z"
                 fill="url(#wave-green-grad)"
               />
               <path
-                d="M0,19 C15,21 25,13 40,16 C55,19 70,9 85,14 C92,16 97,11 100,8"
+                d="M 0,56 C 10,50 14,48 22,48 C 30,48 34,54 42,54 C 50,54 54,44 62,44 C 70,44 74,50 82,50 C 90,50 94,39 102,39 C 110,39 114,46 122,46 C 130,46 134,34 142,34 C 150,34 154,41 162,41 C 170,41 174,29 182,29 C 190,29 194,36 202,36 C 210,36 214,23 222,23 C 230,23 234,30 242,30 C 250,30 254,18 262,18 C 270,18 274,24 282,24 C 290,24 294,12 300,12"
                 fill="none"
                 stroke="#10B981"
-                strokeWidth="2.2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
           </div>
         </div>
 
         {/* Card 2: Total Batches */}
-        <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-xs flex flex-col justify-between overflow-hidden relative group hover:border-blue-300 transition-all">
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                <BookOpen className="w-5 h-5" />
-              </div>
-              <span className="inline-flex items-center text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
-                ↑ 0%
-              </span>
+        <div className="bg-white rounded-2xl pt-4 sm:pt-4.5 px-4 sm:px-4.5 pb-0 border border-slate-200/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex flex-col justify-between overflow-hidden relative group hover:border-blue-300 transition-all">
+          <div className="flex items-center gap-3.5 sm:gap-4 relative z-10">
+            <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-[#E1EFFE] flex items-center justify-center shrink-0 shadow-2xs">
+              <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-[#0284C7]" />
             </div>
-            <p className="text-xs font-semibold text-slate-500 mt-3">
-              {isBangla ? 'মোট ব্যাচ' : 'Total Batches'}
-            </p>
-            <h3 className="text-2xl font-black text-[#0F172A] tracking-tight mt-0.5 font-sans">
-              {d(stats.totalBatches)}
-            </h3>
+            <div className="min-w-0">
+              <p className="text-[13px] sm:text-sm font-bold text-[#0F172A] tracking-tight leading-tight truncate">
+                {isBangla ? 'মোট ব্যাচ' : 'Total Batches'}
+              </p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl sm:text-[27px] font-black text-[#0F172A] tracking-tight leading-none font-sans">
+                  {d(stats.totalBatches)}
+                </span>
+                <span className="text-xs sm:text-[13px] font-bold text-[#0284C7] flex items-center gap-0.5">
+                  <span>↑</span>
+                  <span>0%</span>
+                </span>
+              </div>
+            </div>
           </div>
-          {/* Smooth Blue Wave Sparkline */}
-          <div className="w-full mt-2 -mb-1">
-            <svg className="w-full h-10 overflow-visible" viewBox="0 0 100 24" preserveAspectRatio="none">
+
+          {/* Undulating Wave Sparkline with Full Bottom Shadow */}
+          <div className="w-full mt-2 sm:mt-3">
+            <svg
+              className="w-full h-12 sm:h-14 block overflow-visible"
+              viewBox="0 0 300 65"
+              preserveAspectRatio="none"
+            >
               <defs>
                 <linearGradient id="wave-blue-grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0284C7" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#0284C7" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="#0284C7" stopOpacity="0.45" />
+                  <stop offset="55%" stopColor="#0284C7" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#0284C7" stopOpacity="0.01" />
                 </linearGradient>
               </defs>
               <path
-                d="M0,20 C18,17 32,8 48,15 C62,21 78,11 92,16 C96,17 98,15 100,13 L100,24 L0,24 Z"
+                d="M 0,58 C 10,52 14,50 22,50 C 30,50 34,55 42,55 C 50,55 54,45 62,45 C 70,45 74,51 82,51 C 90,51 94,41 102,41 C 110,41 114,47 122,47 C 130,47 134,35 142,35 C 150,35 154,42 162,42 C 170,42 174,30 182,30 C 190,30 194,37 202,37 C 210,37 214,24 222,24 C 230,24 234,31 242,31 C 250,31 254,19 262,19 C 270,19 274,25 282,25 C 290,25 294,13 300,13 L 300,65 L 0,65 Z"
                 fill="url(#wave-blue-grad)"
               />
               <path
-                d="M0,20 C18,17 32,8 48,15 C62,21 78,11 92,16 C96,17 98,15 100,13"
+                d="M 0,58 C 10,52 14,50 22,50 C 30,50 34,55 42,55 C 50,55 54,45 62,45 C 70,45 74,51 82,51 C 90,51 94,41 102,41 C 110,41 114,47 122,47 C 130,47 134,35 142,35 C 150,35 154,42 162,42 C 170,42 174,30 182,30 C 190,30 194,37 202,37 C 210,37 214,24 222,24 C 230,24 234,31 242,31 C 250,31 254,19 262,19 C 270,19 274,25 282,25 C 290,25 294,13 300,13"
                 fill="none"
                 stroke="#0284C7"
-                strokeWidth="2.2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
           </div>
         </div>
 
         {/* Card 3: Active Courses */}
-        <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-xs flex flex-col justify-between overflow-hidden relative group hover:border-amber-300 transition-all">
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                <GraduationCap className="w-5 h-5" />
-              </div>
-              <span className="inline-flex items-center text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
-                ↑ 1%
-              </span>
+        <div className="bg-white rounded-2xl pt-4 sm:pt-4.5 px-4 sm:px-4.5 pb-0 border border-slate-200/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex flex-col justify-between overflow-hidden relative group hover:border-amber-300 transition-all">
+          <div className="flex items-center gap-3.5 sm:gap-4 relative z-10">
+            <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-[#FEF0E0] flex items-center justify-center shrink-0 shadow-2xs">
+              <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7 text-[#EA580C]" />
             </div>
-            <p className="text-xs font-semibold text-slate-500 mt-3">
-              {isBangla ? 'সক্রিয় কোর্স' : 'Active Courses'}
-            </p>
-            <h3 className="text-2xl font-black text-[#0F172A] tracking-tight mt-0.5 font-sans">
-              {d(stats.totalCourses)}
-            </h3>
+            <div className="min-w-0">
+              <p className="text-[13px] sm:text-sm font-bold text-[#0F172A] tracking-tight leading-tight truncate">
+                {isBangla ? 'সক্রিয় কোর্স' : 'Active Courses'}
+              </p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl sm:text-[27px] font-black text-[#0F172A] tracking-tight leading-none font-sans">
+                  {d(stats.totalCourses)}
+                </span>
+                <span className="text-xs sm:text-[13px] font-bold text-[#10B981] flex items-center gap-0.5">
+                  <span>↑</span>
+                  <span>1%</span>
+                </span>
+              </div>
+            </div>
           </div>
-          {/* Smooth Amber Wave Sparkline */}
-          <div className="w-full mt-2 -mb-1">
-            <svg className="w-full h-10 overflow-visible" viewBox="0 0 100 24" preserveAspectRatio="none">
+
+          {/* Undulating Wave Sparkline with Full Bottom Shadow */}
+          <div className="w-full mt-2 sm:mt-3">
+            <svg
+              className="w-full h-12 sm:h-14 block overflow-visible"
+              viewBox="0 0 300 65"
+              preserveAspectRatio="none"
+            >
               <defs>
                 <linearGradient id="wave-amber-grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="#F97316" stopOpacity="0.45" />
+                  <stop offset="55%" stopColor="#F97316" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#F97316" stopOpacity="0.01" />
                 </linearGradient>
               </defs>
               <path
-                d="M0,18 C16,14 30,22 46,17 C62,12 76,20 88,14 C94,11 98,15 100,12 L100,24 L0,24 Z"
+                d="M 0,57 C 10,51 14,49 22,49 C 30,49 34,54 42,54 C 50,54 54,44 62,44 C 70,44 74,50 82,50 C 90,50 94,40 102,40 C 110,40 114,46 122,46 C 130,46 134,34 142,34 C 150,34 154,41 162,41 C 170,41 174,29 182,29 C 190,29 194,35 202,35 C 210,35 214,23 222,23 C 230,23 234,29 242,29 C 250,29 254,17 262,17 C 270,17 274,23 282,23 C 290,23 294,11 300,11 L 300,65 L 0,65 Z"
                 fill="url(#wave-amber-grad)"
               />
               <path
-                d="M0,18 C16,14 30,22 46,17 C62,12 76,20 88,14 C94,11 98,15 100,12"
+                d="M 0,57 C 10,51 14,49 22,49 C 30,49 34,54 42,54 C 50,54 54,44 62,44 C 70,44 74,50 82,50 C 90,50 94,40 102,40 C 110,40 114,46 122,46 C 130,46 134,34 142,34 C 150,34 154,41 162,41 C 170,41 174,29 182,29 C 190,29 194,35 202,35 C 210,35 214,23 222,23 C 230,23 234,29 242,29 C 250,29 254,17 262,17 C 270,17 274,23 282,23 C 290,23 294,11 300,11"
                 fill="none"
-                stroke="#F59E0B"
-                strokeWidth="2.2"
+                stroke="#F97316"
+                strokeWidth="2.5"
                 strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
           </div>
         </div>
 
         {/* Card 4: Total Sessions */}
-        <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-xs flex flex-col justify-between overflow-hidden relative group hover:border-purple-300 transition-all">
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                <Calendar className="w-5 h-5" />
-              </div>
-              <span className="inline-flex items-center text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">
-                ↑ 5%
-              </span>
+        <div className="bg-white rounded-2xl pt-4 sm:pt-4.5 px-4 sm:px-4.5 pb-0 border border-slate-200/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex flex-col justify-between overflow-hidden relative group hover:border-purple-300 transition-all">
+          <div className="flex items-center gap-3.5 sm:gap-4 relative z-10">
+            <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-[#F3E8FF] flex items-center justify-center shrink-0 shadow-2xs">
+              <Calendar className="w-6 h-6 sm:w-7 sm:h-7 text-[#9333EA]" />
             </div>
-            <p className="text-xs font-semibold text-slate-500 mt-3">
-              {isBangla ? 'মোট সেশন' : 'Total Sessions'}
-            </p>
-            <h3 className="text-2xl font-black text-[#0F172A] tracking-tight mt-0.5 font-sans">
-              {d(stats.totalSessions)}
-            </h3>
+            <div className="min-w-0">
+              <p className="text-[13px] sm:text-sm font-bold text-[#0F172A] tracking-tight leading-tight truncate">
+                {isBangla ? 'মোট সেশন' : 'Total Sessions'}
+              </p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl sm:text-[27px] font-black text-[#0F172A] tracking-tight leading-none font-sans">
+                  {d(stats.totalSessions)}
+                </span>
+                <span className="text-xs sm:text-[13px] font-bold text-[#10B981] flex items-center gap-0.5">
+                  <span>↑</span>
+                  <span>5%</span>
+                </span>
+              </div>
+            </div>
           </div>
-          {/* Smooth Purple Wave Sparkline */}
-          <div className="w-full mt-2 -mb-1">
-            <svg className="w-full h-10 overflow-visible" viewBox="0 0 100 24" preserveAspectRatio="none">
+
+          {/* Undulating Wave Sparkline with Full Bottom Shadow */}
+          <div className="w-full mt-2 sm:mt-3">
+            <svg
+              className="w-full h-12 sm:h-14 block overflow-visible"
+              viewBox="0 0 300 65"
+              preserveAspectRatio="none"
+            >
               <defs>
                 <linearGradient id="wave-purple-grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="#A855F7" stopOpacity="0.45" />
+                  <stop offset="55%" stopColor="#A855F7" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#A855F7" stopOpacity="0.01" />
                 </linearGradient>
               </defs>
               <path
-                d="M0,19 C14,15 28,21 44,16 C60,11 74,18 86,13 C92,10 97,14 100,11 L100,24 L0,24 Z"
+                d="M 0,59 C 10,53 14,51 22,51 C 30,51 34,56 42,56 C 50,56 54,46 62,46 C 70,46 74,52 82,52 C 90,52 94,42 102,42 C 110,42 114,48 122,48 C 130,48 134,36 142,36 C 150,36 154,43 162,43 C 170,43 174,31 182,31 C 190,31 194,38 202,38 C 210,38 214,25 222,25 C 230,25 234,32 242,32 C 250,32 254,20 262,20 C 270,20 274,26 282,26 C 290,26 294,14 300,14 L 300,65 L 0,65 Z"
                 fill="url(#wave-purple-grad)"
               />
               <path
-                d="M0,19 C14,15 28,21 44,16 C60,11 74,18 86,13 C92,10 97,14 100,11"
+                d="M 0,59 C 10,53 14,51 22,51 C 30,51 34,56 42,56 C 50,56 54,46 62,46 C 70,46 74,52 82,52 C 90,52 94,42 102,42 C 110,42 114,48 122,48 C 130,48 134,36 142,36 C 150,36 154,43 162,43 C 170,43 174,31 182,31 C 190,31 194,38 202,38 C 210,38 214,25 222,25 C 230,25 234,32 242,32 C 250,32 254,20 262,20 C 270,20 274,26 282,26 C 290,26 294,14 300,14"
                 fill="none"
-                stroke="#8B5CF6"
-                strokeWidth="2.2"
+                stroke="#A855F7"
+                strokeWidth="2.5"
                 strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
           </div>
