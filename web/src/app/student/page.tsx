@@ -261,6 +261,9 @@ export default function StudentPortalPage() {
         if (params.get('scan') === 'true') {
           setScannerOpen(true);
         }
+        if (params.get('card') === 'true') {
+          setIdCardOpen(true);
+        }
       }
     };
     handleUrlTab();
@@ -268,12 +271,18 @@ export default function StudentPortalPage() {
     const onTabNav = (e: any) => {
       const href = e.detail?.href || '';
       handleUrlTab(href);
-      setTimeout(() => {
-        const tabEl = document.getElementById('student-tab-section');
-        if (tabEl) {
-          tabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 50);
+      if (href === '/student') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      if (href.includes('?tab=')) {
+        setTimeout(() => {
+          const tabEl = document.getElementById('student-tab-section');
+          if (tabEl) {
+            tabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 50);
+      }
     };
 
     const onDirectTab = (e: any) => {
@@ -659,14 +668,14 @@ export default function StudentPortalPage() {
 
   return (
     <div className="space-y-6">
-      {/* Islamic Modern Student Hero Welcome Card (Full Custom Background Artwork) */}
-      <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FDF8EC] min-h-[245px] lg:min-h-[285px] flex items-center">
+      {/* Islamic Modern Student Hero Welcome Card (Full Seamless Widescreen Background Artwork) */}
+      <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[245px] lg:min-h-[290px] flex items-center">
         <Image
           src="/islamic-hero-banner-bg.png"
           alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
           fill
           priority
-          className="object-cover object-bottom-right pointer-events-none select-none"
+          className="object-cover object-right pointer-events-none select-none"
         />
 
         {/* Subtle mobile/tablet left scrim so text remains crisp over narrower screens */}
@@ -676,7 +685,7 @@ export default function StudentPortalPage() {
         />
 
         {/* Content Positioned Cleanly on the Left Side */}
-        <div className="relative z-10 p-5 sm:p-7 pb-8 lg:max-w-[52%] w-full">
+        <div className="relative z-10 p-5 sm:p-7 pb-8 lg:max-w-[50%] w-full">
           {/* Welcome Heading */}
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl lg:text-[28px] font-extrabold text-[#002F25] tracking-tight font-serif leading-tight">

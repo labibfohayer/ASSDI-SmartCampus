@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Menu,
   X,
@@ -30,10 +30,13 @@ import {
   Clock,
   Megaphone,
   ChevronRight,
+  ChevronDown,
   Settings,
   Bookmark,
   Archive,
   Smartphone,
+  Search,
+  CreditCard,
 } from 'lucide-react';
 import { triggerPwaInstall } from '@/components/pwa/PwaInstaller';
 import { useAuth } from '@/contexts/AuthContext';
@@ -132,10 +135,39 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const { user, logoutUser } = useAuth();
   const { isBangla, t } = useLanguage();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [menuManagerOpen, setMenuManagerOpen] = useState(false);
   const [adminMenus, setAdminMenus] = useState<CustomNavItem[]>(DEFAULT_ADMIN_MENUS);
   const [currentSearch, setCurrentSearch] = useState('');
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [studentSearchQuery, setStudentSearchQuery] = useState('');
+  const [studentSearchFocused, setStudentSearchFocused] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const studentSearchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+      if (studentSearchRef.current && !studentSearchRef.current.contains(event.target as Node)) {
+        setStudentSearchFocused(false);
+      }
+    };
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setProfileMenuOpen(false);
+        setStudentSearchFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -360,7 +392,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             titleEn: 'MAIN MENU',
             items: [
               {
-                href: '/student',
+                href: '/student?tab=today',
                 labelBn: 'আজকের ক্লাস ও মূল্যায়ন',
                 labelEn: "Today's Schedule & Feedback",
                 icon: Calendar,
@@ -745,6 +777,28 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             </div>
           )}
 
+          {/* Top Primary Dashboard Menu Button (Student Role - Reference Image Architecture) */}
+          {role === 'student' && (
+            <div className="px-3 pt-3 pb-0.5 shrink-0">
+              <Link
+                href="/student"
+                onClick={() => handleNavClick('/student')}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-[0.98] cursor-pointer ${
+                  pathname === '/student' && !currentSearch
+                    ? 'bg-gradient-to-r from-[#FF8108] to-[#EA580C] text-white shadow-md shadow-orange-950/30'
+                    : 'text-[#D1FAE5]/85 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <LayoutDashboard
+                  className={`w-4 h-4 shrink-0 ${
+                    pathname === '/student' && !currentSearch ? 'text-white' : 'text-[#6EE7B7]'
+                  }`}
+                />
+                <span>{isBangla ? 'ড্যাশবোর্ড' : 'Dashboard'}</span>
+              </Link>
+            </div>
+          )}
+
           {/* Navigation Items (Serial by Serial) */}
           <nav className="p-3 overflow-y-auto flex-1 flex flex-col justify-between">
             <div className="space-y-4">
@@ -861,7 +915,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           </nav>
         </div>
 
-        {/* Bottom: User Card, Language Toggle & Logout */}
+        {/* Bottom: User Card (Non-student) or Mosque Card + Copyright (Student) */}
         <div
           className={`p-2.5 border-t space-y-2 shrink-0 ${
             role === 'student'
@@ -869,87 +923,59 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               : 'border-[#FCD34D] bg-[#FFFBEB]'
           }`}
         >
-          {/* Islamic Mosque Artwork Quote Card (Student Only - Prominent & Beautifully Balanced) */}
-          {role === 'student' && (
-            <div className="pt-0.5 pb-1 px-1 flex justify-center">
-              <div className="relative group w-full max-w-[230px]">
-                <Image
-                  src="/islamic-sidebar-card.png"
-                  alt="জ্ঞানই শান্তি, দাওয়াই সফলতা"
-                  width={320}
-                  height={320}
-                  priority
-                  quality={100}
-                  className="w-full h-auto object-contain drop-shadow-md group-hover:scale-102 transition-transform duration-300"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* User info snippet */}
-          <div
-            className={`flex items-center justify-between gap-2 p-2 rounded-xl shadow-2xs ${
-              role === 'student'
-                ? 'bg-[#00281F] border border-[#065F46] text-white'
-                : 'bg-white border border-[#FCD34D]'
-            }`}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs ${
-                  role === 'student'
-                    ? 'bg-gradient-to-tr from-[#FF8108] to-[#EA580C] text-white border border-[#F97316]'
-                    : 'bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D]'
-                }`}
-              >
-                {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
-              </div>
-              <div className="min-w-0 text-left">
-                <p
-                  className={`font-bold text-xs truncate font-serif ${
-                    role === 'student' ? 'text-white' : 'text-[#0F172A]'
-                  }`}
-                >
-                  {user?.full_name || 'Student User'}
-                </p>
-                <p
-                  className={`text-[10px] font-mono truncate ${
-                    role === 'student' ? 'text-[#6EE7B7]' : 'text-[#64748B]'
-                  }`}
-                >
-                  {user?.login_id || 'student'}
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={handleLogout}
-              title={isBangla ? 'লগআউট' : 'Logout'}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
-                role === 'student'
-                  ? 'text-[#A7F3D0] hover:text-rose-400 hover:bg-rose-950/40'
-                  : 'text-[#64748B] hover:text-rose-600 hover:bg-rose-50'
-              }`}
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Student Compact PWA & Language Bar */}
           {role === 'student' ? (
-            <div className="flex items-center justify-between gap-1.5 px-0.5 pt-0.5">
-              <button
-                type="button"
-                onClick={triggerPwaInstall}
-                className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-medium bg-[#00281F] hover:bg-[#003429] text-[#D1FAE5] border border-[#065F46] transition cursor-pointer"
-              >
-                <Smartphone className="w-3 h-3 text-[#FF8108]" />
-                <span>{isBangla ? 'অ্যাপ ইনস্টল' : 'Install PWA'}</span>
-              </button>
-              <LanguageSwitcher />
-            </div>
+            <>
+              {/* Islamic Mosque Artwork Quote Card (Student Only - Prominent & Beautifully Balanced) */}
+              <div className="pt-0.5 pb-1 px-1 flex justify-center">
+                <div className="relative group w-full max-w-[230px]">
+                  <Image
+                    src="/islamic-sidebar-card.png"
+                    alt="জ্ঞানই শান্তি, দাওয়াই সফলতা"
+                    width={320}
+                    height={320}
+                    priority
+                    quality={100}
+                    className="w-full h-auto object-contain drop-shadow-md group-hover:scale-102 transition-transform duration-300"
+                  />
+                </div>
+              </div>
+
+              {/* Student Footer Copyright with Red Heart (Image 1 Style) */}
+              <div className="text-center pt-1.5 pb-0.5 text-[9.5px] text-[#A7F3D0]/70 space-y-0.5 border-t border-[#00241C]">
+                <p>© 2026 As-Sunnah Skill Development Institute</p>
+                <p className="flex items-center justify-center gap-1 text-[9px]">
+                  <span>All rights reserved.</span>
+                  <span className="text-rose-500 text-xs">❤️</span>
+                </p>
+              </div>
+            </>
           ) : (
             <>
+              {/* User info snippet (Staff/Admin/Coordinator/Teacher) */}
+              <div className="flex items-center justify-between gap-2 p-2 rounded-xl shadow-2xs bg-white border border-[#FCD34D]">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs bg-[#FEF3C7] text-[#B45309] border border-[#FCD34D]">
+                    {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
+                  </div>
+                  <div className="min-w-0 text-left">
+                    <p className="font-bold text-xs truncate font-serif text-[#0F172A]">
+                      {user?.full_name || 'Staff User'}
+                    </p>
+                    <p className="text-[10px] font-mono truncate text-[#64748B]">
+                      {user?.login_id || 'user'}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  title={isBangla ? 'লগআউট' : 'Logout'}
+                  className="p-1.5 rounded-lg transition-colors cursor-pointer shrink-0 text-[#64748B] hover:text-rose-600 hover:bg-rose-50"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+
               {/* Mobile PWA Install Trigger */}
               <button
                 type="button"
@@ -975,17 +1001,6 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               </div>
             </>
           )}
-
-          {/* Student Footer Copyright with Red Heart (Image 1 Style) */}
-          {role === 'student' && (
-            <div className="text-center pt-1.5 pb-0.5 text-[9.5px] text-[#A7F3D0]/60 space-y-0.5 border-t border-[#00241C]">
-              <p>© 2026 As-Sunnah Skill Development Institute</p>
-              <p className="flex items-center justify-center gap-1 text-[9px]">
-                <span>All rights reserved.</span>
-                <span className="text-rose-500 text-xs">❤️</span>
-              </p>
-            </div>
-          )}
         </div>
       </aside>
 
@@ -1002,82 +1017,323 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         />
 
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#E2E8F0] h-14 sm:h-16 flex items-center justify-between px-3 sm:px-6 lg:px-8 shadow-2xs">
-          {/* Left: Mobile Toggle & Page Context Breadcrumb */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <button
-              onClick={() => setMobileSidebarOpen(true)}
-              className="p-1.5 -ml-1 rounded-xl text-slate-700 hover:bg-amber-100/70 md:hidden cursor-pointer active:scale-95 transition shrink-0"
-              title="Open Navigation"
-              aria-label="মেনু খুলুন"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+        {role === 'student' ? (
+          <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#E2E8F0] h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-7 shadow-2xs gap-3">
+            {/* Left: Mobile Drawer Button & Search Bar (Reference Image 1 Style) */}
+            <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="p-1.5 -ml-1 rounded-xl text-slate-700 hover:bg-emerald-50 md:hidden cursor-pointer active:scale-95 transition shrink-0"
+                title="Open Navigation"
+                aria-label="মেনু খুলুন"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
 
-            {/* Mobile Brand / Page Title */}
-            <div className="flex sm:hidden items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-white p-0.5 border border-[#FCD34D] shrink-0 flex items-center justify-center shadow-2xs">
-                <Image
-                  src="/logo.png"
-                  alt="ASSDI Logo"
-                  width={22}
-                  height={22}
-                  className="object-contain"
-                />
+              <div className="hidden md:flex p-1.5 rounded-lg text-slate-500 items-center justify-center shrink-0">
+                <Menu className="w-4 h-4" />
               </div>
-              <span className="font-bold text-xs text-[#0F172A] truncate font-serif">
-                {activeItemLabel || (isBangla ? 'আস-সুন্নাহ স্কিল' : 'ASSDI')}
-              </span>
+
+              {/* Search Bar with Quick Student Navigation Results */}
+              <div ref={studentSearchRef} className="relative flex-1 max-w-md">
+                <div className="flex items-center gap-2 bg-[#F1F5F9]/90 hover:bg-[#F1F5F9] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#002F25]/20 border border-slate-200/80 rounded-full px-3.5 py-1.5 transition-all">
+                  <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                  <input
+                    type="text"
+                    value={studentSearchQuery}
+                    onFocus={() => setStudentSearchFocused(true)}
+                    onChange={(e) => {
+                      setStudentSearchQuery(e.target.value);
+                      setStudentSearchFocused(true);
+                    }}
+                    placeholder={isBangla ? 'যেকোনো কিছু খুঁজুন (ক্লাস, সনদ, উপস্থিতি...)' : 'Search anything...'}
+                    className="w-full bg-transparent text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                  />
+                  {studentSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setStudentSearchQuery('')}
+                      className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                      aria-label="Clear search"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {studentSearchFocused && (
+                  <div className="absolute left-0 right-0 mt-2 rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-72 overflow-y-auto">
+                    {[
+                      { href: '/student', labelBn: 'ড্যাশবোর্ড ওভারভিউ', labelEn: 'Dashboard Overview', icon: LayoutDashboard },
+                      { href: '/student?tab=today', labelBn: 'আজকের ক্লাস ও মূল্যায়ন', labelEn: "Today's Schedule & Feedback", icon: Calendar },
+                      { href: '/student?scan=true', labelBn: 'কিউআর দিয়ে উপস্থিতি', labelEn: 'Scan Attendance QR', icon: QrCode },
+                      { href: '/student?tab=materials', labelBn: 'লেকচার শিট ও রিসোর্স হাব', labelEn: 'Lecture Notes & Hub', icon: BookOpen },
+                      { href: '/student?tab=attendance', labelBn: 'উপস্থিতির হিস্ট্রি লগ', labelEn: 'Attendance Log', icon: CheckCircle2 },
+                      { href: '/student?tab=help', labelBn: 'শিক্ষকের সমাধান ও উত্তর', labelEn: 'Teacher Help & Replies', icon: HelpCircle },
+                      { href: '/student?tab=graduation', labelBn: 'সনদ ও গ্র্যাজুয়েশন ট্র্যাকার', labelEn: 'Graduation & Certificate', icon: Award },
+                      { href: '/student?card=true', labelBn: 'ডিজিটাল আইডি কার্ড', labelEn: 'Digital Student ID Card', icon: CreditCard },
+                      { href: '/announcements', labelBn: 'প্রাতিষ্ঠানিক নোটিশ বোর্ড', labelEn: 'Notice Board', icon: Megaphone },
+                    ]
+                      .filter((opt) => {
+                        if (!studentSearchQuery.trim()) return true;
+                        const q = studentSearchQuery.toLowerCase();
+                        return opt.labelBn.toLowerCase().includes(q) || opt.labelEn.toLowerCase().includes(q);
+                      })
+                      .map((opt) => {
+                        const OptIcon = opt.icon;
+                        return (
+                          <button
+                            key={opt.href}
+                            type="button"
+                            onClick={() => {
+                              setStudentSearchFocused(false);
+                              setStudentSearchQuery('');
+                              if (opt.href === '/announcements' || pathname !== '/student') {
+                                router.push(opt.href);
+                              } else {
+                                handleNavClick(opt.href);
+                              }
+                            }}
+                            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-left text-xs text-slate-700 hover:bg-emerald-50 hover:text-[#002F25] transition-colors cursor-pointer"
+                          >
+                            <OptIcon className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
+                            <span className="font-medium truncate">
+                              {isBangla ? opt.labelBn : opt.labelEn}
+                            </span>
+                          </button>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="hidden sm:flex items-center gap-2 text-xs">
-              <span className="font-bold text-[#0F172A] font-serif">{t('brand.name')}</span>
-              <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
-              <span className="font-bold text-[#0F766E] bg-[#F0FDFA] px-2.5 py-0.5 rounded-md border border-[#CCFBF1]">
-                {activeItemLabel || t('brand.course')}
-              </span>
-            </div>
-          </div>
+            {/* Right: Language Switcher, Notification Bell & Student Profile Dropdown (Reference Image 1 Style) */}
+            <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
+              <div className="hidden sm:block">
+                <LanguageSwitcher />
+              </div>
 
-          {/* Right: Academic Cohort, Live Status, Time & Switcher */}
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-            <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 border border-[#E2E8F0] text-[#334155] text-xs font-semibold shadow-2xs">
-              <span className="text-[#0F766E] font-bold">SBMC</span>
-              <span className="text-slate-400">•</span>
-              <span className="text-[#475569] font-medium">{isBangla ? 'ব্যাচ ০১' : 'Batch #1'}</span>
+              {/* Notification Bell */}
+              <NotificationBell />
+
+              {/* Student Profile Account Dropdown */}
+              <div ref={profileDropdownRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setProfileMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-2 sm:gap-2.5 py-1 px-1.5 sm:px-2.5 rounded-full hover:bg-slate-100/80 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
+                  aria-expanded={profileMenuOpen}
+                  aria-haspopup="menu"
+                >
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-[#002F25] to-[#0F766E] text-white flex items-center justify-center text-xs sm:text-sm font-extrabold shadow-xs border-2 border-emerald-200 shrink-0">
+                    {user?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
+                  </div>
+                  <div className="hidden sm:block text-left leading-tight max-w-[150px]">
+                    <p className="text-xs font-bold text-[#0F172A] truncate font-serif">
+                      {user?.full_name || 'Abdullah Student'}
+                    </p>
+                    <p className="text-[10.5px] font-medium text-[#64748B] truncate">
+                      {isBangla ? 'শিক্ষার্থী' : 'Student'}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
+                      profileMenuOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {profileMenuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-2 w-60 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-1"
+                  >
+                    <div className="px-3.5 py-2.5 border-b border-slate-100">
+                      <p className="text-xs font-bold text-[#0F172A] truncate font-serif">
+                        {user?.full_name || 'Abdullah Student'}
+                      </p>
+                      <p className="text-[10.5px] font-mono text-[#0F766E] mt-0.5 truncate">
+                        {user?.login_id || 'STD-2026-042-001'}
+                      </p>
+                    </div>
+
+                    <div className="py-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          if (pathname !== '/student') router.push('/student');
+                          else handleNavClick('/student');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-[#002F25] transition-colors cursor-pointer"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-[#0F766E]" />
+                        <span>{isBangla ? 'ড্যাশবোর্ড ওভারভিউ' : 'Dashboard Overview'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          if (pathname !== '/student') router.push('/student?card=true');
+                          else handleNavClick('/student?card=true');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-[#002F25] transition-colors cursor-pointer"
+                      >
+                        <CreditCard className="w-4 h-4 text-[#0F766E]" />
+                        <span>{isBangla ? 'ডিজিটাল আইডি ও এডমিট কার্ড' : 'Digital Student ID Card'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          if (pathname !== '/student') router.push('/student?tab=attendance');
+                          else handleNavClick('/student?tab=attendance');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-[#002F25] transition-colors cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-[#0F766E]" />
+                        <span>{isBangla ? 'উপস্থিতির হিস্ট্রি লগ' : 'Attendance History'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          if (pathname !== '/student') router.push('/student?tab=graduation');
+                          else handleNavClick('/student?tab=graduation');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-[#002F25] transition-colors cursor-pointer"
+                      >
+                        <Award className="w-4 h-4 text-[#0F766E]" />
+                        <span>{isBangla ? 'সনদ ও গ্র্যাজুয়েশন ট্র্যাকার' : 'Certificate & Progress'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          triggerPwaInstall();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-[#B45309] transition-colors cursor-pointer"
+                      >
+                        <Smartphone className="w-4 h-4 text-[#FF8108]" />
+                        <span>{isBangla ? 'হোমস্ক্রিনে অ্যাপ ইনস্টল' : 'Install App (PWA)'}</span>
+                      </button>
+                    </div>
+
+                    <div className="sm:hidden px-3.5 py-2 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-slate-500">
+                        {isBangla ? 'ভাষা' : 'Language'}
+                      </span>
+                      <LanguageSwitcher />
+                    </div>
+
+                    <div className="border-t border-slate-100 pt-1 mt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4 text-rose-600" />
+                        <span>{isBangla ? 'লগআউট করুন' : 'Logout'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </header>
+        ) : (
+          <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#E2E8F0] h-14 sm:h-16 flex items-center justify-between px-3 sm:px-6 lg:px-8 shadow-2xs">
+            {/* Left: Mobile Toggle & Page Context Breadcrumb */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="p-1.5 -ml-1 rounded-xl text-slate-700 hover:bg-amber-100/70 md:hidden cursor-pointer active:scale-95 transition shrink-0"
+                title="Open Navigation"
+                aria-label="মেনু খুলুন"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+
+              {/* Mobile Brand / Page Title */}
+              <div className="flex sm:hidden items-center gap-2 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-white p-0.5 border border-[#FCD34D] shrink-0 flex items-center justify-center shadow-2xs">
+                  <Image
+                    src="/logo.png"
+                    alt="ASSDI Logo"
+                    width={22}
+                    height={22}
+                    className="object-contain"
+                  />
+                </div>
+                <span className="font-bold text-xs text-[#0F172A] truncate font-serif">
+                  {activeItemLabel || (isBangla ? 'আস-সুন্নাহ স্কিল' : 'ASSDI')}
+                </span>
+              </div>
+
+              <div className="hidden sm:flex items-center gap-2 text-xs">
+                <span className="font-bold text-[#0F172A] font-serif">{t('brand.name')}</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                <span className="font-bold text-[#0F766E] bg-[#F0FDFA] px-2.5 py-0.5 rounded-md border border-[#CCFBF1]">
+                  {activeItemLabel || t('brand.course')}
+                </span>
+              </div>
             </div>
 
-            <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] text-[#0369A1] text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-[#0284C7] animate-pulse" />
-              <span>{isBangla ? 'সিস্টেম সক্রিয়' : 'System Active'}</span>
-            </div>
+            {/* Right: Academic Cohort, Live Status, Time & Switcher */}
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+              <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 border border-[#E2E8F0] text-[#334155] text-xs font-semibold shadow-2xs">
+                <span className="text-[#0F766E] font-bold">SBMC</span>
+                <span className="text-slate-400">•</span>
+                <span className="text-[#475569] font-medium">{isBangla ? 'ব্যাচ ০১' : 'Batch #1'}</span>
+              </div>
 
-            <div className="hidden md:flex items-center gap-1.5 text-xs text-[#475569] font-medium">
-              <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
-              <span suppressHydrationWarning>
-                {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
-                  weekday: 'short',
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </span>
-            </div>
+              <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] text-[#0369A1] text-xs font-bold">
+                <span className="w-2 h-2 rounded-full bg-[#0284C7] animate-pulse" />
+                <span>{isBangla ? 'সিস্টেম সক্রিয়' : 'System Active'}</span>
+              </div>
 
-            {/* Notification Bell */}
-            <NotificationBell />
+              <div className="hidden md:flex items-center gap-1.5 text-xs text-[#475569] font-medium">
+                <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
+                <span suppressHydrationWarning>
+                  {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              </div>
 
-            <div className="sm:hidden">
-              <LanguageSwitcher />
+              {/* Notification Bell */}
+              <NotificationBell />
+
+              <div className="sm:hidden">
+                <LanguageSwitcher />
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
         {/* Notice Banner (e.g. Observer Read-Only Notice) */}
         {noticeBanner}
 
-        {/* Main Body Content */}
-        <main className="flex-1 max-w-7xl w-full mx-auto p-3.5 sm:p-6 lg:p-8 relative z-10 pb-24 md:pb-8">
+        {/* Main Body Content (Full width on Student role so zero empty side gaps on wide monitors) */}
+        <main
+          className={`flex-1 w-full relative z-10 pb-24 md:pb-8 ${
+            role === 'student'
+              ? 'px-4 sm:px-6 lg:px-7 py-4 sm:py-5'
+              : 'max-w-7xl mx-auto p-3.5 sm:p-6 lg:p-8'
+          }`}
+        >
           {children}
         </main>
 
