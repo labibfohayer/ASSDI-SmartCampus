@@ -47,6 +47,9 @@ import {
   Tooltip,
   ReferenceLine,
   LabelList,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 import WebQRScannerModal from '@/components/student/WebQRScannerModal';
 import StudentIdCardModal from '@/components/student/StudentIdCardModal';
@@ -596,6 +599,26 @@ export default function StudentPortalPage() {
     return Math.round(Math.min(100, attPct * 0.5 + avgUnderstandingPct * 0.3 + helpScore * 0.2) * 10) / 10;
   })();
 
+  // Learning progress breakdown (Completed, In Progress, Not Started) summing cleanly to 100%
+  const learningProgressBreakdown = (() => {
+    const completed = Math.min(100, Math.max(0, Math.round(overallProgressScore * 10) / 10));
+    const remaining = Math.max(0, Math.round((100 - completed) * 10) / 10);
+    if (remaining <= 0) {
+      return { completed: 100, inProgress: 0, notStarted: 0 };
+    }
+    const partialOrPendingCount =
+      sessions.filter(
+        (s) => (hasAttended(s.id) && !hasGivenFeedback(s.id)) || (!hasAttended(s.id) && hasGivenFeedback(s.id))
+      ).length + pendingHelpCount;
+    const rawInProgress =
+      sessions.length > 0 && partialOrPendingCount > 0
+        ? (partialOrPendingCount / sessions.length) * 100
+        : remaining * 0.65;
+    const inProgress = Math.round(Math.min(remaining * 0.82, Math.max(remaining * 0.55, rawInProgress)) * 10) / 10;
+    const notStarted = Math.max(0, Math.round((100 - completed - inProgress) * 10) / 10);
+    return { completed, inProgress, notStarted };
+  })();
+
   // Exam / Quiz Results score from real attempted quizzes or class evaluation understanding
   const attemptedQuizzes = quizzes.filter((q) => q?.has_attempted && q?.my_attempt?.percentage !== undefined);
   const examResultScore = (() => {
@@ -1026,16 +1049,19 @@ export default function StudentPortalPage() {
 
       {/* DASHBOARD OVERVIEW VIEW: Middle 3-Column Row (Attendance Overview + Quick Actions + Upcoming Classes) */}
       {isDashboardHome && (
+        <div className="space-y-4 sm:space-y-5">
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1.42fr_1fr_1.33fr] gap-4 items-stretch">
           {/* 1. Compact Attendance Overview Chart Card */}
           <div className="lg:col-span-2 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#16A34A] shrink-0">
-                    <BarChart3 className="w-4 h-4" />
-                  </div>
-                  <h2 className="text-sm sm:text-[15px] font-extrabold text-[#0F172A] font-serif">
+                <div className="flex items-center gap-2.5">
+                  <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="2" y="13" width="4.5" height="9" rx="1.5" fill="#86EFAC" />
+                    <rect x="9.5" y="8" width="4.5" height="14" rx="1.5" fill="#22C55E" />
+                    <rect x="17" y="3" width="4.5" height="19" rx="1.5" fill="#15803D" />
+                  </svg>
+                  <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
                     {isBangla ? 'উপস্থিতির সংক্ষিপ্ত চিত্র' : 'Attendance Overview'}
                   </h2>
                 </div>
@@ -1167,9 +1193,9 @@ export default function StudentPortalPage() {
 
             <div className="relative z-10 flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <Zap className="w-4 h-4 text-[#FACC15] fill-[#FACC15] shrink-0" />
-                  <h2 className="text-sm sm:text-[15px] font-extrabold tracking-tight !text-white font-serif truncate">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-6 h-6 text-[#FACC15] fill-[#FACC15] shrink-0 drop-shadow-xs" />
+                  <h2 className="text-base sm:text-[17px] font-extrabold tracking-tight !text-white font-serif truncate">
                     {isBangla ? 'দ্রুত কাজসমূহ' : 'Quick Actions'}
                   </h2>
                 </div>
@@ -1190,12 +1216,12 @@ export default function StudentPortalPage() {
             <div className="relative z-10 grid grid-cols-2 gap-2.5 mt-3.5 flex-1">
               <button
                 type="button"
-                onClick={() => handleTabChange('materials')}
+                onClick={() => handleTabChange('today')}
                 className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <BookOpen className="w-5 h-5 text-[#059669]" />
+                <BookOpen className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
                 <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                  {isBangla ? 'লেকচার ও কোর্স' : 'View My Courses'}
+                  {isBangla ? 'আমার ক্লাসসমূহ' : 'View My Courses'}
                 </span>
               </button>
 
@@ -1212,7 +1238,7 @@ export default function StudentPortalPage() {
                 }}
                 className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <Send className="w-5 h-5 text-[#059669]" />
+                <Send className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
                 <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
                   {isBangla ? 'কুইজ ও কাজ' : 'Submit Assignment'}
                 </span>
@@ -1223,7 +1249,7 @@ export default function StudentPortalPage() {
                 onClick={() => handleTabChange('graduation')}
                 className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <BarChart3 className="w-5 h-5 text-[#059669]" />
+                <BarChart3 className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
                 <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
                   {isBangla ? 'ফলাফল দেখুন' : 'Check Results'}
                 </span>
@@ -1234,7 +1260,7 @@ export default function StudentPortalPage() {
                 onClick={() => handleTabChange('help')}
                 className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <Headset className="w-5 h-5 text-[#059669]" />
+                <Headset className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
                 <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
                   {isBangla ? 'শিক্ষকের সহায়তা' : 'Contact Support'}
                 </span>
@@ -1245,11 +1271,19 @@ export default function StudentPortalPage() {
           {/* 3. Upcoming Classes Card */}
           <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
             <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-[#EA580C] shrink-0">
-                  <Calendar className="w-4 h-4" />
-                </div>
-                <h2 className="text-sm sm:text-[15px] font-extrabold text-[#0F172A] font-serif truncate">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <svg className="w-7 h-7 shrink-0" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                  <rect x="2.5" y="4.5" width="23" height="20.5" rx="4.5" fill="#FFF7ED" stroke="#FDBA74" strokeWidth="1.4" />
+                  <path d="M2.5 9C2.5 6.51472 4.51472 4.5 7 4.5H21C23.4853 4.5 25.5 6.51472 25.5 9V11H2.5V9Z" fill="#EA580C" />
+                  <rect x="7.5" y="2" width="2.5" height="4.5" rx="1.25" fill="#9A3412" />
+                  <rect x="18" y="2" width="2.5" height="4.5" rx="1.25" fill="#9A3412" />
+                  <rect x="7" y="14.5" width="3.2" height="3" rx="0.8" fill="#FB923C" />
+                  <rect x="12.4" y="14.5" width="3.2" height="3" rx="0.8" fill="#EA580C" />
+                  <rect x="17.8" y="14.5" width="3.2" height="3" rx="0.8" fill="#FB923C" />
+                  <rect x="7" y="19.2" width="3.2" height="3" rx="0.8" fill="#FDBA74" />
+                  <rect x="12.4" y="19.2" width="3.2" height="3" rx="0.8" fill="#FB923C" />
+                </svg>
+                <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif truncate">
                   {isBangla ? 'আসন্ন ক্লাসসমূহ' : 'Upcoming Classes'}
                 </h2>
               </div>
@@ -1304,9 +1338,9 @@ export default function StudentPortalPage() {
                       <button
                         type="button"
                         onClick={() => handleTabChange('today')}
-                        className="bg-[#059669] hover:bg-[#047857] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition cursor-pointer shrink-0 shadow-2xs active:scale-95"
+                        className="bg-[#059669] hover:bg-[#047857] text-white text-[11px] font-bold px-3.5 py-1.5 rounded-lg transition cursor-pointer shrink-0 shadow-2xs active:scale-95"
                       >
-                        {isBangla ? 'ক্লাস' : 'Join'}
+                        {isBangla ? 'যোগ দিন' : 'Join'}
                       </button>
                     </div>
                   );
@@ -1321,6 +1355,115 @@ export default function StudentPortalPage() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Bottom Row: My Learning Progress Card (Left column of bottom row; space ready for Recent Activities & Promo next) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          <div className="lg:col-span-6 xl:col-span-4 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect x="2" y="14" width="4" height="7" rx="1" fill="#86EFAC" />
+                  <rect x="8" y="10" width="4" height="11" rx="1" fill="#22C55E" />
+                  <rect x="14" y="6" width="4" height="15" rx="1" fill="#059669" />
+                  <path d="M4 9L10.5 4.5L15 7.5L21 3M21 3H16.5M21 3V7.5" stroke="#15803D" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif truncate">
+                  {isBangla ? 'আমার শিখন প্রগতি' : 'My Learning Progress'}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleTabChange('graduation')}
+                className="text-xs font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+              >
+                <span>{isBangla ? 'বিস্তারিত →' : 'View Details →'}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 sm:gap-6 mt-4 flex-1">
+              {/* Donut Ring Chart */}
+              <div className="relative w-[132px] h-[132px] shrink-0 flex items-center justify-center">
+                <PieChart width={132} height={132}>
+                  <Pie
+                    data={[
+                      {
+                        name: isBangla ? 'সম্পন্ন' : 'Completed',
+                        value: learningProgressBreakdown.completed,
+                        color: '#059669',
+                      },
+                      {
+                        name: isBangla ? 'চলমান ও বাকি' : 'Remaining',
+                        value: Math.max(0, 100 - learningProgressBreakdown.completed),
+                        color: '#E2E8F0',
+                      },
+                    ]}
+                    dataKey="value"
+                    cx="50%"
+                    cy="50%"
+                    startAngle={90}
+                    endAngle={-270}
+                    innerRadius={44}
+                    outerRadius={59}
+                    paddingAngle={learningProgressBreakdown.completed < 100 ? 1.5 : 0}
+                    stroke="none"
+                    isAnimationActive={false}
+                  >
+                    <Cell fill="#059669" />
+                    <Cell fill="#E2E8F0" />
+                  </Pie>
+                  <Tooltip
+                    formatter={(val: any, name: any) => [`${Number(val).toFixed(1)}%`, name]}
+                    contentStyle={{
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                      fontSize: '11px',
+                      padding: '6px 10px',
+                    }}
+                  />
+                </PieChart>
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-[20px] font-black text-[#0F172A] tracking-tight font-serif">
+                    {learningProgressBreakdown.completed.toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress Breakdown Legend */}
+              <div className="flex-1 space-y-3.5 min-w-0">
+                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
+                  <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] shrink-0" />
+                    <span>{isBangla ? 'সম্পন্ন' : 'Completed'}</span>
+                  </span>
+                  <span className="font-extrabold text-[#0F172A] tabular-nums shrink-0">
+                    {learningProgressBreakdown.completed.toFixed(1)}%
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
+                  <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FB923C] shrink-0" />
+                    <span>{isBangla ? 'চলমান' : 'In Progress'}</span>
+                  </span>
+                  <span className="font-extrabold text-[#0F172A] tabular-nums shrink-0">
+                    {learningProgressBreakdown.inProgress.toFixed(1)}%
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
+                  <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#CBD5E1] shrink-0" />
+                    <span>{isBangla ? 'শুরু হয়নি' : 'Not Started'}</span>
+                  </span>
+                  <span className="font-extrabold text-[#0F172A] tabular-nums shrink-0">
+                    {learningProgressBreakdown.notStarted.toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
       )}
 
