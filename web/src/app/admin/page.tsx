@@ -363,9 +363,9 @@ export default function AdminOverviewPage() {
   ];
 
   return (
-    <div className="space-y-1.5 sm:space-y-2">
+    <div className="h-full flex flex-col justify-between min-h-0 space-y-0 gap-1 sm:gap-1.5">
       {/* 1. SLIM ISLAMIC MODERN HERO WELCOME CARD */}
-      <div className="relative rounded-xl overflow-hidden shadow-2xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[54px] sm:min-h-[58px] py-1 px-3 sm:px-3.5 flex items-center">
+      <div className="relative rounded-xl overflow-hidden shadow-2xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[46px] sm:min-h-[50px] py-1 px-3 sm:px-3.5 flex items-center shrink-0">
         <Image
           src="/islamic-hero-banner-slim.png"
           alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
@@ -485,7 +485,7 @@ export default function AdminOverviewPage() {
       )}
 
       {/* 2. ROW 2: 4 KPI CARDS WITH WAVE SPARKLINES (SLIM COMPACT PIXEL-PERFECT) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1 sm:gap-1.5 shrink-0">
         {/* Card 1: Total Students */}
         <div className="bg-white rounded-xl pt-1.5 px-2.5 pb-0 border border-slate-200/90 shadow-2xs flex flex-col justify-between overflow-hidden relative group hover:border-emerald-300 transition-all">
           <div className="flex items-center gap-2 sm:gap-2.5 relative z-10">
@@ -728,9 +728,9 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* 3. ROW 3: RECENT REPORTS TABLE (7 COLS) + QUICK ACTIONS (5 COLS) - SLIM COMPACT PIXEL-PERFECT */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-1.5 sm:gap-2 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-1 sm:gap-1.5 items-stretch shrink-0">
         {/* Left: Recent Reports (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-xl p-2 sm:p-2.5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-1 border-b border-slate-100">
               <div className="flex items-center gap-1.5">
@@ -801,7 +801,7 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Right: Quick Actions Card (5 cols) */}
-        <div className="lg:col-span-5 relative overflow-hidden rounded-xl bg-gradient-to-br from-[#013B2A] via-[#012E20] to-[#012117] p-2 sm:p-2.5 text-white shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-5 relative overflow-hidden rounded-xl bg-gradient-to-br from-[#013B2A] via-[#012E20] to-[#012117] p-1.5 sm:p-2 text-white shadow-2xs flex flex-col justify-between">
           {/* Subtle curved warm wave matching reference mockup */}
           <svg
             className="pointer-events-none absolute -bottom-1 -right-1 w-20 h-16 opacity-90"
@@ -901,9 +901,9 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* 4. ROW 4: RECENT ACTIVITIES (4 COLS) + UPCOMING CLASSES (5 COLS) + COURSE PROGRESS (3 COLS) - SLIM COMPACT */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-1.5 sm:gap-2 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-1 sm:gap-1.5 items-stretch shrink-0">
         {/* Col 1: Recent Activities (4 cols) */}
-        <div className="md:col-span-12 lg:col-span-4 bg-white rounded-xl p-2 sm:p-2.5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="md:col-span-12 lg:col-span-4 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-1 border-b border-slate-100">
               <div className="flex items-center gap-1.5">
@@ -945,7 +945,7 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Col 2: Upcoming Classes (5 cols) */}
-        <div className="md:col-span-12 lg:col-span-5 bg-white rounded-xl p-2 sm:p-2.5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="md:col-span-12 lg:col-span-5 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-1 border-b border-slate-100">
               <div className="flex items-center gap-1.5">
@@ -998,7 +998,7 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Col 3: Course Progress Circular Donut (3 cols) */}
-        <div className="md:col-span-12 lg:col-span-3 bg-white rounded-xl p-2 sm:p-2.5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="md:col-span-12 lg:col-span-3 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-1 pb-1 border-b border-slate-100">
               <PieChart className="w-3.5 h-3.5 text-emerald-600" />
@@ -1082,9 +1082,9 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* 5. ROW 5: SYSTEM STATISTICS (8 COLS) + BUILDING SKILLS PROMO BANNER (4 COLS) - SLIM COMPACT */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-1.5 sm:gap-2 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-1 sm:gap-1.5 items-stretch shrink-0">
         {/* Left: System Statistics (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-xl p-2 sm:p-2.5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-8 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-1 border-b border-slate-100">
               <div className="flex items-center gap-1">
@@ -1144,7 +1144,7 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Right: Building Skills Promo Banner (4 cols) */}
-        <div className="lg:col-span-4 relative overflow-hidden rounded-xl bg-gradient-to-r from-[#00382B] via-[#002B21] to-[#001D16] border border-[#064E3B]/40 p-2 sm:p-2.5 text-white shadow-2xs flex flex-col justify-between min-h-[72px] group">
+        <div className="lg:col-span-4 relative overflow-hidden rounded-xl bg-gradient-to-r from-[#00382B] via-[#002B21] to-[#001D16] border border-[#064E3B]/40 p-1.5 sm:p-2 text-white shadow-2xs flex flex-col justify-between min-h-[64px] group">
           <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-30 pointer-events-none select-none">
             <Image
               src="/islamic-banner-mosque.png"

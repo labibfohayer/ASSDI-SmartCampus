@@ -891,7 +891,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         />
 
         {/* Top Header Bar (Unified Pristine Header across All Roles - Desktop Menu Icon & Search Bar Removed) */}
-        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#E2E8F0] h-11 sm:h-12 flex items-center justify-between px-3.5 sm:px-5 shadow-2xs gap-3">
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#E2E8F0] h-11 flex items-center justify-between px-3.5 sm:px-5 shadow-2xs gap-3">
           {/* Left: Mobile Drawer Button & Breadcrumb */}
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <button
@@ -1160,7 +1160,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             role === 'student'
               ? 'flex flex-col px-4 sm:px-6 pt-3 pb-24 md:pb-3'
               : pathname === '/admin'
-              ? 'w-full px-3 sm:px-4 lg:px-5 py-1.5 pb-2 md:pb-1 flex flex-col justify-between'
+              ? 'w-full px-2.5 sm:px-4 lg:px-5 py-1 sm:py-1.5 flex flex-col justify-between md:h-[calc(100dvh-theme(spacing.11))] md:max-h-[calc(100dvh-theme(spacing.11))] md:overflow-hidden'
               : 'w-full px-3 sm:px-5 lg:px-6 py-2 sm:py-2.5 pb-20 md:pb-2'
           }`}
         >
