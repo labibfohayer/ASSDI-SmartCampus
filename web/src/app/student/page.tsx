@@ -44,66 +44,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUser } from '@/lib/auth';
 
-function SparklineWave({
-  values,
-  color = '#10B981',
-  gradientId = 'green-wave',
-}: {
-  values: number[];
-  color?: string;
-  gradientId?: string;
-}) {
-  const safeValues =
-    values.length === 0 ? [0, 0] : values.length === 1 ? [values[0], values[0]] : values;
-
-  const width = 200;
-  const topY = 4;
-  const bottomY = 36;
-  const usableHeight = bottomY - topY;
-
-  const points = safeValues.map((val, idx) => {
-    const clamped = Math.max(0, Math.min(100, Number.isFinite(val) ? val : 0));
-    const x = (idx / (safeValues.length - 1)) * width;
-    const y = bottomY - (clamped / 100) * usableHeight;
-    return { x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) };
-  });
-
-  // Monotone horizontal-midpoint cubic Bezier curve (no vertical overshoot outside 0..100%)
-  let linePath = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i];
-    const p1 = points[i + 1];
-    const cx = Number(((p0.x + p1.x) / 2).toFixed(2));
-    linePath += ` C ${cx} ${p0.y}, ${cx} ${p1.y}, ${p1.x} ${p1.y}`;
-  }
-
-  const last = points[points.length - 1];
-  const areaPath = `${linePath} L ${last.x} 40 L ${points[0].x} 40 Z`;
-
-  return (
-    <div className="w-full h-10 overflow-visible mt-2 pointer-events-none">
-      <svg className="w-full h-full overflow-visible" viewBox="0 0 200 40" fill="none" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.28" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.02" />
-          </linearGradient>
-        </defs>
-        <line x1="0" y1={bottomY} x2="200" y2={bottomY} stroke="#E2E8F0" strokeWidth="1" strokeDasharray="3 3" />
-        <path d={areaPath} fill={`url(#${gradientId})`} />
-        <path
-          d={linePath}
-          stroke={color}
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx={last.x} cy={last.y} r="3" fill={color} stroke="#FFFFFF" strokeWidth="1.2" />
-      </svg>
-    </div>
-  );
-}
-
 interface StudentProfile {
   id: number;
   student_id_number: string;
@@ -592,78 +532,30 @@ export default function StudentPortalPage() {
     return true;
   });
 
-  // Real data calculations for KPI cards & measurement-driven sparkline graphs
-  const chronologicalAttRecords = [...attRecords].reverse();
-  const totalSessCount = attSummary?.total_sessions || chronologicalAttRecords.length || 0;
+  // Real data calculations for KPI cards (Attendance Rate, Completed Classes, Overall Progress, Help Requests)
+  const totalSessCount = attSummary?.total_sessions || attRecords.length || 0;
   const presentCount = attSummary?.present || 0;
-  const absentCount = attSummary?.absent || 0;
   const attPct = Number(attSummary?.attendance_percentage ?? 0);
-  const presentPct = totalSessCount > 0 ? Math.round((presentCount / totalSessCount) * 1000) / 10 : 0;
-  const absentPct = totalSessCount > 0 ? Math.round((absentCount / totalSessCount) * 1000) / 10 : 0;
   const attDeltaVsTarget = Math.round((attPct - 75) * 10) / 10;
   const resolvedHelpCount = helpRequests.filter((h) => h.status === 'resolved').length;
-  const helpResolvedPct = helpRequests.length > 0 ? Math.round((resolvedHelpCount / helpRequests.length) * 100) : 0;
+  const pendingHelpCount = helpRequests.filter((h) => h.status !== 'resolved').length;
 
-  // 1. Attendance Rate trajectory (0-100 scale): goes up on present, drops on absent, ends at real attPct
-  const attendanceTrendSeries: number[] = (() => {
-    if (chronologicalAttRecords.length === 0) {
-      return attPct > 0 ? [Math.max(0, attPct - 12), attPct] : [0, 0];
+  // Overall Progress composite score: Attendance (50%) + Class Understanding Feedback (30%) + Help Request Resolution (20%)
+  const avgUnderstandingPct = (() => {
+    if (graduationData?.average_understanding_percentage !== undefined) {
+      return Number(graduationData.average_understanding_percentage);
     }
-    let attendedSoFar = 0;
-    return chronologicalAttRecords.map((rec, idx) => {
-      if (rec.status === 'present' || rec.status === 'late' || rec.status === 'approved_leave') {
-        attendedSoFar += 1;
-      }
-      return Math.round((attendedSoFar / (idx + 1)) * 1000) / 10;
-    });
+    if (feedbacks.length === 0) return 0;
+    const avgRating = feedbacks.reduce((acc, fb) => acc + (fb.understanding_rating || 0), 0) / feedbacks.length;
+    return Math.round(avgRating * 20 * 10) / 10;
   })();
 
-  // 2. Present Sessions cumulative progress % out of total sessions (scales proportionally to presentCount/totalSessCount)
-  const presentProgressSeries: number[] = (() => {
-    if (chronologicalAttRecords.length === 0 || totalSessCount === 0) {
-      return [0, presentPct];
+  const overallProgressScore = (() => {
+    if (graduationData?.overall_readiness_score !== undefined) {
+      return Number(graduationData.overall_readiness_score);
     }
-    let presentSoFar = 0;
-    return [
-      0,
-      ...chronologicalAttRecords.map((rec) => {
-        if (rec.status === 'present' || rec.status === 'late') {
-          presentSoFar += 1;
-        }
-        return Math.round((presentSoFar / totalSessCount) * 1000) / 10;
-      }),
-    ];
-  })();
-
-  // 3. Absence rate cumulative progression out of total sessions (scales proportionally to absentCount/totalSessCount)
-  const absentTrendSeries: number[] = (() => {
-    if (chronologicalAttRecords.length === 0 || totalSessCount === 0) {
-      return [0, absentPct];
-    }
-    let absentSoFar = 0;
-    return [
-      0,
-      ...chronologicalAttRecords.map((rec) => {
-        if (rec.status === 'absent') {
-          absentSoFar += 1;
-        }
-        return Math.round((absentSoFar / totalSessCount) * 1000) / 10;
-      }),
-    ];
-  })();
-
-  // 4. Help Requests resolution progression scaled accurately to resolved percentage (ends at helpResolvedPct)
-  const helpTrendSeries: number[] = (() => {
-    if (helpRequests.length === 0) return [0, 0];
-    const sorted = [...helpRequests].reverse();
-    let resolvedSoFar = 0;
-    return [
-      0,
-      ...sorted.map((req) => {
-        if (req.status === 'resolved') resolvedSoFar += 1;
-        return Math.round((resolvedSoFar / helpRequests.length) * 1000) / 10;
-      }),
-    ];
+    const helpScore = pendingHelpCount === 0 ? 100 : 50;
+    return Math.round(Math.min(100, attPct * 0.5 + avgUnderstandingPct * 0.3 + helpScore * 0.2) * 10) / 10;
   })();
 
   return (
@@ -771,8 +663,8 @@ export default function StudentPortalPage() {
         </div>
       </div>
 
-      {/* Attendance & Learning Metric Cards (Measurement-Driven Sparkline Charts & Clickable Shortcuts) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      {/* Clean Student KPI Metric Cards (Attendance Rate, Completed Classes, Overall Progress, Help Requests) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1: Attendance Rate */}
         <div
           role="button"
@@ -789,47 +681,42 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'উপস্থিতির বিস্তারিত হিস্ট্রি দেখতে ক্লিক করুন' : 'Click to view attendance history'}
-          className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none flex flex-col justify-between"
+          className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3.5"
         >
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200/60 shadow-2xs group-hover:scale-105 transition-transform">
-                <CheckCircle2 className="w-5 h-5 text-emerald-700" />
-              </div>
-              <div className="min-w-0">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-serif truncate">
-                  {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-full bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Calendar className="w-5 h-5 text-[#0284C7]" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+                {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
+              </span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-2xl sm:text-[28px] font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                  {safeFixed(attSummary?.attendance_percentage)}%
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-serif">
-                    {safeFixed(attSummary?.attendance_percentage)}%
-                  </span>
-                  <span
-                    className={`text-[11px] font-bold inline-flex items-center ${
-                      attDeltaVsTarget >= 0 ? 'text-emerald-600' : 'text-red-600'
-                    }`}
-                    title={isBangla ? '৭৫% ন্যূনতম মানদণ্ডের সাপেক্ষে' : 'Relative to 75% benchmark'}
-                  >
-                    {attDeltaVsTarget >= 0 ? `↑ +${attDeltaVsTarget}%` : `↓ ${attDeltaVsTarget}%`}
-                  </span>
-                </div>
+                <span
+                  className={`text-[11px] font-bold inline-flex items-center ${
+                    attDeltaVsTarget >= 0 ? 'text-emerald-600' : 'text-red-600'
+                  }`}
+                >
+                  {attDeltaVsTarget >= 0 ? `↑ +${attDeltaVsTarget}%` : `↓ ${attDeltaVsTarget}%`}
+                </span>
               </div>
             </div>
-
-            <SparklineWave values={attendanceTrendSeries} color="#10B981" gradientId="wave-attendance" />
           </div>
 
-          <p className="text-[11px] font-semibold text-emerald-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            <span className="truncate">
-              {attPct >= 80
-                ? isBangla ? 'সন্তোষজনক ও নিয়মিত উপস্থিতি' : 'Satisfactory attendance'
-                : isBangla ? 'উপস্থিতির হার বৃদ্ধি প্রয়োজন' : 'Needs improvement'}
-            </span>
-          </p>
+          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                attPct < 75 ? 'bg-red-500' : 'bg-[#16A34A]'
+              }`}
+              style={{ width: `${Math.min(Math.max(attPct, 0), 100)}%` }}
+            />
+          </div>
         </div>
 
-        {/* Card 2: Present Sessions */}
+        {/* Card 2: Completed Classes */}
         <div
           role="button"
           tabIndex={0}
@@ -844,95 +731,82 @@ export default function StudentPortalPage() {
               document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
             }
           }}
-          title={isBangla ? 'উপস্থিত সেশনের তালিকা দেখতে ক্লিক করুন' : 'Click to view attended sessions'}
-          className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none flex flex-col justify-between"
+          title={isBangla ? 'সম্পন্ন ক্লাসের তালিকা দেখতে ক্লিক করুন' : 'Click to view completed classes'}
+          className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3.5"
         >
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-sky-100/80 text-sky-700 flex items-center justify-center shrink-0 border border-sky-200/60 shadow-2xs group-hover:scale-105 transition-transform">
-                <UserCheck className="w-5 h-5 text-sky-700" />
-              </div>
-              <div className="min-w-0">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-serif truncate">
-                  {isBangla ? 'উপস্থিত সেশন' : 'Present Sessions'}
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-full bg-[#FFEDD5] text-[#EA580C] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-5 h-5 text-[#EA580C]" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+                {isBangla ? 'সম্পন্ন ক্লাস' : 'Completed Classes'}
+              </span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-2xl sm:text-[28px] font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                  {presentCount}
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-serif">
-                    {presentCount}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400">
-                    / {totalSessCount}
-                  </span>
-                  <span className="text-[11px] font-bold text-sky-600 inline-flex items-center ml-1">
-                    {presentPct}%
-                  </span>
-                </div>
+                <span className="text-xs font-semibold text-slate-400">
+                  / {totalSessCount}
+                </span>
               </div>
             </div>
-
-            <SparklineWave values={presentProgressSeries} color="#0284C7" gradientId="wave-present" />
           </div>
 
-          <p className="text-[11px] font-semibold text-emerald-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            <span className="truncate">{isBangla ? 'সফলভাবে ক্লাসে সম্পন্ন' : 'Attended successfully'}</span>
-          </p>
+          <div className="flex items-center justify-between text-xs pt-0.5">
+            <span className="font-semibold text-[#D97706] truncate">
+              {isBangla ? 'এই কোর্সে উপস্থিত' : 'Attended so far'}
+            </span>
+            <span className="font-bold text-[#0F766E] group-hover:underline inline-flex items-center gap-0.5 shrink-0">
+              {isBangla ? 'বিস্তারিত →' : 'View Details →'}
+            </span>
+          </div>
         </div>
 
-        {/* Card 3: Absent Sessions */}
+        {/* Card 3: Overall Progress (Attendance + Class Understanding Feedback + Help Resolution) */}
         <div
           role="button"
           tabIndex={0}
           onClick={() => {
-            handleTabChange('attendance');
+            handleTabChange('graduation');
             document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              handleTabChange('attendance');
+              handleTabChange('graduation');
               document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
             }
           }}
-          title={isBangla ? 'অনুপস্থিতির হিস্ট্রি ও বিস্তারিত দেখতে ক্লিক করুন' : 'Click to view absence history'}
-          className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none flex flex-col justify-between"
+          title={
+            isBangla
+              ? `উপস্থিতি (${safeFixed(attPct)}%) ও পাঠ বোঝার মূল্যায়ন (${safeFixed(avgUnderstandingPct)}%) অনুযায়ী সার্বিক অগ্রগতি`
+              : `Overall progress combining attendance (${safeFixed(attPct)}%) & lesson understanding (${safeFixed(avgUnderstandingPct)}%)`
+          }
+          className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3.5"
         >
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-100/80 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200/60 shadow-2xs group-hover:scale-105 transition-transform">
-                <AlertCircle className="w-5 h-5 text-amber-700" />
-              </div>
-              <div className="min-w-0">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-serif truncate">
-                  {isBangla ? 'অনুপস্থিতি' : 'Absences'}
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-full bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Award className="w-5 h-5 text-[#9333EA]" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+                {isBangla ? 'ওভারঅল প্রগ্রেস' : 'Overall Progress'}
+              </span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-2xl sm:text-[28px] font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                  {overallProgressScore.toFixed(1)}%
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className={`text-2xl sm:text-3xl font-black ${absentCount >= 3 ? 'text-amber-600' : 'text-[#0F172A]'} tracking-tight font-serif`}>
-                    {absentCount}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400">
-                    {isBangla ? 'সেশন' : 'sessions'}
-                  </span>
-                  <span className="text-[11px] font-bold text-amber-600 inline-flex items-center ml-1">
-                    {absentPct}%
-                  </span>
-                </div>
               </div>
             </div>
-
-            <SparklineWave values={absentTrendSeries} color="#F59E0B" gradientId="wave-absent" />
           </div>
 
-          <p className={`text-[11px] font-bold mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2 ${
-            absentCount >= 3 ? 'text-amber-600' : 'text-slate-600'
-          }`}>
-            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">
-              {absentCount >= 3
-                ? isBangla ? 'সতর্কবার্তা: অনুপস্থিতি বেশি' : 'Warning: High absences'
-                : isBangla ? 'স্বাভাবিক সীমার মধ্যে' : 'Normal range'}
-            </span>
-          </p>
+          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full bg-[#16A34A] transition-all duration-500"
+              style={{ width: `${Math.min(Math.max(overallProgressScore, 0), 100)}%` }}
+            />
+          </div>
         </div>
 
         {/* Card 4: Help Requests */}
@@ -950,42 +824,38 @@ export default function StudentPortalPage() {
               document.getElementById('student-tab-section')?.scrollIntoView({ behavior: 'smooth' });
             }
           }}
-          title={isBangla ? 'শিক্ষকের সমাধান ও উত্তর দেখতে ক্লিক করুন' : 'Click to view teacher solutions'}
-          className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group select-none flex flex-col justify-between"
+          title={isBangla ? 'শিক্ষকের সমাধান ও উত্তর দেখতে ক্লিক করুন' : 'Click to view help requests'}
+          className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3.5"
         >
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-100/80 text-purple-700 flex items-center justify-center shrink-0 border border-purple-200/60 shadow-2xs group-hover:scale-105 transition-transform">
-                <HelpCircle className="w-5 h-5 text-purple-700" />
-              </div>
-              <div className="min-w-0">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-serif truncate">
-                  {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-full bg-[#CCFBF1] text-[#0F766E] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <HelpCircle className="w-5 h-5 text-[#0F766E]" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+                {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
+              </span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-2xl sm:text-[28px] font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                  {helpRequests.length}
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-serif">
-                    {helpRequests.length}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400">
-                    {isBangla ? 'টি' : 'total'}
-                  </span>
-                  <span className="text-[11px] font-bold text-purple-600 inline-flex items-center ml-1">
-                    {helpRequests.length > 0 ? `${helpResolvedPct}%` : '0%'}
-                  </span>
-                </div>
+                <span className="text-[11px] font-bold text-[#0F766E]">
+                  {resolvedHelpCount} {isBangla ? 'সমাধান' : 'Resolved'}
+                </span>
               </div>
             </div>
-
-            <SparklineWave values={helpTrendSeries} color="#A855F7" gradientId="wave-help" />
           </div>
 
-          <p className="text-[11px] font-bold text-purple-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-            <span className="truncate">
-              {resolvedHelpCount}{' '}
-              {isBangla ? 'টি সমাধান হয়েছে' : 'resolved'}
+          <div className="flex items-center justify-between text-xs pt-0.5">
+            <span className={`font-semibold truncate ${pendingHelpCount > 0 ? 'text-[#D97706]' : 'text-emerald-600'}`}>
+              {pendingHelpCount > 0
+                ? isBangla ? `${pendingHelpCount}টি অপেক্ষমান` : `${pendingHelpCount} Pending`
+                : isBangla ? 'সব সমাধান হয়েছে' : 'All Resolved'}
             </span>
-          </p>
+            <span className="font-bold text-[#0F766E] group-hover:underline inline-flex items-center gap-0.5 shrink-0">
+              {isBangla ? 'বিস্তারিত →' : 'View Requests →'}
+            </span>
+          </div>
         </div>
       </div>
 
