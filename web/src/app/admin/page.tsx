@@ -874,29 +874,29 @@ export default function AdminOverviewPage() {
                 <tbody className="divide-y divide-slate-50">
                   {recentReports.map((report, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/70 transition">
-                      <td className="py-2.5 pr-2 font-semibold text-[#0F172A] text-xs whitespace-nowrap">
+                      <td className="py-2 pr-2 font-semibold text-[#0F172A] text-xs whitespace-nowrap">
                         {report.name}
                       </td>
-                      <td className="py-2.5 px-2 whitespace-nowrap">
+                      <td className="py-2 px-2 whitespace-nowrap">
                         <span
                           className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${report.typeColor}`}
                         >
                           {report.type}
                         </span>
                       </td>
-                      <td className="py-2.5 px-2 text-slate-500 text-xs whitespace-nowrap">
+                      <td className="py-2 px-2 text-slate-500 text-xs whitespace-nowrap">
                         {report.date}
                       </td>
-                      <td className="py-2.5 px-2 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E6F8ED] text-[#16A34A]">
+                      <td className="py-2 px-2 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E6F8ED] text-[#16A34A] border border-emerald-100">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]" />
                           {report.status}
                         </span>
                       </td>
-                      <td className="py-2.5 pl-2 text-right whitespace-nowrap">
+                      <td className="py-2 pl-2 text-right whitespace-nowrap">
                         <Link
                           href={report.link}
-                          className="inline-flex items-center justify-center w-6 h-6 rounded-full text-slate-400 hover:text-emerald-700 bg-slate-50 hover:bg-slate-100 transition shadow-2xs"
+                          className="inline-flex items-center justify-center px-2 py-0.5 rounded-full border border-slate-200 hover:border-emerald-300 text-emerald-600 bg-white hover:bg-slate-50 transition shadow-2xs"
                           title={isBangla ? 'রিপোর্ট দেখুন' : 'View Report'}
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -1150,21 +1150,21 @@ export default function AdminOverviewPage() {
         <div className="md:col-span-12 lg:col-span-3 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 pb-2.5 border-b border-slate-100">
-              <Clock className="w-5 h-5 text-emerald-700 shrink-0" strokeWidth={2.5} />
-              <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
+              <Clock className="w-6 h-6 text-emerald-700 shrink-0" strokeWidth={2.7} />
+              <h3 className="text-base sm:text-lg font-black text-[#0F172A] font-serif">
                 {isBangla ? 'কোর্স অগ্রগতি' : 'Course Progress'}
               </h3>
             </div>
 
-            <div className="flex flex-col items-center justify-center my-3">
-              <div className="relative w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center my-3.5">
+              <div className="relative w-40 h-40 sm:w-44 sm:h-44 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle
                     cx="50"
                     cy="50"
                     r="38"
                     stroke="#E2E8F0"
-                    strokeWidth="10"
+                    strokeWidth="11"
                     fill="none"
                   />
                   <circle
@@ -1172,7 +1172,7 @@ export default function AdminOverviewPage() {
                     cy="50"
                     r="38"
                     stroke="#059669"
-                    strokeWidth="10"
+                    strokeWidth="11"
                     strokeDasharray="238.76"
                     strokeDashoffset={238.76 * (1 - 0.724)}
                     strokeLinecap="round"
@@ -1183,26 +1183,26 @@ export default function AdminOverviewPage() {
                     cy="50"
                     r="38"
                     stroke="#F59E0B"
-                    strokeWidth="10"
+                    strokeWidth="11"
                     strokeDasharray="238.76"
                     strokeDashoffset={238.76 * (1 - 0.182)}
                     strokeLinecap="round"
                     fill="none"
-                    className="opacity-90"
+                    className="opacity-95"
                     style={{ transformOrigin: '50% 50%', transform: 'rotate(260deg)' }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none">
+                  <span className="text-3xl font-black text-[#0F172A] tracking-tight leading-none">
                     72.4%
                   </span>
-                  <span className="text-[9.5px] text-slate-500 font-bold mt-1 tracking-wider">
+                  <span className="text-[10px] text-slate-500 font-bold mt-1 tracking-wider uppercase">
                     {isBangla ? 'অগ্রগতি' : 'Progress'}
                   </span>
                 </div>
               </div>
 
-              <span className="text-[11px] font-bold text-slate-500 text-center mt-2 block">
+              <span className="text-xs font-bold text-slate-600 text-center mt-2 block tracking-tight">
                 {isBangla ? 'সার্বিক অগ্রগতি' : 'Overall Progress'}
               </span>
 
