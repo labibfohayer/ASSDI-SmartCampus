@@ -7,14 +7,17 @@ DEBUG = False
 # Database Configuration (Supports DATABASE_URL for Neon / Render, or discrete DB_* vars)
 database_url = os.environ.get("DATABASE_URL") or config("DATABASE_URL", default="")
 if database_url:
+    is_pooled = "-pooler." in database_url
     DATABASES = {
         "default": dj_database_url.parse(
             database_url,
-            conn_max_age=600,
+            conn_max_age=0 if is_pooled else 600,
             conn_health_checks=True,
             ssl_require=True,
         )
     }
+    if is_pooled:
+        DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 else:
     DATABASES = {
         "default": {
