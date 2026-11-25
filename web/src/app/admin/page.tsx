@@ -37,6 +37,9 @@ import {
   CheckCircle2,
   Search,
   CheckSquare,
+  AlertTriangle,
+  UserX,
+  Phone,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -435,31 +438,47 @@ export default function AdminOverviewPage() {
     });
   }, [attendanceSearchQuery, mockAttendanceRoster]);
 
-  // Recent activity stream matching reference mockup
-  const recentActivities = [
+  // At-Risk & Repeated Absence Alerts for Coordinator (SRS Section 6 & 130)
+  const atRiskStudentsAlerts = [
     {
-      title: isBangla ? 'নতুন উপস্থিতি চিহ্নিত: ব্যাচ এ' : 'New attendance marked: Batch A',
-      time: isBangla ? '২ মিনিট আগে' : '2 minutes ago',
-      icon: FileText,
-      iconBg: 'bg-blue-50 text-blue-600',
+      id: 1,
+      name: isBangla ? 'নাজমুল হুদা' : 'Nazmul Huda',
+      roll: 'SBMC-42-006',
+      batch: isBangla ? 'ব্যাচ ৪২' : 'Batch 42',
+      phone: '01816-***006',
+      issue: isBangla ? 'টানা ৩ দিন অনুপস্থিত' : '3 Days Absent',
+      rate: '৬৫%',
+      severity: 'high',
     },
     {
-      title: isBangla ? 'শিক্ষার্থী নিবন্ধিত: আহমেদ আলী' : 'Student registered: Ahmed Ali',
-      time: isBangla ? '১৫ মিনিট আগে' : '15 minutes ago',
-      icon: UserCheck,
-      iconBg: 'bg-amber-50 text-amber-600',
+      id: 2,
+      name: isBangla ? 'ইমরান নাজির' : 'Imran Nazir',
+      roll: 'SBMC-42-011',
+      batch: isBangla ? 'ব্যাচ ৪২' : 'Batch 42',
+      phone: '01921-***011',
+      issue: isBangla ? 'অনুমোদনহীন অনুপস্থিত' : 'Unapproved Leave',
+      rate: '৭০%',
+      severity: 'medium',
     },
     {
-      title: isBangla ? 'ফি পরিশোধ গ্রহণ: রহিমা বেগম' : 'Fee payment received from Rahima Begum',
-      time: isBangla ? '১ ঘণ্টা আগে' : '1 hour ago',
-      icon: CreditCard,
-      iconBg: 'bg-emerald-50 text-emerald-600',
+      id: 3,
+      name: isBangla ? 'তারেক মাহমুদ' : 'Tarek Mahmud',
+      roll: 'SBMC-41-019',
+      batch: isBangla ? 'ব্যাচ ৪১' : 'Batch 41',
+      phone: '01712-***019',
+      issue: isBangla ? 'উপস্থিতি ৬০% এর নিচে' : 'Attendance <60%',
+      rate: '৫৮%',
+      severity: 'high',
     },
     {
-      title: isBangla ? 'নতুন কোর্স যুক্ত: গ্রাফিক ডিজাইন' : 'New course added: Graphic Design',
-      time: isBangla ? '২ ঘণ্টা আগে' : '2 hours ago',
-      icon: BookOpen,
-      iconBg: 'bg-purple-50 text-purple-600',
+      id: 4,
+      name: isBangla ? 'জাহিদ হাসান' : 'Zahid Hasan',
+      roll: 'SBMC-41-028',
+      batch: isBangla ? 'ব্যাচ ৪১' : 'Batch 41',
+      phone: '01918-***028',
+      issue: isBangla ? 'টানা ২ দিন ক্লাস মিস' : '2 Consecutive Missed',
+      rate: '৭২%',
+      severity: 'medium',
     },
   ];
 
@@ -1012,19 +1031,22 @@ export default function AdminOverviewPage() {
 
       {/* 4. ROW 4: RECENT ACTIVITIES (4 COLS) + UPCOMING CLASSES (5 COLS) + COURSE PROGRESS (3 COLS) */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-stretch">
-        {/* Col 1: Recent Activities (4 cols) */}
+        {/* Col 1: At-Risk & Repeated Absence Alerts (4 cols - SRS Coordinator Priority) */}
         <div className="md:col-span-12 lg:col-span-4 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-emerald-600" />
+                <AlertTriangle className="w-4.5 h-4.5 text-rose-600 shrink-0" />
                 <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
-                  {isBangla ? 'সাম্প্রতিক কার্যক্রম' : 'Recent Activities'}
+                  {isBangla ? 'ঝুঁকিপূর্ণ শিক্ষার্থী অ্যালার্ট' : 'At-Risk Student Alerts'}
                 </h3>
+                <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-black bg-rose-100 text-rose-700 border border-rose-200">
+                  {isBangla ? '৪ জন' : '4'}
+                </span>
               </div>
               <Link
-                href="/announcements"
-                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline"
+                href="/coordinator/at-risk"
+                className="text-xs font-bold text-rose-700 hover:text-rose-800 flex items-center gap-0.5 hover:underline"
               >
                 <span>{isBangla ? 'সব দেখুন' : 'View All'}</span>
                 <ArrowRight className="w-3 h-3" />
@@ -1032,24 +1054,48 @@ export default function AdminOverviewPage() {
             </div>
 
             <div className="space-y-2 mt-2">
-              {recentActivities.map((act, i) => {
-                const Icon = act.icon;
-                return (
-                  <div key={i} className="flex items-center gap-2.5">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${act.iconBg}`}>
-                      <Icon className="w-3.5 h-3.5" />
+              {atRiskStudentsAlerts.map((st) => (
+                <div
+                  key={st.id}
+                  className="flex items-center justify-between gap-2 p-2 rounded-xl border border-slate-100 hover:border-rose-200 hover:bg-rose-50/20 transition group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
+                        st.severity === 'high' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'
+                      }`}
+                    >
+                      {st.name.charAt(0)}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-bold text-[#0F172A] leading-tight truncate">
-                        {act.title}
-                      </p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        {act.time}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-xs font-bold text-[#0F172A] truncate">
+                          {st.name}
+                        </h4>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                          {st.batch}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                        {st.roll} • {st.phone}
                       </p>
                     </div>
                   </div>
-                );
-              })}
+
+                  <div className="flex items-center gap-1.5 shrink-0 text-right">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold border ${
+                        st.severity === 'high'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                      }`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${st.severity === 'high' ? 'bg-rose-600' : 'bg-amber-500'}`} />
+                      {st.issue}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
