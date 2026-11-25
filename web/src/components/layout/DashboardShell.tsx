@@ -1157,28 +1157,24 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         {/* Main Body Content (Full width across all roles - zero empty left/right boxed gutters) */}
         <main
           className={`flex-1 w-full relative z-10 ${
-            role === 'student'
+            role === 'student' || pathname === '/admin'
               ? 'flex flex-col px-4 sm:px-6 pt-3 pb-24 md:pb-3'
-              : pathname === '/admin'
-              ? 'w-full px-2.5 sm:px-4 lg:px-5 py-1 sm:py-1.5 flex flex-col justify-between md:h-[calc(100dvh-theme(spacing.11))] md:max-h-[calc(100dvh-theme(spacing.11))] md:overflow-hidden'
               : 'w-full px-3 sm:px-5 lg:px-6 py-2 sm:py-2.5 pb-20 md:pb-2'
           }`}
         >
           {children}
         </main>
 
-        {/* Institutional Footer (Hidden on /admin to match reference mockup single-screen zero-scroll requirement) */}
-        {pathname !== '/admin' && (
-          <footer
-            className={`border-t border-slate-200/80 bg-white text-center text-slate-500 ${
-              role === 'student'
-                ? 'py-2 text-[11px] pb-20 md:pb-2'
-                : 'py-1.5 text-[10.5px] pb-20 md:pb-1.5'
-            }`}
-          >
-            <p>© 2026 আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট (ASSDI) • ঢাকা, বাংলাদেশ</p>
-          </footer>
-        )}
+        {/* Institutional Footer */}
+        <footer
+          className={`border-t border-slate-200/80 bg-white text-center text-slate-500 ${
+            role === 'student' || pathname === '/admin'
+              ? 'py-2 text-[11px] pb-20 md:pb-2'
+              : 'py-1.5 text-[10.5px] pb-20 md:pb-1.5'
+          }`}
+        >
+          <p>© 2026 আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট (ASSDI) • ঢাকা, বাংলাদেশ</p>
+        </footer>
       </div>
 
       {/* Mobile Bottom Navigation Bar (নেটিভ অ্যাপ স্টাইল কুইক অ্যাক্সেস) */}

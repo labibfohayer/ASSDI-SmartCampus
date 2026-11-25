@@ -363,9 +363,9 @@ export default function AdminOverviewPage() {
   ];
 
   return (
-    <div className="h-full flex flex-col justify-between min-h-0 space-y-0 gap-1 sm:gap-1.5">
-      {/* 1. SLIM ISLAMIC MODERN HERO WELCOME CARD */}
-      <div className="relative rounded-xl overflow-hidden shadow-2xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[46px] sm:min-h-[50px] py-1 px-3 sm:px-3.5 flex items-center shrink-0">
+    <div className="flex-1 flex flex-col gap-3.5">
+      {/* 1. SLIM ISLAMIC MODERN HERO WELCOME CARD (MATCHING STUDENT PAGE BANNER SCALE) */}
+      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[138px] lg:min-h-[146px] flex items-center">
         <Image
           src="/islamic-hero-banner-slim.png"
           alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
@@ -374,63 +374,72 @@ export default function AdminOverviewPage() {
           className="object-cover object-right pointer-events-none select-none"
         />
 
+        {/* Subtle mobile/tablet left scrim so text remains crisp over narrower screens */}
         <div
           className="lg:hidden absolute inset-0 bg-gradient-to-r from-[#FFFDF8]/92 via-[#FDF8EC]/80 to-transparent pointer-events-none"
           aria-hidden="true"
         />
 
-        <div className="relative z-10 lg:max-w-[62%] w-full">
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm sm:text-[15px] font-black text-[#0F172A] tracking-tight font-serif leading-none">
-              {isBangla ? 'স্বাগতম' : 'Welcome back'}, {user?.full_name?.split(' ')[0] || (isBangla ? 'করিম' : 'Karim')}! 👋
-            </h1>
-            <span className="hidden sm:inline-block text-[10px] text-[#334155] font-medium leading-none truncate">
-              {isBangla
-                ? '• আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট'
-                : "• As-Sunnah Skill Development Institute"}
+        {/* Compact Left Content */}
+        <div className="relative z-10 px-4 py-2.5 sm:px-5 lg:max-w-[62%] w-full">
+          <p className="text-xs sm:text-[13.5px] font-extrabold text-[#064E3B] tracking-tight flex items-center gap-1.5 leading-none mb-0.5">
+            <span>{isBangla ? 'আসসালামু আলাইকুম!' : 'Assalamu Alaikum!'}</span>
+            <span className="text-sm sm:text-base" role="img" aria-label="wave">
+              👋
             </span>
-          </div>
+          </p>
 
-          <div className="mt-1 flex flex-wrap items-center gap-1 sm:gap-1.5">
-            <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#E6F4EA]/95 border border-[#A7F3D0] text-[#065F46] text-[9.5px] font-semibold shadow-2xs">
-              <Calendar className="w-2.5 h-2.5 text-[#059669]" />
+          <h1 className="text-lg sm:text-xl lg:text-[22px] font-black text-[#0F172A] tracking-tight font-serif leading-tight">
+            {isBangla ? 'স্বাগতম' : 'Welcome back'}, {user?.full_name?.split(' ')[0] || (isBangla ? 'করিম' : 'Karim')}!
+          </h1>
+
+          <p className="text-[11px] sm:text-xs text-[#334155] font-medium mt-0.5 leading-snug">
+            {isBangla
+              ? 'আল্লাহ আপনার নেতৃত্ব ও একাডেমিক কোঅর্ডিনেশনে বরকত দিন — আজকের কার্যক্রম দেখে নিন।'
+              : "Here's what's happening at As-Sunnah Skill Development Institute today."}
+          </p>
+
+          {/* Single Strip: Date, Role & Quick Actions */}
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E6F4EA]/95 border border-[#A7F3D0] text-[#064E3B] text-[11px] font-semibold shadow-2xs">
+              <Calendar className="w-3 h-3 text-[#059669]" />
               <span suppressHydrationWarning>
                 {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
                   weekday: 'short',
+                  year: 'numeric',
                   month: 'short',
                   day: 'numeric',
-                  year: 'numeric',
                 })}
               </span>
             </div>
 
-            <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#E6F4EA] border border-[#A7F3D0] text-[#065F46] text-[9.5px] font-bold shadow-2xs">
-              <ShieldCheck className="w-2.5 h-2.5 text-[#059669]" />
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E6F4EA] border border-[#A7F3D0] text-[#065F46] text-[11px] font-bold shadow-2xs">
+              <ShieldCheck className="w-3 h-3 text-[#059669]" />
               <span>{isBangla ? 'কোর্স কোঅর্ডিনেটর' : 'Course Coordinator'}</span>
             </div>
 
             <Link
               href="/admin/students"
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[9.5px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
             >
-              <Users className="w-2.5 h-2.5 text-[#0F766E]" />
+              <Users className="w-3 h-3 text-[#0F766E]" />
               <span>{isBangla ? 'শিক্ষার্থী' : 'Students'}</span>
             </Link>
 
             <Link
               href="/admin/teachers"
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[9.5px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white border border-[#E2E8F0] hover:border-emerald-300 text-[#0F172A] hover:text-[#0F766E] text-[11px] font-medium transition cursor-pointer shadow-2xs active:scale-95"
             >
-              <UserCheck className="w-2.5 h-2.5 text-[#059669]" />
+              <UserCheck className="w-3 h-3 text-[#059669]" />
               <span>{isBangla ? 'শিক্ষক' : 'Teachers'}</span>
             </Link>
 
             <button
               type="button"
               onClick={() => setShowManageNoticesModal(true)}
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 text-[9.5px] font-bold cursor-pointer transition shadow-2xs active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 text-[11px] font-bold cursor-pointer transition shadow-2xs active:scale-95"
             >
-              <Bell className="w-2.5 h-2.5 text-amber-600" />
+              <Bell className="w-3 h-3 text-amber-600" />
               <span>{isBangla ? `নোটিশ (${announcements.length})` : `Notices (${announcements.length})`}</span>
             </button>
 
@@ -446,9 +455,9 @@ export default function AdminOverviewPage() {
                 });
                 setShowNoticeModal(true);
               }}
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#059669] hover:bg-[#047857] text-white text-[9.5px] font-bold transition cursor-pointer shadow-2xs active:scale-95"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-[11px] font-bold transition cursor-pointer shadow-2xs active:scale-95"
             >
-              <Megaphone className="w-2.5 h-2.5" />
+              <Megaphone className="w-3 h-3" />
               <span>{isBangla ? '+ নতুন নোটিশ' : '+ New Notice'}</span>
             </button>
           </div>
@@ -484,23 +493,23 @@ export default function AdminOverviewPage() {
         </div>
       )}
 
-      {/* 2. ROW 2: 4 KPI CARDS WITH WAVE SPARKLINES (SLIM COMPACT PIXEL-PERFECT) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1 sm:gap-1.5 shrink-0">
+      {/* 2. ROW 2: 4 KPI METRIC CARDS WITH WAVE SPARKLINES (MATCHING STUDENT PAGE SCALE) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* Card 1: Total Students */}
-        <div className="bg-white rounded-xl pt-1.5 px-2.5 pb-0 border border-slate-200/90 shadow-2xs flex flex-col justify-between overflow-hidden relative group hover:border-emerald-300 transition-all">
-          <div className="flex items-center gap-2 sm:gap-2.5 relative z-10">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#DDF5E7] flex items-center justify-center shrink-0 shadow-2xs">
-              <Users className="w-4 h-4 text-[#059669]" />
+        <div className="bg-white px-4 pt-3.5 pb-0 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer group select-none flex flex-col justify-between gap-2 overflow-hidden relative">
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="w-11 h-11 rounded-full bg-[#DDF5E7] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+              <Users className="w-5 h-5 text-[#059669]" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-[#0F172A] tracking-tight leading-tight truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'মোট শিক্ষার্থী' : 'Total Students'}
-              </p>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-lg sm:text-[19px] font-black text-[#0F172A] tracking-tight leading-none font-sans">
+              </span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {d(stats.totalStudents)}
                 </span>
-                <span className="text-[10px] font-bold text-[#10B981] flex items-center gap-0.5">
+                <span className="text-[11px] font-bold text-[#10B981] inline-flex items-center gap-0.5">
                   <span>↑</span>
                   <span>12%</span>
                 </span>
@@ -509,9 +518,9 @@ export default function AdminOverviewPage() {
           </div>
 
           {/* Undulating Wave Sparkline */}
-          <div className="w-full mt-0.5">
+          <div className="w-full mt-1">
             <svg
-              className="w-full h-5 sm:h-5.5 block overflow-visible"
+              className="w-full h-8 sm:h-9 block overflow-visible"
               viewBox="0 0 300 30"
               preserveAspectRatio="none"
             >
@@ -530,37 +539,37 @@ export default function AdminOverviewPage() {
                 d={studentSparkline.pathD}
                 fill="none"
                 stroke="#10B981"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <circle
                 cx={studentSparkline.points[studentSparkline.points.length - 1].x}
                 cy={studentSparkline.points[studentSparkline.points.length - 1].y}
-                r="2.5"
+                r="3"
                 fill="#10B981"
                 stroke="#FFFFFF"
-                strokeWidth="1"
+                strokeWidth="1.5"
               />
             </svg>
           </div>
         </div>
 
         {/* Card 2: Total Batches */}
-        <div className="bg-white rounded-xl pt-1.5 px-2.5 pb-0 border border-slate-200/90 shadow-2xs flex flex-col justify-between overflow-hidden relative group hover:border-blue-300 transition-all">
-          <div className="flex items-center gap-2 sm:gap-2.5 relative z-10">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#E1EFFE] flex items-center justify-center shrink-0 shadow-2xs">
-              <BookOpen className="w-4 h-4 text-[#0284C7]" />
+        <div className="bg-white px-4 pt-3.5 pb-0 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group select-none flex flex-col justify-between gap-2 overflow-hidden relative">
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="w-11 h-11 rounded-full bg-[#E1EFFE] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+              <BookOpen className="w-5 h-5 text-[#0284C7]" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-[#0F172A] tracking-tight leading-tight truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'মোট ব্যাচ' : 'Total Batches'}
-              </p>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-lg sm:text-[19px] font-black text-[#0F172A] tracking-tight leading-none font-sans">
+              </span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {d(stats.totalBatches)}
                 </span>
-                <span className="text-[10px] font-bold text-[#0284C7] flex items-center gap-0.5">
+                <span className="text-[11px] font-bold text-[#0284C7] inline-flex items-center gap-0.5">
                   <span>↑</span>
                   <span>0%</span>
                 </span>
@@ -569,9 +578,9 @@ export default function AdminOverviewPage() {
           </div>
 
           {/* Undulating Wave Sparkline */}
-          <div className="w-full mt-0.5">
+          <div className="w-full mt-1">
             <svg
-              className="w-full h-5 sm:h-5.5 block overflow-visible"
+              className="w-full h-8 sm:h-9 block overflow-visible"
               viewBox="0 0 300 30"
               preserveAspectRatio="none"
             >
@@ -590,37 +599,37 @@ export default function AdminOverviewPage() {
                 d={batchSparkline.pathD}
                 fill="none"
                 stroke="#0284C7"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <circle
                 cx={batchSparkline.points[batchSparkline.points.length - 1].x}
                 cy={batchSparkline.points[batchSparkline.points.length - 1].y}
-                r="2.5"
+                r="3"
                 fill="#0284C7"
                 stroke="#FFFFFF"
-                strokeWidth="1"
+                strokeWidth="1.5"
               />
             </svg>
           </div>
         </div>
 
         {/* Card 3: Active Courses */}
-        <div className="bg-white rounded-xl pt-1.5 px-2.5 pb-0 border border-slate-200/90 shadow-2xs flex flex-col justify-between overflow-hidden relative group hover:border-amber-300 transition-all">
-          <div className="flex items-center gap-2 sm:gap-2.5 relative z-10">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#FEF0E0] flex items-center justify-center shrink-0 shadow-2xs">
-              <GraduationCap className="w-4 h-4 text-[#EA580C]" />
+        <div className="bg-white px-4 pt-3.5 pb-0 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 transition-all cursor-pointer group select-none flex flex-col justify-between gap-2 overflow-hidden relative">
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="w-11 h-11 rounded-full bg-[#FEF0E0] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+              <GraduationCap className="w-5 h-5 text-[#EA580C]" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-[#0F172A] tracking-tight leading-tight truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'সক্রিয় কোর্স' : 'Active Courses'}
-              </p>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-lg sm:text-[19px] font-black text-[#0F172A] tracking-tight leading-none font-sans">
+              </span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {d(stats.totalCourses)}
                 </span>
-                <span className="text-[10px] font-bold text-[#10B981] flex items-center gap-0.5">
+                <span className="text-[11px] font-bold text-[#10B981] inline-flex items-center gap-0.5">
                   <span>↑</span>
                   <span>1%</span>
                 </span>
@@ -629,9 +638,9 @@ export default function AdminOverviewPage() {
           </div>
 
           {/* Undulating Wave Sparkline */}
-          <div className="w-full mt-0.5">
+          <div className="w-full mt-1">
             <svg
-              className="w-full h-5 sm:h-5.5 block overflow-visible"
+              className="w-full h-8 sm:h-9 block overflow-visible"
               viewBox="0 0 300 30"
               preserveAspectRatio="none"
             >
@@ -650,37 +659,37 @@ export default function AdminOverviewPage() {
                 d={courseSparkline.pathD}
                 fill="none"
                 stroke="#F97316"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <circle
                 cx={courseSparkline.points[courseSparkline.points.length - 1].x}
                 cy={courseSparkline.points[courseSparkline.points.length - 1].y}
-                r="2.5"
+                r="3"
                 fill="#F97316"
                 stroke="#FFFFFF"
-                strokeWidth="1"
+                strokeWidth="1.5"
               />
             </svg>
           </div>
         </div>
 
         {/* Card 4: Total Sessions */}
-        <div className="bg-white rounded-xl pt-1.5 px-2.5 pb-0 border border-slate-200/90 shadow-2xs flex flex-col justify-between overflow-hidden relative group hover:border-purple-300 transition-all">
-          <div className="flex items-center gap-2 sm:gap-2.5 relative z-10">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#F3E8FF] flex items-center justify-center shrink-0 shadow-2xs">
-              <Calendar className="w-4 h-4 text-[#9333EA]" />
+        <div className="bg-white px-4 pt-3.5 pb-0 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 transition-all cursor-pointer group select-none flex flex-col justify-between gap-2 overflow-hidden relative">
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="w-11 h-11 rounded-full bg-[#F3E8FF] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+              <Calendar className="w-5 h-5 text-[#9333EA]" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-[#0F172A] tracking-tight leading-tight truncate">
+              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'মোট সেশন' : 'Total Sessions'}
-              </p>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-lg sm:text-[19px] font-black text-[#0F172A] tracking-tight leading-none font-sans">
+              </span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {d(stats.totalSessions)}
                 </span>
-                <span className="text-[10px] font-bold text-[#10B981] flex items-center gap-0.5">
+                <span className="text-[11px] font-bold text-[#10B981] inline-flex items-center gap-0.5">
                   <span>↑</span>
                   <span>5%</span>
                 </span>
@@ -689,9 +698,9 @@ export default function AdminOverviewPage() {
           </div>
 
           {/* Undulating Wave Sparkline */}
-          <div className="w-full mt-0.5">
+          <div className="w-full mt-1">
             <svg
-              className="w-full h-5 sm:h-5.5 block overflow-visible"
+              className="w-full h-8 sm:h-9 block overflow-visible"
               viewBox="0 0 300 30"
               preserveAspectRatio="none"
             >
@@ -710,86 +719,86 @@ export default function AdminOverviewPage() {
                 d={sessionSparkline.pathD}
                 fill="none"
                 stroke="#A855F7"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <circle
                 cx={sessionSparkline.points[sessionSparkline.points.length - 1].x}
                 cy={sessionSparkline.points[sessionSparkline.points.length - 1].y}
-                r="2.5"
+                r="3"
                 fill="#A855F7"
                 stroke="#FFFFFF"
-                strokeWidth="1"
+                strokeWidth="1.5"
               />
             </svg>
           </div>
         </div>
       </div>
 
-      {/* 3. ROW 3: RECENT REPORTS TABLE (7 COLS) + QUICK ACTIONS (5 COLS) - SLIM COMPACT PIXEL-PERFECT */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-1 sm:gap-1.5 items-stretch shrink-0">
+      {/* 3. ROW 3: RECENT REPORTS TABLE (7 COLS) + QUICK ACTIONS (5 COLS) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
         {/* Left: Recent Reports (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2">
                 {/* Reference matching 3-bar rounded orange icon */}
-                <svg className="w-4 h-4 text-[#F59E0B] shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="w-5 h-5 text-[#F59E0B] shrink-0" viewBox="0 0 20 20" fill="currentColor">
                   <rect x="2.5" y="8" width="3.5" height="9.5" rx="1.75" />
                   <rect x="8" y="3" width="3.5" height="14.5" rx="1.75" />
                   <rect x="13.5" y="6" width="3.5" height="11.5" rx="1.75" />
                 </svg>
-                <h2 className="text-xs sm:text-[13px] font-extrabold text-[#0F172A] font-serif">
+                <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
                   {isBangla ? 'সাম্প্রতিক রিপোর্টসমূহ' : 'Recent Reports'}
                 </h2>
               </div>
-              <div className="inline-flex items-center gap-1 text-[9.5px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 px-1.5 py-0.2 rounded-md cursor-pointer transition shadow-2xs">
+              <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg cursor-pointer transition shadow-2xs">
                 <span>{isBangla ? 'এই মাসে' : 'This Month'}</span>
-                <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
+                <ChevronDown className="w-3 h-3 text-slate-400" />
               </div>
             </div>
 
-            <div className="overflow-x-auto mt-0.5">
+            <div className="overflow-x-auto mt-2">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="text-slate-400 border-b border-slate-100 font-semibold text-[10px]">
-                    <th className="py-0.8 pr-2">{isBangla ? 'রিপোর্টের নাম' : 'Report Name'}</th>
-                    <th className="py-0.8 px-2">{isBangla ? 'ধরন' : 'Type'}</th>
-                    <th className="py-0.8 px-2">{isBangla ? 'তৈরির তারিখ' : 'Generated On'}</th>
-                    <th className="py-0.8 px-2">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
-                    <th className="py-0.8 pl-2 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
+                  <tr className="text-slate-400 border-b border-slate-100 font-semibold text-[11px]">
+                    <th className="py-2 pr-2">{isBangla ? 'রিপোর্টের নাম' : 'Report Name'}</th>
+                    <th className="py-2 px-2">{isBangla ? 'ধরন' : 'Type'}</th>
+                    <th className="py-2 px-2">{isBangla ? 'তৈরির তারিখ' : 'Generated On'}</th>
+                    <th className="py-2 px-2">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
+                    <th className="py-2 pl-2 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {recentReports.map((report, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/70 transition">
-                      <td className="py-0.8 sm:py-1 pr-2 font-semibold text-[#0F172A] text-[11px] whitespace-nowrap">
+                      <td className="py-2.5 pr-2 font-semibold text-[#0F172A] text-xs whitespace-nowrap">
                         {report.name}
                       </td>
-                      <td className="py-0.8 sm:py-1 px-2 whitespace-nowrap">
+                      <td className="py-2.5 px-2 whitespace-nowrap">
                         <span
-                          className={`inline-block px-1.5 py-0.2 rounded-full text-[9px] font-bold ${report.typeColor}`}
+                          className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${report.typeColor}`}
                         >
                           {report.type}
                         </span>
                       </td>
-                      <td className="py-0.8 sm:py-1 px-2 text-slate-500 text-[10px] whitespace-nowrap">
+                      <td className="py-2.5 px-2 text-slate-500 text-xs whitespace-nowrap">
                         {report.date}
                       </td>
-                      <td className="py-0.8 sm:py-1 px-2 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-[#E6F8ED] text-[#16A34A]">
-                          <span className="w-1 h-1 rounded-full bg-[#16A34A]" />
+                      <td className="py-2.5 px-2 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E6F8ED] text-[#16A34A]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]" />
                           {report.status}
                         </span>
                       </td>
-                      <td className="py-0.8 sm:py-1 pl-2 text-right whitespace-nowrap">
+                      <td className="py-2.5 pl-2 text-right whitespace-nowrap">
                         <Link
                           href={report.link}
-                          className="inline-flex items-center justify-center w-5 h-5 rounded-full text-slate-400 hover:text-emerald-700 bg-slate-50 hover:bg-slate-100 transition shadow-2xs"
+                          className="inline-flex items-center justify-center w-6 h-6 rounded-full text-slate-400 hover:text-emerald-700 bg-slate-50 hover:bg-slate-100 transition shadow-2xs"
                           title={isBangla ? 'রিপোর্ট দেখুন' : 'View Report'}
                         >
-                          <Eye className="w-3 h-3" />
+                          <Eye className="w-3.5 h-3.5" />
                         </Link>
                       </td>
                     </tr>
@@ -801,10 +810,10 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Right: Quick Actions Card (5 cols) */}
-        <div className="lg:col-span-5 relative overflow-hidden rounded-xl bg-gradient-to-br from-[#013B2A] via-[#012E20] to-[#012117] p-1.5 sm:p-2 text-white shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-5 relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#013B2A] via-[#012E20] to-[#012117] p-4 sm:p-5 text-white shadow-xs flex flex-col justify-between">
           {/* Subtle curved warm wave matching reference mockup */}
           <svg
-            className="pointer-events-none absolute -bottom-1 -right-1 w-20 h-16 opacity-90"
+            className="pointer-events-none absolute -bottom-1 -right-1 w-28 h-20 opacity-90"
             viewBox="0 0 100 80"
             fill="none"
             aria-hidden="true"
@@ -814,85 +823,85 @@ export default function AdminOverviewPage() {
           </svg>
 
           {/* Header */}
-          <div className="relative z-10 flex items-start justify-between gap-2 mb-1">
+          <div className="relative z-10 flex items-start justify-between gap-2 mb-2">
             <div className="min-w-0">
-              <div className="flex items-center gap-1">
-                <Zap className="w-3.5 h-3.5 text-[#FACC15] fill-[#FACC15] shrink-0 drop-shadow-xs" />
-                <h2 className="text-xs sm:text-[13px] font-extrabold tracking-tight !text-white font-serif truncate">
+              <div className="flex items-center gap-1.5">
+                <Zap className="w-4 h-4 text-[#FACC15] fill-[#FACC15] shrink-0 drop-shadow-xs" />
+                <h2 className="text-[15px] sm:text-base font-extrabold tracking-tight !text-white font-serif truncate">
                   {isBangla ? 'দ্রুত কাজসমূহ' : 'Quick Actions'}
                 </h2>
               </div>
-              <p className="text-[9.5px] !text-emerald-100/85 mt-0.2 truncate">
+              <p className="text-xs !text-emerald-100/85 mt-0.5 truncate">
                 {isBangla ? 'সহজেই ইনস্টিটিউট পরিচালনা করুন' : 'Manage your institute easily'}
               </p>
             </div>
             <Link
               href="/admin/batches"
               aria-label={isBangla ? 'সব অপশন দেখুন' : 'View all actions'}
-              className="w-5 h-5 rounded-full bg-white hover:bg-emerald-50 text-[#013B2A] flex items-center justify-center shrink-0 transition cursor-pointer shadow-xs active:scale-95"
+              className="w-6 h-6 rounded-full bg-white hover:bg-emerald-50 text-[#013B2A] flex items-center justify-center shrink-0 transition cursor-pointer shadow-xs active:scale-95"
             >
-              <ChevronRight className="w-3 h-3 stroke-[2.5]" />
+              <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
             </Link>
           </div>
 
           {/* 6 White Action Tiles Grid - Exact Reference Icons & Actions */}
-          <div className="relative z-10 grid grid-cols-3 gap-1.5 mt-0.5 flex-1">
+          <div className="relative z-10 grid grid-cols-3 gap-2.5 mt-1 flex-1">
             <Link
               href="/admin/teachers"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-lg py-1 px-1 sm:py-1.2 sm:px-1 flex flex-col items-center justify-center gap-0.5 text-center shadow-2xs hover:shadow transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2.5 px-2 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
-              <UserPlus className="w-4 h-4 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[9.5px] font-bold text-[#0F172A] leading-tight">
+              <UserPlus className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'শিক্ষক যোগ' : 'Add Teacher'}
               </span>
             </Link>
 
             <Link
               href="/admin/students?tab=batches"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-lg py-1 px-1 sm:py-1.2 sm:px-1 flex flex-col items-center justify-center gap-0.5 text-center shadow-2xs hover:shadow transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2.5 px-2 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
-              <Users className="w-4 h-4 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[9.5px] font-bold text-[#0F172A] leading-tight">
+              <Users className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'ব্যাচ বরাদ্দ' : 'Assign to Batch'}
               </span>
             </Link>
 
             <Link
               href="/reports"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-lg py-1 px-1 sm:py-1.2 sm:px-1 flex flex-col items-center justify-center gap-0.5 text-center shadow-2xs hover:shadow transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2.5 px-2 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
-              <Download className="w-4 h-4 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[9.5px] font-bold text-[#0F172A] leading-tight">
+              <Download className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'রিপোর্ট এক্সপোর্ট' : 'Export Report'}
               </span>
             </Link>
 
             <Link
               href="/reports"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-lg py-1 px-1 sm:py-1.2 sm:px-1 flex flex-col items-center justify-center gap-0.5 text-center shadow-2xs hover:shadow transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2.5 px-2 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
-              <BarChart3 className="w-4 h-4 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[9.5px] font-bold text-[#0F172A] leading-tight">
+              <BarChart3 className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'রিপোর্ট দেখুন' : 'View Reports'}
               </span>
             </Link>
 
             <Link
               href="/admin/students?tab=progress"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-lg py-1 px-1 sm:py-1.2 sm:px-1 flex flex-col items-center justify-center gap-0.5 text-center shadow-2xs hover:shadow transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2.5 px-2 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
-              <BookOpen className="w-4 h-4 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[9.5px] font-bold text-[#0F172A] leading-tight">
+              <BookOpen className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'কোর্স পরিচালনা' : 'Manage Courses'}
               </span>
             </Link>
 
             <Link
               href="/admin/menu-control"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-lg py-1 px-1 sm:py-1.2 sm:px-1 flex flex-col items-center justify-center gap-0.5 text-center shadow-2xs hover:shadow transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2.5 px-2 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow transition-all cursor-pointer border border-white/60 group"
             >
-              <Settings className="w-4 h-4 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[9.5px] font-bold text-[#0F172A] leading-tight">
+              <Settings className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'সেটিংস' : 'Settings'}
               </span>
             </Link>
@@ -900,40 +909,40 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* 4. ROW 4: RECENT ACTIVITIES (4 COLS) + UPCOMING CLASSES (5 COLS) + COURSE PROGRESS (3 COLS) - SLIM COMPACT */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-1 sm:gap-1.5 items-stretch shrink-0">
+      {/* 4. ROW 4: RECENT ACTIVITIES (4 COLS) + UPCOMING CLASSES (5 COLS) + COURSE PROGRESS (3 COLS) */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-stretch">
         {/* Col 1: Recent Activities (4 cols) */}
-        <div className="md:col-span-12 lg:col-span-4 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="md:col-span-12 lg:col-span-4 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                <h3 className="text-xs sm:text-[13px] font-extrabold text-[#0F172A] font-serif">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
                   {isBangla ? 'সাম্প্রতিক কার্যক্রম' : 'Recent Activities'}
                 </h3>
               </div>
               <Link
                 href="/announcements"
-                className="text-[9.5px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline"
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline"
               >
                 <span>{isBangla ? 'সব দেখুন' : 'View All'}</span>
-                <ArrowRight className="w-2.5 h-2.5" />
+                <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="space-y-1 mt-1">
+            <div className="space-y-2 mt-2">
               {recentActivities.map((act, i) => {
                 const Icon = act.icon;
                 return (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 ${act.iconBg}`}>
-                      <Icon className="w-2.5 h-2.5" />
+                  <div key={i} className="flex items-center gap-2.5">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${act.iconBg}`}>
+                      <Icon className="w-3.5 h-3.5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[10px] font-bold text-[#0F172A] leading-tight truncate">
+                      <p className="text-xs font-bold text-[#0F172A] leading-tight truncate">
                         {act.title}
                       </p>
-                      <p className="text-[8.5px] text-slate-400">
+                      <p className="text-[10px] text-slate-400 mt-0.5">
                         {act.time}
                       </p>
                     </div>
@@ -945,41 +954,41 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Col 2: Upcoming Classes (5 cols) */}
-        <div className="md:col-span-12 lg:col-span-5 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="md:col-span-12 lg:col-span-5 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-amber-500" />
-                <h3 className="text-xs sm:text-[13px] font-extrabold text-[#0F172A] font-serif">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-amber-500" />
+                <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
                   {isBangla ? 'আসন্ন ক্লাসসমূহ' : 'Upcoming Classes'}
                 </h3>
               </div>
               <Link
                 href="/admin/sessions"
-                className="text-[9.5px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline"
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline"
               >
                 <span>{isBangla ? 'সব দেখুন' : 'View All'}</span>
-                <ArrowRight className="w-2.5 h-2.5" />
+                <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="space-y-1 mt-1">
+            <div className="space-y-2 mt-2">
               {upcomingClasses.map((cls, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between gap-1.5 p-1 rounded-md border border-slate-100 hover:border-emerald-200 hover:bg-slate-50/50 transition"
+                  className="flex items-center justify-between gap-2 p-2 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-slate-50/50 transition"
                 >
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <div className="px-1 py-0.5 rounded bg-emerald-50 text-emerald-800 text-center shrink-0 border border-emerald-100">
-                      <span className="block text-[8.5px] font-bold leading-tight">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="px-2 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-center shrink-0 border border-emerald-100">
+                      <span className="block text-[10px] font-bold leading-tight">
                         {cls.dateBadge}
                       </span>
                     </div>
                     <div className="min-w-0">
-                      <h4 className="text-[10px] font-bold text-[#0F172A] truncate">
+                      <h4 className="text-xs font-bold text-[#0F172A] truncate">
                         {cls.title}
                       </h4>
-                      <p className="text-[8.5px] text-slate-500 truncate">
+                      <p className="text-[10px] text-slate-500 truncate mt-0.5">
                         {cls.instructor} • {cls.time}
                       </p>
                     </div>
@@ -987,7 +996,7 @@ export default function AdminOverviewPage() {
 
                   <Link
                     href={cls.joinHref}
-                    className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-[#059669] hover:bg-[#047857] text-white text-[9px] font-bold transition shrink-0 shadow-2xs cursor-pointer"
+                    className="inline-flex items-center justify-center px-3 py-1 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold transition shrink-0 shadow-2xs cursor-pointer"
                   >
                     {isBangla ? 'যুক্ত হোন' : 'Join'}
                   </Link>
@@ -998,17 +1007,17 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Col 3: Course Progress Circular Donut (3 cols) */}
-        <div className="md:col-span-12 lg:col-span-3 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="md:col-span-12 lg:col-span-3 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-1 pb-1 border-b border-slate-100">
-              <PieChart className="w-3.5 h-3.5 text-emerald-600" />
-              <h3 className="text-xs sm:text-[13px] font-extrabold text-[#0F172A] font-serif">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+              <PieChart className="w-4 h-4 text-emerald-600" />
+              <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
                 {isBangla ? 'কোর্স অগ্রগতি' : 'Course Progress'}
               </h3>
             </div>
 
-            <div className="flex flex-col items-center justify-center my-0.5">
-              <div className="relative w-16 h-16 flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center my-2">
+              <div className="relative w-20 h-20 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle
                     cx="50"
@@ -1044,33 +1053,33 @@ export default function AdminOverviewPage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-xs font-black text-[#0F172A] tracking-tight leading-none">
+                  <span className="text-sm font-black text-[#0F172A] tracking-tight leading-none">
                     72.4%
                   </span>
-                  <span className="text-[7.5px] text-slate-500 font-semibold mt-0.5">
+                  <span className="text-[8.5px] text-slate-500 font-semibold mt-0.5">
                     {isBangla ? 'অগ্রগতি' : 'Progress'}
                   </span>
                 </div>
               </div>
 
-              <div className="w-full space-y-0.5 mt-0.5 text-[9px]">
+              <div className="w-full space-y-1 mt-2 text-xs">
                 <div className="flex items-center justify-between text-slate-600">
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#059669]" />
                     <span>{isBangla ? 'সম্পন্ন' : 'Completed'}</span>
                   </span>
                   <span className="font-bold text-[#0F172A]">72.4%</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
                     <span>{isBangla ? 'চলমান' : 'In Progress'}</span>
                   </span>
                   <span className="font-bold text-[#0F172A]">18.2%</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-slate-300" />
                     <span>{isBangla ? 'শুরু হয়নি' : 'Not Started'}</span>
                   </span>
                   <span className="font-bold text-[#0F172A]">9.4%</span>
@@ -1081,61 +1090,61 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* 5. ROW 5: SYSTEM STATISTICS (8 COLS) + BUILDING SKILLS PROMO BANNER (4 COLS) - SLIM COMPACT */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-1 sm:gap-1.5 items-stretch shrink-0">
+      {/* 5. ROW 5: SYSTEM STATISTICS (8 COLS) + BUILDING SKILLS PROMO BANNER (4 COLS) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
         {/* Left: System Statistics (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-xl p-1.5 sm:p-2 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-8 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-              <div className="flex items-center gap-1">
-                <BarChart2 className="w-3.5 h-3.5 text-emerald-600" />
-                <h3 className="text-xs sm:text-[13px] font-extrabold text-[#0F172A] font-serif">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <BarChart2 className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
                   {isBangla ? 'সিস্টেম পরিসংখ্যান' : 'System Statistics'}
                 </h3>
               </div>
-              <div className="inline-flex items-center gap-1 text-[9px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded-md cursor-pointer transition">
+              <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg cursor-pointer transition">
                 <span>{isBangla ? 'এই মাসে' : 'This Month'}</span>
-                <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
+                <ChevronDown className="w-3 h-3 text-slate-400" />
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-1.5 mt-1">
-              <div className="bg-[#F8FAFC] rounded-lg py-0.8 px-1 border border-slate-100 text-center flex flex-col items-center justify-center">
-                <div className="w-4 h-4 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center mb-0.5">
-                  <Users className="w-2.5 h-2.5" />
+            <div className="grid grid-cols-4 gap-2.5 mt-2">
+              <div className="bg-[#F8FAFC] rounded-xl p-3 border border-slate-100 text-center flex flex-col items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1">
+                  <Users className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm sm:text-base font-black text-[#0F172A] leading-tight">{d(stats.totalStudents)}</h4>
-                <p className="text-[8.5px] font-semibold text-slate-500">
+                <h4 className="text-xl font-black text-[#0F172A] leading-tight">{d(stats.totalStudents)}</h4>
+                <p className="text-xs font-semibold text-slate-500 mt-0.5">
                   {isBangla ? 'শিক্ষার্থী' : 'Students'}
                 </p>
               </div>
 
-              <div className="bg-[#F8FAFC] rounded-lg py-0.8 px-1 border border-slate-100 text-center flex flex-col items-center justify-center">
-                <div className="w-4 h-4 rounded bg-blue-50 text-blue-600 flex items-center justify-center mb-0.5">
-                  <BookOpen className="w-2.5 h-2.5" />
+              <div className="bg-[#F8FAFC] rounded-xl p-3 border border-slate-100 text-center flex flex-col items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
+                  <BookOpen className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm sm:text-base font-black text-[#0F172A] leading-tight">{d(stats.totalBatches)}</h4>
-                <p className="text-[8.5px] font-semibold text-slate-500">
+                <h4 className="text-xl font-black text-[#0F172A] leading-tight">{d(stats.totalBatches)}</h4>
+                <p className="text-xs font-semibold text-slate-500 mt-0.5">
                   {isBangla ? 'ব্যাচ' : 'Batches'}
                 </p>
               </div>
 
-              <div className="bg-[#F8FAFC] rounded-lg py-0.8 px-1 border border-slate-100 text-center flex flex-col items-center justify-center">
-                <div className="w-4 h-4 rounded bg-amber-50 text-amber-600 flex items-center justify-center mb-0.5">
-                  <GraduationCap className="w-2.5 h-2.5" />
+              <div className="bg-[#F8FAFC] rounded-xl p-3 border border-slate-100 text-center flex flex-col items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-1">
+                  <GraduationCap className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm sm:text-base font-black text-[#0F172A] leading-tight">{d(stats.totalCourses)}</h4>
-                <p className="text-[8.5px] font-semibold text-slate-500">
+                <h4 className="text-xl font-black text-[#0F172A] leading-tight">{d(stats.totalCourses)}</h4>
+                <p className="text-xs font-semibold text-slate-500 mt-0.5">
                   {isBangla ? 'কোর্স' : 'Courses'}
                 </p>
               </div>
 
-              <div className="bg-[#F8FAFC] rounded-lg py-0.8 px-1 border border-slate-100 text-center flex flex-col items-center justify-center">
-                <div className="w-4 h-4 rounded bg-purple-50 text-purple-600 flex items-center justify-center mb-0.5">
-                  <Calendar className="w-2.5 h-2.5" />
+              <div className="bg-[#F8FAFC] rounded-xl p-3 border border-slate-100 text-center flex flex-col items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mb-1">
+                  <Calendar className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm sm:text-base font-black text-[#0F172A] leading-tight">{d(stats.totalSessions)}</h4>
-                <p className="text-[8.5px] font-semibold text-slate-500">
+                <h4 className="text-xl font-black text-[#0F172A] leading-tight">{d(stats.totalSessions)}</h4>
+                <p className="text-xs font-semibold text-slate-500 mt-0.5">
                   {isBangla ? 'সেশন' : 'Sessions'}
                 </p>
               </div>
@@ -1143,9 +1152,9 @@ export default function AdminOverviewPage() {
           </div>
         </div>
 
-        {/* Right: Building Skills Promo Banner (4 cols) */}
-        <div className="lg:col-span-4 relative overflow-hidden rounded-xl bg-gradient-to-r from-[#00382B] via-[#002B21] to-[#001D16] border border-[#064E3B]/40 p-1.5 sm:p-2 text-white shadow-2xs flex flex-col justify-between min-h-[64px] group">
-          <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-30 pointer-events-none select-none">
+        {/* Right: Building Skills Promo Banner (4 cols - Matching Student Promo Card Scale) */}
+        <div className="lg:col-span-4 relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00382B] via-[#002B21] to-[#001D16] border border-[#064E3B]/40 p-4 sm:p-5 text-white shadow-xs flex flex-col justify-between min-h-[120px] group">
+          <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-35 pointer-events-none select-none">
             <Image
               src="/islamic-banner-mosque.png"
               alt="Mosque Silhouette"
@@ -1155,21 +1164,21 @@ export default function AdminOverviewPage() {
           </div>
 
           <div className="relative z-10">
-            <h3 className="text-xs sm:text-[13px] font-black text-white font-serif tracking-tight leading-tight">
+            <h3 className="text-base sm:text-lg font-black text-white font-serif tracking-tight leading-tight">
               {isBangla ? 'দক্ষতা অর্জন' : 'Building Skills'}
             </h3>
-            <p className="text-[9.5px] font-semibold text-[#FDE68A] mt-0.2">
+            <p className="text-xs font-semibold text-[#FDE68A] mt-1">
               {isBangla ? 'উম্মাহর উন্নয়ন ও সেবায় নিয়োজিত' : 'Building a Better Ummah'}
             </p>
           </div>
 
-          <div className="relative z-10 mt-1">
+          <div className="relative z-10 mt-3">
             <Link
               href="/reports"
-              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#EA580C] hover:bg-[#C2410C] text-white text-[9.5px] font-bold rounded-md shadow-2xs transition group-hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold rounded-lg shadow-xs transition group-hover:scale-105 active:scale-95"
             >
               <span>{isBangla ? 'রিপোর্ট হাব দেখুন' : 'View Reports'}</span>
-              <ArrowRight className="w-2.5 h-2.5" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
