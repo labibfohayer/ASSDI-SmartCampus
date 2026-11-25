@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import {
   GraduationCap,
   Calendar,
@@ -35,7 +36,8 @@ import {
   ChevronDown,
   ArrowLeft,
   Zap,
-  Headset,
+  Info,
+  Trophy,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -132,6 +134,7 @@ interface HelpRequestItem {
 
 export default function StudentPortalPage() {
   const { isBangla } = useLanguage();
+  const router = useRouter();
 
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [attSummary, setAttSummary] = useState<AttendanceSummary | null>(null);
@@ -141,6 +144,7 @@ export default function StudentPortalPage() {
   const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>([]);
   const [helpRequests, setHelpRequests] = useState<HelpRequestItem[]>([]);
   const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDashboardHome, setIsDashboardHome] = useState<boolean>(true);
   const [attendanceRange, setAttendanceRange] = useState<'month' | 'all'>('month');
@@ -335,7 +339,7 @@ export default function StudentPortalPage() {
     setLoading(true);
     try {
       // Normal student loading with graceful individual error handling
-      const [profRes, attRes, sessRes, fbRes, helpRes, matRes, gradRes, quizRes] = await Promise.all([
+      const [profRes, attRes, sessRes, fbRes, helpRes, matRes, gradRes, quizRes, annRes] = await Promise.all([
         api.get('/api/v1/students/me/').catch(() => ({ data: null })),
         api.get('/api/v1/attendance/mine/').catch(() => ({ data: null })),
         api.get('/api/v1/class-sessions/?status=published').catch(() => ({ data: [] })),
@@ -344,6 +348,7 @@ export default function StudentPortalPage() {
         api.get('/api/v1/session-materials/').catch(() => ({ data: [] })),
         api.get('/api/v1/students/me/graduation-eligibility/').catch(() => ({ data: null })),
         api.get('/api/v1/quizzes/').catch(() => ({ data: [] })),
+        api.get('/api/v1/announcements/').catch(() => ({ data: [] })),
       ]);
 
       if (gradRes.data) {
@@ -382,6 +387,11 @@ export default function StudentPortalPage() {
         ? quizRes.data
         : quizRes.data?.results || [];
       setQuizzes(quizList);
+
+      const annList = Array.isArray(annRes.data)
+        ? annRes.data
+        : annRes.data?.results || [];
+      setAnnouncements(annList);
     } catch (err) {
       console.warn('Error loading student portal data:', err);
     } finally {
@@ -695,10 +705,77 @@ export default function StudentPortalPage() {
     };
   };
 
+  // Recent activities derived cleanly from real feedback, attendance, announcements & evaluation milestones
+  const recentActivityItems = (() => {
+    const formatActTime = (iso?: string) => {
+      if (!iso) return isBangla ? 'সম্প্রতি' : 'Recently';
+      const dt = new Date(iso);
+      if (isNaN(dt.getTime())) return iso.slice(0, 10);
+      return dt.toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    };
+
+    const latestFb = feedbacks[0];
+    const latestAtt = attRecords[0];
+    const latestAnn = announcements[0];
+
+    return [
+      {
+        id: 'act-1',
+        type: 'feedback' as const,
+        title: latestFb
+          ? isBangla
+            ? `ফিডব্যাক সম্পন্ন: ${latestFb.topic_title || latestFb.subject_name}`
+            : `Feedback submitted: ${latestFb.topic_title || latestFb.subject_name}`
+          : latestAtt
+          ? isBangla
+            ? `ক্লাস উপস্থিতি গৃহীত: ${latestAtt.subject_name}`
+            : `Attendance recorded: ${latestAtt.subject_name}`
+          : isBangla
+          ? 'ক্লাস উপস্থিতি ও মূল্যায়ন সক্রিয় রয়েছে'
+          : 'Class attendance & evaluation active',
+        subtitle: formatActTime(latestFb?.submitted_at || latestAtt?.marked_at || latestAtt?.session_date),
+        onClick: () => handleTabChange('today'),
+      },
+      {
+        id: 'act-2',
+        type: 'notice' as const,
+        title: latestAnn
+          ? isBangla
+            ? `নতুন নোটিশ: ${latestAnn.title}`
+            : `New notice: ${latestAnn.title}`
+          : isBangla
+          ? 'প্রাতিষ্ঠানিক নোটিশ বোর্ড আপডেট'
+          : 'Notice Board: Check latest class updates',
+        subtitle: formatActTime(latestAnn?.published_at || latestAnn?.created_at),
+        onClick: () => router.push('/announcements'),
+      },
+      {
+        id: 'act-3',
+        type: 'result' as const,
+        title:
+          attemptedQuizzes.length > 0
+            ? isBangla
+              ? `কুইজ ফলাফল প্রকাশিত (${examResultScore.toFixed(1)}%)`
+              : `Quiz result published (${examResultScore.toFixed(1)}%)`
+            : isBangla
+            ? `পাঠ মূল্যায়ন ও প্রস্তুতি স্কোর (${overallProgressScore.toFixed(1)}%)`
+            : `Class evaluation & readiness (${overallProgressScore.toFixed(1)}%)`,
+        subtitle: isBangla
+          ? `${presentCount}/${totalSessCount}টি সেশন সম্পন্ন`
+          : `${presentCount}/${totalSessCount} sessions completed`,
+        onClick: () => handleTabChange('graduation'),
+      },
+    ];
+  })();
+
   return (
-    <div className="space-y-4 sm:space-y-5">
-      {/* Slim Islamic Modern Student Hero Welcome Card (Matching Reference Height & Assalamu Alaikum Greeting) */}
-      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[168px] lg:min-h-[184px] flex items-center">
+    <div className="space-y-3">
+      {/* Slim Islamic Modern Student Hero Welcome Card (Fits 100% Without Scrolling) */}
+      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FEF6DF] min-h-[124px] lg:min-h-[136px] flex items-center">
         <Image
           src="/islamic-hero-banner-slim.png"
           alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
@@ -714,26 +791,26 @@ export default function StudentPortalPage() {
         />
 
         {/* Compact Left Content */}
-        <div className="relative z-10 px-5 py-4 sm:px-6 lg:max-w-[62%] w-full">
-          <p className="text-sm sm:text-[15px] font-extrabold text-[#064E3B] tracking-tight flex items-center gap-1.5 mb-0.5">
+        <div className="relative z-10 px-4 py-2.5 sm:px-5 lg:max-w-[62%] w-full">
+          <p className="text-xs sm:text-[13.5px] font-extrabold text-[#064E3B] tracking-tight flex items-center gap-1.5 leading-none mb-0.5">
             <span>{isBangla ? 'আসসালামু আলাইকুম!' : 'Assalamu Alaikum!'}</span>
-            <span className="text-base sm:text-lg" role="img" aria-label="wave">
+            <span className="text-sm sm:text-base" role="img" aria-label="wave">
               👋
             </span>
           </p>
 
-          <h1 className="text-lg sm:text-xl lg:text-[25px] font-black text-[#0F172A] tracking-tight font-serif leading-tight">
+          <h1 className="text-lg sm:text-xl lg:text-[22px] font-black text-[#0F172A] tracking-tight font-serif leading-tight">
             {isBangla ? 'স্বাগতম' : 'Welcome back'}, {profile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || (isBangla ? 'শিক্ষার্থী' : 'Student')}!
           </h1>
 
-          <p className="text-[11px] sm:text-xs text-[#334155] font-medium mt-0.5 leading-snug">
+          <p className="text-[11px] text-[#334155] font-medium mt-0.5 leading-snug">
             {isBangla
               ? 'আল্লাহ আপনার শিক্ষার যাত্রাকে সফল করুন — আজকের কার্যক্রম দেখে নিন।'
               : 'May Allah make your learning journey successful.'}
           </p>
 
           {/* Compact Single Strip: Date, Batch & Quick Actions */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
             <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E6F4EA]/95 border border-[#A7F3D0] text-[#065F46] text-[11px] font-semibold shadow-2xs">
               <Calendar className="w-3 h-3 text-[#059669]" />
               <span suppressHydrationWarning>
@@ -788,8 +865,8 @@ export default function StudentPortalPage() {
         </div>
       </div>
 
-      {/* 5 Clean Student KPI Metric Cards (Attendance Rate, Completed Classes, Overall Progress, Help Requests, Exam Results) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 sm:gap-4">
+      {/* 5 Clean Student KPI Metric Cards (Compact Single-Screen Height) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
         {/* Card 1: Attendance Rate */}
         <div
           role="button"
@@ -802,22 +879,22 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'উপস্থিতির বিস্তারিত হিস্ট্রি দেখতে ক্লিক করুন' : 'Click to view attendance history'}
-          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
+          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Calendar className="w-5 h-5 text-[#0284C7]" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-full bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Calendar className="w-4.5 h-4.5 text-[#0284C7]" />
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'উপস্থিতি হার' : 'Attendance Rate'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5 flex-wrap sm:flex-nowrap">
-                <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif whitespace-nowrap">
+                <span className="text-lg 2xl:text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif whitespace-nowrap">
                   {safeFixed(attSummary?.attendance_percentage)}%
                 </span>
                 <span
-                  className={`text-[11px] font-bold inline-flex items-center whitespace-nowrap ${
+                  className={`text-[10.5px] font-bold inline-flex items-center whitespace-nowrap ${
                     attDeltaVsTarget >= 0 ? 'text-emerald-600' : 'text-red-600'
                   }`}
                 >
@@ -827,7 +904,7 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 attPct < 75 ? 'bg-red-500' : 'bg-[#16A34A]'
@@ -849,28 +926,28 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'সম্পন্ন ক্লাসের তালিকা দেখতে ক্লিক করুন' : 'Click to view completed classes'}
-          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
+          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-[#FFEDD5] text-[#EA580C] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-5 h-5 text-[#EA580C]" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-full bg-[#FFEDD5] text-[#EA580C] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-4.5 h-4.5 text-[#EA580C]" />
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'সম্পন্ন ক্লাস' : 'Completed Classes'}
               </span>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {presentCount}
                 </span>
-                <span className="text-xs font-semibold text-slate-400">
+                <span className="text-[11px] font-semibold text-slate-400">
                   / {totalSessCount}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px]">
+          <div className="flex items-center justify-between text-[10.5px]">
             <span className="font-semibold text-[#D97706] truncate">
               {isBangla ? 'এই কোর্সে উপস্থিত' : 'Attended'}
             </span>
@@ -896,25 +973,25 @@ export default function StudentPortalPage() {
               ? `উপস্থিতি (${safeFixed(attPct)}%) ও পাঠ বোঝার মূল্যায়ন (${safeFixed(avgUnderstandingPct)}%) অনুযায়ী সার্বিক অগ্রগতি`
               : `Overall progress combining attendance (${safeFixed(attPct)}%) & lesson understanding (${safeFixed(avgUnderstandingPct)}%)`
           }
-          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
+          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Award className="w-5 h-5 text-[#9333EA]" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-full bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Award className="w-4.5 h-4.5 text-[#9333EA]" />
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'ওভারঅল প্রগ্রেস' : 'Overall Progress'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {overallProgressScore.toFixed(1)}%
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full bg-[#16A34A] transition-all duration-500"
               style={{ width: `${Math.min(Math.max(overallProgressScore, 0), 100)}%` }}
@@ -934,28 +1011,28 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'শিক্ষকের সমাধান ও উত্তর দেখতে ক্লিক করুন' : 'Click to view help requests'}
-          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
+          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-[#DCFCE7] text-[#15803D] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <HelpCircle className="w-5 h-5 text-[#15803D]" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-full bg-[#DCFCE7] text-[#15803D] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <HelpCircle className="w-4.5 h-4.5 text-[#15803D]" />
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'হেল্প রিকোয়েস্ট' : 'Help Requests'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {helpRequests.length}
                 </span>
-                <span className="text-[11px] font-bold text-[#15803D]">
+                <span className="text-[10.5px] font-bold text-[#15803D]">
                   {resolvedHelpCount} {isBangla ? 'সমাধান' : 'Resolved'}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px]">
+          <div className="flex items-center justify-between text-[10.5px]">
             <span className={`font-semibold truncate ${pendingHelpCount > 0 ? 'text-[#D97706]' : 'text-emerald-600'}`}>
               {pendingHelpCount > 0
                 ? isBangla ? `${pendingHelpCount}টি অপেক্ষমান` : `${pendingHelpCount} Pending`
@@ -979,25 +1056,25 @@ export default function StudentPortalPage() {
             }
           }}
           title={isBangla ? 'মূল্যায়ন ও কুইজের ফলাফল দেখতে ক্লিক করুন' : 'Click to view quiz & evaluation results'}
-          className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-3"
+          className="bg-white px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 active:scale-[0.99] transition-all cursor-pointer group select-none flex flex-col justify-between gap-2"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-[#CCFBF1] text-[#0F766E] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <FileCheck2 className="w-5 h-5 text-[#0F766E]" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-full bg-[#CCFBF1] text-[#0F766E] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <FileCheck2 className="w-4.5 h-4.5 text-[#0F766E]" />
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold text-[#334155] block font-serif truncate">
+              <span className="text-[11.5px] font-bold text-[#334155] block font-serif truncate">
                 {isBangla ? 'মূল্যায়ন ফলাফল' : 'Exam Results'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
+                <span className="text-xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
                   {examResultScore.toFixed(1)}%
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px]">
+          <div className="flex items-center justify-between text-[10.5px]">
             <span className="font-semibold text-slate-500 truncate">
               {attemptedQuizzes.length > 0
                 ? isBangla ? `${attemptedQuizzes.length}টি কুইজ সম্পন্ন` : `${attemptedQuizzes.length} Quiz(zes)`
@@ -1046,21 +1123,21 @@ export default function StudentPortalPage() {
         </div>
       )}
 
-      {/* DASHBOARD OVERVIEW VIEW: Middle 3-Column Row (Attendance Overview + Quick Actions + Upcoming Classes) */}
+      {/* DASHBOARD OVERVIEW VIEW: Middle 3-Column Row + Bottom 3-Column Row (Fits 100% in 1 Single Page) */}
       {isDashboardHome && (
-        <div className="space-y-4 sm:space-y-5">
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1.42fr_1fr_1.33fr] gap-4 items-stretch">
+        <div className="space-y-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1.42fr_1fr_1.33fr] gap-3.5 items-stretch">
           {/* 1. Compact Attendance Overview Chart Card */}
-          <div className="lg:col-span-2 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
+          <div className="lg:col-span-2 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-3.5 sm:p-4 flex flex-col justify-between">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5">
-                  <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5.5 h-5.5 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <rect x="2" y="13" width="4.5" height="9" rx="1.5" fill="#86EFAC" />
                     <rect x="9.5" y="8" width="4.5" height="14" rx="1.5" fill="#22C55E" />
                     <rect x="17" y="3" width="4.5" height="19" rx="1.5" fill="#15803D" />
                   </svg>
-                  <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
+                  <h2 className="text-[14.5px] sm:text-[15px] font-extrabold text-[#0F172A] font-serif">
                     {isBangla ? 'উপস্থিতির সংক্ষিপ্ত চিত্র' : 'Attendance Overview'}
                   </h2>
                 </div>
@@ -1070,17 +1147,17 @@ export default function StudentPortalPage() {
                     value={attendanceRange}
                     onChange={(e) => setAttendanceRange(e.target.value as 'month' | 'all')}
                     aria-label={isBangla ? 'সময়সীমা নির্বাচন' : 'Select time range'}
-                    className="appearance-none bg-white border border-slate-200 hover:border-slate-300 rounded-lg pl-2.5 pr-7 py-1 text-[11px] font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="appearance-none bg-white border border-slate-200 hover:border-slate-300 rounded-lg pl-2.5 pr-6 py-0.5 text-[11px] font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                   >
                     <option value="month">{isBangla ? 'এই মাস' : 'This Month'}</option>
                     <option value="all">{isBangla ? 'সব সেশন' : 'All Sessions'}</option>
                   </select>
-                  <ChevronDown className="w-3 h-3 text-slate-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-3 h-3 text-slate-500 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
               </div>
 
               {/* Compact Chart Legend */}
-              <div className="flex items-center justify-end gap-3.5 mt-2 mb-1.5 text-[11px] font-semibold">
+              <div className="flex items-center justify-end gap-3 mt-1 mb-0.5 text-[10.5px] font-semibold">
                 <span className="inline-flex items-center gap-1.5 text-slate-700">
                   <span className="w-2 h-2 rounded-full bg-[#16A34A]" />
                   <span>{isBangla ? 'উপস্থিতি %' : 'Attendance %'}</span>
@@ -1094,9 +1171,9 @@ export default function StudentPortalPage() {
             </div>
 
             {/* Recharts Compact Area Chart */}
-            <div className="w-full h-[196px]">
+            <div className="w-full h-[154px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={attendanceOverviewData} margin={{ top: 24, right: 18, left: -12, bottom: 2 }}>
+                <AreaChart data={attendanceOverviewData} margin={{ top: 22, right: 18, left: -14, bottom: 0 }}>
                   <defs>
                     <linearGradient id="studentAttOverviewGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#16A34A" stopOpacity={0.22} />
@@ -1184,10 +1261,10 @@ export default function StudentPortalPage() {
           </div>
 
           {/* 2. Quick Actions Deep Forest Green Card with Vivid Dark-Orange Corner Curves */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#025033] via-[#013C24] to-[#012918] p-4 sm:p-5 text-white shadow-sm flex flex-col justify-between">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#025033] via-[#013C24] to-[#012918] p-3.5 sm:p-4 text-white shadow-sm flex flex-col justify-between">
             {/* Reference-Matched Bottom-Right & Bottom-Left Deep Orange Corner Waves */}
             <svg
-              className="pointer-events-none absolute -bottom-1 -right-1 w-28 h-24"
+              className="pointer-events-none absolute -bottom-1 -right-1 w-24 h-20"
               viewBox="0 0 120 100"
               fill="none"
               aria-hidden="true"
@@ -1197,7 +1274,7 @@ export default function StudentPortalPage() {
               <path d="M120 100H82C96 86 108 75 120 62V100Z" fill="#F59E0B" fillOpacity="0.9" />
             </svg>
             <svg
-              className="pointer-events-none absolute -bottom-1 -left-1 w-24 h-20"
+              className="pointer-events-none absolute -bottom-1 -left-1 w-20 h-16"
               viewBox="0 0 100 84"
               fill="none"
               aria-hidden="true"
@@ -1208,13 +1285,13 @@ export default function StudentPortalPage() {
 
             <div className="relative z-10 flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-6 h-6 text-[#FACC15] fill-[#FACC15] shrink-0 drop-shadow-xs" />
-                  <h2 className="text-base sm:text-[17px] font-extrabold tracking-tight !text-white font-serif truncate">
+                <div className="flex items-center gap-1.5">
+                  <Zap className="w-5 h-5 text-[#FACC15] fill-[#FACC15] shrink-0 drop-shadow-xs" />
+                  <h2 className="text-[15px] sm:text-base font-extrabold tracking-tight !text-white font-serif truncate">
                     {isBangla ? 'দ্রুত কাজসমূহ' : 'Quick Actions'}
                   </h2>
                 </div>
-                <p className="text-[11px] !text-emerald-100/90 mt-0.5 truncate">
+                <p className="text-[10.5px] !text-emerald-100/90 mt-0.5 truncate">
                   {isBangla ? 'সহজেই আপনার স্টাডি টুল ব্যবহার করুন' : 'Access your study tools easily'}
                 </p>
               </div>
@@ -1222,20 +1299,20 @@ export default function StudentPortalPage() {
                 type="button"
                 onClick={() => handleTabChange('today')}
                 aria-label={isBangla ? 'সব টুল ও ক্লাস দেখুন' : 'View all study tools'}
-                className="w-7 h-7 rounded-full bg-white hover:bg-emerald-50 text-[#064E3B] flex items-center justify-center shrink-0 transition cursor-pointer shadow-xs active:scale-95"
+                className="w-6.5 h-6.5 rounded-full bg-white hover:bg-emerald-50 text-[#064E3B] flex items-center justify-center shrink-0 transition cursor-pointer shadow-xs active:scale-95"
               >
-                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+                <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
               </button>
             </div>
 
-            <div className="relative z-10 grid grid-cols-2 gap-2.5 mt-3.5 flex-1">
+            <div className="relative z-10 grid grid-cols-2 gap-2 mt-2.5 flex-1">
               <button
                 type="button"
                 onClick={() => setScannerOpen(true)}
-                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2 py-2 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <QrCode className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
-                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                <QrCode className="w-6 h-6 text-[#059669]" strokeWidth={2.2} />
+                <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                   {isBangla ? 'কিউআর স্ক্যান' : 'Scan QR'}
                 </span>
               </button>
@@ -1243,10 +1320,10 @@ export default function StudentPortalPage() {
               <button
                 type="button"
                 onClick={() => handleTabChange('today')}
-                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2 py-2 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <Star className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
-                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                <Star className="w-6 h-6 text-[#059669]" strokeWidth={2.2} />
+                <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                   {isBangla ? 'ক্লাস ফিডব্যাক' : 'Class Feedback'}
                 </span>
               </button>
@@ -1254,10 +1331,10 @@ export default function StudentPortalPage() {
               <button
                 type="button"
                 onClick={() => handleTabChange('materials')}
-                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2 py-2 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <BookOpen className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
-                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                <BookOpen className="w-6 h-6 text-[#059669]" strokeWidth={2.2} />
+                <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                   {isBangla ? 'লেকচার শিট' : 'Lecture Notes'}
                 </span>
               </button>
@@ -1265,10 +1342,10 @@ export default function StudentPortalPage() {
               <button
                 type="button"
                 onClick={() => handleTabChange('graduation')}
-                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2 py-2 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <Award className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
-                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                <Award className="w-6 h-6 text-[#059669]" strokeWidth={2.2} />
+                <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                   {isBangla ? 'ফলাফল ও সনদ' : 'Results & Cert'}
                 </span>
               </button>
@@ -1276,10 +1353,10 @@ export default function StudentPortalPage() {
           </div>
 
           {/* 3. Upcoming Classes Card */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-3.5 sm:p-4 flex flex-col justify-between">
             <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <svg className="w-7 h-7 shrink-0" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <div className="flex items-center gap-2 min-w-0">
+                <svg className="w-6 h-6 shrink-0" viewBox="0 0 28 28" fill="none" aria-hidden="true">
                   <rect x="2.5" y="4.5" width="23" height="20.5" rx="4.5" fill="#FFF7ED" stroke="#FDBA74" strokeWidth="1.4" />
                   <path d="M2.5 9C2.5 6.51472 4.51472 4.5 7 4.5H21C23.4853 4.5 25.5 6.51472 25.5 9V11H2.5V9Z" fill="#EA580C" />
                   <rect x="7.5" y="2" width="2.5" height="4.5" rx="1.25" fill="#9A3412" />
@@ -1290,37 +1367,37 @@ export default function StudentPortalPage() {
                   <rect x="7" y="19.2" width="3.2" height="3" rx="0.8" fill="#FDBA74" />
                   <rect x="12.4" y="19.2" width="3.2" height="3" rx="0.8" fill="#FB923C" />
                 </svg>
-                <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif truncate">
+                <h2 className="text-[14.5px] sm:text-[15px] font-extrabold text-[#0F172A] font-serif truncate">
                   {isBangla ? 'আসন্ন ক্লাসসমূহ' : 'Upcoming Classes'}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => handleTabChange('today')}
-                className="text-xs font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+                className="text-[11px] font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
               >
                 <span>{isBangla ? 'সব দেখুন →' : 'View All →'}</span>
               </button>
             </div>
 
-            <div className="space-y-2.5 mt-3.5 flex-1 flex flex-col justify-center">
+            <div className="space-y-1.5 mt-2.5 flex-1 flex flex-col justify-center">
               {upcomingDisplaySessions.length > 0 ? (
                 upcomingDisplaySessions.map((sess) => {
                   const badge = formatSessionDateBadge(sess.session_date);
                   return (
                     <div
                       key={sess.id}
-                      className="flex items-center justify-between gap-2.5 bg-white hover:bg-[#F0FDF4]/60 border border-slate-200/80 shadow-2xs rounded-xl px-3 py-2 transition-colors"
+                      className="flex items-center justify-between gap-2 bg-white hover:bg-[#F0FDF4]/60 border border-slate-200/80 shadow-2xs rounded-xl px-2.5 py-1.5 transition-colors"
                     >
                       {/* Reference-Matched Mint-Green Date Card with Green Border & Shadow */}
-                      <div className="w-12 shrink-0 rounded-lg bg-[#E3F5EB] border border-[#6EE7B7] py-1 text-center leading-[1.15] shadow-[0_2px_8px_rgba(16,185,129,0.24)]">
-                        <span className="block text-[9.5px] font-bold text-[#065F46]">
+                      <div className="w-11 shrink-0 rounded-lg bg-[#E3F5EB] border border-[#6EE7B7] py-0.5 text-center leading-[1.1] shadow-[0_2px_6px_rgba(16,185,129,0.22)]">
+                        <span className="block text-[9px] font-bold text-[#065F46]">
                           {badge.weekday}
                         </span>
-                        <span className="block text-[9.5px] font-bold text-[#047857]">
+                        <span className="block text-[9px] font-bold text-[#047857]">
                           {badge.month}
                         </span>
-                        <span className="block text-[13.5px] font-black text-[#022C22]">
+                        <span className="block text-[12.5px] font-black text-[#022C22]">
                           {badge.day}
                         </span>
                       </div>
@@ -1328,13 +1405,13 @@ export default function StudentPortalPage() {
                       {/* Class Title & Time/Teacher */}
                       <div className="min-w-0 flex-1">
                         <p
-                          className="text-xs sm:text-[13px] font-bold text-[#0F172A] truncate"
+                          className="text-xs font-bold text-[#0F172A] truncate"
                           title={sess.topic_title || sess.subject_name}
                         >
                           {sess.topic_title || sess.subject_name}
                         </p>
                         <p
-                          className="text-[11px] text-slate-500 truncate mt-0.5"
+                          className="text-[10.5px] text-slate-500 truncate mt-0.5"
                           title={`${sess.start_time?.slice(0, 5)} - ${sess.end_time?.slice(0, 5)} • ${sess.teacher_name}`}
                         >
                           {sess.start_time?.slice(0, 5)} - {sess.end_time?.slice(0, 5)} • {sess.teacher_name}
@@ -1345,7 +1422,7 @@ export default function StudentPortalPage() {
                       <button
                         type="button"
                         onClick={() => handleTabChange('today')}
-                        className="bg-[#059669] hover:bg-[#047857] text-white text-[11px] font-bold px-3.5 py-1.5 rounded-lg transition cursor-pointer shrink-0 shadow-2xs active:scale-95"
+                        className="bg-[#059669] hover:bg-[#047857] text-white text-[11px] font-bold px-3 py-1 rounded-lg transition cursor-pointer shrink-0 shadow-2xs active:scale-95"
                       >
                         {isBangla ? 'যোগ দিন' : 'Join'}
                       </button>
@@ -1353,8 +1430,8 @@ export default function StudentPortalPage() {
                   );
                 })
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-center text-slate-400">
-                  <Calendar className="w-7 h-7 mb-2 text-slate-300" />
+                <div className="flex flex-col items-center justify-center py-6 text-center text-slate-400">
+                  <Calendar className="w-6 h-6 mb-1.5 text-slate-300" />
                   <p className="text-xs font-medium">
                     {isBangla ? 'কোনো নির্ধারিত ক্লাস নেই' : 'No upcoming classes scheduled'}
                   </p>
@@ -1364,42 +1441,43 @@ export default function StudentPortalPage() {
           </div>
         </div>
 
-        {/* Bottom Row: My Learning Progress Card (Left column of bottom row; space ready for Recent Activities & Promo next) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-          <div className="lg:col-span-6 xl:col-span-4 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
+        {/* Bottom 3-Column Row: My Learning Progress + Recent Activities + Keep Learning HD Banner */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-[1.15fr_1.32fr_1.48fr] gap-3.5 items-stretch">
+          {/* Bottom Col 1: My Learning Progress Donut Card */}
+          <div className="lg:col-span-6 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-3.5 sm:p-4 flex flex-col justify-between">
             <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <div className="flex items-center gap-2 min-w-0">
+                <svg className="w-5.5 h-5.5 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <rect x="2" y="14" width="4" height="7" rx="1" fill="#86EFAC" />
                   <rect x="8" y="10" width="4" height="11" rx="1" fill="#22C55E" />
                   <rect x="14" y="6" width="4" height="15" rx="1" fill="#059669" />
                   <path d="M4 9L10.5 4.5L15 7.5L21 3M21 3H16.5M21 3V7.5" stroke="#15803D" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <h2 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif truncate">
+                <h2 className="text-[14.5px] sm:text-[15px] font-extrabold text-[#0F172A] font-serif truncate">
                   {isBangla ? 'আমার শিখন প্রগতি' : 'My Learning Progress'}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => handleTabChange('graduation')}
-                className="text-xs font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+                className="text-[11px] font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
               >
                 <span>{isBangla ? 'বিস্তারিত →' : 'View Details →'}</span>
               </button>
             </div>
 
-            <div className="flex items-center justify-between gap-4 sm:gap-6 mt-4 flex-1">
-              {/* Reference-Matched Glossy Emerald Gradient Donut Ring */}
+            <div className="flex items-center justify-between gap-4 mt-2.5 flex-1">
+              {/* Compact Reference-Matched Glossy Emerald Gradient Donut Ring */}
               <div
-                className="relative w-[136px] h-[136px] shrink-0 flex items-center justify-center"
+                className="relative w-[108px] h-[108px] shrink-0 flex items-center justify-center"
                 title={`${isBangla ? 'সম্পন্ন:' : 'Completed:'} ${learningProgressBreakdown.completed.toFixed(1)}%`}
               >
                 {(() => {
-                  const r = 52;
+                  const r = 42;
                   const circ = 2 * Math.PI * r;
                   const dashOffset = circ * (1 - learningProgressBreakdown.completed / 100);
                   return (
-                    <svg className="w-full h-full" viewBox="0 0 140 140" aria-hidden="true">
+                    <svg className="w-full h-full" viewBox="0 0 116 116" aria-hidden="true">
                       <defs>
                         <linearGradient id="studentLearningDonutGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" stopColor="#34D399" />
@@ -1407,42 +1485,33 @@ export default function StudentPortalPage() {
                           <stop offset="100%" stopColor="#047857" />
                         </linearGradient>
                       </defs>
-                      {/* Light Slate Track */}
+                      <circle cx="58" cy="58" r={r} fill="none" stroke="#E2E8F0" strokeWidth="13" />
                       <circle
-                        cx="70"
-                        cy="70"
-                        r={r}
-                        fill="none"
-                        stroke="#E2E8F0"
-                        strokeWidth="15"
-                      />
-                      {/* Glossy Emerald Progress Arc with Rounded Ends */}
-                      <circle
-                        cx="70"
-                        cy="70"
+                        cx="58"
+                        cy="58"
                         r={r}
                         fill="none"
                         stroke="url(#studentLearningDonutGrad)"
-                        strokeWidth="15"
+                        strokeWidth="13"
                         strokeDasharray={circ}
                         strokeDashoffset={dashOffset}
                         strokeLinecap="round"
-                        transform="rotate(-90 70 70)"
-                        style={{ filter: 'drop-shadow(0 3px 6px rgba(5, 150, 105, 0.25))' }}
+                        transform="rotate(-90 58 58)"
+                        style={{ filter: 'drop-shadow(0 2px 5px rgba(5, 150, 105, 0.25))' }}
                       />
                     </svg>
                   );
                 })()}
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[21px] font-black text-[#0F172A] tracking-tight font-serif">
+                  <span className="text-[17px] font-black text-[#0F172A] tracking-tight font-serif">
                     {learningProgressBreakdown.completed.toFixed(1)}%
                   </span>
                 </div>
               </div>
 
               {/* Progress Breakdown Legend */}
-              <div className="flex-1 space-y-3.5 min-w-0">
-                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
+              <div className="flex-1 space-y-2.5 min-w-0">
+                <div className="flex items-center justify-between gap-2 text-xs">
                   <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] shrink-0" />
                     <span>{isBangla ? 'সম্পন্ন' : 'Completed'}</span>
@@ -1452,7 +1521,7 @@ export default function StudentPortalPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
+                <div className="flex items-center justify-between gap-2 text-xs">
                   <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FB923C] shrink-0" />
                     <span>{isBangla ? 'চলমান' : 'In Progress'}</span>
@@ -1462,7 +1531,7 @@ export default function StudentPortalPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 text-xs sm:text-[13px]">
+                <div className="flex items-center justify-between gap-2 text-xs">
                   <span className="inline-flex items-center gap-2 text-slate-600 font-semibold truncate">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#CBD5E1] shrink-0" />
                     <span>{isBangla ? 'শুরু হয়নি' : 'Not Started'}</span>
@@ -1475,7 +1544,63 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          {/* Bottom-Right HD Vector Artwork Card: Keep Learning... Keep Growing... With As-Sunnah */}
+          {/* Bottom Col 2: Recent Activities Card */}
+          <div className="lg:col-span-6 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-3.5 sm:p-4 flex flex-col justify-between">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-full bg-[#E3F5EB] text-[#059669] flex items-center justify-center shrink-0">
+                  <Clock className="w-3.5 h-3.5 stroke-[2.4]" />
+                </div>
+                <h2 className="text-[14.5px] sm:text-[15px] font-extrabold text-[#0F172A] font-serif truncate">
+                  {isBangla ? 'সাম্প্রতিক কার্যক্রম' : 'Recent Activities'}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleTabChange('attendance')}
+                className="text-[11px] font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+              >
+                <span>{isBangla ? 'সব দেখুন →' : 'View All →'}</span>
+              </button>
+            </div>
+
+            <div className="space-y-2 mt-2.5 flex-1 flex flex-col justify-center">
+              {recentActivityItems.map((act) => (
+                <button
+                  key={act.id}
+                  type="button"
+                  onClick={act.onClick}
+                  className="w-full flex items-center gap-2.5 text-left rounded-xl px-2 py-1 hover:bg-slate-50 transition-colors cursor-pointer group"
+                >
+                  {act.type === 'feedback' && (
+                    <div className="w-7 h-7 rounded-full bg-emerald-100 text-[#059669] flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                  )}
+                  {act.type === 'notice' && (
+                    <div className="w-7 h-7 rounded-full bg-sky-100 text-[#0284C7] flex items-center justify-center shrink-0">
+                      <Info className="w-4 h-4" />
+                    </div>
+                  )}
+                  {act.type === 'result' && (
+                    <div className="w-7 h-7 rounded-full bg-amber-100 text-[#D97706] flex items-center justify-center shrink-0">
+                      <Trophy className="w-3.5 h-3.5" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-[#0F172A] truncate group-hover:text-[#0F766E] transition-colors">
+                      {act.title}
+                    </p>
+                    <p className="text-[10.5px] text-slate-500 truncate">
+                      {act.subtitle}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom Col 3: User's HD Keep Learning... Keep Growing... With As-Sunnah Image Card */}
           <div
             onClick={() => handleTabChange('graduation')}
             role="button"
@@ -1487,145 +1612,19 @@ export default function StudentPortalPage() {
               }
             }}
             title={isBangla ? 'শিখন অগ্রগতি ও সনদপত্র দেখতে ক্লিক করুন' : 'View your learning journey and certificate readiness'}
-            className="lg:col-span-6 xl:col-start-9 xl:col-span-4 relative overflow-hidden rounded-2xl shadow-sm border border-[#064E3B]/40 min-h-[205px] p-5 sm:p-6 flex flex-col justify-center cursor-pointer group select-none"
+            className="lg:col-span-12 xl:col-span-1 relative overflow-hidden rounded-2xl shadow-xs border border-[#064E3B]/30 min-h-[154px] h-full cursor-pointer group select-none"
             style={{
               background:
-                'radial-gradient(circle at 82% 52%, rgba(251, 191, 36, 0.92) 0%, rgba(217, 119, 6, 0.55) 26%, rgba(6, 78, 59, 0.92) 56%, #022C22 100%)',
+                'linear-gradient(90deg, #00461c 0%, #00461c 48%, #0d541e 72%, #8c6e22 92%, #bd8d25 100%)',
             }}
           >
-            {/* Atmospheric Dawn Light Rays & Subtle Twinkle Stars */}
-            <svg
-              className="pointer-events-none absolute inset-0 w-full h-full"
-              viewBox="0 0 420 220"
-              preserveAspectRatio="xMaxYMid slice"
-              fill="none"
-              aria-hidden="true"
-            >
-              <defs>
-                <radialGradient id="promoDawnGlow" cx="78%" cy="56%" r="52%">
-                  <stop offset="0%" stopColor="#FEF08A" stopOpacity="0.92" />
-                  <stop offset="38%" stopColor="#F59E0B" stopOpacity="0.48" />
-                  <stop offset="78%" stopColor="#065F46" stopOpacity="0.1" />
-                  <stop offset="100%" stopColor="#022C22" stopOpacity="0" />
-                </radialGradient>
-                <linearGradient id="promoDomeMain" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#34D399" />
-                  <stop offset="45%" stopColor="#059669" />
-                  <stop offset="100%" stopColor="#064E3B" />
-                </linearGradient>
-                <linearGradient id="promoWallGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#FEF3C7" />
-                  <stop offset="100%" stopColor="#D97706" />
-                </linearGradient>
-                <linearGradient id="promoGoldSwoosh" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#FACC15" />
-                  <stop offset="60%" stopColor="#F59E0B" />
-                  <stop offset="100%" stopColor="#FDE047" />
-                </linearGradient>
-                <linearGradient id="promoMeadow" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#022C22" />
-                  <stop offset="65%" stopColor="#065F46" />
-                  <stop offset="100%" stopColor="#064E3B" />
-                </linearGradient>
-              </defs>
-
-              {/* Soft Twilight Stars */}
-              <circle cx="242" cy="36" r="1.4" fill="#FEF08A" fillOpacity="0.7" />
-              <circle cx="276" cy="22" r="1.1" fill="#FFFFFF" fillOpacity="0.55" />
-              <circle cx="312" cy="40" r="1.5" fill="#FEF08A" fillOpacity="0.75" />
-              <circle cx="394" cy="28" r="1.2" fill="#FFFFFF" fillOpacity="0.6" />
-
-              {/* Golden Sunset Glow Halo Behind Mosque */}
-              <rect x="0" y="0" width="420" height="220" fill="url(#promoDawnGlow)" />
-
-              {/* Distant Faint Mosque Silhouette for Depth */}
-              <g opacity="0.26" fill="#064E3B">
-                <rect x="208" y="138" width="52" height="50" />
-                <path d="M214 138C214 124 224 114 234 114C244 114 254 124 254 138Z" />
-                <rect x="196" y="102" width="6" height="84" />
-                <polygon points="196,102 199,90 202,102" />
-              </g>
-
-              {/* Tall Left Minaret */}
-              <g>
-                <rect x="266" y="64" width="9" height="106" fill="#FEF3C7" stroke="#065F46" strokeWidth="0.8" />
-                <rect x="264" y="92" width="13" height="4.5" rx="1.5" fill="#065F46" />
-                <rect x="264" y="122" width="13" height="4.5" rx="1.5" fill="#065F46" />
-                <path d="M265 64C265 56 270.5 48 270.5 48C270.5 48 276 56 276 64Z" fill="url(#promoDomeMain)" />
-                <line x1="270.5" y1="48" x2="270.5" y2="41" stroke="#FACC15" strokeWidth="1.4" />
-              </g>
-
-              {/* Tall Right Minaret */}
-              <g>
-                <rect x="378" y="48" width="10" height="122" fill="#FEF3C7" stroke="#065F46" strokeWidth="0.8" />
-                <rect x="375.5" y="80" width="15" height="5" rx="1.5" fill="#065F46" />
-                <rect x="375.5" y="114" width="15" height="5" rx="1.5" fill="#065F46" />
-                <path d="M377 48C377 39 383 30 383 30C383 30 389 39 389 48Z" fill="url(#promoDomeMain)" />
-                <line x1="383" y1="30" x2="383" y2="22" stroke="#FACC15" strokeWidth="1.5" />
-                <circle cx="383" cy="21" r="1.8" fill="#FACC15" />
-              </g>
-
-              {/* Secondary Flanking Side Domes */}
-              <path d="M280 130C280 116 290 107 296 107C302 107 312 116 312 130Z" fill="url(#promoDomeMain)" />
-              <line x1="296" y1="107" x2="296" y2="99" stroke="#FACC15" strokeWidth="1.3" />
-
-              <path d="M342 128C342 114 352 105 358 105C364 105 374 114 374 128Z" fill="url(#promoDomeMain)" />
-              <line x1="358" y1="105" x2="358" y2="97" stroke="#FACC15" strokeWidth="1.3" />
-
-              {/* Hero Central Grand Green Dome */}
-              <path
-                d="M298 128C298 104 316 84 327 78C338 84 356 104 356 128Z"
-                fill="url(#promoDomeMain)"
-                stroke="#064E3B"
-                strokeWidth="0.8"
-              />
-              {/* Specular Highlight on Grand Dome */}
-              <path
-                d="M311 122C312 106 320 93 326 87"
-                stroke="#A7F3D0"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeOpacity="0.65"
-              />
-              <line x1="327" y1="78" x2="327" y2="66" stroke="#FACC15" strokeWidth="1.6" />
-              <path d="M325 65C326.5 62.5 329.5 62.5 330.5 65C329 66.5 326 66.5 325 65Z" fill="#FDE047" />
-
-              {/* Sunlit Arched Facade Body */}
-              <rect x="275" y="128" width="104" height="48" rx="3" fill="url(#promoWallGlow)" />
-              <rect x="275" y="126" width="104" height="5" fill="#065F46" />
-              {/* Colonnade Arches */}
-              <path d="M285 174V147C285 142 293 142 293 147V174H285Z" fill="#064E3B" />
-              <path d="M300 174V147C300 142 308 142 308 147V174H300Z" fill="#064E3B" />
-              <path d="M317 174V143C317 135 337 135 337 143V174H317Z" fill="#047857" />
-              <path d="M346 174V147C346 142 354 142 354 147V174H346Z" fill="#064E3B" />
-              <path d="M361 174V147C361 142 369 142 369 147V174H361Z" fill="#064E3B" />
-
-              {/* Lush Palm & Garden Silhouette Foreground */}
-              <path d="M0 178C90 166 175 168 250 182C310 194 370 170 420 154V220H0V178Z" fill="url(#promoMeadow)" />
-              <circle cx="268" cy="170" r="14" fill="#15803D" />
-              <circle cx="284" cy="176" r="12" fill="#16A34A" />
-              <circle cx="386" cy="164" r="15" fill="#15803D" />
-              <circle cx="404" cy="160" r="14" fill="#065F46" />
-
-              {/* Bottom Sweeping Golden Swoosh Ribbon */}
-              <path
-                d="M18 198C98 188 188 176 266 196C325 210 375 182 420 156V165C374 192 325 220 264 205C184 185 96 194 18 202Z"
-                fill="url(#promoGoldSwoosh)"
-              />
-            </svg>
-
-            {/* Ultra-Crisp Code-Rendered Typography */}
-            <div className="relative z-10 max-w-[66%] group-hover:translate-x-0.5 transition-transform">
-              <p className="text-[19px] sm:text-[21px] font-black !text-white leading-[1.15] tracking-tight drop-shadow-xs">
-                Keep Learning...
-              </p>
-              <p className="text-[19px] sm:text-[21px] font-black !text-[#FDE047] leading-[1.15] tracking-tight drop-shadow-xs mt-0.5">
-                Keep Growing...
-              </p>
-              <p className="text-[13.5px] sm:text-[15px] font-extrabold !text-[#ECFDF5] mt-2 tracking-wide">
-                With As-Sunnah
-              </p>
-            </div>
+            <Image
+              src="/keep-learning-promo.png"
+              alt="Keep Learning... Keep Growing... With As-Sunnah"
+              fill
+              priority
+              className="object-contain 2xl:object-cover object-center group-hover:scale-[1.02] transition-transform duration-300"
+            />
           </div>
         </div>
         </div>

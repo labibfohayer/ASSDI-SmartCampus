@@ -1018,7 +1018,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
 
         {/* Top Header Bar */}
         {role === 'student' ? (
-          <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#E2E8F0] h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-7 shadow-2xs gap-3">
+          <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#E2E8F0] h-14 flex items-center justify-between px-4 sm:px-6 shadow-2xs gap-3">
             {/* Left: Mobile Drawer Button & Search Bar (Reference Image 1 Style) */}
             <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
               <button
@@ -1326,19 +1326,25 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         {/* Notice Banner (e.g. Observer Read-Only Notice) */}
         {noticeBanner}
 
-        {/* Main Body Content (Full width on Student role so zero empty side gaps on wide monitors) */}
+        {/* Main Body Content (Full width & compact single-screen fit on Student role) */}
         <main
-          className={`flex-1 w-full relative z-10 pb-24 md:pb-8 ${
+          className={`flex-1 w-full relative z-10 ${
             role === 'student'
-              ? 'px-4 sm:px-6 lg:px-7 py-4 sm:py-5'
-              : 'max-w-7xl mx-auto p-3.5 sm:p-6 lg:p-8'
+              ? 'px-4 sm:px-6 pt-3 pb-24 md:pb-3'
+              : 'max-w-7xl mx-auto p-3.5 sm:p-6 lg:p-8 pb-24 md:pb-8'
           }`}
         >
           {children}
         </main>
 
         {/* Institutional Footer */}
-        <footer className="border-t border-slate-200/80 bg-white py-4 text-center text-xs text-slate-500 pb-20 md:pb-4">
+        <footer
+          className={`border-t border-slate-200/80 bg-white text-center text-slate-500 ${
+            role === 'student'
+              ? 'py-2 text-[11px] pb-20 md:pb-2'
+              : 'py-4 text-xs pb-20 md:pb-4'
+          }`}
+        >
           <p>© 2026 আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউট (ASSDI) • ঢাকা, বাংলাদেশ</p>
         </footer>
       </div>
