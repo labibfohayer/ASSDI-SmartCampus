@@ -116,7 +116,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed flex flex-col justify-between text-[#0F172A] relative"
-      style={{ backgroundImage: "url('/madrasatus-sunnah-bg.jpg')" }}
+      style={{ backgroundImage: "url('/login-islamic-bg.jpg')" }}
     >
       {/* Floating Language Switcher in top right corner */}
       <div className="absolute top-3 right-3 sm:top-5 sm:right-5 z-20">
