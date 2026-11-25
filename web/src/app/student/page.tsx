@@ -1231,31 +1231,34 @@ export default function StudentPortalPage() {
             <div className="relative z-10 grid grid-cols-2 gap-2.5 mt-3.5 flex-1">
               <button
                 type="button"
-                onClick={() => handleTabChange('today')}
+                onClick={() => setScannerOpen(true)}
                 className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <BookOpen className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
+                <QrCode className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
                 <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                  {isBangla ? 'আমার ক্লাসসমূহ' : 'View My Courses'}
+                  {isBangla ? 'কিউআর স্ক্যান' : 'Scan QR'}
                 </span>
               </button>
 
               <button
                 type="button"
-                onClick={() => {
-                  const latestSess = sessions[0];
-                  if (latestSess) {
-                    setSelectedSessionForAssignments(latestSess);
-                    setAssignmentsModalOpen(true);
-                  } else {
-                    handleTabChange('today');
-                  }
-                }}
+                onClick={() => handleTabChange('today')}
                 className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <Send className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
+                <Star className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
                 <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                  {isBangla ? 'কুইজ ও কাজ' : 'Submit Assignment'}
+                  {isBangla ? 'ক্লাস ফিডব্যাক' : 'Class Feedback'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleTabChange('materials')}
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+              >
+                <BookOpen className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
+                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                  {isBangla ? 'লেকচার শিট' : 'Lecture Notes'}
                 </span>
               </button>
 
@@ -1264,20 +1267,9 @@ export default function StudentPortalPage() {
                 onClick={() => handleTabChange('graduation')}
                 className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
               >
-                <BarChart3 className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
+                <Award className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
                 <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                  {isBangla ? 'ফলাফল দেখুন' : 'Check Results'}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleTabChange('help')}
-                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
-              >
-                <Headset className="w-7 h-7 text-[#059669]" strokeWidth={2.2} />
-                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                  {isBangla ? 'শিক্ষকের সহায়তা' : 'Contact Support'}
+                  {isBangla ? 'ফলাফল ও সনদ' : 'Results & Cert'}
                 </span>
               </button>
             </div>
@@ -1480,6 +1472,159 @@ export default function StudentPortalPage() {
                   </span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Bottom-Right HD Vector Artwork Card: Keep Learning... Keep Growing... With As-Sunnah */}
+          <div
+            onClick={() => handleTabChange('graduation')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleTabChange('graduation');
+              }
+            }}
+            title={isBangla ? 'শিখন অগ্রগতি ও সনদপত্র দেখতে ক্লিক করুন' : 'View your learning journey and certificate readiness'}
+            className="lg:col-span-6 xl:col-start-9 xl:col-span-4 relative overflow-hidden rounded-2xl shadow-sm border border-[#064E3B]/40 min-h-[205px] p-5 sm:p-6 flex flex-col justify-center cursor-pointer group select-none"
+            style={{
+              background:
+                'radial-gradient(circle at 82% 52%, rgba(251, 191, 36, 0.92) 0%, rgba(217, 119, 6, 0.55) 26%, rgba(6, 78, 59, 0.92) 56%, #022C22 100%)',
+            }}
+          >
+            {/* Atmospheric Dawn Light Rays & Subtle Twinkle Stars */}
+            <svg
+              className="pointer-events-none absolute inset-0 w-full h-full"
+              viewBox="0 0 420 220"
+              preserveAspectRatio="xMaxYMid slice"
+              fill="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <radialGradient id="promoDawnGlow" cx="78%" cy="56%" r="52%">
+                  <stop offset="0%" stopColor="#FEF08A" stopOpacity="0.92" />
+                  <stop offset="38%" stopColor="#F59E0B" stopOpacity="0.48" />
+                  <stop offset="78%" stopColor="#065F46" stopOpacity="0.1" />
+                  <stop offset="100%" stopColor="#022C22" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="promoDomeMain" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#34D399" />
+                  <stop offset="45%" stopColor="#059669" />
+                  <stop offset="100%" stopColor="#064E3B" />
+                </linearGradient>
+                <linearGradient id="promoWallGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#FEF3C7" />
+                  <stop offset="100%" stopColor="#D97706" />
+                </linearGradient>
+                <linearGradient id="promoGoldSwoosh" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#FACC15" />
+                  <stop offset="60%" stopColor="#F59E0B" />
+                  <stop offset="100%" stopColor="#FDE047" />
+                </linearGradient>
+                <linearGradient id="promoMeadow" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#022C22" />
+                  <stop offset="65%" stopColor="#065F46" />
+                  <stop offset="100%" stopColor="#064E3B" />
+                </linearGradient>
+              </defs>
+
+              {/* Soft Twilight Stars */}
+              <circle cx="242" cy="36" r="1.4" fill="#FEF08A" fillOpacity="0.7" />
+              <circle cx="276" cy="22" r="1.1" fill="#FFFFFF" fillOpacity="0.55" />
+              <circle cx="312" cy="40" r="1.5" fill="#FEF08A" fillOpacity="0.75" />
+              <circle cx="394" cy="28" r="1.2" fill="#FFFFFF" fillOpacity="0.6" />
+
+              {/* Golden Sunset Glow Halo Behind Mosque */}
+              <rect x="0" y="0" width="420" height="220" fill="url(#promoDawnGlow)" />
+
+              {/* Distant Faint Mosque Silhouette for Depth */}
+              <g opacity="0.26" fill="#064E3B">
+                <rect x="208" y="138" width="52" height="50" />
+                <path d="M214 138C214 124 224 114 234 114C244 114 254 124 254 138Z" />
+                <rect x="196" y="102" width="6" height="84" />
+                <polygon points="196,102 199,90 202,102" />
+              </g>
+
+              {/* Tall Left Minaret */}
+              <g>
+                <rect x="266" y="64" width="9" height="106" fill="#FEF3C7" stroke="#065F46" strokeWidth="0.8" />
+                <rect x="264" y="92" width="13" height="4.5" rx="1.5" fill="#065F46" />
+                <rect x="264" y="122" width="13" height="4.5" rx="1.5" fill="#065F46" />
+                <path d="M265 64C265 56 270.5 48 270.5 48C270.5 48 276 56 276 64Z" fill="url(#promoDomeMain)" />
+                <line x1="270.5" y1="48" x2="270.5" y2="41" stroke="#FACC15" strokeWidth="1.4" />
+              </g>
+
+              {/* Tall Right Minaret */}
+              <g>
+                <rect x="378" y="48" width="10" height="122" fill="#FEF3C7" stroke="#065F46" strokeWidth="0.8" />
+                <rect x="375.5" y="80" width="15" height="5" rx="1.5" fill="#065F46" />
+                <rect x="375.5" y="114" width="15" height="5" rx="1.5" fill="#065F46" />
+                <path d="M377 48C377 39 383 30 383 30C383 30 389 39 389 48Z" fill="url(#promoDomeMain)" />
+                <line x1="383" y1="30" x2="383" y2="22" stroke="#FACC15" strokeWidth="1.5" />
+                <circle cx="383" cy="21" r="1.8" fill="#FACC15" />
+              </g>
+
+              {/* Secondary Flanking Side Domes */}
+              <path d="M280 130C280 116 290 107 296 107C302 107 312 116 312 130Z" fill="url(#promoDomeMain)" />
+              <line x1="296" y1="107" x2="296" y2="99" stroke="#FACC15" strokeWidth="1.3" />
+
+              <path d="M342 128C342 114 352 105 358 105C364 105 374 114 374 128Z" fill="url(#promoDomeMain)" />
+              <line x1="358" y1="105" x2="358" y2="97" stroke="#FACC15" strokeWidth="1.3" />
+
+              {/* Hero Central Grand Green Dome */}
+              <path
+                d="M298 128C298 104 316 84 327 78C338 84 356 104 356 128Z"
+                fill="url(#promoDomeMain)"
+                stroke="#064E3B"
+                strokeWidth="0.8"
+              />
+              {/* Specular Highlight on Grand Dome */}
+              <path
+                d="M311 122C312 106 320 93 326 87"
+                stroke="#A7F3D0"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeOpacity="0.65"
+              />
+              <line x1="327" y1="78" x2="327" y2="66" stroke="#FACC15" strokeWidth="1.6" />
+              <path d="M325 65C326.5 62.5 329.5 62.5 330.5 65C329 66.5 326 66.5 325 65Z" fill="#FDE047" />
+
+              {/* Sunlit Arched Facade Body */}
+              <rect x="275" y="128" width="104" height="48" rx="3" fill="url(#promoWallGlow)" />
+              <rect x="275" y="126" width="104" height="5" fill="#065F46" />
+              {/* Colonnade Arches */}
+              <path d="M285 174V147C285 142 293 142 293 147V174H285Z" fill="#064E3B" />
+              <path d="M300 174V147C300 142 308 142 308 147V174H300Z" fill="#064E3B" />
+              <path d="M317 174V143C317 135 337 135 337 143V174H317Z" fill="#047857" />
+              <path d="M346 174V147C346 142 354 142 354 147V174H346Z" fill="#064E3B" />
+              <path d="M361 174V147C361 142 369 142 369 147V174H361Z" fill="#064E3B" />
+
+              {/* Lush Palm & Garden Silhouette Foreground */}
+              <path d="M0 178C90 166 175 168 250 182C310 194 370 170 420 154V220H0V178Z" fill="url(#promoMeadow)" />
+              <circle cx="268" cy="170" r="14" fill="#15803D" />
+              <circle cx="284" cy="176" r="12" fill="#16A34A" />
+              <circle cx="386" cy="164" r="15" fill="#15803D" />
+              <circle cx="404" cy="160" r="14" fill="#065F46" />
+
+              {/* Bottom Sweeping Golden Swoosh Ribbon */}
+              <path
+                d="M18 198C98 188 188 176 266 196C325 210 375 182 420 156V165C374 192 325 220 264 205C184 185 96 194 18 202Z"
+                fill="url(#promoGoldSwoosh)"
+              />
+            </svg>
+
+            {/* Ultra-Crisp Code-Rendered Typography */}
+            <div className="relative z-10 max-w-[66%] group-hover:translate-x-0.5 transition-transform">
+              <p className="text-[19px] sm:text-[21px] font-black !text-white leading-[1.15] tracking-tight drop-shadow-xs">
+                Keep Learning...
+              </p>
+              <p className="text-[19px] sm:text-[21px] font-black !text-[#FDE047] leading-[1.15] tracking-tight drop-shadow-xs mt-0.5">
+                Keep Growing...
+              </p>
+              <p className="text-[13.5px] sm:text-[15px] font-extrabold !text-[#ECFDF5] mt-2 tracking-wide">
+                With As-Sunnah
+              </p>
             </div>
           </div>
         </div>
