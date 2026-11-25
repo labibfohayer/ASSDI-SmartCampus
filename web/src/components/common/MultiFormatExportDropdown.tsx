@@ -15,6 +15,7 @@ import {
 import toast from 'react-hot-toast';
 import { getAccessToken } from '@/lib/auth';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { API_BASE } from '@/lib/api';
 
 export type ExportFileType = 'pdf' | 'docx' | 'pptx' | 'xlsx' | 'csv' | 'print';
 
@@ -144,7 +145,7 @@ export default function MultiFormatExportDropdown({
       const token = getAccessToken();
       const params = { ...queryParams, export: format };
       const queryString = new URLSearchParams(params).toString();
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+      const baseUrl = API_BASE;
       const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
       const downloadUrl = `${baseUrl}/api/v1/${cleanEndpoint}?${queryString}`;
 

@@ -23,7 +23,7 @@ import {
   Clock,
   Star,
 } from 'lucide-react';
-import api from '@/lib/api';
+import api, { API_BASE } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import MultiFormatExportDropdown from '@/components/common/MultiFormatExportDropdown';
@@ -294,8 +294,7 @@ export default function ReportsPage() {
       queryParams.export = format;
 
       const queryString = new URLSearchParams(queryParams).toString();
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+      const baseUrl = API_BASE;
       const downloadEndpoint = `${baseUrl}/api/v1/${currentReport.endpoint}?${queryString}`;
 
       const response = await fetch(downloadEndpoint, {

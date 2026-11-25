@@ -28,7 +28,7 @@ import {
   User as UserIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '@/lib/api';
+import api, { API_BASE } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import MultiFormatExportDropdown from '@/components/common/MultiFormatExportDropdown';
@@ -309,7 +309,7 @@ export default function AdminStudentsPage() {
     setDownloadingTemplate(true);
     try {
       const token = getAccessToken();
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+      const baseUrl = API_BASE;
       const endpoint = templateFormat === 'csv'
         ? `${baseUrl}/api/v1/students/import-template/?template_format=csv`
         : `${baseUrl}/api/v1/students/import-template/`;
