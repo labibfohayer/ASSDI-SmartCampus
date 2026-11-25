@@ -44,26 +44,61 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUser } from '@/lib/auth';
 
-function SparklineWave({ color = '#10B981', gradientId = 'green-wave' }: { color?: string; gradientId?: string }) {
+function SparklineWave({
+  values,
+  color = '#10B981',
+  gradientId = 'green-wave',
+}: {
+  values: number[];
+  color?: string;
+  gradientId?: string;
+}) {
+  const safeValues =
+    values.length === 0 ? [0, 0] : values.length === 1 ? [values[0], values[0]] : values;
+
+  const width = 200;
+  const topY = 4;
+  const bottomY = 36;
+  const usableHeight = bottomY - topY;
+
+  const points = safeValues.map((val, idx) => {
+    const clamped = Math.max(0, Math.min(100, Number.isFinite(val) ? val : 0));
+    const x = (idx / (safeValues.length - 1)) * width;
+    const y = bottomY - (clamped / 100) * usableHeight;
+    return { x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) };
+  });
+
+  // Monotone horizontal-midpoint cubic Bezier curve (no vertical overshoot outside 0..100%)
+  let linePath = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i];
+    const p1 = points[i + 1];
+    const cx = Number(((p0.x + p1.x) / 2).toFixed(2));
+    linePath += ` C ${cx} ${p0.y}, ${cx} ${p1.y}, ${p1.x} ${p1.y}`;
+  }
+
+  const last = points[points.length - 1];
+  const areaPath = `${linePath} L ${last.x} 40 L ${points[0].x} 40 Z`;
+
   return (
-    <div className="w-full h-8 overflow-hidden mt-1.5 pointer-events-none">
-      <svg className="w-full h-full" viewBox="0 0 200 32" fill="none" preserveAspectRatio="none">
+    <div className="w-full h-10 overflow-visible mt-2 pointer-events-none">
+      <svg className="w-full h-full overflow-visible" viewBox="0 0 200 40" fill="none" preserveAspectRatio="none">
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={color} stopOpacity="0.28" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.0" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.02" />
           </linearGradient>
         </defs>
+        <line x1="0" y1={bottomY} x2="200" y2={bottomY} stroke="#E2E8F0" strokeWidth="1" strokeDasharray="3 3" />
+        <path d={areaPath} fill={`url(#${gradientId})`} />
         <path
-          d="M 0 24 C 25 18, 45 28, 70 16 C 95 6, 120 20, 145 10 C 165 4, 185 8, 200 5 L 200 32 L 0 32 Z"
-          fill={`url(#${gradientId})`}
-        />
-        <path
-          d="M 0 24 C 25 18, 45 28, 70 16 C 95 6, 120 20, 145 10 C 165 4, 185 8, 200 5"
+          d={linePath}
           stroke={color}
-          strokeWidth="2.5"
+          strokeWidth="2.4"
           strokeLinecap="round"
+          strokeLinejoin="round"
         />
+        <circle cx={last.x} cy={last.y} r="3" fill={color} stroke="#FFFFFF" strokeWidth="1.2" />
       </svg>
     </div>
   );
@@ -548,41 +583,111 @@ export default function StudentPortalPage() {
     return true;
   });
 
+  // Real data calculations for KPI cards & measurement-driven sparkline graphs
+  const chronologicalAttRecords = [...attRecords].reverse();
+  const totalSessCount = attSummary?.total_sessions || chronologicalAttRecords.length || 0;
+  const presentCount = attSummary?.present || 0;
+  const absentCount = attSummary?.absent || 0;
+  const attPct = Number(attSummary?.attendance_percentage ?? 0);
+  const presentPct = totalSessCount > 0 ? Math.round((presentCount / totalSessCount) * 1000) / 10 : 0;
+  const absentPct = totalSessCount > 0 ? Math.round((absentCount / totalSessCount) * 1000) / 10 : 0;
+  const attDeltaVsTarget = Math.round((attPct - 75) * 10) / 10;
+  const resolvedHelpCount = helpRequests.filter((h) => h.status === 'resolved').length;
+  const helpResolvedPct = helpRequests.length > 0 ? Math.round((resolvedHelpCount / helpRequests.length) * 100) : 0;
+
+  // 1. Attendance Rate trajectory (0-100 scale): goes up on present, drops on absent, ends at real attPct
+  const attendanceTrendSeries: number[] = (() => {
+    if (chronologicalAttRecords.length === 0) {
+      return attPct > 0 ? [Math.max(0, attPct - 12), attPct] : [0, 0];
+    }
+    let attendedSoFar = 0;
+    return chronologicalAttRecords.map((rec, idx) => {
+      if (rec.status === 'present' || rec.status === 'late' || rec.status === 'approved_leave') {
+        attendedSoFar += 1;
+      }
+      return Math.round((attendedSoFar / (idx + 1)) * 1000) / 10;
+    });
+  })();
+
+  // 2. Present Sessions cumulative progress % out of total sessions (scales proportionally to presentCount/totalSessCount)
+  const presentProgressSeries: number[] = (() => {
+    if (chronologicalAttRecords.length === 0 || totalSessCount === 0) {
+      return [0, presentPct];
+    }
+    let presentSoFar = 0;
+    return [
+      0,
+      ...chronologicalAttRecords.map((rec) => {
+        if (rec.status === 'present' || rec.status === 'late') {
+          presentSoFar += 1;
+        }
+        return Math.round((presentSoFar / totalSessCount) * 1000) / 10;
+      }),
+    ];
+  })();
+
+  // 3. Absence rate cumulative progression out of total sessions (scales proportionally to absentCount/totalSessCount)
+  const absentTrendSeries: number[] = (() => {
+    if (chronologicalAttRecords.length === 0 || totalSessCount === 0) {
+      return [0, absentPct];
+    }
+    let absentSoFar = 0;
+    return [
+      0,
+      ...chronologicalAttRecords.map((rec) => {
+        if (rec.status === 'absent') {
+          absentSoFar += 1;
+        }
+        return Math.round((absentSoFar / totalSessCount) * 1000) / 10;
+      }),
+    ];
+  })();
+
+  // 4. Help Requests resolution progression scaled accurately to resolved percentage (ends at helpResolvedPct)
+  const helpTrendSeries: number[] = (() => {
+    if (helpRequests.length === 0) return [0, 0];
+    const sorted = [...helpRequests].reverse();
+    let resolvedSoFar = 0;
+    return [
+      0,
+      ...sorted.map((req) => {
+        if (req.status === 'resolved') resolvedSoFar += 1;
+        return Math.round((resolvedSoFar / helpRequests.length) * 1000) / 10;
+      }),
+    ];
+  })();
+
   return (
     <div className="space-y-6">
-      {/* Islamic Modern Student Hero Welcome Banner (Reference Design Architecture) */}
-      <div className="bg-gradient-to-r from-[#FFFDF8] via-[#FDF8EC] to-[#F7EFCF] rounded-2xl sm:rounded-3xl border border-[#FDE68A] shadow-xs p-5 sm:p-7 relative overflow-hidden">
-        {/* Decorative Mosque Artwork on the Right (Seamless blend with Calligraphy & Green Skyline) */}
-        <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-auto h-full pointer-events-none select-none">
-          <Image
-            src="/islamic-banner-art.png"
-            alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
-            width={377}
-            height={144}
-            priority
-            className="h-full w-auto object-cover object-right"
-          />
-        </div>
+      {/* Islamic Modern Student Hero Welcome Card (Full Custom Background Artwork) */}
+      <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs border border-[#FDE68A]/70 bg-[#FDF8EC] min-h-[245px] lg:min-h-[285px] flex items-center">
+        <Image
+          src="/islamic-hero-banner-bg.png"
+          alt="দক্ষতা অর্জন করি, ইসলামের পথে এগিয়ে যাই"
+          fill
+          priority
+          className="object-cover object-bottom-right pointer-events-none select-none"
+        />
 
-        {/* Top-Right Decorative Amber/Emerald Curve Accent (Matching Reference Design on small screens) */}
+        {/* Subtle mobile/tablet left scrim so text remains crisp over narrower screens */}
         <div
-          className="lg:hidden absolute -top-8 -right-8 w-28 h-28 rounded-full border-4 border-emerald-700/30 bg-amber-100/40 pointer-events-none"
+          className="lg:hidden absolute inset-0 bg-gradient-to-r from-[#FFFDF8]/92 via-[#FDF8EC]/80 to-transparent pointer-events-none"
           aria-hidden="true"
         />
 
-        {/* Content on the Left */}
-        <div className="relative z-10 max-w-2xl">
+        {/* Content Positioned Cleanly on the Left Side */}
+        <div className="relative z-10 p-5 sm:p-7 pb-8 lg:max-w-[52%] w-full">
           {/* Welcome Heading */}
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#002F25] tracking-tight font-serif">
+            <h1 className="text-xl sm:text-2xl lg:text-[28px] font-extrabold text-[#002F25] tracking-tight font-serif leading-tight">
               {isBangla ? 'স্বাগতম' : 'Welcome back'}, {profile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || (isBangla ? 'শিক্ষার্থী' : 'Student')}!
             </h1>
-            <span className="text-2xl sm:text-3xl" role="img" aria-label="wave">
+            <span className="text-2xl sm:text-3xl shrink-0" role="img" aria-label="wave">
               👋
             </span>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#475569] font-medium mt-1.5 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#334155] font-medium mt-1.5 leading-relaxed">
             {isBangla
               ? 'আস-সুন্নাহ স্কিল ডেভেলপমেন্ট ইনস্টিটিউটে আজকের শিক্ষণ ও ক্লাসের কার্যক্রম দেখে নিন।'
               : "Here's what's happening at As-Sunnah Skill Development Institute today."}
@@ -590,7 +695,7 @@ export default function StudentPortalPage() {
 
           {/* Date, Batch, Student ID Badges */}
           <div className="mt-3.5 flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6F4EA] border border-[#A7F3D0] text-[#065F46] text-xs font-semibold shadow-2xs">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6F4EA]/95 border border-[#A7F3D0] text-[#065F46] text-xs font-semibold shadow-2xs">
               <Calendar className="w-3.5 h-3.5 text-[#059669]" />
               <span suppressHydrationWarning>
                 {new Date().toLocaleDateString(isBangla ? 'bn-BD' : 'en-US', {
@@ -610,7 +715,7 @@ export default function StudentPortalPage() {
               {profile?.student_id_number || 'STD-2026-042-001'}
             </span>
 
-            <span className="text-[11px] font-semibold bg-[#F0FDFA] text-[#0F766E] px-2.5 py-1 rounded-full border border-[#CCFBF1] flex items-center gap-1 shadow-2xs">
+            <span className="text-[11px] font-semibold bg-[#F0FDFA]/95 text-[#0F766E] px-2.5 py-1 rounded-full border border-[#CCFBF1] flex items-center gap-1 shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0D9488] animate-pulse" />
               {isBangla ? 'নিয়মিত শিক্ষার্থী' : 'Active Student'}
             </span>
@@ -629,7 +734,7 @@ export default function StudentPortalPage() {
 
             <button
               onClick={() => setIdCardOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+              className="px-3.5 py-2 rounded-xl bg-white/95 hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
               title={isBangla ? 'ডিজিটাল আইডি কার্ড' : 'Digital Student ID'}
             >
               <CreditCard className="w-3.5 h-3.5 text-[#B45309]" />
@@ -638,7 +743,7 @@ export default function StudentPortalPage() {
 
             <button
               onClick={() => setCertModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+              className="px-3.5 py-2 rounded-xl bg-white/95 hover:bg-[#FFFBEB] text-[#B45309] border border-[#FCD34D] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
               title={isBangla ? 'কোর্স সনদপত্র' : 'Course Certificate'}
             >
               <Award className="w-3.5 h-3.5 text-[#B45309]" />
@@ -648,7 +753,7 @@ export default function StudentPortalPage() {
             <button
               onClick={loadStudentData}
               title={isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh'}
-              className="px-3 py-2 rounded-xl bg-white hover:bg-[#FFFBEB] text-[#64748B] hover:text-[#0F172A] border border-slate-200/90 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer shadow-xs active:scale-95"
+              className="px-3 py-2 rounded-xl bg-white/95 hover:bg-[#FFFBEB] text-[#64748B] hover:text-[#0F172A] border border-slate-200/90 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer shadow-xs active:scale-95"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-[#0F766E] ${loading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">{isBangla ? 'তথ্য রিফ্রেশ' : 'Refresh'}</span>
@@ -657,7 +762,7 @@ export default function StudentPortalPage() {
         </div>
       </div>
 
-      {/* Attendance & Learning Metric Cards (Bento Wave Style & Clickable Shortcuts) */}
+      {/* Attendance & Learning Metric Cards (Measurement-Driven Sparkline Charts & Clickable Shortcuts) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1: Attendance Rate */}
         <div
@@ -690,27 +795,32 @@ export default function StudentPortalPage() {
                   <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-serif">
                     {safeFixed(attSummary?.attendance_percentage)}%
                   </span>
-                  <span className="text-[11px] font-bold text-emerald-600 inline-flex items-center">
-                    ↑ 12%
+                  <span
+                    className={`text-[11px] font-bold inline-flex items-center ${
+                      attDeltaVsTarget >= 0 ? 'text-emerald-600' : 'text-red-600'
+                    }`}
+                    title={isBangla ? '৭৫% ন্যূনতম মানদণ্ডের সাপেক্ষে' : 'Relative to 75% benchmark'}
+                  >
+                    {attDeltaVsTarget >= 0 ? `↑ +${attDeltaVsTarget}%` : `↓ ${attDeltaVsTarget}%`}
                   </span>
                 </div>
               </div>
             </div>
 
-            <SparklineWave color="#10B981" gradientId="wave-attendance" />
+            <SparklineWave values={attendanceTrendSeries} color="#10B981" gradientId="wave-attendance" />
           </div>
 
           <p className="text-[11px] font-semibold text-emerald-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
             <span className="truncate">
-              {(attSummary?.attendance_percentage || 0) >= 80
+              {attPct >= 80
                 ? isBangla ? 'সন্তোষজনক ও নিয়মিত উপস্থিতি' : 'Satisfactory attendance'
                 : isBangla ? 'উপস্থিতির হার বৃদ্ধি প্রয়োজন' : 'Needs improvement'}
             </span>
           </p>
         </div>
 
-        {/* Card 2: Present Days */}
+        {/* Card 2: Present Sessions */}
         <div
           role="button"
           tabIndex={0}
@@ -739,19 +849,19 @@ export default function StudentPortalPage() {
                 </span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                   <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-serif">
-                    {attSummary?.present || 0}
+                    {presentCount}
                   </span>
                   <span className="text-xs font-semibold text-slate-400">
-                    / {attSummary?.total_sessions || 0}
+                    / {totalSessCount}
                   </span>
                   <span className="text-[11px] font-bold text-sky-600 inline-flex items-center ml-1">
-                    ↑ 0%
+                    {presentPct}%
                   </span>
                 </div>
               </div>
             </div>
 
-            <SparklineWave color="#0284C7" gradientId="wave-present" />
+            <SparklineWave values={presentProgressSeries} color="#0284C7" gradientId="wave-present" />
           </div>
 
           <p className="text-[11px] font-semibold text-emerald-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
@@ -760,7 +870,7 @@ export default function StudentPortalPage() {
           </p>
         </div>
 
-        {/* Card 3: Absent Days */}
+        {/* Card 3: Absent Sessions */}
         <div
           role="button"
           tabIndex={0}
@@ -788,28 +898,28 @@ export default function StudentPortalPage() {
                   {isBangla ? 'অনুপস্থিতি' : 'Absences'}
                 </span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className={`text-2xl sm:text-3xl font-black ${(attSummary?.absent || 0) >= 3 ? 'text-amber-600' : 'text-[#0F172A]'} tracking-tight font-serif`}>
-                    {attSummary?.absent || 0}
+                  <span className={`text-2xl sm:text-3xl font-black ${absentCount >= 3 ? 'text-amber-600' : 'text-[#0F172A]'} tracking-tight font-serif`}>
+                    {absentCount}
                   </span>
                   <span className="text-xs font-semibold text-slate-400">
                     {isBangla ? 'সেশন' : 'sessions'}
                   </span>
                   <span className="text-[11px] font-bold text-amber-600 inline-flex items-center ml-1">
-                    ↑ 1%
+                    {absentPct}%
                   </span>
                 </div>
               </div>
             </div>
 
-            <SparklineWave color="#F59E0B" gradientId="wave-absent" />
+            <SparklineWave values={absentTrendSeries} color="#F59E0B" gradientId="wave-absent" />
           </div>
 
           <p className={`text-[11px] font-bold mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2 ${
-            (attSummary?.absent || 0) >= 3 ? 'text-amber-600' : 'text-slate-600'
+            absentCount >= 3 ? 'text-amber-600' : 'text-slate-600'
           }`}>
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">
-              {(attSummary?.absent || 0) >= 3
+              {absentCount >= 3
                 ? isBangla ? 'সতর্কবার্তা: অনুপস্থিতি বেশি' : 'Warning: High absences'
                 : isBangla ? 'স্বাভাবিক সীমার মধ্যে' : 'Normal range'}
             </span>
@@ -851,19 +961,19 @@ export default function StudentPortalPage() {
                     {isBangla ? 'টি' : 'total'}
                   </span>
                   <span className="text-[11px] font-bold text-purple-600 inline-flex items-center ml-1">
-                    ↑ 5%
+                    {helpRequests.length > 0 ? `${helpResolvedPct}%` : '0%'}
                   </span>
                 </div>
               </div>
             </div>
 
-            <SparklineWave color="#A855F7" gradientId="wave-help" />
+            <SparklineWave values={helpTrendSeries} color="#A855F7" gradientId="wave-help" />
           </div>
 
           <p className="text-[11px] font-bold text-purple-700 mt-2.5 flex items-center gap-1.5 border-t border-slate-100 pt-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
             <span className="truncate">
-              {helpRequests.filter((h) => h.status === 'resolved').length}{' '}
+              {resolvedHelpCount}{' '}
               {isBangla ? 'টি সমাধান হয়েছে' : 'resolved'}
             </span>
           </p>
