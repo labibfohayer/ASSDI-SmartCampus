@@ -52,7 +52,7 @@ const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
   {
     id: 'overview',
     href: '/admin',
-    labelBn: 'কোঅর্ডিনেশন ওভারভিউ',
+    labelBn: 'সিস্টেম ওভারভিউ',
     labelEn: 'System Overview',
     iconName: 'ShieldCheck',
     section: 'main',
@@ -62,39 +62,19 @@ const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
   {
     id: 'students',
     href: '/admin/students',
-    labelBn: 'শিক্ষার্থী ও ভর্তি',
-    labelEn: 'Student Directory',
+    labelBn: 'স্টুডেন্ট',
+    labelEn: 'Students',
     iconName: 'Users',
     section: 'main',
     isArchived: false,
     isSystemDefault: true,
   },
   {
-    id: 'courses',
+    id: 'teachers',
     href: '/admin/courses',
-    labelBn: 'কোর্স ও ব্যাচসমূহ',
-    labelEn: 'Courses & Batches',
-    iconName: 'Layers',
-    section: 'main',
-    isArchived: false,
-    isSystemDefault: true,
-  },
-  {
-    id: 'sessions',
-    href: '/admin/sessions',
-    labelBn: 'ক্লাস সেশন ও রুটিন',
-    labelEn: 'Class Sessions & Routine',
-    iconName: 'Calendar',
-    section: 'main',
-    isArchived: false,
-    isSystemDefault: true,
-  },
-  {
-    id: 'announcements',
-    href: '/announcements',
-    labelBn: 'নোটিশ ও অ্যানাউন্সমেন্ট',
-    labelEn: 'Notice Board',
-    iconName: 'Megaphone',
+    labelBn: 'টিচার্স',
+    labelEn: 'Teachers',
+    iconName: 'GraduationCap',
     section: 'main',
     isArchived: false,
     isSystemDefault: true,
@@ -214,7 +194,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('assdi_admin_nav_menus_v1');
+        const saved = localStorage.getItem('assdi_admin_nav_menus_v3');
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -223,7 +203,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
               (m: any) => m.id !== 'coordinator_analytics' && m.href !== '/coordinator'
             );
             setAdminMenus(sanitized);
-            localStorage.setItem('assdi_admin_nav_menus_v1', JSON.stringify(sanitized));
+            localStorage.setItem('assdi_admin_nav_menus_v3', JSON.stringify(sanitized));
           }
         }
       } catch (e) {
@@ -235,14 +215,14 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
   const handleSaveAdminMenus = (updated: CustomNavItem[]) => {
     setAdminMenus(updated);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('assdi_admin_nav_menus_v1', JSON.stringify(updated));
+      localStorage.setItem('assdi_admin_nav_menus_v3', JSON.stringify(updated));
     }
   };
 
   const handleResetAdminMenus = () => {
     setAdminMenus(DEFAULT_ADMIN_MENUS);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('assdi_admin_nav_menus_v1');
+      localStorage.removeItem('assdi_admin_nav_menus_v3');
     }
   };
 

@@ -28,6 +28,7 @@ import {
   Settings,
   Star,
   HelpCircle,
+  GraduationCap,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -58,6 +59,7 @@ export const AVAILABLE_ICONS: { [key: string]: any } = {
   Settings,
   Star,
   HelpCircle,
+  GraduationCap,
 };
 
 interface AdminMenuManagerModalProps {
