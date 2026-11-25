@@ -1149,22 +1149,22 @@ export default function AdminOverviewPage() {
         {/* Col 3: Course Progress Circular Donut (3 cols) */}
         <div className="md:col-span-12 lg:col-span-3 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <PieChart className="w-4 h-4 text-emerald-600" />
+            <div className="flex items-center gap-2 pb-2.5 border-b border-slate-100">
+              <Clock className="w-5 h-5 text-emerald-700 shrink-0" strokeWidth={2.5} />
               <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
                 {isBangla ? 'কোর্স অগ্রগতি' : 'Course Progress'}
               </h3>
             </div>
 
-            <div className="flex flex-col items-center justify-center my-2">
-              <div className="relative w-20 h-20 flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center my-3">
+              <div className="relative w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle
                     cx="50"
                     cy="50"
                     r="38"
                     stroke="#E2E8F0"
-                    strokeWidth="9"
+                    strokeWidth="10"
                     fill="none"
                   />
                   <circle
@@ -1172,7 +1172,7 @@ export default function AdminOverviewPage() {
                     cy="50"
                     r="38"
                     stroke="#059669"
-                    strokeWidth="9"
+                    strokeWidth="10"
                     strokeDasharray="238.76"
                     strokeDashoffset={238.76 * (1 - 0.724)}
                     strokeLinecap="round"
@@ -1183,46 +1183,50 @@ export default function AdminOverviewPage() {
                     cy="50"
                     r="38"
                     stroke="#F59E0B"
-                    strokeWidth="9"
+                    strokeWidth="10"
                     strokeDasharray="238.76"
                     strokeDashoffset={238.76 * (1 - 0.182)}
                     strokeLinecap="round"
                     fill="none"
-                    className="opacity-70"
+                    className="opacity-90"
                     style={{ transformOrigin: '50% 50%', transform: 'rotate(260deg)' }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-sm font-black text-[#0F172A] tracking-tight leading-none">
+                  <span className="text-2xl font-black text-[#0F172A] tracking-tight leading-none">
                     72.4%
                   </span>
-                  <span className="text-[8.5px] text-slate-500 font-semibold mt-0.5">
+                  <span className="text-[9.5px] text-slate-500 font-bold mt-1 tracking-wider">
                     {isBangla ? 'অগ্রগতি' : 'Progress'}
                   </span>
                 </div>
               </div>
 
-              <div className="w-full space-y-1 mt-2 text-xs">
+              <span className="text-[11px] font-bold text-slate-500 text-center mt-2 block">
+                {isBangla ? 'সার্বিক অগ্রগতি' : 'Overall Progress'}
+              </span>
+
+              <div className="w-full space-y-1.5 mt-3 pt-2.5 border-t border-slate-100 text-xs">
                 <div className="flex items-center justify-between text-slate-600">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#059669]" />
-                    <span>{isBangla ? 'সম্পন্ন' : 'Completed'}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#059669] shrink-0" />
+                    <span className="font-medium">{isBangla ? 'সম্পন্ন' : 'Completed'}</span>
                   </span>
-                  <span className="font-bold text-[#0F172A]">72.4%</span>
+                  <span className="font-extrabold text-[#0F172A]">72.4%</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-                    <span>{isBangla ? 'চলমান' : 'In Progress'}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] shrink-0" />
+                    <span className="font-medium">{isBangla ? 'চলমান' : 'In Progress'}</span>
                   </span>
-                  <span className="font-bold text-[#0F172A]">18.2%</span>
+                  <span className="font-extrabold text-[#0F172A]">18.2%</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-slate-300" />
-                    <span>{isBangla ? 'শুরু হয়নি' : 'Not Started'}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-300 shrink-0" />
+                    <span className="font-medium">{isBangla ? 'শুরু হয়নি' : 'Not Started'}</span>
                   </span>
-                  <span className="font-bold text-[#0F172A]">9.4%</span>
+                  <span className="font-extrabold text-[#0F172A]">9.4%</span>
                 </div>
               </div>
             </div>
