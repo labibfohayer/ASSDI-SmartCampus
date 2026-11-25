@@ -34,6 +34,8 @@ import {
   BarChart3,
   ChevronDown,
   ArrowLeft,
+  Zap,
+  Headset,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -644,6 +646,35 @@ export default function StudentPortalPage() {
     return points;
   })();
 
+  // Upcoming / Scheduled classes list (top 3 chronological future or most recent published sessions)
+  const upcomingDisplaySessions = (() => {
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const future = [...sessions]
+      .filter((s) => (s.session_date || '') >= todayIso)
+      .sort((a, b) => `${a.session_date} ${a.start_time}`.localeCompare(`${b.session_date} ${b.start_time}`));
+    if (future.length >= 3) return future.slice(0, 3);
+    const seen = new Set(future.map((s) => s.id));
+    const fallback = sessions.filter((s) => !seen.has(s.id));
+    return [...future, ...fallback].slice(0, 3);
+  })();
+
+  const formatSessionDateBadge = (dateStr: string) => {
+    if (!dateStr || !dateStr.includes('-')) {
+      return { weekday: isBangla ? 'আজ' : 'Day', month: '', day: '--' };
+    }
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dt = new Date(y, (m || 1) - 1, d || 1);
+    const weekdayBn = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি'][dt.getDay()];
+    const weekdayEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dt.getDay()];
+    const monthBn = ['জানু', 'ফেব্রু', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টে', 'অক্টো', 'নভে', 'ডিসে'][dt.getMonth()];
+    const monthEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dt.getMonth()];
+    return {
+      weekday: isBangla ? weekdayBn : weekdayEn,
+      month: isBangla ? monthBn : monthEn,
+      day: isBangla ? String(d).replace(/\d/g, (n) => '০১২৩৪৫৬৭৮৯'[Number(n)]) : String(d),
+    };
+  };
+
   return (
     <div className="space-y-4 sm:space-y-5">
       {/* Slim Islamic Modern Student Hero Welcome Card (Matching Reference Height) */}
@@ -993,133 +1024,302 @@ export default function StudentPortalPage() {
         </div>
       )}
 
-      {/* DASHBOARD OVERVIEW VIEW: Attendance Overview Chart (More cards coming step-by-step) */}
+      {/* DASHBOARD OVERVIEW VIEW: Middle 3-Column Row (Attendance Overview + Quick Actions + Upcoming Classes) */}
       {isDashboardHome && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 sm:p-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#16A34A]">
-                <BarChart3 className="w-4 h-4" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1.42fr_1fr_1.33fr] gap-4 items-stretch">
+          {/* 1. Compact Attendance Overview Chart Card */}
+          <div className="lg:col-span-2 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#16A34A] shrink-0">
+                    <BarChart3 className="w-4 h-4" />
+                  </div>
+                  <h2 className="text-sm sm:text-[15px] font-extrabold text-[#0F172A] font-serif">
+                    {isBangla ? 'উপস্থিতির সংক্ষিপ্ত চিত্র' : 'Attendance Overview'}
+                  </h2>
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={attendanceRange}
+                    onChange={(e) => setAttendanceRange(e.target.value as 'month' | 'all')}
+                    aria-label={isBangla ? 'সময়সীমা নির্বাচন' : 'Select time range'}
+                    className="appearance-none bg-white border border-slate-200 hover:border-slate-300 rounded-lg pl-2.5 pr-7 py-1 text-[11px] font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  >
+                    <option value="month">{isBangla ? 'এই মাস' : 'This Month'}</option>
+                    <option value="all">{isBangla ? 'সব সেশন' : 'All Sessions'}</option>
+                  </select>
+                  <ChevronDown className="w-3 h-3 text-slate-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
               </div>
-              <h2 className="text-base sm:text-lg font-extrabold text-[#0F172A] font-serif">
-                {isBangla ? 'উপস্থিতির সংক্ষিপ্ত চিত্র' : 'Attendance Overview'}
-              </h2>
+
+              {/* Compact Chart Legend */}
+              <div className="flex items-center justify-end gap-3.5 mt-2 mb-1.5 text-[11px] font-semibold">
+                <span className="inline-flex items-center gap-1.5 text-slate-700">
+                  <span className="w-2 h-2 rounded-full bg-[#16A34A]" />
+                  <span>{isBangla ? 'উপস্থিতি %' : 'Attendance %'}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-slate-700">
+                  <span className="w-3 border-t-2 border-dashed border-[#F59E0B] inline-block" />
+                  <span className="w-2 h-2 rounded-full bg-[#F59E0B] -ml-1" />
+                  <span>{isBangla ? 'লক্ষ্যমাত্রা (৮০%)' : 'Target (80%)'}</span>
+                </span>
+              </div>
             </div>
 
-            <div className="relative">
-              <select
-                value={attendanceRange}
-                onChange={(e) => setAttendanceRange(e.target.value as 'month' | 'all')}
-                aria-label={isBangla ? 'সময়সীমা নির্বাচন' : 'Select time range'}
-                className="appearance-none bg-white border border-slate-200 hover:border-slate-300 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-              >
-                <option value="month">{isBangla ? 'এই মাস' : 'This Month'}</option>
-                <option value="all">{isBangla ? 'সব সেশন' : 'All Sessions'}</option>
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-          </div>
-
-          {/* Chart Legend */}
-          <div className="flex items-center justify-end gap-4 mt-2 mb-3 text-xs font-semibold">
-            <span className="inline-flex items-center gap-1.5 text-slate-700">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#16A34A]" />
-              <span>{isBangla ? 'উপস্থিতি %' : 'Attendance %'}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-slate-700">
-              <span className="w-3.5 border-t-2 border-dashed border-[#F59E0B] inline-block" />
-              <span className="w-2 h-2 rounded-full bg-[#F59E0B] -ml-1" />
-              <span>{isBangla ? 'লক্ষ্যমাত্রা (৮০%)' : 'Target (80%)'}</span>
-            </span>
-          </div>
-
-          {/* Recharts Area Chart */}
-          <div className="w-full h-[250px] sm:h-[275px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={attendanceOverviewData} margin={{ top: 28, right: 26, left: -2, bottom: 4 }}>
-                <defs>
-                  <linearGradient id="studentAttOverviewGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#16A34A" stopOpacity={0.22} />
-                    <stop offset="95%" stopColor="#16A34A" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis
-                  dataKey="label"
-                  padding={{ left: 26, right: 16 }}
-                  axisLine={{ stroke: '#CBD5E1' }}
-                  tickLine={false}
-                  tick={{ fill: '#64748B', fontSize: 12, fontWeight: 600 }}
-                  dy={8}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  ticks={[0, 25, 50, 75, 100]}
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#64748B', fontSize: 11, fontWeight: 500 }}
-                  tickFormatter={(v) => `${v}%`}
-                />
-                <Tooltip
-                  content={({ active, payload, label }) => {
-                    if (!active || !payload || payload.length === 0) return null;
-                    const item = payload[0].payload;
-                    return (
-                      <div className="bg-white border border-slate-200 rounded-xl shadow-lg px-3.5 py-2.5 text-xs">
-                        <p className="font-bold text-[#0F172A]">{label}</p>
-                        <p className="text-[#16A34A] font-extrabold mt-0.5">
-                          {isBangla ? 'উপস্থিতি হার:' : 'Attendance:'} {item.labelPct}
-                        </p>
-                        <p className="text-slate-500 text-[11px] mt-0.5">
-                          {isBangla ? 'উপস্থিত সেশন:' : 'Attended:'} {item.sessionsText}
-                        </p>
-                      </div>
-                    );
-                  }}
-                />
-                <ReferenceLine y={80} stroke="#F59E0B" strokeDasharray="6 4" strokeWidth={1.8} />
-                <Area
-                  type="monotone"
-                  dataKey="attendance"
-                  stroke="#16A34A"
-                  strokeWidth={2.5}
-                  fill="url(#studentAttOverviewGrad)"
-                  dot={{ r: 5, fill: '#FFFFFF', stroke: '#16A34A', strokeWidth: 2.5 }}
-                  activeDot={{ r: 6.5, fill: '#16A34A', stroke: '#FFFFFF', strokeWidth: 2 }}
-                >
-                  <LabelList
-                    dataKey="labelPct"
-                    position="top"
-                    content={(props: any) => {
-                      const { x, y, value } = props;
-                      if (x === undefined || y === undefined || !value) return null;
+            {/* Recharts Compact Area Chart */}
+            <div className="w-full h-[196px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={attendanceOverviewData} margin={{ top: 24, right: 18, left: -12, bottom: 2 }}>
+                  <defs>
+                    <linearGradient id="studentAttOverviewGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#16A34A" stopOpacity={0.22} />
+                      <stop offset="95%" stopColor="#16A34A" stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <XAxis
+                    dataKey="label"
+                    padding={{ left: 22, right: 16 }}
+                    axisLine={{ stroke: '#CBD5E1' }}
+                    tickLine={false}
+                    tick={{ fill: '#64748B', fontSize: 11, fontWeight: 600 }}
+                    dy={6}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    ticks={[0, 25, 50, 75, 100]}
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748B', fontSize: 10.5, fontWeight: 500 }}
+                    tickFormatter={(v) => `${v}%`}
+                  />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (!active || !payload || payload.length === 0) return null;
+                      const item = payload[0].payload;
                       return (
-                        <g transform={`translate(${x},${Math.max(18, y - 10)})`}>
-                          <rect
-                            x={-21}
-                            y={-15}
-                            width={42}
-                            height={18}
-                            rx={5}
-                            fill="#16A34A"
-                          />
-                          <text
-                            x={0}
-                            y={-3}
-                            textAnchor="middle"
-                            fill="#FFFFFF"
-                            fontSize={10.5}
-                            fontWeight={700}
-                          >
-                            {value}
-                          </text>
-                        </g>
+                        <div className="bg-white border border-slate-200 rounded-xl shadow-lg px-3 py-2 text-xs">
+                          <p className="font-bold text-[#0F172A]">{label}</p>
+                          <p className="text-[#16A34A] font-extrabold mt-0.5">
+                            {isBangla ? 'উপস্থিতি হার:' : 'Attendance:'} {item.labelPct}
+                          </p>
+                          <p className="text-slate-500 text-[11px] mt-0.5">
+                            {isBangla ? 'উপস্থিত সেশন:' : 'Attended:'} {item.sessionsText}
+                          </p>
+                        </div>
                       );
                     }}
                   />
-                </Area>
-              </AreaChart>
-            </ResponsiveContainer>
+                  <ReferenceLine y={80} stroke="#F59E0B" strokeDasharray="5 4" strokeWidth={1.6} />
+                  <Area
+                    type="monotone"
+                    dataKey="attendance"
+                    stroke="#16A34A"
+                    strokeWidth={2.2}
+                    fill="url(#studentAttOverviewGrad)"
+                    dot={{ r: 4.5, fill: '#FFFFFF', stroke: '#16A34A', strokeWidth: 2.2 }}
+                    activeDot={{ r: 6, fill: '#16A34A', stroke: '#FFFFFF', strokeWidth: 2 }}
+                  >
+                    <LabelList
+                      dataKey="labelPct"
+                      position="top"
+                      content={(props: any) => {
+                        const { x, y, value } = props;
+                        if (x === undefined || y === undefined || !value) return null;
+                        return (
+                          <g transform={`translate(${x},${Math.max(16, y - 9)})`}>
+                            <rect
+                              x={-20}
+                              y={-14}
+                              width={40}
+                              height={17}
+                              rx={4.5}
+                              fill="#16A34A"
+                            />
+                            <text
+                              x={0}
+                              y={-2.5}
+                              textAnchor="middle"
+                              fill="#FFFFFF"
+                              fontSize={10}
+                              fontWeight={700}
+                            >
+                              {value}
+                            </text>
+                          </g>
+                        );
+                      }}
+                    />
+                  </Area>
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* 2. Quick Actions Dark Emerald Card */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#064E3B] via-[#043927] to-[#022C22] p-4 sm:p-5 text-white shadow-sm flex flex-col justify-between">
+            {/* Subtle Gold & Emerald Ambient Accents */}
+            <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full bg-emerald-400/15 blur-2xl" aria-hidden="true" />
+            <div className="pointer-events-none absolute -bottom-7 -right-5 w-20 h-20 rounded-tl-[26px] bg-amber-500/35 rotate-12" aria-hidden="true" />
+            <div className="pointer-events-none absolute -bottom-8 -left-6 w-20 h-20 rounded-full bg-amber-400/20" aria-hidden="true" />
+
+            <div className="relative z-10 flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-[#FACC15] fill-[#FACC15] shrink-0" />
+                  <h2 className="text-sm sm:text-[15px] font-extrabold tracking-tight !text-white font-serif truncate">
+                    {isBangla ? 'দ্রুত কাজসমূহ' : 'Quick Actions'}
+                  </h2>
+                </div>
+                <p className="text-[11px] !text-emerald-100/90 mt-0.5 truncate">
+                  {isBangla ? 'সহজেই আপনার স্টাডি টুল ব্যবহার করুন' : 'Access your study tools easily'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleTabChange('today')}
+                aria-label={isBangla ? 'সব টুল ও ক্লাস দেখুন' : 'View all study tools'}
+                className="w-7 h-7 rounded-full bg-white hover:bg-emerald-50 text-[#064E3B] flex items-center justify-center shrink-0 transition cursor-pointer shadow-xs active:scale-95"
+              >
+                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+
+            <div className="relative z-10 grid grid-cols-2 gap-2.5 mt-3.5 flex-1">
+              <button
+                type="button"
+                onClick={() => handleTabChange('materials')}
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+              >
+                <BookOpen className="w-5 h-5 text-[#059669]" />
+                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                  {isBangla ? 'লেকচার ও কোর্স' : 'View My Courses'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const latestSess = sessions[0];
+                  if (latestSess) {
+                    setSelectedSessionForAssignments(latestSess);
+                    setAssignmentsModalOpen(true);
+                  } else {
+                    handleTabChange('today');
+                  }
+                }}
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+              >
+                <Send className="w-5 h-5 text-[#059669]" />
+                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                  {isBangla ? 'কুইজ ও কাজ' : 'Submit Assignment'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleTabChange('graduation')}
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+              >
+                <BarChart3 className="w-5 h-5 text-[#059669]" />
+                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                  {isBangla ? 'ফলাফল দেখুন' : 'Check Results'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleTabChange('help')}
+                className="bg-[#F2FBF7] hover:bg-white text-[#0F172A] rounded-xl px-2.5 py-3 flex flex-col items-center justify-center gap-2 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60"
+              >
+                <Headset className="w-5 h-5 text-[#059669]" />
+                <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+                  {isBangla ? 'শিক্ষকের সহায়তা' : 'Contact Support'}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* 3. Upcoming Classes Card */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-[#EA580C] shrink-0">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <h2 className="text-sm sm:text-[15px] font-extrabold text-[#0F172A] font-serif truncate">
+                  {isBangla ? 'আসন্ন ক্লাসসমূহ' : 'Upcoming Classes'}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleTabChange('today')}
+                className="text-xs font-bold text-[#0F766E] hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+              >
+                <span>{isBangla ? 'সব দেখুন →' : 'View All →'}</span>
+              </button>
+            </div>
+
+            <div className="space-y-2.5 mt-3.5 flex-1 flex flex-col justify-center">
+              {upcomingDisplaySessions.length > 0 ? (
+                upcomingDisplaySessions.map((sess) => {
+                  const badge = formatSessionDateBadge(sess.session_date);
+                  return (
+                    <div
+                      key={sess.id}
+                      className="flex items-center justify-between gap-2.5 bg-[#F8FAFC] hover:bg-[#F0FDF4]/70 border border-slate-100 rounded-xl px-3 py-2 transition-colors"
+                    >
+                      {/* Date Badge */}
+                      <div className="w-11 shrink-0 rounded-lg bg-white border border-emerald-100/90 py-1 text-center leading-[1.15] shadow-2xs">
+                        <span className="block text-[9.5px] font-semibold text-slate-500">
+                          {badge.weekday}
+                        </span>
+                        <span className="block text-[9.5px] font-bold text-[#047857]">
+                          {badge.month}
+                        </span>
+                        <span className="block text-[13px] font-black text-[#0F172A]">
+                          {badge.day}
+                        </span>
+                      </div>
+
+                      {/* Class Title & Time/Teacher */}
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className="text-xs sm:text-[13px] font-bold text-[#0F172A] truncate"
+                          title={sess.topic_title || sess.subject_name}
+                        >
+                          {sess.topic_title || sess.subject_name}
+                        </p>
+                        <p
+                          className="text-[11px] text-slate-500 truncate mt-0.5"
+                          title={`${sess.start_time?.slice(0, 5)} - ${sess.end_time?.slice(0, 5)} • ${sess.teacher_name}`}
+                        >
+                          {sess.start_time?.slice(0, 5)} - {sess.end_time?.slice(0, 5)} • {sess.teacher_name}
+                        </p>
+                      </div>
+
+                      {/* Green Action Pill */}
+                      <button
+                        type="button"
+                        onClick={() => handleTabChange('today')}
+                        className="bg-[#059669] hover:bg-[#047857] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition cursor-pointer shrink-0 shadow-2xs active:scale-95"
+                      >
+                        {isBangla ? 'ক্লাস' : 'Join'}
+                      </button>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center text-slate-400">
+                  <Calendar className="w-7 h-7 mb-2 text-slate-300" />
+                  <p className="text-xs font-medium">
+                    {isBangla ? 'কোনো নির্ধারিত ক্লাস নেই' : 'No upcoming classes scheduled'}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
