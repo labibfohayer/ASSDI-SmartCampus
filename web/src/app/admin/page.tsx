@@ -35,6 +35,8 @@ import {
   RefreshCw,
   ClipboardCheck,
   CheckCircle2,
+  Search,
+  CheckSquare,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -153,6 +155,14 @@ export default function AdminOverviewPage() {
     target_batch: '',
   });
   const [publishingNotice, setPublishingNotice] = useState(false);
+
+  // Class Attendance Monitoring Modal state for Coordinator
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [selectedClassForAttendance, setSelectedClassForAttendance] = useState<any>(null);
+  const [attendanceSearchQuery, setAttendanceSearchQuery] = useState('');
+  const [selectedAttendanceCourse, setSelectedAttendanceCourse] = useState('all');
+  const [selectedAttendanceBatch, setSelectedAttendanceBatch] = useState('all');
+  const [selectedAttendanceSession, setSelectedAttendanceSession] = useState('all');
 
   // Dynamically compute authentic sparkline curves based on live state values
   const studentSparkline = useMemo(
@@ -314,36 +324,116 @@ export default function AdminOverviewPage() {
   // Today's classes & attendance monitoring for Coordinator (replaces student Join button)
   const todayClassesMonitoring = [
     {
+      id: 1,
+      courseId: 'sbmc',
+      courseName: isBangla ? 'স্মল বিজনেস ম্যানেজমেন্ট কোর্স (SBMC)' : 'Small Business Management Course (SBMC)',
       title: isBangla ? 'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস' : 'Graphic Design & Brand Assets',
       batch: isBangla ? 'ব্যাচ ৪২' : 'Batch 42',
+      batchCode: 'batch-42',
+      sessionNum: isBangla ? 'সেশন ০৪' : 'Session 04',
       instructor: isBangla ? 'জুবায়ের আহমেদ' : 'Zubair Ahmed',
       room: isBangla ? 'ল্যাব ১' : 'Lab 1',
       time: isBangla ? '০৯:০০ - ১০:০০ সকাল' : '09:00 - 10:00 AM',
       status: 'live',
       statusLabel: isBangla ? 'চলমান' : 'Live',
+      totalEnrolled: 40,
+      presentCount: 36,
+      lateCount: 2,
+      absentCount: 2,
       attendanceHref: '/teacher/attendance',
     },
     {
+      id: 2,
+      courseId: 'madrasa',
+      courseName: isBangla ? 'ইসলামিক ফাউন্ডেশন ও মাদরাসা বেসিক' : 'Islamic Foundation & Madrasa Basics',
       title: isBangla ? 'ইসলামিক বেসিকস (মাদরাসা)' : 'Islamic Basics (Madrasa)',
       batch: isBangla ? 'ব্যাচ ৪২' : 'Batch 42',
+      batchCode: 'batch-42',
+      sessionNum: isBangla ? 'সেশন ০৩' : 'Session 03',
       instructor: isBangla ? 'কাওসার হোসেন' : 'Kawsar Hossain',
       room: isBangla ? 'রুম ১০২' : 'Room 102',
       time: isBangla ? '১০:৩০ - ১১:৩০ সকাল' : '10:30 - 11:30 AM',
       status: 'upcoming',
       statusLabel: isBangla ? 'অপেক্ষমাণ' : 'Upcoming',
+      totalEnrolled: 38,
+      presentCount: 34,
+      lateCount: 3,
+      absentCount: 1,
       attendanceHref: '/teacher/attendance',
     },
     {
+      id: 3,
+      courseId: 'video',
+      courseName: isBangla ? 'ডিজিটাল ভিডিও এডিটিং ও কনটেন্ট ক্রিয়েশন' : 'Digital Video Editing & Content Creation',
       title: isBangla ? 'ডিজিটাল ভিডিও এডিটিং ও রিলস' : 'Digital Video Editing & Reels',
       batch: isBangla ? 'ব্যাচ ৪১' : 'Batch 41',
+      batchCode: 'batch-41',
+      sessionNum: isBangla ? 'সেশন ০৫' : 'Session 05',
       instructor: isBangla ? 'কাওসার হোসেন' : 'Kawsar Hossain',
       room: isBangla ? 'ল্যাব ২' : 'Lab 2',
       time: isBangla ? '০১:০০ - ০২:০০ দুপুর' : '01:00 - 02:00 PM',
       status: 'completed',
       statusLabel: isBangla ? 'হাজিরা সম্পন্ন' : 'Completed',
+      totalEnrolled: 35,
+      presentCount: 33,
+      lateCount: 1,
+      absentCount: 1,
       attendanceHref: '/teacher/attendance',
     },
   ];
+
+  // Dynamic filter lists for coordinator attendance modal
+  const attendanceCourses = [
+    { id: 'all', name: isBangla ? 'সকল কোর্স (All Courses)' : 'All Courses' },
+    { id: 'sbmc', name: isBangla ? 'স্মল বিজনেস ম্যানেজমেন্ট কোর্স (SBMC)' : 'Small Business Management Course (SBMC)' },
+    { id: 'graphic', name: isBangla ? 'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস' : 'Graphic Design & Brand Assets' },
+    { id: 'video', name: isBangla ? 'ডিজিটাল ভিডিও এডিটিং ও রিলস' : 'Digital Video Editing & Reels' },
+    { id: 'madrasa', name: isBangla ? 'ইসলামিক বেসিকস (মাদরাসা)' : 'Islamic Basics (Madrasa)' },
+  ];
+
+  const attendanceBatches = [
+    { id: 'all', name: isBangla ? 'সকল ব্যাচ (All Batches)' : 'All Batches' },
+    { id: 'batch-42', name: isBangla ? 'ব্যাচ ৪২ (চলতি ব্যাচ)' : 'Batch 42 (Active)' },
+    { id: 'batch-41', name: isBangla ? 'ব্যাচ ৪১' : 'Batch 41' },
+    { id: 'batch-40', name: isBangla ? 'ব্যাচ ৪০' : 'Batch 40' },
+  ];
+
+  const attendanceSessions = [
+    { id: 'all', name: isBangla ? 'সর্বশেষ চলমান সেশন' : 'Latest Active Session' },
+    { id: 'session-1', name: isBangla ? 'সেশন ০১: পরিচিতি ও সিলেবাস ওভারভিউ' : 'Session 01: Intro & Syllabus' },
+    { id: 'session-2', name: isBangla ? 'সেশন ০২: ব্যবসায়িক পরিকল্পনা ও মডেলিং' : 'Session 02: Business Planning' },
+    { id: 'session-3', name: isBangla ? 'সেশন ০৩: ফাইন্যান্স ও প্র্যাকটিক্যাল হিসাব' : 'Session 03: Financial Accounting' },
+    { id: 'session-4', name: isBangla ? 'সেশন ০৪: ব্র্যান্ডিং ও সোশ্যাল মিডিয়া' : 'Session 04: Branding & Marketing' },
+  ];
+
+  // Mock attendance roster with verified student profiles
+  const mockAttendanceRoster = [
+    { id: 1, roll: 'SBMC-42-001', name: 'আব্দুল্লাহ আল মাহমুদ', enName: 'Abdullah Al Mahmud', phone: '01711-***001', status: 'present', checkIn: '০৮:৫২ সকাল', method: 'QR Scan', note: isBangla ? 'যথাসময়ে উপস্থিত' : 'On Time' },
+    { id: 2, roll: 'SBMC-42-002', name: 'মুহাম্মদ তানভীর হাসান', enName: 'Muhammad Tanvir Hasan', phone: '01812-***002', status: 'present', checkIn: '০৮:৫৫ সকাল', method: 'QR Scan', note: isBangla ? 'যথাসময়ে উপস্থিত' : 'On Time' },
+    { id: 3, roll: 'SBMC-42-003', name: 'রাহিম আহমেদ চৌধুরী', enName: 'Rahim Ahmed Chowdhury', phone: '01913-***003', status: 'present', checkIn: '০৮:৫৮ সকাল', method: 'Manual Verify', note: isBangla ? 'শিক্ষক দ্বারা ভেরিফাইড' : 'Teacher Verified' },
+    { id: 4, roll: 'SBMC-42-004', name: 'আরিফুল ইসলাম', enName: 'Ariful Islam', phone: '01614-***004', status: 'late', checkIn: '০৯:১২ সকাল', method: 'QR Scan', note: isBangla ? 'যানজটের কারণে ১২ মিনিট বিলম্ব' : 'Late by 12 mins' },
+    { id: 5, roll: 'SBMC-42-005', name: 'মো: সাইফুল ইসলাম', enName: 'Md. Saiful Islam', phone: '01715-***005', status: 'present', checkIn: '০৯:০১ সকাল', method: 'QR Scan', note: isBangla ? 'উপস্থিত' : 'Present' },
+    { id: 6, roll: 'SBMC-42-006', name: 'নাজমুল হুদা', enName: 'Nazmul Huda', phone: '01816-***006', status: 'absent', checkIn: '--', method: '--', note: isBangla ? 'অননুমোদিত অনুপস্থিত' : 'Unexcused Absence' },
+    { id: 7, roll: 'SBMC-42-007', name: 'কামরুল হাসান রিয়াদ', enName: 'Kamrul Hasan Riyad', phone: '01917-***007', status: 'present', checkIn: '০৮:৪৮ সকাল', method: 'QR Scan', note: isBangla ? 'আগে উপস্থিত' : 'Early' },
+    { id: 8, roll: 'SBMC-42-008', name: 'হাসিবুর রহমান', enName: 'Hasibur Rahman', phone: '01518-***008', status: 'present', checkIn: '০৮:৫৬ সকাল', method: 'QR Scan', note: isBangla ? 'উপস্থিত' : 'Present' },
+    { id: 9, roll: 'SBMC-42-009', name: 'জাকির হোসেন', enName: 'Zakir Hossain', phone: '01719-***009', status: 'late', checkIn: '০৯:১৬ সকাল', method: 'Manual Verify', note: isBangla ? 'অফিসের কাজে ১৬ মিনিট বিলম্ব' : 'Office Delay 16m' },
+    { id: 10, roll: 'SBMC-42-010', name: 'মেহেদী হাসান শুভ', enName: 'Mehedi Hasan Shuvo', phone: '01820-***010', status: 'present', checkIn: '০৮:৫০ সকাল', method: 'QR Scan', note: isBangla ? 'উপস্থিত' : 'Present' },
+    { id: 11, roll: 'SBMC-42-011', name: 'ইমরান নাজির', enName: 'Imran Nazir', phone: '01921-***011', status: 'absent', checkIn: '--', method: '--', note: isBangla ? 'অসুস্থতাজনিত ছুটির আবেদন' : 'Medical Leave Applied' },
+    { id: 12, roll: 'SBMC-42-012', name: 'শাকিল আহমেদ', enName: 'Shakil Ahmed', phone: '01622-***012', status: 'present', checkIn: '০৮:৫৯ সকাল', method: 'QR Scan', note: isBangla ? 'উপস্থিত' : 'Present' },
+  ];
+
+  const filteredAttendanceList = useMemo(() => {
+    return mockAttendanceRoster.filter((student) => {
+      const q = attendanceSearchQuery.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        student.name.toLowerCase().includes(q) ||
+        student.enName.toLowerCase().includes(q) ||
+        student.roll.toLowerCase().includes(q) ||
+        student.phone.includes(q)
+      );
+    });
+  }, [attendanceSearchQuery, mockAttendanceRoster]);
 
   // Recent activity stream matching reference mockup
   const recentActivities = [
@@ -971,16 +1061,22 @@ export default function AdminOverviewPage() {
               <div className="flex items-center gap-2">
                 <ClipboardCheck className="w-4 h-4 text-emerald-600" />
                 <h3 className="text-[15px] sm:text-base font-extrabold text-[#0F172A] font-serif">
-                  {isBangla ? 'আজকের ক্লাস ও তদারকি' : "Today's Classes & Monitoring"}
+                  {isBangla ? 'আজকের ক্লাস ও হাজিরা তদারকি' : "Today's Classes & Attendance"}
                 </h3>
               </div>
-              <Link
-                href="/admin/sessions"
-                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline"
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedClassForAttendance(todayClassesMonitoring[0]);
+                  setSelectedAttendanceCourse(todayClassesMonitoring[0].courseId || 'all');
+                  setSelectedAttendanceBatch(todayClassesMonitoring[0].batchCode || 'all');
+                  setShowAttendanceModal(true);
+                }}
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline cursor-pointer"
               >
-                <span>{isBangla ? 'রুটিন দেখুন' : 'View Routine'}</span>
+                <span>{isBangla ? 'হাজিরা ড্যাশবোর্ড' : 'Attendance Hub'}</span>
                 <ArrowRight className="w-3 h-3" />
-              </Link>
+              </button>
             </div>
 
             <div className="space-y-2 mt-2">
@@ -1030,13 +1126,19 @@ export default function AdminOverviewPage() {
                       </span>
                     )}
 
-                    <Link
-                      href={cls.attendanceHref}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedClassForAttendance(cls);
+                        setSelectedAttendanceCourse(cls.courseId || 'all');
+                        setSelectedAttendanceBatch(cls.batchCode || 'all');
+                        setShowAttendanceModal(true);
+                      }}
                       className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-[10.5px] font-bold transition shadow-2xs cursor-pointer active:scale-95"
                       title={isBangla ? 'হাজিরা শিট তদারকি করুন' : 'View Attendance Sheet'}
                     >
                       {isBangla ? 'হাজিরা' : 'Attendance'}
-                    </Link>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -1448,6 +1550,233 @@ export default function AdminOverviewPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* Class Attendance Monitoring Modal for Coordinator         */}
+      {/* Allows inspecting attendance for ANY course & ANY class    */}
+      {/* ========================================================= */}
+      {showAttendanceModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-100 bg-linear-to-r from-emerald-50/70 to-slate-50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                  <ClipboardCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base sm:text-lg font-bold text-[#0F172A] font-serif">
+                      {isBangla ? 'ক্লাস হাজিরা তদারকি' : 'Class Attendance Monitoring'}
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      {isBangla ? 'কোঅর্ডিনেটর ভিউ' : 'Coordinator View'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {selectedClassForAttendance
+                      ? `${selectedClassForAttendance.title} • ${selectedClassForAttendance.batch} (${selectedClassForAttendance.room})`
+                      : (isBangla ? 'যেকোনো কোর্স ও ব্যাচের লাইভ হাজিরা পর্যবেক্ষণ' : 'Monitor live attendance across courses & batches')}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAttendanceModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Filter Controls: Any Course, Any Batch, Any Session */}
+            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/60 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {/* Course Switcher */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                    {isBangla ? 'কোর্স নির্বাচন করুন' : 'Select Course'}
+                  </label>
+                  <select
+                    value={selectedAttendanceCourse}
+                    onChange={(e) => setSelectedAttendanceCourse(e.target.value)}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white font-medium text-slate-800 focus:outline-none focus:border-emerald-600"
+                  >
+                    {attendanceCourses.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Batch Switcher */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                    {isBangla ? 'ব্যাচ নির্বাচন করুন' : 'Select Batch'}
+                  </label>
+                  <select
+                    value={selectedAttendanceBatch}
+                    onChange={(e) => setSelectedAttendanceBatch(e.target.value)}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white font-medium text-slate-800 focus:outline-none focus:border-emerald-600"
+                  >
+                    {attendanceBatches.map((b) => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Class Session Switcher */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                    {isBangla ? 'ক্লাস সেশন নির্বাচন করুন' : 'Select Class Session'}
+                  </label>
+                  <select
+                    value={selectedAttendanceSession}
+                    onChange={(e) => setSelectedAttendanceSession(e.target.value)}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white font-medium text-slate-800 focus:outline-none focus:border-emerald-600"
+                  >
+                    {attendanceSessions.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Quick Search bar */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={attendanceSearchQuery}
+                  onChange={(e) => setAttendanceSearchQuery(e.target.value)}
+                  placeholder={isBangla ? 'শিক্ষার্থীর নাম, রোল নম্বর বা মোবাইল দিয়ে অনুসন্ধান করুন...' : 'Search student by name, roll or phone...'}
+                  className="w-full pl-9 pr-4 py-1.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-emerald-600 placeholder:text-slate-400"
+                />
+              </div>
+
+              {/* Attendance Summary Stat Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200/90 text-center">
+                  <span className="text-[10px] text-slate-500 font-bold block">{isBangla ? 'মোট শিক্ষার্থী' : 'Enrolled'}</span>
+                  <span className="text-base font-extrabold text-[#0F172A]">
+                    {selectedClassForAttendance?.totalEnrolled || 40}
+                  </span>
+                </div>
+                <div className="bg-emerald-50/80 p-2.5 rounded-xl border border-emerald-200 text-center">
+                  <span className="text-[10px] text-emerald-700 font-bold block">{isBangla ? 'উপস্থিত' : 'Present'}</span>
+                  <span className="text-base font-extrabold text-emerald-800">
+                    {selectedClassForAttendance?.presentCount || 36} <span className="text-[11px] font-normal text-emerald-600">(90%)</span>
+                  </span>
+                </div>
+                <div className="bg-amber-50/80 p-2.5 rounded-xl border border-amber-200 text-center">
+                  <span className="text-[10px] text-amber-700 font-bold block">{isBangla ? 'বিলম্ব' : 'Late'}</span>
+                  <span className="text-base font-extrabold text-amber-800">
+                    {selectedClassForAttendance?.lateCount || 2} <span className="text-[11px] font-normal text-amber-600">(5%)</span>
+                  </span>
+                </div>
+                <div className="bg-rose-50/80 p-2.5 rounded-xl border border-rose-200 text-center">
+                  <span className="text-[10px] text-rose-700 font-bold block">{isBangla ? 'অনুপস্থিত' : 'Absent'}</span>
+                  <span className="text-base font-extrabold text-rose-800">
+                    {selectedClassForAttendance?.absentCount || 2} <span className="text-[11px] font-normal text-rose-600">(5%)</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Roster Table (Scrollable) */}
+            <div className="overflow-y-auto flex-1 p-4 sm:p-5 divide-y divide-slate-100">
+              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 text-[11px] font-bold text-slate-600 border-b border-slate-200">
+                      <th className="py-2.5 px-3">{isBangla ? 'রোল' : 'Roll'}</th>
+                      <th className="py-2.5 px-3">{isBangla ? 'শিক্ষার্থীর নাম' : 'Student Name'}</th>
+                      <th className="py-2.5 px-3 text-center">{isBangla ? 'হাজিরা' : 'Status'}</th>
+                      <th className="py-2.5 px-3 text-center">{isBangla ? 'প্রবেশ সময়' : 'Time'}</th>
+                      <th className="py-2.5 px-3 text-center">{isBangla ? 'পদ্ধতি' : 'Method'}</th>
+                      <th className="py-2.5 px-3">{isBangla ? 'মন্তব্য' : 'Note'}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-xs">
+                    {filteredAttendanceList.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="text-center py-8 text-slate-400 font-medium">
+                          {isBangla ? 'কোনো শিক্ষার্থী খুঁজে পাওয়া যায়নি' : 'No student found'}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredAttendanceList.map((st) => (
+                        <tr key={st.id} className="hover:bg-slate-50/80 transition">
+                          <td className="py-2 px-3 font-mono font-bold text-slate-600 text-[11px]">
+                            {st.roll}
+                          </td>
+                          <td className="py-2 px-3">
+                            <span className="font-bold text-[#0F172A] block">
+                              {isBangla ? st.name : st.enName}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              {st.phone}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 text-center">
+                            {st.status === 'present' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                                {isBangla ? 'উপস্থিত' : 'Present'}
+                              </span>
+                            )}
+                            {st.status === 'late' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                <Clock className="w-2.5 h-2.5 text-amber-600" />
+                                {isBangla ? 'বিলম্ব' : 'Late'}
+                              </span>
+                            )}
+                            {st.status === 'absent' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                                <AlertCircle className="w-2.5 h-2.5 text-rose-600" />
+                                {isBangla ? 'অনুপস্থিত' : 'Absent'}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-center font-mono text-[11px] text-slate-600">
+                            {st.checkIn}
+                          </td>
+                          <td className="py-2 px-3 text-center">
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                              {st.method}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 text-[11px] text-slate-500">
+                            {st.note}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Modal Footer with Link to Full 9 SRS Report Hub & Close */}
+            <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between flex-wrap gap-2">
+              <Link
+                href="/reports?tab=daily-attendance"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition shadow-2xs"
+              >
+                <FileText className="w-3.5 h-3.5 text-emerald-700" />
+                <span>{isBangla ? '৯টি এসআরএস রিপোর্ট হাবে বিস্তারিত দেখুন (PDF / Excel)' : 'Open Full SRS Daily Attendance Report'}</span>
+                <ExternalLink className="w-3 h-3 text-emerald-600" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowAttendanceModal(false)}
+                className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition"
+              >
+                {isBangla ? 'বন্ধ করুন' : 'Close'}
+              </button>
+            </div>
           </div>
         </div>
       )}
