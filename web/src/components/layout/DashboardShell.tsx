@@ -191,7 +191,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
     }
   }, [pathname]);
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, e?: React.MouseEvent<HTMLElement>) => {
     setMobileSidebarOpen(false);
     if (typeof window !== 'undefined') {
       if (href.includes('?')) {
@@ -201,6 +201,9 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         setCurrentSearch('');
       }
       if (pathname === '/student' && href.startsWith('/student')) {
+        if (e && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+          e.preventDefault();
+        }
         window.history.pushState(null, '', href);
       }
       window.dispatchEvent(new CustomEvent('assdi-tab-navigate', { detail: { href } }));
@@ -782,8 +785,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             <div className="px-3 pt-3 pb-0.5 shrink-0">
               <Link
                 href="/student"
-                onClick={() => handleNavClick('/student')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-[0.98] cursor-pointer ${
+                onClick={(e) => handleNavClick('/student', e)}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors duration-200 active:scale-[0.98] cursor-pointer ${
                   pathname === '/student' && !currentSearch
                     ? 'bg-gradient-to-r from-[#FF8108] to-[#EA580C] text-white shadow-md shadow-orange-950/30'
                     : 'text-[#D1FAE5]/85 hover:text-white hover:bg-white/10'
@@ -823,8 +826,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                         <li key={item.href}>
                           <Link
                             href={item.href}
-                            onClick={() => handleNavClick(item.href)}
-                            className={`relative flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-[0.98] ${
+                            onClick={(e) => handleNavClick(item.href, e)}
+                            className={`relative flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors duration-200 cursor-pointer active:scale-[0.98] ${
                               active
                                 ? role === 'student'
                                   ? 'bg-gradient-to-r from-[#FF8108] to-[#EA580C] text-white font-bold shadow-md shadow-orange-950/30'
@@ -1361,7 +1364,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             <Link
               key={item.href}
               href={item.href}
-              onClick={() => handleNavClick(item.href)}
+              onClick={(e) => handleNavClick(item.href, e)}
               className={`flex flex-col items-center justify-center flex-1 py-1 px-0.5 rounded-lg text-center transition-all duration-150 active:scale-95 ${
                 active
                   ? 'text-[#0F766E] font-bold'

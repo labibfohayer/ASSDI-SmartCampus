@@ -237,16 +237,13 @@ export default function StudentPortalPage() {
       handleUrlTab(href);
       if (href === '/student') {
         setIsDashboardHome(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (window.scrollY > 40) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         return;
       }
-      if (href.includes('?tab=')) {
-        setTimeout(() => {
-          const tabEl = document.getElementById('student-tab-section');
-          if (tabEl) {
-            tabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 50);
+      if (href.includes('?tab=') && window.scrollY > 40) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
 
@@ -255,12 +252,9 @@ export default function StudentPortalPage() {
       if (['today', 'attendance', 'help', 'materials', 'graduation'].includes(tab)) {
         setActiveTab(tab);
         setIsDashboardHome(false);
-        setTimeout(() => {
-          const tabEl = document.getElementById('student-tab-section');
-          if (tabEl) {
-            tabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 50);
+        if (window.scrollY > 40) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
     };
 
@@ -1125,7 +1119,7 @@ export default function StudentPortalPage() {
 
       {/* DASHBOARD OVERVIEW VIEW: Middle 3-Column Row + Bottom 3-Column Row (Fills 100% Viewport Height With Zero Bottom Void) */}
       {isDashboardHome && (
-        <div className="flex-1 flex flex-col gap-3.5">
+        <div key="student-dashboard-home" className="student-view-enter flex-1 flex flex-col gap-3.5">
         <div className="xl:flex-[1.35] grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1.42fr_1fr_1.33fr] gap-3.5 items-stretch min-h-[245px]">
           {/* 1. Compact Attendance Overview Chart Card */}
           <div className="lg:col-span-2 xl:col-span-1 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 flex flex-col justify-between">
@@ -1223,6 +1217,7 @@ export default function StudentPortalPage() {
                     fill="url(#studentAttOverviewGrad)"
                     dot={{ r: 4.5, fill: '#FFFFFF', stroke: '#16A34A', strokeWidth: 2.2 }}
                     activeDot={{ r: 6, fill: '#16A34A', stroke: '#FFFFFF', strokeWidth: 2 }}
+                    isAnimationActive={false}
                   >
                     <LabelList
                       dataKey="labelPct"
@@ -1632,7 +1627,7 @@ export default function StudentPortalPage() {
 
       {/* DEDICATED SIDEBAR TAB VIEWS (Visible only when user navigates to a specific menu/tab) */}
       {!isDashboardHome && (
-        <div className="space-y-4">
+        <div key="student-tab-views" className="student-view-enter space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             {/* Back to Clean Dashboard Overview Button */}
             <button
@@ -1727,6 +1722,7 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
+      <div key={activeTab} className="student-tab-enter">
       {/* TAB 1: Today's Classes & Feedback */}
       {activeTab === 'today' && (
         <div className="space-y-4">
@@ -2607,6 +2603,7 @@ export default function StudentPortalPage() {
           </div>
         </div>
       )}
+      </div>
         </div>
       )}
 
