@@ -269,7 +269,7 @@ export default function AdminOverviewPage() {
     {
       name: isBangla ? 'দৈনিক উপস্থিতি রিপোর্ট' : 'Daily Attendance Report',
       type: isBangla ? 'উপস্থিতি' : 'Attendance',
-      typeColor: 'bg-blue-50 text-blue-600 border-blue-200',
+      typeColor: 'bg-[#EAF2FE] text-[#2563EB]',
       date: isBangla ? '২৪ নভে, ২০২৬' : 'Nov 24, 2026',
       status: isBangla ? 'প্রস্তুত' : 'Ready',
       link: '/reports?tab=daily-attendance',
@@ -277,7 +277,7 @@ export default function AdminOverviewPage() {
     {
       name: isBangla ? 'শিক্ষার্থীর পারফরম্যান্স রিপোর্ট' : 'Student Performance Report',
       type: isBangla ? 'পারফরম্যান্স' : 'Performance',
-      typeColor: 'bg-purple-50 text-purple-600 border-purple-200',
+      typeColor: 'bg-[#F5EFFE] text-[#9333EA]',
       date: isBangla ? '২৩ নভে, ২০২৬' : 'Nov 23, 2026',
       status: isBangla ? 'প্রস্তুত' : 'Ready',
       link: '/reports?tab=monthly-student-performance',
@@ -285,7 +285,7 @@ export default function AdminOverviewPage() {
     {
       name: isBangla ? 'ব্যাচভিত্তিক ফলাফল রিপোর্ট' : 'Batch-wise Report',
       type: isBangla ? 'ব্যাচ' : 'Batch',
-      typeColor: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+      typeColor: 'bg-[#EAF8F0] text-[#16A34A]',
       date: isBangla ? '২১ নভে, ২০২৬' : 'Nov 21, 2026',
       status: isBangla ? 'প্রস্তুত' : 'Ready',
       link: '/reports?tab=batch-wise-performance',
@@ -293,7 +293,7 @@ export default function AdminOverviewPage() {
     {
       name: isBangla ? 'ফি আদায় ও কালেকশন রিপোর্ট' : 'Fee Collection Report',
       type: isBangla ? 'ফি' : 'Fee',
-      typeColor: 'bg-amber-50 text-amber-600 border-amber-200',
+      typeColor: 'bg-[#FEF4E8] text-[#EA580C]',
       date: isBangla ? '২১ নভে, ২০২৬' : 'Nov 21, 2026',
       status: isBangla ? 'প্রস্তুত' : 'Ready',
       link: '/reports',
@@ -301,7 +301,7 @@ export default function AdminOverviewPage() {
     {
       name: isBangla ? 'কোর্স প্রগ্রেস রিপোর্ট' : 'Course Progress Report',
       type: isBangla ? 'কোর্স' : 'Course',
-      typeColor: 'bg-teal-50 text-teal-600 border-teal-200',
+      typeColor: 'bg-[#E6F7F9] text-[#0891B2]',
       date: isBangla ? '২০ নভে, ২০২৬' : 'Nov 20, 2026',
       status: isBangla ? 'প্রস্তুত' : 'Ready',
       link: '/reports?tab=weekly-progress',
@@ -730,64 +730,69 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* 3. ROW 3: RECENT REPORTS TABLE (7 COLS) + QUICK ACTIONS (5 COLS) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      {/* 3. ROW 3: RECENT REPORTS TABLE (7 COLS) + QUICK ACTIONS (5 COLS) - SLIM COMPACT PIXEL-PERFECT */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
         {/* Left: Recent Reports (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white rounded-2xl p-3.5 sm:p-4 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-amber-500" />
-                <h2 className="text-base font-extrabold text-[#0F172A] font-serif">
+                {/* Reference matching 3-bar rounded orange icon */}
+                <svg className="w-4.5 h-4.5 text-[#F59E0B] shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <rect x="2.5" y="8" width="3.5" height="9.5" rx="1.75" />
+                  <rect x="8" y="3" width="3.5" height="14.5" rx="1.75" />
+                  <rect x="13.5" y="6" width="3.5" height="11.5" rx="1.75" />
+                </svg>
+                <h2 className="text-sm sm:text-[15px] font-extrabold text-[#0F172A] font-serif">
                   {isBangla ? 'সাম্প্রতিক রিপোর্টসমূহ' : 'Recent Reports'}
                 </h2>
               </div>
-              <div className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg cursor-pointer transition">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-lg cursor-pointer transition shadow-2xs">
                 <span>{isBangla ? 'এই মাসে' : 'This Month'}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <ChevronDown className="w-3 h-3 text-slate-400" />
               </div>
             </div>
 
-            <div className="overflow-x-auto mt-2">
+            <div className="overflow-x-auto mt-1">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="text-slate-400 border-b border-slate-100 font-semibold">
-                    <th className="py-2.5 pr-3">{isBangla ? 'রিপোর্টের নাম' : 'Report Name'}</th>
-                    <th className="py-2.5 px-3">{isBangla ? 'ধরন' : 'Type'}</th>
-                    <th className="py-2.5 px-3">{isBangla ? 'তৈরির তারিখ' : 'Generated On'}</th>
-                    <th className="py-2.5 px-3">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
-                    <th className="py-2.5 pl-3 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
+                  <tr className="text-slate-400 border-b border-slate-100 font-semibold text-[11px]">
+                    <th className="py-1.5 pr-2.5">{isBangla ? 'রিপোর্টের নাম' : 'Report Name'}</th>
+                    <th className="py-1.5 px-2.5">{isBangla ? 'ধরন' : 'Type'}</th>
+                    <th className="py-1.5 px-2.5">{isBangla ? 'তৈরির তারিখ' : 'Generated On'}</th>
+                    <th className="py-1.5 px-2.5">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
+                    <th className="py-1.5 pl-2.5 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {recentReports.map((report, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/70 transition">
-                      <td className="py-3 pr-3 font-semibold text-[#0F172A] whitespace-nowrap">
+                      <td className="py-1.5 sm:py-2 pr-2.5 font-semibold text-[#0F172A] text-xs whitespace-nowrap">
                         {report.name}
                       </td>
-                      <td className="py-3 px-3 whitespace-nowrap">
+                      <td className="py-1.5 sm:py-2 px-2.5 whitespace-nowrap">
                         <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${report.typeColor}`}
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10.5px] font-bold ${report.typeColor}`}
                         >
                           {report.type}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-slate-500 whitespace-nowrap">
+                      <td className="py-1.5 sm:py-2 px-2.5 text-slate-500 text-xs whitespace-nowrap">
                         {report.date}
                       </td>
-                      <td className="py-3 px-3 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                      <td className="py-1.5 sm:py-2 px-2.5 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-[#E6F8ED] text-[#16A34A]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]" />
                           {report.status}
                         </span>
                       </td>
-                      <td className="py-3 pl-3 text-right whitespace-nowrap">
+                      <td className="py-1.5 sm:py-2 pl-2.5 text-right whitespace-nowrap">
                         <Link
                           href={report.link}
-                          className="inline-flex items-center justify-center w-7 h-7 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition"
+                          className="inline-flex items-center justify-center w-6 h-6 rounded-full text-slate-400 hover:text-emerald-700 bg-slate-50 hover:bg-slate-100 transition shadow-2xs"
                           title={isBangla ? 'রিপোর্ট দেখুন' : 'View Report'}
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-3.5 h-3.5" />
                         </Link>
                       </td>
                     </tr>
@@ -799,106 +804,98 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Right: Quick Actions Card (5 cols) */}
-        <div className="lg:col-span-5 relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#025033] via-[#013C24] to-[#012918] p-5 text-white shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-5 relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#013B2A] via-[#012E20] to-[#012117] p-3.5 sm:p-4 text-white shadow-xs flex flex-col justify-between">
+          {/* Subtle curved warm wave matching reference mockup */}
           <svg
-            className="pointer-events-none absolute -bottom-1 -right-1 w-28 h-24"
-            viewBox="0 0 120 100"
+            className="pointer-events-none absolute -bottom-1 -right-1 w-24 h-20 opacity-90"
+            viewBox="0 0 100 80"
             fill="none"
             aria-hidden="true"
           >
-            <path d="M120 100H20C48 70 72 52 120 26V100Z" fill="#C2410C" fillOpacity="0.95" />
-            <path d="M120 100H52C74 78 96 62 120 42V100Z" fill="#EA580C" />
+            <path d="M100 80H25C45 55 65 42 100 20V80Z" fill="#C2410C" fillOpacity="0.85" />
+            <path d="M100 80H48C66 62 82 50 100 34V80Z" fill="#EA580C" />
           </svg>
 
           {/* Header */}
-          <div className="relative z-10 flex items-start justify-between gap-2">
+          <div className="relative z-10 flex items-start justify-between gap-2 mb-2 sm:mb-2.5">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <Zap className="w-5 h-5 text-[#FACC15] fill-[#FACC15] shrink-0 drop-shadow-xs" />
-                <h2 className="text-[17px] font-extrabold tracking-tight !text-white font-serif truncate">
+                <Zap className="w-4 h-4 text-[#FACC15] fill-[#FACC15] shrink-0 drop-shadow-xs" />
+                <h2 className="text-sm sm:text-[15px] font-extrabold tracking-tight !text-white font-serif truncate">
                   {isBangla ? 'দ্রুত কাজসমূহ' : 'Quick Actions'}
                 </h2>
               </div>
-              <p className="text-[11.5px] !text-emerald-100/90 mt-0.5 truncate">
-                {isBangla ? 'সহজেই ইনস্টিটিউটের সার্বিক কার্যক্রম পরিচালনা করুন' : 'Manage your institute easily'}
+              <p className="text-[11px] !text-emerald-100/85 mt-0.5 truncate">
+                {isBangla ? 'সহজেই ইনস্টিটিউট পরিচালনা করুন' : 'Manage your institute easily'}
               </p>
             </div>
             <Link
               href="/admin/batches"
               aria-label={isBangla ? 'সব অপশন দেখুন' : 'View all actions'}
-              className="w-7 h-7 rounded-full bg-white hover:bg-emerald-50 text-[#064E3B] flex items-center justify-center shrink-0 transition cursor-pointer shadow-xs active:scale-95"
+              className="w-6 h-6 rounded-full bg-white hover:bg-emerald-50 text-[#013B2A] flex items-center justify-center shrink-0 transition cursor-pointer shadow-xs active:scale-95"
             >
-              <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+              <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
             </Link>
           </div>
 
-          {/* 6 White Action Tiles Grid */}
-          <div className="relative z-10 grid grid-cols-3 gap-2.5 mt-4 flex-1">
+          {/* 6 White Action Tiles Grid - Exact Reference Icons & Actions */}
+          <div className="relative z-10 grid grid-cols-3 gap-2 mt-1 sm:mt-1.5 flex-1">
             <Link
               href="/admin/teachers"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1 sm:py-2.5 sm:px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <UserPlus className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+              <UserPlus className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'শিক্ষক যোগ' : 'Add Teacher'}
               </span>
             </Link>
 
             <Link
-              href="/admin/teachers"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
+              href="/admin/students?tab=batches"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1 sm:py-2.5 sm:px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <BookOpen className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'বিষয় বরাদ্দ' : 'Assign Subject'}
+              <Users className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
+                {isBangla ? 'ব্যাচ বরাদ্দ' : 'Assign to Batch'}
               </span>
             </Link>
 
-            <button
-              onClick={() => {
-                setNoticeForm({
-                  title: '',
-                  content: '',
-                  scope: 'Course',
-                  target_course: coursesList[0]?.id ? String(coursesList[0].id) : '',
-                  target_batch: '',
-                });
-                setShowNoticeModal(true);
-              }}
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
+            <Link
+              href="/reports"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1 sm:py-2.5 sm:px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <Megaphone className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'নোটিশ দিন' : 'Post Notice'}
+              <Download className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
+                {isBangla ? 'রিপোর্ট এক্সপোর্ট' : 'Export Report'}
               </span>
-            </button>
+            </Link>
 
             <Link
               href="/reports"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1 sm:py-2.5 sm:px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <BarChart3 className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+              <BarChart3 className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'রিপোর্ট দেখুন' : 'View Reports'}
               </span>
             </Link>
 
             <Link
-              href="/admin/students"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
+              href="/admin/students?tab=progress"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1 sm:py-2.5 sm:px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <Users className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
-                {isBangla ? 'ছাত্র বহিষ্কার/ভর্তি' : 'Students Hub'}
+              <BookOpen className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
+                {isBangla ? 'কোর্স পরিচালনা' : 'Manage Courses'}
               </span>
             </Link>
 
             <Link
               href="/admin/menu-control"
-              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
+              className="bg-white hover:bg-[#F0FDF4] text-[#0F172A] rounded-xl py-2 px-1 sm:py-2.5 sm:px-1.5 flex flex-col items-center justify-center gap-1 text-center shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer border border-white/60 group"
             >
-              <Settings className="w-6 h-6 text-[#059669] group-hover:scale-110 transition-transform" />
-              <span className="text-[11.5px] font-bold text-[#0F172A] leading-tight">
+              <Settings className="w-5 h-5 text-[#059669] group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold text-[#0F172A] leading-tight">
                 {isBangla ? 'সেটিংস' : 'Settings'}
               </span>
             </Link>
