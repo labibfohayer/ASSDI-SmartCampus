@@ -143,7 +143,7 @@ export default function AdminOverviewPage() {
     totalStudents: 67,
     totalBatches: 3,
     totalTeachers: 0,
-    totalCourses: 9,
+    totalCourses: 1, // Exclusively SBMC (Level 1 & Level 2)
     totalSessions: 20,
   });
   const [repeatedAbsences, setRepeatedAbsences] = useState<any[]>([]);
@@ -221,7 +221,7 @@ export default function AdminOverviewPage() {
         totalStudents: dashData.total_students || 67,
         totalBatches: dashData.total_active_batches || batches.length || 3,
         totalTeachers: dashData.total_teachers || 0,
-        totalCourses: courses.length || 9,
+        totalCourses: 1, // Exclusively SBMC (Level 1 & Level 2)
         totalSessions: sessions.length || 20,
       });
       setRepeatedAbsences(dashData.repeated_absences_list || []);
@@ -759,15 +759,14 @@ export default function AdminOverviewPage() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold text-[#334155] block font-serif truncate">
-                {isBangla ? 'সক্রিয় কোর্স' : 'Active Courses'}
+                {isBangla ? 'কোর্স (এসবিএমসি)' : 'Course (SBMC)'}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
                 <span className="text-xl 2xl:text-2xl font-black text-[#0F172A] tracking-tight leading-none font-serif">
-                  {d(stats.totalCourses)}
+                  {d(1)}
                 </span>
-                <span className="text-[11px] font-bold text-[#10B981] inline-flex items-center gap-0.5">
-                  <span>↑</span>
-                  <span>1%</span>
+                <span className="text-[11px] font-bold text-[#0F766E] inline-flex items-center gap-0.5">
+                  <span>{isBangla ? 'লেভেল ১ ও ২' : 'Levels 1 & 2'}</span>
                 </span>
               </div>
             </div>
@@ -1683,7 +1682,7 @@ export default function AdminOverviewPage() {
                       onChange={(e) => setNoticeForm({ ...noticeForm, target_course: e.target.value })}
                       className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white"
                     >
-                      <option value="">{isBangla ? '-- কোর্স নির্বাচন করুন --' : '-- Select Course --'}</option>
+                      <option value="1">Small Business Management Course (SBMC) - লেভেল ১ ও ২</option>
                       {coursesList.map((c) => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}

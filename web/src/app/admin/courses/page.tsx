@@ -26,6 +26,86 @@ import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+export const SBMC_LEVELS = [
+  {
+    id: 1,
+    code: 'SBMC-L1',
+    level: 1,
+    nameBn: 'এসবিএমসি — লেভেল ১: ফাউন্ডেশন ও কোর স্কিলস',
+    nameEn: 'SBMC — Level 1: Foundation & Core Skills',
+    descriptionBn: '৩ মাস মেয়াদী আবাসিক প্রারম্ভিক কোর্স। আইটি ফাউন্ডেশন, গ্রাফিক ডিজাইন, ভিডিও এডিটিং, ইংরেজি ও ইসলামিক মূল্যবোধ।',
+    descriptionEn: '3-month residential foundation program covering digital content, graphic design, language, and Islamic ethics.',
+    durationMonths: 3,
+    subjectsCount: 4,
+    subjects: [
+      'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস (GD-101)',
+      'ডিজিটাল কনটেন্ট ও ভিডিও এডিটিং (VE-102)',
+      'ইসলামিক বেসিকস - মাদ্রাসা/জেনারেল (IS-104)',
+      'ইংলিশ ল্যাঙ্গুয়েজ ও কমিউনিকেশন (EN-106)',
+    ],
+    status: 'সক্রিয় কারিকুলাম',
+    campus: 'কাজী বাড়ি ক্যাম্পাস, উত্তর বাড্ডা',
+  },
+  {
+    id: 2,
+    code: 'SBMC-L2',
+    level: 2,
+    nameBn: 'এসবিএমসি — লেভেল ২: অ্যাডভান্সড এন্টারপ্রেনারশিপ ও প্রজেক্টস',
+    nameEn: 'SBMC — Level 2: Advanced Entrepreneurship & Specialization',
+    descriptionBn: '৩ মাস মেয়াদী আবাসিক অ্যাডভান্সড কোর্স। প্র্যাকটিক্যাল অ্যাকাউন্টিং, মেটা মার্কেটিং ফানেল, ফ্রিল্যান্সিং ও লিডারশিপ।',
+    descriptionEn: '3-month residential advanced specialization covering practical accounting, marketing funnels, and freelancing.',
+    durationMonths: 3,
+    subjectsCount: 4,
+    subjects: [
+      'ইউআই/ইউএক্স ও টাইপোগ্রাফি (UX-103)',
+      'ফ্রিল্যান্সিং ও মার্কেটপ্লেস প্রজেক্ট (FL-105)',
+      'থিওরিটিক্যাল ও প্র্যাকটিক্যাল অ্যাকাউন্টিং (AC-107)',
+      'অফিস অ্যাডমিনিস্ট্রেশন ও মাইক্রোসফট অফিস (OF-108)',
+    ],
+    status: 'সক্রিয় কারিকুলাম',
+    campus: 'কাজী বাড়ি ক্যাম্পাস, উত্তর বাড্ডা',
+  },
+];
+
+export const DEFAULT_SBMC_BATCHES = [
+  {
+    id: 42,
+    batch_number: 42,
+    name: 'SBMC ব্যাচ ৪২ (জেনারেল ও মাদ্রাসা ব্যাকগ্রাউন্ড)',
+    level: 1,
+    level_name: 'লেভেল ১ (ফাউন্ডেশন)',
+    start_date: '2026-01-10',
+    end_date: '2026-04-10',
+    capacity: 40,
+    status: 'চলমান (Active)',
+    course_name: 'Small Business Management Course (SBMC)',
+  },
+  {
+    id: 41,
+    batch_number: 41,
+    name: 'SBMC ব্যাচ ৪১ (মর্নিং শিফট - এন্টারপ্রেনারশিপ)',
+    level: 2,
+    level_name: 'লেভেল ২ (অ্যাডভান্সড)',
+    start_date: '2025-10-15',
+    end_date: '2026-01-15',
+    capacity: 40,
+    status: 'চলমান (Active)',
+    course_name: 'Small Business Management Course (SBMC)',
+  },
+  {
+    id: 43,
+    batch_number: 43,
+    name: 'SBMC ব্যাচ ৪৩ (নতুন ইনটেক - কাজী বাড়ি ক্যাম্পাস)',
+    level: 1,
+    level_name: 'লেভেল ১ (ফাউন্ডেশন)',
+    start_date: '2026-02-01',
+    end_date: '2026-05-01',
+    capacity: 40,
+    status: 'আসন্ন (Upcoming)',
+    course_name: 'Small Business Management Course (SBMC)',
+  },
+];
+
 export default function AdminCoursesPage() {
   const { t, d, isBangla } = useLanguage();
 
@@ -43,7 +123,8 @@ export default function AdminCoursesPage() {
   const [batchForm, setBatchForm] = useState({
     name: '',
     batch_number: '',
-    course_id: '',
+    level: '1',
+    course_id: '1',
     campus_id: '1',
     start_date: '',
     end_date: '',
@@ -278,7 +359,8 @@ export default function AdminCoursesPage() {
       setBatchForm({
         name: '',
         batch_number: '',
-        course_id: courses[0]?.id ? String(courses[0].id) : '',
+        level: '1',
+        course_id: courses[0]?.id ? String(courses[0].id) : '1',
         campus_id: '1',
         start_date: '',
         end_date: '',
@@ -305,15 +387,15 @@ export default function AdminCoursesPage() {
         <div className="relative z-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 border border-[#FCD34D] rounded-full text-xs font-semibold text-[#92400E] mb-2.5 shadow-xs">
             <Layers className="w-3.5 h-3.5 text-[#0F766E]" />
-            <span>{isBangla ? 'একাডেমিক কারিকুলাম কন্ট্রোল' : 'Curriculum Governance'}</span>
+            <span>{isBangla ? 'এসবিএমসি কারিকুলাম কন্ট্রোল • লেভেল ১ ও ২' : 'SBMC Curriculum • Level 1 & 2'}</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading text-[#0F172A]">
-            {isBangla ? 'কোর্স, ব্যাচ ও কারিকুলাম প্রশাসন' : 'Courses, Batches & Curriculum'}
+            {isBangla ? 'এসবিএমসি কারিকুলাম ও ব্যাচ প্রশাসন' : 'SBMC Curriculum, Batches & Levels'}
           </h1>
           <p className="text-xs sm:text-sm text-[#78350F] mt-1 max-w-xl">
             {isBangla
-              ? 'ইনস্টিটিউটের কোর্স কারিকুলাম, সক্রিয় ব্যাচ এবং শিক্ষক নিয়োগের সেন্ট্রাল কনফিগারেশন।'
-              : 'Configure institute courses, active academic batches, and teacher assignments.'}
+              ? '৩ মাস মেয়াদী আবাসিক এসবিএমসি (Small Business Management Course) এর লেভেল ১ ও লেভেল ২ ব্যাচ এবং অনুষদ ব্যবস্থাপনা।'
+              : 'Official 3-Month Residential SBMC Level 1 & Level 2 batches, curriculum, and faculty allocations.'}
           </p>
         </div>
 
@@ -326,40 +408,69 @@ export default function AdminCoursesPage() {
         </button>
       </div>
 
-      {/* Courses Overview */}
+      {/* Courses Overview: Strictly SBMC Level 1 and Level 2 */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-        <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-[#0F766E]" />
-          <span>{isBangla ? 'কোর্স কারিকুলাম ও বিবরণ' : 'Active Course Offerings'}</span>
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-[#0F766E]" />
+              <span>{isBangla ? 'এসবিএমসি কোর্স কারিকুলাম ও লেভেল অফারিংস' : 'SBMC Course Curriculum & Level Offerings'}</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {isBangla
+                ? '৩ মাস মেয়াদী আবাসিক এসবিএমসি কোর্সের প্রাতিষ্ঠানিক লেভেল ১ ও লেভেল ২ কারিকুলাম কাঠামো।'
+                : '3-Month Residential SBMC official Level 1 and Level 2 curriculum framework.'}
+            </p>
+          </div>
+          <span className="self-start sm:self-auto px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+            {isBangla ? 'কঠোর এসবিএমসি স্কোপ • লেভেল ১ ও ২' : 'Strict SBMC Scope • Level 1 & 2'}
+          </span>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {courses.map((c) => (
+          {SBMC_LEVELS.map((level) => (
             <div
-              key={c.id}
-              className="p-5 rounded-2xl bg-gradient-to-br from-[#F0FDFA] to-white border border-[#CCFBF1] space-y-3"
+              key={level.id}
+              className="p-5 rounded-2xl bg-gradient-to-br from-[#F0FDFA] to-white border border-[#CCFBF1] space-y-3 shadow-2xs"
             >
               <div className="flex items-center justify-between">
-                <span className="px-2 py-0.5 bg-[#0F766E] text-white text-[10px] font-bold rounded-full uppercase">
-                  {c.code || 'SBMC'}
+                <span className="px-2.5 py-0.5 bg-[#0F766E] text-white text-[11px] font-bold rounded-full uppercase tracking-wider">
+                  {level.code}
                 </span>
                 <span className="text-xs font-semibold text-gray-500">
-                  {isBangla ? 'মেয়াদ:' : 'Duration:'} {d(c.duration_months || 3)} {isBangla ? 'মাস' : 'Months'}
+                  {isBangla ? 'মেয়াদ:' : 'Duration:'} {d(level.durationMonths)} {isBangla ? 'মাস (আবাসিক)' : 'Months (Residential)'}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-base font-bold text-gray-900">{c.name}</h3>
+                <h3 className="text-base font-bold text-gray-900">
+                  {isBangla ? level.nameBn : level.nameEn}
+                </h3>
                 <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                  {c.description || (isBangla
-                    ? 'ক্ষুদ্র ব্যবসা পরিচালনা, হিসাবরক্ষণ, অফিস ম্যানেজমেন্ট এবং মার্কেটিং বিষয়ক পূর্ণাঙ্গ স্কিল কোর্স।'
-                    : 'Comprehensive entrepreneurship, office management, and small business operations.')}
+                  {isBangla ? level.descriptionBn : level.descriptionEn}
                 </p>
               </div>
 
+              {/* Subjects in this level */}
+              <div className="bg-white/80 p-3 rounded-xl border border-emerald-100/80 space-y-1.5">
+                <p className="text-[11px] font-bold text-emerald-900">
+                  {isBangla ? 'নির্ধারিত বিষয়সমূহ (৪টি বিষয়):' : 'Assigned Subjects:'}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-slate-700">
+                  {level.subjects.map((sub, idx) => (
+                    <div key={idx} className="flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
+                      <span className="truncate">{sub}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-[#0F766E] font-bold">
-                <span>{isBangla ? 'সক্রিয় বিষয় সংখ্যা:' : 'Total Subjects:'} {d(c.subjects_count || 8)} টি</span>
-                <span>{isBangla ? 'ক্যাম্পাস:' : 'Campus:'} {c.campus_name || 'Kazi Bari'}</span>
+                <span>{isBangla ? 'ক্যাম্পাস:' : 'Campus:'} {level.campus}</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px]">
+                  {level.status}
+                </span>
               </div>
             </div>
           ))}
@@ -372,16 +483,16 @@ export default function AdminCoursesPage() {
           <div>
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
               <Layers className="w-5 h-5 text-[#0F766E]" />
-              <span>{isBangla ? 'ব্যাচ তালিকা ও স্ট্যাটাস' : 'Academic Batches Directory'}</span>
+              <span>{isBangla ? 'এসবিএমসি ব্যাচ ও লেভেল ডিরেক্টরি' : 'SBMC Batches & Levels Directory'}</span>
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
               {isBangla
-                ? 'কোর্সের চলমান ও ভবিষ্যৎ ব্যাচের সময়সূচি ও আসন সংখ্যা।'
-                : 'Timeline, start/end dates, and student capacity for all batches.'}
+                ? 'এসবিএমসি লেভেল ১ ও লেভেল ২ এর চলমান ও ভবিষ্যৎ ব্যাচের সময়সূচি ও আসন সংখ্যা।'
+                : 'Timeline, levels (Level 1 & 2), start/end dates, and capacity for all SBMC cohorts.'}
             </p>
           </div>
           <span className="text-xs font-bold text-[#0369A1] px-3 py-1 bg-[#F0FDFA] rounded-full border border-[#CCFBF1]">
-            {d(batches.length)} {isBangla ? 'টি ব্যাচ' : 'Batches'}
+            {d((batches.length > 0 ? batches : DEFAULT_SBMC_BATCHES).length)} {isBangla ? 'টি ব্যাচ' : 'Batches'}
           </span>
         </div>
 
@@ -391,6 +502,7 @@ export default function AdminCoursesPage() {
               <tr>
                 <th className="py-3 px-4">{isBangla ? 'ব্যাচ নম্বর' : 'Batch No'}</th>
                 <th className="py-3 px-4">{isBangla ? 'ব্যাচের নাম' : 'Batch Name'}</th>
+                <th className="py-3 px-4">{isBangla ? 'কোর্স লেভেল' : 'Course Level'}</th>
                 <th className="py-3 px-4">{isBangla ? 'শুরুর তারিখ' : 'Start Date'}</th>
                 <th className="py-3 px-4">{isBangla ? 'সমাপ্তির তারিখ' : 'End Date'}</th>
                 <th className="py-3 px-4">{isBangla ? 'আসন ক্ষমতা' : 'Capacity'}</th>
@@ -398,13 +510,24 @@ export default function AdminCoursesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {batches.map((b) => (
+              {(batches.length > 0 ? batches : DEFAULT_SBMC_BATCHES).map((b: any) => (
                 <tr key={b.id} className="hover:bg-[#F0FDFA]/50 transition">
                   <td className="py-3.5 px-4 font-bold font-mono text-[#0F766E]">
                     #{b.batch_number}
                   </td>
                   <td className="py-3.5 px-4 font-bold text-gray-900">
                     {b.name}
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      b.level === 2 || (b.name && b.name.includes('৪১'))
+                        ? 'bg-amber-100 text-amber-900 border border-amber-200'
+                        : 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                    }`}>
+                      {b.level === 2 || (b.name && b.name.includes('৪১'))
+                        ? (isBangla ? 'লেভেল ২ (অ্যাডভান্সড)' : 'Level 2')
+                        : (isBangla ? 'লেভেল ১ (ফাউন্ডেশন)' : 'Level 1')}
+                    </span>
                   </td>
                   <td className="py-3.5 px-4 font-mono text-gray-600">
                     {d(b.start_date)}
@@ -413,7 +536,7 @@ export default function AdminCoursesPage() {
                     {d(b.end_date)}
                   </td>
                   <td className="py-3.5 px-4 text-gray-700">
-                    {d(b.capacity || 40)} {isBangla ? 'জন' : 'seats'}
+                    {d(b.capacity || 40)} {isBangla ? 'জন (আবাসিক)' : 'seats'}
                   </td>
                   <td className="py-3.5 px-4">
                     <span className="px-2.5 py-0.5 rounded-full bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1] text-[10px] font-bold">
@@ -756,19 +879,33 @@ export default function AdminCoursesPage() {
             <form onSubmit={handleCreateBatch} className="space-y-3.5 text-xs">
               <div>
                 <label className="block font-bold text-gray-700 mb-1">
-                  {isBangla ? 'কোর্স নির্বাচন *' : 'Select Course *'}
+                  {isBangla ? 'কোর্স ও লেভেল নির্বাচন *' : 'Select Course & Level *'}
                 </label>
                 <select
-                  value={batchForm.course_id}
-                  onChange={(e) => setBatchForm({ ...batchForm, course_id: e.target.value })}
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                  value={batchForm.level}
+                  onChange={(e) => {
+                    const lvl = e.target.value;
+                    const num = batchForm.batch_number || '৪৪';
+                    setBatchForm({
+                      ...batchForm,
+                      level: lvl,
+                      name: `SBMC ব্যাচ ${num} (লেভেল ${lvl === '1' ? '১' : '২'})`,
+                    });
+                  }}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
                 >
-                  {courses.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name} ({c.code})
-                    </option>
-                  ))}
+                  <option value="1">
+                    {isBangla ? 'SBMC - লেভেল ১: ফাউন্ডেশন ও কোর স্কিলস (SBMC-L1)' : 'SBMC - Level 1: Foundation & Core Skills (SBMC-L1)'}
+                  </option>
+                  <option value="2">
+                    {isBangla ? 'SBMC - লেভেল ২: অ্যাডভান্সড এন্টারপ্রেনারশিপ (SBMC-L2)' : 'SBMC - Level 2: Advanced Entrepreneurship (SBMC-L2)'}
+                  </option>
                 </select>
+                <p className="text-[10.5px] text-emerald-800 font-semibold mt-1">
+                  {isBangla
+                    ? 'কঠোর এসবিএমসি স্কোপ: ইনস্টিটিউটের অন্য কোনো কোর্স এখানে অন্তর্ভুক্ত নয়।'
+                    : 'Strict SBMC Scope: Exclusively for SBMC Level 1 & Level 2.'}
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

@@ -47,16 +47,6 @@ class Command(BaseCommand):
                 "is_staff": False,
                 "is_superuser": False,
             },
-            {
-                "login_id": "observer01",
-                "full_name": "Tariq Observer (Dummy)",
-                "role": UserRole.OBSERVER,
-                "email": "observer.demo@assdi.local",
-                "phone": "01700000004",
-                "password": "ObserverPass2026!",
-                "is_staff": False,
-                "is_superuser": False,
-            },
         ]
 
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Creating ASSDI Demo Users ==="))

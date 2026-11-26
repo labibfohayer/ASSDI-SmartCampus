@@ -92,7 +92,6 @@ interface DashboardData {
 export default function CoordinatorDashboardPage() {
   const { user } = useAuth();
   const { t, d, isBangla } = useLanguage();
-  const isObserver = user?.role === 'observer';
 
   const safeFixed = (val: any, fallback = '0.0') =>
     typeof val === 'number' && !isNaN(val) ? val.toFixed(1) : fallback;
@@ -532,21 +531,7 @@ export default function CoordinatorDashboardPage() {
           </div>
 
           <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 space-y-3 shadow-xs">
-            {isObserver ? (
-              <div className="text-center py-6 space-y-2">
-                <div className="w-10 h-10 bg-purple-50 text-purple-700 rounded-full flex items-center justify-center mx-auto border border-purple-100">
-                  <Eye className="w-5 h-5" />
-                </div>
-                <h4 className="text-xs font-bold text-[#0F172A] font-heading">
-                  {isBangla ? 'পর্যবেক্ষক মোড: ব্যক্তিগত নাম গোপন' : 'Observer Mode: Names Redacted'}
-                </h4>
-                <p className="text-[11px] text-[#475569]">
-                  {isBangla
-                    ? `বর্তমানে মোট ${d(data?.students_requiring_attention_count || 0)} জন শিক্ষার্থী ঝুঁকিপূর্ণ হিসেবে চিহ্নিত।`
-                    : `Currently ${data?.students_requiring_attention_count || 0} students are flagged as at-risk.`}
-                </p>
-              </div>
-            ) : data?.students_requiring_attention?.length === 0 ? (
+            {data?.students_requiring_attention?.length === 0 ? (
               <div className="text-center py-8 space-y-2">
                 <div className="w-10 h-10 bg-[#F0FDFA] text-[#0284C7] rounded-full flex items-center justify-center mx-auto border border-[#CCFBF1]">
                   <CheckSquare className="w-5 h-5" />

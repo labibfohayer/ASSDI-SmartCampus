@@ -26,8 +26,6 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           ? '/admin'
           : user.role === 'teacher'
           ? '/teacher'
-          : user.role === 'observer'
-          ? '/coordinator'
           : '/login';
       router.replace(targetDashboard);
     }
@@ -48,8 +46,6 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         ? '/admin'
         : user.role === 'teacher'
         ? '/teacher'
-        : user.role === 'observer'
-        ? '/coordinator'
         : '/login';
 
     return (

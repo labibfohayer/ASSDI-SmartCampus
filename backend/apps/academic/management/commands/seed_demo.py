@@ -121,19 +121,6 @@ class Command(BaseCommand):
                 course=course,
             )
 
-            # Observer
-            observer_user, _ = User.objects.get_or_create(
-                login_id="observer01",
-                defaults={
-                    "full_name": "Tariq Observer (Dummy)",
-                    "role": UserRole.OBSERVER,
-                    "email": "observer.demo@assdi.local",
-                    "phone": "01700000004",
-                },
-            )
-            observer_user.set_password("ObserverPass2026!")
-            observer_user.save()
-
             # 4. Departments
             dept_biz, _ = Department.objects.get_or_create(
                 course=course,
@@ -778,9 +765,7 @@ class Command(BaseCommand):
             self.stdout.write(f"• {t_user.full_name} ({t_user.login_id}) teaches: {subs_str}")
 
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Staff Demo Login Credentials ==="))
-        self.stdout.write(f"• Super Admin: login_id: admin01          | password: AdminPass2026!")
         self.stdout.write(f"• Coordinator: login_id: coord01          | password: CoordPass2026!")
-        self.stdout.write(f"• Observer:    login_id: observer01       | password: ObserverPass2026!")
         self.stdout.write(f"• Teachers:    login_id: teacher_msoffice | password: TeacherPass2026! (and teacher_acct, teacher_admin, etc.)")
 
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Sample Enrolled Student Credentials ==="))

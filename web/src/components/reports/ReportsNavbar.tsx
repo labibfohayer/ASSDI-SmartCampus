@@ -42,7 +42,6 @@ export default function ReportsNavbar() {
           label: isBangla ? 'শিক্ষক পোর্টাল' : 'Teacher Portal',
           icon: BookOpen,
         };
-      case 'observer':
       default:
         return {
           href: '/coordinator',

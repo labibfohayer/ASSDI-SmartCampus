@@ -186,7 +186,7 @@ export default function NotificationBell() {
       title.includes('সতর্কতা') ||
       title.includes('absence')
     ) {
-      if (user?.role === 'super_admin' || user?.role === 'coordinator' || user?.role === 'observer') {
+      if (user?.role === 'super_admin' || user?.role === 'coordinator') {
         return '/coordinator/at-risk';
       }
       if (user?.role === 'teacher') {
@@ -226,7 +226,6 @@ export default function NotificationBell() {
     // Fallback based on role
     if (user?.role === 'super_admin' || user?.role === 'coordinator') return '/admin';
     if (user?.role === 'teacher') return '/teacher';
-    if (user?.role === 'observer') return '/coordinator';
     return '/student';
   };
 

@@ -26,8 +26,6 @@ export default function CoordinatorNavbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isObserver = user?.role === 'observer';
-
   const navItems = [
     {
       href: '/coordinator',
@@ -78,15 +76,9 @@ export default function CoordinatorNavbar() {
                   <span className="font-bold text-[#0F172A] text-sm tracking-tight font-heading">
                     {t('brand.name')}
                   </span>
-                  <span
-                    className={`px-2 py-0.5 text-[10px] font-bold rounded-full flex items-center gap-1 ${
-                      isObserver
-                        ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                        : 'bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1]'
-                    }`}
-                  >
-                    {isObserver ? <Eye className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3 text-[#0369A1]" />}
-                    <span>{isObserver ? 'পর্যবেক্ষক মোড' : 'কোঅর্ডিনেটর পোর্টাল'}</span>
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full flex items-center gap-1 bg-[#F0FDFA] text-[#0369A1] border border-[#CCFBF1]">
+                    <ShieldCheck className="w-3 h-3 text-[#0369A1]" />
+                    <span>{isBangla ? 'কোঅর্ডিনেটর পোর্টাল' : 'Coordinator Portal'}</span>
                   </span>
                 </div>
                 <p className="text-[11px] text-[#0F766E] font-medium">
@@ -124,12 +116,8 @@ export default function CoordinatorNavbar() {
 
             {/* User Profile */}
             <div className="hidden md:flex items-center gap-2.5 pl-2 border-l border-[#E2E8F0]">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                  isObserver ? 'bg-purple-100 text-purple-800' : 'bg-[#FFFBEB] border border-[#FCD34D] text-[#0F766E]'
-                }`}
-              >
-                {isObserver ? <Eye className="w-4 h-4" /> : <UserIcon className="w-4 h-4" />}
+              <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs bg-[#FFFBEB] border border-[#FCD34D] text-[#0F766E]">
+                <UserIcon className="w-4 h-4" />
               </div>
               <div className="text-left">
                 <p className="text-xs font-bold text-[#0F172A] leading-tight font-heading">

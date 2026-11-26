@@ -35,8 +35,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ? '/student'
         : user.role === 'teacher'
         ? '/teacher'
-        : user.role === 'observer'
-        ? '/coordinator'
         : '/login';
 
     return (

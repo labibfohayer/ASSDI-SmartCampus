@@ -25,7 +25,6 @@ import { GraduationCertificateModal, GraduationData } from '@/components/student
 export default function CoordinatorAtRiskPage() {
   const { user } = useAuth();
   const { t, d, isBangla } = useLanguage();
-  const isObserver = user?.role === 'observer';
   const safeFixed = (val: any, fallback = '0.0') =>
     typeof val === 'number' && !isNaN(val) ? val.toFixed(1) : fallback;
 
@@ -107,24 +106,8 @@ export default function CoordinatorAtRiskPage() {
         </div>
       </div>
 
-      {/* Observer Mode Notice */}
-      {isObserver && (
-        <div className="bg-purple-50 border border-purple-200 p-6 rounded-2xl text-center space-y-2">
-          <Eye className="w-10 h-10 text-purple-600 mx-auto" />
-          <h3 className="text-base font-bold text-purple-950">
-            {isBangla ? 'পর্যবেক্ষক মোড সক্রিয় (ব্যক্তিগত তথ্য সংরক্ষিত)' : 'Observer Mode Active (Data Protected)'}
-          </h3>
-          <p className="text-xs text-purple-800 max-w-md mx-auto leading-relaxed">
-            {isBangla
-              ? `নীতিমালা অনুযায়ী পর্যবেক্ষকদের কাছে শিক্ষার্থীদের ব্যক্তিগত নাম, ফোন নম্বর ও রোল গোপন রাখা হয়েছে। বর্তমানে মোট ${d(data?.students_requiring_attention_count || 0)} জন শিক্ষার্থী ঝুঁকিপূর্ণ হিসেবে চিহ্নিত।`
-              : `Per institutional privacy rules, personal contact data and names are hidden for observer accounts. Total ${data?.students_requiring_attention_count || 0} students are flagged.`}
-          </p>
-        </div>
-      )}
-
-      {/* Main Table for Non-Observers */}
-      {!isObserver && (
-        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+      {/* Main Table */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
           {/* Search & Filter Tabs */}
           <div className="p-4 border-b border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[#F8FAFC]">
             <div className="relative w-full sm:w-72">
@@ -284,7 +267,6 @@ export default function CoordinatorAtRiskPage() {
             </div>
           )}
         </div>
-      )}
 
       {/* Graduation & Certificate Modal */}
       {selectedStudentForGraduation && (

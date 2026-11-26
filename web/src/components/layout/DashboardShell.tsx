@@ -62,8 +62,8 @@ const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
   {
     id: 'batches',
     href: '/admin/courses',
-    labelBn: 'ব্যাচ ও কোর্স পরিচালনা',
-    labelEn: 'Batches & Courses',
+    labelBn: 'SBMC ব্যাচ ও লেভেল পরিচালনা',
+    labelEn: 'SBMC Batches & Levels',
     iconName: 'Layers',
     section: 'main',
     isArchived: false,
@@ -117,7 +117,7 @@ export interface NavSection {
 
 interface DashboardShellProps {
   children: React.ReactNode;
-  role: 'super_admin' | 'coordinator' | 'teacher' | 'student' | 'observer' | 'reports';
+  role: 'super_admin' | 'coordinator' | 'teacher' | 'student' | 'reports';
   noticeBanner?: React.ReactNode;
 }
 
@@ -277,38 +277,8 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         ];
       }
 
-      case 'observer':
+      case 'reports':
         return [
-          {
-            titleBn: 'কো-অর্ডিনেশন ও মনিটরিং',
-            titleEn: 'Coordination & Monitoring',
-            items: [
-              {
-                href: '/coordinator',
-                labelBn: 'ওভারভিউ অ্যানালিটিক্স',
-                labelEn: 'Overview & KPIs',
-                icon: LayoutDashboard,
-              },
-              {
-                href: '/coordinator/batches',
-                labelBn: 'ব্যাচ ও ফ্যাকাল্টি বিশ্লেষণ',
-                labelEn: 'Batches & Faculty',
-                icon: Layers,
-              },
-              {
-                href: '/coordinator/at-risk',
-                labelBn: 'ঝুঁকিপূর্ণ শিক্ষার্থী ট্র্যাকিং',
-                labelEn: 'At-Risk Students',
-                icon: AlertTriangle,
-              },
-              {
-                href: '/announcements',
-                labelBn: 'নোটিশ ও অ্যানাউন্সমেন্ট',
-                labelEn: 'Notice Board',
-                icon: Megaphone,
-              },
-            ],
-          },
           {
             titleBn: 'প্রাতিষ্ঠানিক রিপোর্ট',
             titleEn: 'Institutional Reports',
@@ -473,11 +443,6 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
           label: isBangla ? 'সম্মানিত শিক্ষক' : 'Faculty Member',
           color: 'bg-teal-800 text-white',
         };
-      case 'observer':
-        return {
-          label: isBangla ? 'পর্যবেক্ষক (Observer)' : 'Observer',
-          color: 'bg-purple-800 text-white',
-        };
       case 'student':
         return {
           label: isBangla ? 'শিক্ষার্থী' : 'Student',
@@ -485,7 +450,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         };
       default:
         return {
-          label: isBangla ? 'স্টাফ' : 'Staff',
+          label: isBangla ? 'কোর্স কো-অর্ডিনেটর' : 'Course Coordinator',
           color: 'bg-slate-700 text-white',
         };
     }
@@ -500,8 +465,6 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         return '/admin';
       case 'teacher':
         return '/teacher';
-      case 'observer':
-        return '/coordinator';
       case 'student':
       default:
         return '/student';
@@ -515,8 +478,6 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
         return isBangla ? 'COORDINATOR / কোঅর্ডিনেটর' : 'COORDINATOR';
       case 'teacher':
         return isBangla ? 'TEACHER / শিক্ষক' : 'TEACHER';
-      case 'observer':
-        return isBangla ? 'OBSERVER / পর্যবেক্ষক' : 'OBSERVER';
       case 'student':
       default:
         return isBangla ? 'STUDENT / শিক্ষার্থী' : 'STUDENT';
@@ -668,10 +629,10 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
             icon: FileText,
           },
         ];
-      default: // observer or fallback
+      default:
         return [
           {
-            href: role === 'observer' ? '/coordinator' : '/admin',
+            href: '/admin',
             labelBn: 'ড্যাশবোর্ড',
             labelEn: 'Dashboard',
             icon: LayoutDashboard,
@@ -949,7 +910,7 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                   ? isBangla ? 'অনুষদ শিক্ষক' : 'Faculty'
                   : (role === 'super_admin' || role === 'coordinator')
                   ? isBangla ? 'কোর্স কোঅর্ডিনেটর' : 'Course Coordinator'
-                  : isBangla ? 'সিস্টেম সক্রিয়' : 'System Active'}
+                  : isBangla ? 'এসবিএমসি লেভেল ১ ও ২' : 'SBMC Level 1 & 2'}
               </span>
             </div>
 

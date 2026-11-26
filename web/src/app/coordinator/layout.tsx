@@ -21,8 +21,8 @@ export default function CoordinatorLayout({ children }: { children: React.ReactN
       return;
     }
 
-    // Role check: Coordinator, Super admin & Observer are allowed in /coordinator
-    const allowed = ['coordinator', 'super_admin', 'observer'];
+    // Role check: Coordinator & Super admin are allowed in /coordinator
+    const allowed = ['coordinator', 'super_admin'];
     if (user && !allowed.includes(user.role)) {
       router.replace('/login');
     }
@@ -36,28 +36,8 @@ export default function CoordinatorLayout({ children }: { children: React.ReactN
     );
   }
 
-  const isObserver = user?.role === 'observer';
-
-  const noticeBanner = isObserver ? (
-    <div className="bg-[#FFFBEB] text-[#92400E] px-4 py-2 text-xs font-medium border-b border-[#FCD34D]">
-      <div className="w-full px-2 sm:px-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Eye className="w-4 h-4 text-[#0F766E] shrink-0" />
-          <span>
-            {isBangla
-              ? 'পর্যবেক্ষক মোড (Observer Mode) সক্রিয়: শুধুমাত্র এগ্রিগেট মেট্রিক ও সামগ্রিক রিপোর্ট দৃশ্যমান। ব্যক্তিগত ফোন বা যোগাযোগ তথ্য গোপন রাখা হয়েছে।'
-              : 'Observer Mode Active: Aggregate metrics & summary reports visible only. Personal contact details are protected.'}
-          </span>
-        </div>
-        <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-[#0F766E] text-white text-[10px] uppercase font-bold tracking-wider">
-          Read-Only
-        </span>
-      </div>
-    </div>
-  ) : null;
-
   return (
-    <DashboardShell role={isObserver ? 'observer' : 'coordinator'} noticeBanner={noticeBanner}>
+    <DashboardShell role="coordinator">
       {children}
     </DashboardShell>
   );
