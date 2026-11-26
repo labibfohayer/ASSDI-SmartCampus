@@ -39,6 +39,9 @@ import {
   Check,
   Layers,
   GraduationCap,
+  Building,
+  Timer,
+  UserX,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -66,6 +69,43 @@ interface ClassSessionItem {
   attendance_count?: number;
   total_students?: number;
   is_live?: boolean;
+}
+
+interface TomorrowSessionItem {
+  id: number;
+  batch_name: string;
+  subject_name: string;
+  topic_title: string;
+  session_date: string;
+  day_label: string;
+  start_time: string;
+  end_time: string;
+  room: string;
+  total_students: number;
+}
+
+interface WeeklyRoutineItem {
+  day: string;
+  dayEn: string;
+  sessions: {
+    id: number;
+    subject_name: string;
+    batch_name: string;
+    start_time: string;
+    end_time: string;
+    room: string;
+  }[];
+}
+
+interface StudentAttendanceDetail {
+  id: number;
+  student_name: string;
+  student_id_number: string;
+  batch_name: string;
+  status: 'present' | 'absent' | 'late';
+  check_in_time: string;
+  duration_minutes: number;
+  method: string;
 }
 
 interface HelpRequestItem {
@@ -145,18 +185,18 @@ interface TeacherAISummary {
   ai_recommendations: AIRecommendation[];
 }
 
-// Fallback high-fidelity demo data for seamless presentation
+// Fallback high-fidelity demo data for multiple classes today
 const DEFAULT_TEACHER_SESSIONS: ClassSessionItem[] = [
   {
     id: 101,
     batch: 42,
-    batch_name: 'ব্যাচ ৪২',
+    batch_name: 'ব্যাচ ৪২ (জেনারেল)',
     course_name: 'Small Business Management Course (SBMC)',
     subject: 1,
     subject_name: 'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস',
     topic: 12,
     topic_title: 'অ্যাডোবি ইলাস্ট্রেটর: ভেক্টর পাথ ও পেন টুল মাস্টারি',
-    session_date: '2026-11-25',
+    session_date: '2026-11-26',
     start_time: '09:00:00',
     end_time: '10:00:00',
     room: 'ল্যাব ০১ (আইটি ভবন)',
@@ -169,13 +209,13 @@ const DEFAULT_TEACHER_SESSIONS: ClassSessionItem[] = [
   {
     id: 102,
     batch: 41,
-    batch_name: 'ব্যাচ ৪১',
+    batch_name: 'ব্যাচ ৪১ (মর্নিং শিফট)',
     course_name: 'Small Business Management Course (SBMC)',
     subject: 2,
     subject_name: 'ডিজিটাল কনটেন্ট ও ভিডিও এডিটিং',
     topic: 8,
     topic_title: 'প্রিমিয়ার প্রো: কালার গ্রেডিং ও অডিও সিঙ্ক',
-    session_date: '2026-11-25',
+    session_date: '2026-11-26',
     start_time: '11:30:00',
     end_time: '12:30:00',
     room: 'মাল্টিমিডিয়া রুম ১০৩',
@@ -185,6 +225,112 @@ const DEFAULT_TEACHER_SESSIONS: ClassSessionItem[] = [
     total_students: 40,
     is_live: false,
   },
+  {
+    id: 103,
+    batch: 42,
+    batch_name: 'ব্যাচ ৪২ (ইভনিং শিফট)',
+    course_name: 'Small Business Management Course (SBMC)',
+    subject: 3,
+    subject_name: 'ইউআই/ইউএক্স ও টাইপোগ্রাফি',
+    topic: 5,
+    topic_title: 'ফিগমা অটো-লেআউট ও কম্পোনেন্ট লাইব্রেরি',
+    session_date: '2026-11-26',
+    start_time: '14:30:00',
+    end_time: '15:30:00',
+    room: 'কম্পিউটার ল্যাব ০২',
+    audience: 'general',
+    status: 'published',
+    attendance_count: 0,
+    total_students: 42,
+    is_live: false,
+  },
+];
+
+// Tomorrow's Scheduled Sessions
+const DEFAULT_TOMORROW_SESSIONS: TomorrowSessionItem[] = [
+  {
+    id: 201,
+    batch_name: 'ব্যাচ ৪২ (জেনারেল)',
+    subject_name: 'ফ্রিল্যান্সিং ও ক্লায়েন্ট কমিউনিকেশন',
+    topic_title: 'ফাইভার ও আপওয়ার্ক গিগ অপ্টিমাইজেশন ও বিডিং',
+    session_date: '2026-11-27',
+    day_label: 'শুক্রবার',
+    start_time: '10:00:00',
+    end_time: '11:00:00',
+    room: 'কম্পিউটার ল্যাব ০১',
+    total_students: 42,
+  },
+  {
+    id: 202,
+    batch_name: 'ব্যাচ ৪১ (মর্নিং শিফট)',
+    subject_name: 'ডিজিটাল কনটেন্ট ও ভিডিও এডিটিং',
+    topic_title: 'আফটার ইফেক্টস: মোশন গ্রাফিক্স ও টাইটেল অ্যানিমেশন',
+    session_date: '2026-11-27',
+    day_label: 'শুক্রবার',
+    start_time: '13:30:00',
+    end_time: '14:30:00',
+    room: 'মাল্টিমিডিয়া রুম ১০৩',
+    total_students: 40,
+  },
+];
+
+// Full Weekly Routine Calendar
+const DEFAULT_WEEKLY_ROUTINE: WeeklyRoutineItem[] = [
+  {
+    day: 'শনিবার',
+    dayEn: 'Saturday',
+    sessions: [
+      { id: 301, subject_name: 'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস', batch_name: 'ব্যাচ ৪২', start_time: '০৯:০০', end_time: '১০:০০', room: 'ল্যাব ০১' },
+      { id: 302, subject_name: 'ডিজিটাল কনটেন্ট ও ভিডিও এডিটিং', batch_name: 'ব্যাচ ৪১', start_time: '১১:৩০', end_time: '১২:৩০', room: 'মাল্টিমিডিয়া ১০৩' },
+    ],
+  },
+  {
+    day: 'রবিবার',
+    dayEn: 'Sunday',
+    sessions: [
+      { id: 303, subject_name: 'ডিজিটাল কনটেন্ট ও ভিডিও এডিটিং', batch_name: 'ব্যাচ ৪১', start_time: '১১:৩০', end_time: '১২:৩০', room: 'মাল্টিমিডিয়া ১০৩' },
+    ],
+  },
+  {
+    day: 'সোমবার',
+    dayEn: 'Monday',
+    sessions: [
+      { id: 304, subject_name: 'ইউআই/ইউএক্স ও টাইপোগ্রাফি', batch_name: 'ব্যাচ ৪২', start_time: '১৪:৩০', end_time: '১৫:৩০', room: 'ল্যাব ০২' },
+    ],
+  },
+  {
+    day: 'মঙ্গলবার',
+    dayEn: 'Tuesday',
+    sessions: [
+      { id: 305, subject_name: 'ডিজিটাল কনটেন্ট ও ভিডিও এডিটিং', batch_name: 'ব্যাচ ৪১', start_time: '১১:৩০', end_time: '১২:৩০', room: 'মাল্টিমিডিয়া ১০৩' },
+    ],
+  },
+  {
+    day: 'বুধবার',
+    dayEn: 'Wednesday',
+    sessions: [
+      { id: 306, subject_name: 'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস', batch_name: 'ব্যাচ ৪২', start_time: '০৯:০০', end_time: '১০:০০', room: 'ল্যাব ০১' },
+      { id: 307, subject_name: 'ইউআই/ইউএক্স ও টাইপোগ্রাফি', batch_name: 'ব্যাচ ৪২', start_time: '১৪:৩০', end_time: '১৫:৩০', room: 'ল্যাব ০২' },
+    ],
+  },
+  {
+    day: 'বৃহস্পতিবার',
+    dayEn: 'Thursday',
+    sessions: [
+      { id: 308, subject_name: 'ফ্রিল্যান্সিং ও ক্লায়েন্ট কমিউনিকেশন', batch_name: 'ব্যাচ ৪২', start_time: '১০:০০', end_time: '১১:০০', room: 'ল্যাব ০১' },
+    ],
+  },
+];
+
+// Demo Student Attendance & Duration Roster
+const DEMO_STUDENT_ATTENDANCE: StudentAttendanceDetail[] = [
+  { id: 1, student_name: 'নাজমুল হুদা', student_id_number: 'SBMC-42-006', batch_name: 'ব্যাচ ৪২', status: 'present', check_in_time: '০৯:০২ সকাল', duration_minutes: 58, method: 'কিউআর স্ক্যান' },
+  { id: 2, student_name: 'ইমরান নাজির', student_id_number: 'SBMC-42-011', batch_name: 'ব্যাচ ৪২', status: 'present', check_in_time: '০৯:০৪ সকাল', duration_minutes: 56, method: 'কিউআর স্ক্যান' },
+  { id: 3, student_name: 'তারেক মাহমুদ', student_id_number: 'SBMC-42-019', batch_name: 'ব্যাচ ৪২', status: 'present', check_in_time: '০৯:০৫ সকাল', duration_minutes: 55, method: 'কিউআর স্ক্যান' },
+  { id: 4, student_name: 'আব্দুল আহাদ', student_id_number: 'SBMC-42-022', batch_name: 'ব্যাচ ৪২', status: 'present', check_in_time: '০৯:০১ সকাল', duration_minutes: 59, method: 'কিউআর স্ক্যান' },
+  { id: 5, student_name: 'তানভীর আহমেদ', student_id_number: 'SBMC-42-031', batch_name: 'ব্যাচ ৪২', status: 'late', check_in_time: '০৯:১৬ সকাল', duration_minutes: 44, method: 'ম্যানুয়াল এন্ট্রি' },
+  { id: 6, student_name: 'জাহিদ হাসান', student_id_number: 'SBMC-42-028', batch_name: 'ব্যাচ ৪২', status: 'absent', check_in_time: '-', duration_minutes: 0, method: 'অনুপস্থিত' },
+  { id: 7, student_name: 'সাকিব আল হাসান', student_id_number: 'SBMC-42-035', batch_name: 'ব্যাচ ৪২', status: 'absent', check_in_time: '-', duration_minutes: 0, method: 'অনুপস্থিত' },
 ];
 
 const DEFAULT_TEACHER_HELP_REQUESTS: HelpRequestItem[] = [
@@ -238,7 +384,7 @@ const DEFAULT_TEACHER_AI_SUMMARY: TeacherAISummary = {
   end_date: '2026-11-26',
   is_thursday: true,
   read_time_minutes: 2,
-  generated_at: '2026-11-25T08:30:00Z',
+  generated_at: '2026-11-26T08:30:00Z',
   summary_metrics: {
     total_sessions: 8,
     total_batches: 2,
@@ -246,8 +392,8 @@ const DEFAULT_TEACHER_AI_SUMMARY: TeacherAISummary = {
     average_rating: 4.5,
     average_percentage: 88,
     total_help_requests: 5,
-    pending_help_requests: 2,
-    resolved_help_requests: 3,
+    pending_help_requests: 1,
+    resolved_help_requests: 4,
     overall_health: 'চমৎকার অগ্রগতি (Good Performance)',
     health_color: 'emerald',
   },
@@ -330,9 +476,16 @@ export default function TeacherOverviewPage() {
   const { t, d, isBangla } = useLanguage();
 
   const [todaySessions, setTodaySessions] = useState<ClassSessionItem[]>(DEFAULT_TEACHER_SESSIONS);
+  const [tomorrowSessions] = useState<TomorrowSessionItem[]>(DEFAULT_TOMORROW_SESSIONS);
+  const [weeklyRoutine] = useState<WeeklyRoutineItem[]>(DEFAULT_WEEKLY_ROUTINE);
   const [helpRequestsList, setHelpRequestsList] = useState<HelpRequestItem[]>(DEFAULT_TEACHER_HELP_REQUESTS);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Tab State for Schedule Hub: today | tomorrow | weekly
+  const [scheduleTab, setScheduleTab] = useState<'today' | 'tomorrow' | 'weekly'>('today');
+
+  // Help Request filter
   const [helpFilter, setHelpFilter] = useState<'all' | 'pending' | 'in_progress' | 'resolved'>('all');
 
   // AI Weekly Teaching Summary State
@@ -344,6 +497,9 @@ export default function TeacherOverviewPage() {
   // Micro-Quiz & Homework Manager Modal
   const [assignmentsManagerOpen, setAssignmentsManagerOpen] = useState(false);
   const [selectedSessionForAssignments, setSelectedSessionForAssignments] = useState<ClassSessionItem | null>(null);
+
+  // Student Attendance & Duration Tracker Modal
+  const [attendanceTrackerSession, setAttendanceTrackerSession] = useState<ClassSessionItem | null>(null);
 
   // Quick Resolve Modal State
   const [resolvingRequest, setResolvingRequest] = useState<HelpRequestItem | null>(null);
@@ -364,7 +520,6 @@ export default function TeacherOverviewPage() {
         setAiSummary(DEFAULT_TEACHER_AI_SUMMARY);
       }
     } catch (err: any) {
-      console.warn('Using default AI Teaching Summary:', err?.message);
       setAiSummary(DEFAULT_TEACHER_AI_SUMMARY);
     } finally {
       setAiLoading(false);
@@ -374,7 +529,6 @@ export default function TeacherOverviewPage() {
 
   const fetchDashboardData = async () => {
     try {
-      // 1. Fetch Today's Sessions for Teacher
       const sessionsRes = await api.get('/api/v1/class-sessions/today/');
       const sData = Array.isArray(sessionsRes.data)
         ? sessionsRes.data
@@ -385,7 +539,6 @@ export default function TeacherOverviewPage() {
         setTodaySessions(DEFAULT_TEACHER_SESSIONS);
       }
 
-      // 2. Fetch Pending Help Requests
       const helpRes = await api.get('/api/v1/help-requests/');
       const hData = Array.isArray(helpRes.data)
         ? helpRes.data
@@ -396,7 +549,6 @@ export default function TeacherOverviewPage() {
         setHelpRequestsList(DEFAULT_TEACHER_HELP_REQUESTS);
       }
     } catch (err: any) {
-      console.warn('Using fallback teacher dashboard data:', err?.message);
       setTodaySessions(DEFAULT_TEACHER_SESSIONS);
       setHelpRequestsList(DEFAULT_TEACHER_HELP_REQUESTS);
     } finally {
@@ -414,15 +566,14 @@ export default function TeacherOverviewPage() {
     setRefreshing(true);
     fetchDashboardData();
     fetchAISummary(true);
-    toast.success(isBangla ? 'ড্যাশবোর্ড ও এআই সামারি সফলভাবে রিফ্রেশ হয়েছে!' : 'Dashboard & AI summary refreshed');
+    toast.success(isBangla ? 'ড্যাশবোর্ড ও শিডিউল সফলভাবে রিফ্রেশ হয়েছে!' : 'Dashboard & schedule refreshed');
   };
 
-  // Toggle help request status directly from overview
   const handleStartHelp = async (req: HelpRequestItem) => {
     try {
       await api.post(`/api/v1/help-requests/${req.id}/start/`);
     } catch (e) {
-      // Fallback local update
+      // Local fallback
     }
     setHelpRequestsList((prev) =>
       prev.map((item) => (item.id === req.id ? { ...item, status: 'in_progress' } : item))
@@ -449,7 +600,7 @@ export default function TeacherOverviewPage() {
         teacher_notes: teacherResolutionNote.trim(),
       });
     } catch (e) {
-      // Fallback local update
+      // Local fallback
     }
 
     setHelpRequestsList((prev) =>
@@ -464,7 +615,6 @@ export default function TeacherOverviewPage() {
     setResolvingRequest(null);
   };
 
-  // Filtered Help Requests
   const filteredHelpRequests = helpRequestsList.filter((req) => {
     if (helpFilter === 'all') return true;
     return req.status === helpFilter;
@@ -473,9 +623,6 @@ export default function TeacherOverviewPage() {
   const pendingCount = helpRequestsList.filter((r) => r.status === 'pending').length;
   const inProgressCount = helpRequestsList.filter((r) => r.status === 'in_progress').length;
   const resolvedCount = helpRequestsList.filter((r) => r.status === 'resolved').length;
-
-  // Active / Live Session
-  const liveSession = todaySessions.find((s) => s.is_live) || todaySessions[0];
 
   return (
     <div className="space-y-6">
@@ -489,13 +636,11 @@ export default function TeacherOverviewPage() {
           className="object-cover object-right pointer-events-none select-none"
         />
 
-        {/* Scrim for crisp readability */}
         <div
           className="lg:hidden absolute inset-0 bg-gradient-to-r from-[#FFFDF8]/95 via-[#FDF8EC]/85 to-transparent pointer-events-none"
           aria-hidden="true"
         />
 
-        {/* Hero Content */}
         <div className="relative z-10 px-4 py-3 sm:px-6 lg:max-w-[65%] w-full">
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-[#E6F4EA] text-[#065F46] border border-[#A7F3D0] inline-flex items-center gap-1 shadow-2xs">
@@ -514,8 +659,8 @@ export default function TeacherOverviewPage() {
 
           <p className="text-xs sm:text-[12.5px] text-[#334155] font-medium mt-1 leading-snug">
             {isBangla
-              ? 'رَّبِّ زِدْنِي عِلْمًا — আল্লাহ আপনার শিক্ষাদানের প্রচেষ্টাকে ফলপ্রসূ ও বরকতময় করুন। আজকের পাঠদান পরিচালনা করুন।'
-              : 'May Allah bless your teaching journey and academic guidance. Manage today’s lectures.'}
+              ? 'رَّبِّ زِدْنِي عِلْمًا — আল্লাহ আপনার শিক্ষাদানের প্রচেষ্টাকে ফলপ্রসূ ও বরকতময় করুন। আজকের ও সাপ্তাহিক পাঠদান পরিচালনা করুন।'
+              : 'May Allah bless your teaching journey and academic guidance. Manage today’s and weekly timetable.'}
           </p>
 
           {/* Quick Action Navigation Strip */}
@@ -575,7 +720,7 @@ export default function TeacherOverviewPage() {
         </div>
       </div>
 
-      {/* 2. KPI Metrics Cards (4 Bento Cards matching Coordinator & Student aesthetics) */}
+      {/* 2. KPI Metrics Cards (4 Bento Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Today's Assigned Sessions */}
         <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 hover:border-emerald-400 transition-all duration-200 shadow-xs group">
@@ -589,11 +734,11 @@ export default function TeacherOverviewPage() {
           </div>
           <h3 className="text-2xl font-black text-[#0F172A] font-serif">
             {d(todaySessions.length)}{' '}
-            <span className="text-xs font-bold text-slate-500">{isBangla ? 'টি সেশন' : 'Sessions'}</span>
+            <span className="text-xs font-bold text-slate-500">{isBangla ? 'টি ক্লাস' : 'Classes'}</span>
           </h3>
           <p className="text-[11px] text-emerald-700 font-semibold mt-1 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            {isBangla ? '১টি চলমান (লাইভ) • ১টি পরবর্তী' : '1 Live • 1 Upcoming'}
+            {isBangla ? '১টি চলমান (লাইভ) • ২টি পরবর্তী' : '1 Live • 2 Upcoming'}
           </p>
         </div>
 
@@ -611,7 +756,7 @@ export default function TeacherOverviewPage() {
             ৯০.২% <span className="text-xs font-bold text-slate-500">({isBangla ? 'চলতি সপ্তাহ' : 'This Week'})</span>
           </h3>
           <p className="text-[11px] text-teal-700 font-semibold mt-1 flex items-center gap-1">
-            <span>●</span> {isBangla ? '৩৮/৪২ জন শিক্ষার্থী উপস্থিত' : '38/42 Students Present'}
+            <span>●</span> {isBangla ? '৩৮/৪২ জন শিক্ষার্থী ক্লাসে উপস্থিত' : '38/42 Students Present'}
           </p>
         </div>
 
@@ -657,91 +802,322 @@ export default function TeacherOverviewPage() {
         </div>
       </div>
 
-      {/* 3. Live Class Session & Projector Command Console (চলমান ক্লাস ও প্রজেক্টর নিয়ন্ত্রণ হাব) */}
-      {liveSession && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#013B2A] via-[#012E20] to-[#012117] p-4 sm:p-5 text-white shadow-sm border border-emerald-500/30">
-          {/* Subtle Islamic Arch & Ambient Golden Glow */}
-          <div className="absolute right-0 top-0 bottom-0 w-80 opacity-15 pointer-events-none select-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-400 via-transparent to-transparent" />
-
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="space-y-1.5 max-w-2xl">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                  {isBangla ? 'লাইভ ক্লাস চলমান' : 'Class in Session'}
-                </span>
-                <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-white/10 text-white border border-white/20">
-                  {liveSession.batch_name || 'ব্যাচ ৪২'}
-                </span>
-                <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-amber-500/20 text-amber-200 border border-amber-400/30">
-                  {liveSession.audience === 'general' ? 'জেনারেল' : liveSession.audience === 'madrasa' ? 'মাদ্রাসা' : 'সম্মিলিত'}
-                </span>
-              </div>
-
-              <h2 className="text-lg sm:text-xl font-black !text-white font-serif tracking-tight leading-snug" style={{ color: '#ffffff' }}>
-                {liveSession.subject_name}
-              </h2>
-
-              <p className="text-xs sm:text-[13px] text-emerald-100/90 font-medium flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-amber-300">টপিক:</span>
-                <span>{liveSession.topic_title}</span>
-              </p>
-
-              <div className="flex items-center gap-3 text-[11px] text-emerald-200/80 pt-0.5 flex-wrap">
-                <span className="inline-flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  {d(liveSession.start_time.slice(0, 5))} - {d(liveSession.end_time.slice(0, 5))} সকাল
-                </span>
-                <span>•</span>
-                <span>{liveSession.room}</span>
-                <span>•</span>
-                <span className="text-emerald-300 font-bold">
-                  {d(liveSession.attendance_count || 38)}/{d(liveSession.total_students || 42)} {isBangla ? 'উপস্থিত' : 'Present'}
-                </span>
-              </div>
+      {/* 3. TEACHER'S CLASS SCHEDULE & ROUTINE HUB (আমার ক্লাস শিডিউল ও রুটিন হাব) */}
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-xs space-y-4">
+        {/* Header with Routine Tabs */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0">
+              <Calendar className="w-5 h-5 text-emerald-700" />
             </div>
-
-            {/* Quick Action Button Group */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <Link
-                href={`/teacher/qr?sessionId=${liveSession.id}`}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF8108] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer active:scale-95 border border-amber-300/40"
-              >
-                <QrCode className="w-4 h-4 text-white" />
-                <span>{isBangla ? 'প্রজেক্টর কিউআর খুলুন' : 'Open Live QR'}</span>
-              </Link>
-
-              <Link
-                href={`/teacher/attendance?sessionId=${liveSession.id}`}
-                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition flex items-center gap-1.5 border border-white/20 shadow-xs cursor-pointer active:scale-95"
-              >
-                <ClipboardCheck className="w-4 h-4 text-emerald-300" />
-                <span>{isBangla ? 'ম্যানুয়াল হাজিরা' : 'Attendance'}</span>
-              </Link>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedSessionForAssignments(liveSession);
-                  setAssignmentsManagerOpen(true);
-                }}
-                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-amber-200 text-xs font-bold transition flex items-center gap-1.5 border border-amber-400/30 shadow-xs cursor-pointer active:scale-95"
-              >
-                <FileQuestion className="w-4 h-4 text-amber-300" />
-                <span>{isBangla ? 'কুইজ ও হোমওয়ার্ক' : 'Quiz & Homework'}</span>
-              </button>
-
-              <Link
-                href={`/teacher/understanding?sessionId=${liveSession.id}${liveSession.topic ? `&topicId=${liveSession.topic}` : ''}`}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600/50 hover:bg-emerald-600 text-white text-xs font-bold transition flex items-center gap-1.5 border border-emerald-400/40 shadow-xs cursor-pointer active:scale-95"
-              >
-                <BarChart3 className="w-4 h-4 text-white" />
-                <span>{isBangla ? 'লাইভ ফিডব্যাক' : 'Feedback'}</span>
-              </Link>
+            <div>
+              <h2 className="text-lg font-black text-[#0F172A] font-serif">
+                {isBangla ? 'আমার ক্লাস শিডিউল ও রুটিন ক্যালেন্ডার' : 'My Teaching Schedule & Routine'}
+              </h2>
+              <p className="text-xs text-slate-500 font-medium">
+                {isBangla ? 'আজকের ক্লাস, আগামীকালের শিডিউল এবং সাপ্তাহিক পূর্ণাঙ্গ সময়সূচী' : 'View all scheduled classes, timings, and attendance'}
+              </p>
             </div>
           </div>
+
+          {/* Interactive Routine Tabs */}
+          <div className="inline-flex rounded-xl p-1 bg-slate-100 text-xs font-bold self-start sm:self-center">
+            <button
+              type="button"
+              onClick={() => setScheduleTab('today')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                scheduleTab === 'today' ? 'bg-white text-emerald-800 shadow-2xs font-black' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{isBangla ? 'আজকের ক্লাস' : "Today's Classes"}</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 text-emerald-800">
+                {d(todaySessions.length)}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setScheduleTab('tomorrow')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                scheduleTab === 'tomorrow' ? 'bg-white text-amber-800 shadow-2xs font-black' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5 text-amber-600" />
+              <span>{isBangla ? 'আগামীকালের শিডিউল' : "Tomorrow's Schedule"}</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800">
+                {d(tomorrowSessions.length)}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setScheduleTab('weekly')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                scheduleTab === 'weekly' ? 'bg-white text-[#0F172A] shadow-2xs font-black' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 text-teal-600" />
+              <span>{isBangla ? 'সাপ্তাহিক রুটিন' : 'Weekly Routine'}</span>
+            </button>
+          </div>
         </div>
-      )}
+
+        {/* TAB 1: TODAY'S CLASSES */}
+        {scheduleTab === 'today' && (
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
+              <span>{isBangla ? 'আজকে আপনার নির্ধারিত ক্লাসসমূহ ও সরাসরি পরিচালনা:' : 'Today’s scheduled class sessions:'}</span>
+              <span className="text-emerald-700 font-bold">
+                {d(todaySessions.length)} {isBangla ? 'টি ক্লাসের সময়সূচী' : 'Sessions Scheduled'}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {todaySessions.map((session, sIdx) => (
+                <div
+                  key={session.id || sIdx}
+                  className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    session.is_live
+                      ? 'bg-gradient-to-br from-[#013B2A] via-[#012E20] to-[#012117] text-white border-emerald-500/40 shadow-sm'
+                      : 'bg-white text-slate-800 border-slate-200 hover:border-emerald-300 shadow-xs'
+                  }`}
+                >
+                  <div className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="space-y-1.5 max-w-2xl">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {session.is_live ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 animate-pulse">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                            {isBangla ? 'লাইভ ক্লাস চলমান' : 'Class in Session'}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            <Clock className="w-3 h-3 text-amber-600" />
+                            {isBangla ? 'পরবর্তী ক্লাস' : 'Upcoming Session'}
+                          </span>
+                        )}
+
+                        <span className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold border ${
+                          session.is_live ? 'bg-white/10 text-white border-white/20' : 'bg-slate-100 text-slate-700 border-slate-200'
+                        }`}>
+                          {session.batch_name}
+                        </span>
+
+                        <span className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold border ${
+                          session.is_live ? 'bg-amber-500/20 text-amber-200 border-amber-400/30' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        }`}>
+                          {session.audience === 'general' ? 'জেনারেল' : session.audience === 'madrasa' ? 'মাদ্রাসা' : 'সম্মিলিত'}
+                        </span>
+                      </div>
+
+                      <h3
+                        className={`text-base sm:text-lg font-black font-serif tracking-tight leading-snug ${
+                          session.is_live ? '!text-white' : 'text-[#0F172A]'
+                        }`}
+                        style={{ color: session.is_live ? '#ffffff' : '#0F172A' }}
+                      >
+                        {session.subject_name}
+                      </h3>
+
+                      <p className={`text-xs sm:text-[12.5px] font-medium flex items-center gap-2 flex-wrap ${
+                        session.is_live ? 'text-emerald-100/90' : 'text-slate-600'
+                      }`}>
+                        <span className={`font-bold ${session.is_live ? 'text-amber-300' : 'text-[#0F766E]'}`}>
+                          {isBangla ? 'আজকের টপিক:' : 'Topic:'}
+                        </span>
+                        <span>{session.topic_title}</span>
+                      </p>
+
+                      <div className={`flex items-center gap-3 text-[11px] pt-1 flex-wrap ${
+                        session.is_live ? 'text-emerald-200/80' : 'text-slate-500'
+                      }`}>
+                        <span className="inline-flex items-center gap-1 font-bold text-amber-500">
+                          <Clock className="w-3.5 h-3.5" />
+                          {d(session.start_time.slice(0, 5))} - {d(session.end_time.slice(0, 5))}
+                          {parseInt(session.start_time.slice(0, 2)) < 12 ? (isBangla ? ' সকাল' : ' AM') : (isBangla ? ' দুপুর/বিকাল' : ' PM')}
+                        </span>
+                        <span>•</span>
+                        <span className="inline-flex items-center gap-1">
+                          <Building className="w-3 h-3 text-slate-400" />
+                          {session.room}
+                        </span>
+                        <span>•</span>
+                        <span className={`font-bold ${session.is_live ? 'text-emerald-300' : 'text-slate-700'}`}>
+                          {session.is_live
+                            ? `${d(session.attendance_count || 38)}/${d(session.total_students || 42)} ${isBangla ? 'জন উপস্থিত (৯০.৫%)' : 'Present'}`
+                            : `${d(session.total_students || 40)} ${isBangla ? 'জন নিবন্ধিত শিক্ষার্থী' : 'Students'}`}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Controls for this class */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Link
+                        href={`/teacher/qr?sessionId=${session.id}`}
+                        className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#FF8108] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 border border-amber-300/40"
+                      >
+                        <QrCode className="w-4 h-4 text-white" />
+                        <span>{isBangla ? 'কিউআর প্রজেক্টর' : 'QR Screen'}</span>
+                      </Link>
+
+                      <Link
+                        href={`/teacher/attendance?sessionId=${session.id}`}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border shadow-xs cursor-pointer active:scale-95 ${
+                          session.is_live
+                            ? 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                        }`}
+                      >
+                        <ClipboardCheck className="w-4 h-4 text-emerald-400" />
+                        <span>{isBangla ? 'হাজিরা শিট' : 'Roster'}</span>
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => setAttendanceTrackerSession(session)}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border shadow-xs cursor-pointer active:scale-95 ${
+                          session.is_live
+                            ? 'bg-emerald-600/40 hover:bg-emerald-600/60 text-emerald-200 border-emerald-400/40'
+                            : 'bg-teal-50 hover:bg-teal-100 text-teal-800 border-teal-200'
+                        }`}
+                        title={isBangla ? 'কোন ছাত্র কতটুকু সময় ক্লাসে ছিল তা দেখুন' : 'View Student Attendance & Duration'}
+                      >
+                        <Timer className="w-4 h-4 text-emerald-400" />
+                        <span>{isBangla ? 'ছাত্রদের সময় তদারকি' : 'Student Times'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedSessionForAssignments(session);
+                          setAssignmentsManagerOpen(true);
+                        }}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border shadow-xs cursor-pointer active:scale-95 ${
+                          session.is_live
+                            ? 'bg-white/10 hover:bg-white/20 text-amber-200 border-amber-400/30'
+                            : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+                        }`}
+                      >
+                        <FileQuestion className="w-4 h-4 text-amber-400" />
+                        <span>{isBangla ? 'কুইজ ও হোমওয়ার্ক' : 'Quiz & HW'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: TOMORROW'S SCHEDULE */}
+        {scheduleTab === 'tomorrow' && (
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
+              <span>{isBangla ? 'আগামীকাল আপনার নির্ধারিত ক্লাস ও পাঠ্যসূচী:' : 'Tomorrow’s scheduled classes & topics:'}</span>
+              <span className="text-amber-800 font-bold">
+                {d(tomorrowSessions.length)} {isBangla ? 'টি ক্লাস নির্ধারিত' : 'Sessions Tomorrow'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {tomorrowSessions.map((session) => (
+                <div
+                  key={session.id}
+                  className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-amber-300 transition space-y-3 shadow-2xs"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-100 text-amber-900 border border-amber-200 flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-amber-700" />
+                      <span>{session.day_label} • {session.session_date}</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-700 border border-slate-200">
+                      {session.batch_name}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-black text-[#0F172A] font-serif">
+                      {session.subject_name}
+                    </h3>
+                    <p className="text-xs text-slate-600 mt-1 font-medium">
+                      <span className="font-bold text-[#0F766E]">{isBangla ? 'টপিক:' : 'Topic:'}</span> {session.topic_title}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200/70 flex items-center justify-between text-[11px] text-slate-600 flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1 font-bold text-amber-800">
+                      <Clock className="w-3.5 h-3.5 text-amber-600" />
+                      {d(session.start_time.slice(0, 5))} - {d(session.end_time.slice(0, 5))}
+                      {parseInt(session.start_time.slice(0, 2)) < 12 ? (isBangla ? ' সকাল' : ' AM') : (isBangla ? ' দুপুর' : ' PM')}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Building className="w-3 h-3 text-slate-400" />
+                      {session.room}
+                    </span>
+                    <span className="font-semibold text-slate-700">
+                      {d(session.total_students)} {isBangla ? 'জন শিক্ষার্থী' : 'Students'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: WEEKLY ROUTINE TIMETABLE */}
+        {scheduleTab === 'weekly' && (
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
+              <span>{isBangla ? 'সুপার অ্যাডমিন ও কো-অর্ডিনেটর কর্তৃক নির্ধারিত আপনার সাপ্তাহিক পূর্ণাঙ্গ রুটিন:' : 'Your weekly recurring academic timetable:'}</span>
+              <span className="text-[#0F766E] font-bold">
+                {isBangla ? '৬ দিনের সাপ্তাহিক শিডিউল' : '6-Day Weekly Routine'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {weeklyRoutine.map((routine, rIdx) => (
+                <div
+                  key={rIdx}
+                  className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4 space-y-2.5 hover:bg-slate-50 transition"
+                >
+                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-200">
+                    <span className="font-black text-sm text-[#0F172A] font-serif">
+                      {routine.day}
+                    </span>
+                    <span className="text-[10.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      {d(routine.sessions.length)} {isBangla ? 'টি ক্লাস' : 'Classes'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {routine.sessions.map((s) => (
+                      <div
+                        key={s.id}
+                        className="p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs space-y-1"
+                      >
+                        <div className="flex items-center justify-between text-[11.5px] font-bold text-[#0F172A]">
+                          <span className="truncate">{s.subject_name}</span>
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 text-slate-700 shrink-0 border border-slate-200">
+                            {s.batch_name}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10.5px] text-slate-500">
+                          <span className="font-bold text-amber-700 flex items-center gap-1 font-mono">
+                            <Clock className="w-3 h-3 text-amber-600" />
+                            {s.start_time} - {s.end_time}
+                          </span>
+                          <span>{s.room}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* 4. Split Layout: Left (7 cols) Help Requests Board & Right (5 cols) Topic Understanding Pulse */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -768,21 +1144,21 @@ export default function TeacherOverviewPage() {
                 <button
                   type="button"
                   onClick={() => setHelpFilter('all')}
-                  className={`px-2.5 py-1 rounded-md transition ${helpFilter === 'all' ? 'bg-white text-[#0F172A] shadow-2xs' : 'text-slate-600 hover:text-slate-900'}`}
+                  className={`px-2.5 py-1 rounded-md transition cursor-pointer ${helpFilter === 'all' ? 'bg-white text-[#0F172A] shadow-2xs' : 'text-slate-600 hover:text-slate-900'}`}
                 >
                   {isBangla ? 'সকল' : 'All'} ({d(helpRequestsList.length)})
                 </button>
                 <button
                   type="button"
                   onClick={() => setHelpFilter('pending')}
-                  className={`px-2.5 py-1 rounded-md transition ${helpFilter === 'pending' ? 'bg-amber-500 text-white shadow-2xs' : 'text-amber-800 hover:text-amber-900'}`}
+                  className={`px-2.5 py-1 rounded-md transition cursor-pointer ${helpFilter === 'pending' ? 'bg-amber-500 text-white shadow-2xs' : 'text-amber-800 hover:text-amber-900'}`}
                 >
                   {isBangla ? 'অমীমাংসিত' : 'Pending'} ({d(pendingCount)})
                 </button>
                 <button
                   type="button"
                   onClick={() => setHelpFilter('resolved')}
-                  className={`px-2.5 py-1 rounded-md transition ${helpFilter === 'resolved' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-emerald-800 hover:text-emerald-900'}`}
+                  className={`px-2.5 py-1 rounded-md transition cursor-pointer ${helpFilter === 'resolved' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-emerald-800 hover:text-emerald-900'}`}
                 >
                   {isBangla ? 'সমাধানকৃত' : 'Resolved'} ({d(resolvedCount)})
                 </button>
@@ -848,12 +1224,10 @@ export default function TeacherOverviewPage() {
                       </span>
                     </div>
 
-                    {/* Student Query Text */}
                     <div className="mt-2 bg-white/90 p-2.5 rounded-lg border border-slate-200/60 text-xs text-[#334155] leading-relaxed italic">
                       &ldquo;{req.student_comment}&rdquo;
                     </div>
 
-                    {/* Teacher resolution note if resolved */}
                     {req.teacher_notes && (
                       <div className="mt-1.5 bg-emerald-50/70 p-2 rounded-lg border border-emerald-200/70 text-[11px] text-emerald-900">
                         <span className="font-bold">{isBangla ? 'শিক্ষকের সমাধান:' : 'Teacher Note:'}</span>{' '}
@@ -861,7 +1235,6 @@ export default function TeacherOverviewPage() {
                       </div>
                     )}
 
-                    {/* Action buttons */}
                     <div className="mt-2.5 flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
                       <span className="text-[10px] text-slate-400 font-medium">{req.created_at}</span>
 
@@ -935,8 +1308,7 @@ export default function TeacherOverviewPage() {
             </div>
 
             {/* Topic list with progress bars */}
-            <div className="space-y-3.5 mt-3">
-              {/* Topic 1 */}
+            <div className="space-y-3 mt-3">
               <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/70 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-[#0F172A] leading-tight">
@@ -955,7 +1327,6 @@ export default function TeacherOverviewPage() {
                 </div>
               </div>
 
-              {/* Topic 2 */}
               <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/70 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-[#0F172A] leading-tight">
@@ -974,7 +1345,6 @@ export default function TeacherOverviewPage() {
                 </div>
               </div>
 
-              {/* Topic 3 */}
               <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/70 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-[#0F172A] leading-tight">
@@ -993,7 +1363,6 @@ export default function TeacherOverviewPage() {
                 </div>
               </div>
 
-              {/* Topic 4 */}
               <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/70 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-[#0F172A] leading-tight">
@@ -1031,7 +1400,6 @@ export default function TeacherOverviewPage() {
 
       {/* 5. AI Weekly Teaching Summary & Recommendation Bento Card */}
       <div className="bg-gradient-to-br from-[#FFFBEB] via-white to-[#F0FDFA] rounded-2xl border-2 border-[#FCD34D] shadow-xs overflow-hidden transition-all duration-300">
-        {/* Card Header */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-[#FEF3C7]/90 via-[#FFFBEB] to-[#ECFDF5]/80 border-b border-[#FCD34D]/70 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-start sm:items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#B45309] text-white flex items-center justify-center shadow-xs shrink-0 border border-[#FCD34D]">
@@ -1078,7 +1446,6 @@ export default function TeacherOverviewPage() {
           </div>
         </div>
 
-        {/* Card Body */}
         {isAiExpanded && (
           <div className="p-4 sm:p-5 space-y-5">
             {aiLoading ? (
@@ -1090,7 +1457,6 @@ export default function TeacherOverviewPage() {
               </div>
             ) : aiSummary ? (
               <>
-                {/* Weekly Health Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/90 p-3 rounded-xl border border-slate-200/90 shadow-2xs">
                   <div>
                     <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
@@ -1133,9 +1499,7 @@ export default function TeacherOverviewPage() {
                   </div>
                 </div>
 
-                {/* Two-Column AI Details */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {/* Left Column: Topics where students struggled */}
                   <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <div className="flex items-center gap-2">
@@ -1177,7 +1541,6 @@ export default function TeacherOverviewPage() {
                             </span>
                           </div>
 
-                          {/* Progress bar */}
                           <div>
                             <div className="flex items-center justify-between text-[10.5px] mb-1">
                               <span className="text-slate-500 font-medium">
@@ -1201,7 +1564,6 @@ export default function TeacherOverviewPage() {
                             </div>
                           </div>
 
-                          {/* Student comment preview */}
                           {item.sample_comments && item.sample_comments.length > 0 && (
                             <div className="text-[10.5px] bg-white p-2 rounded-lg border border-slate-200/60 text-slate-700 italic">
                               &ldquo;{item.sample_comments[0]}&rdquo;
@@ -1212,7 +1574,6 @@ export default function TeacherOverviewPage() {
                     </div>
                   </div>
 
-                  {/* Right Column: AI Actionable 2-Minute Recommendations */}
                   <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <div className="flex items-center gap-2">
@@ -1268,7 +1629,6 @@ export default function TeacherOverviewPage() {
                   </div>
                 </div>
 
-                {/* Attention Students Section */}
                 {aiSummary.attention_students && aiSummary.attention_students.length > 0 && (
                   <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-2xs">
                     <div className="flex items-center justify-between mb-2">
@@ -1312,7 +1672,121 @@ export default function TeacherOverviewPage() {
         )}
       </div>
 
-      {/* 6. Quick Resolve Modal */}
+      {/* 6. STUDENT ATTENDANCE & TIME TRACKER MODAL */}
+      {attendanceTrackerSession && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0">
+                  <Timer className="w-5 h-5 text-emerald-700" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-[#0F172A] font-serif">
+                    {isBangla ? 'শিক্ষার্থীদের ক্লাসে উপস্থিতি ও সময় তদারকি' : 'Student Attendance & Class Duration'}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {attendanceTrackerSession.subject_name} • {attendanceTrackerSession.batch_name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAttendanceTrackerSession(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Quick Session Metrics */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+              <div>
+                <span className="text-slate-500 font-medium text-[10.5px] block">{isBangla ? 'ক্লাসের সময়' : 'Time'}</span>
+                <span className="font-bold text-[#0F172A]">
+                  {d(attendanceTrackerSession.start_time.slice(0, 5))} - {d(attendanceTrackerSession.end_time.slice(0, 5))}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 font-medium text-[10.5px] block">{isBangla ? 'মোট উপস্থিত' : 'Present'}</span>
+                <span className="font-black text-emerald-700">৩৮ / ৪২ জন</span>
+              </div>
+              <div>
+                <span className="text-slate-500 font-medium text-[10.5px] block">{isBangla ? 'উপস্থিতি হার' : 'Rate'}</span>
+                <span className="font-black text-teal-700">৯০.৫%</span>
+              </div>
+              <div>
+                <span className="text-slate-500 font-medium text-[10.5px] block">{isBangla ? 'গড় উপস্থিতি সময়' : 'Avg Duration'}</span>
+                <span className="font-bold text-amber-700">৫৩ মিনিট</span>
+              </div>
+            </div>
+
+            {/* Student List Table */}
+            <div className="border border-slate-200 rounded-xl overflow-hidden max-h-72 overflow-y-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#F8FAFC] text-slate-600 border-b border-slate-200 font-bold uppercase tracking-wider text-[10.5px] sticky top-0">
+                  <tr>
+                    <th className="py-2.5 px-3">{isBangla ? 'শিক্ষার্থীর নাম ও আইডি' : 'Student & ID'}</th>
+                    <th className="py-2.5 px-3">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
+                    <th className="py-2.5 px-3">{isBangla ? 'প্রবেশের সময়' : 'Check-in'}</th>
+                    <th className="py-2.5 px-3">{isBangla ? 'ক্লাসের সক্রিয় সময়' : 'Duration'}</th>
+                    <th className="py-2.5 px-3 text-right">{isBangla ? 'পদ্ধতি' : 'Method'}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {DEMO_STUDENT_ATTENDANCE.map((st) => (
+                    <tr key={st.id} className="hover:bg-slate-50/80 transition">
+                      <td className="py-2.5 px-3">
+                        <span className="font-bold text-[#0F172A] block">{st.student_name}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">{st.student_id_number}</span>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {st.status === 'present' ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            {isBangla ? 'উপস্থিত' : 'Present'}
+                          </span>
+                        ) : st.status === 'late' ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            {isBangla ? 'বিলম্বিত' : 'Late'}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-200">
+                            {isBangla ? 'অনুপস্থিত' : 'Absent'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-700 font-medium">
+                        {st.check_in_time}
+                      </td>
+                      <td className="py-2.5 px-3 font-bold text-slate-800">
+                        {st.duration_minutes > 0 ? `${d(st.duration_minutes)} ${isBangla ? 'মিনিট' : 'mins'}` : '-'}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-slate-500 text-[11px]">
+                        {st.method}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+              <span className="text-slate-500">
+                {isBangla ? 'সকল শিক্ষার্থীর পূর্ণাঙ্গ রিপোর্ট দেখতে ম্যানুয়াল হাজিরা শিটে যান' : 'Go to Attendance Roster for full sheet'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setAttendanceTrackerSession(null)}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#059669] hover:bg-[#047857] transition cursor-pointer shadow-xs"
+              >
+                {isBangla ? 'বন্ধ করুন' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 7. QUICK RESOLVE MODAL */}
       {resolvingRequest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
@@ -1391,7 +1865,7 @@ export default function TeacherOverviewPage() {
         </div>
       )}
 
-      {/* 7. Quiz & Homework Manager Modal */}
+      {/* 8. Quiz & Homework Manager Modal */}
       <QuizAndHomeworkManagerModal
         isOpen={assignmentsManagerOpen}
         onClose={() => {
