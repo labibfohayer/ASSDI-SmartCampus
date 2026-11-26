@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -202,3 +203,129 @@ class HomeworkSubmission(models.Model):
 
     def __str__(self):
         return f"{self.student.student_id_number} - {self.homework.title} ({self.status})"
+
+
+class SpeakingVideoStatus(models.TextChoices):
+    SUBMITTED = "submitted", "Submitted"
+    UNDER_REVIEW = "under_review", "Under Review"
+    EVALUATED = "evaluated", "Evaluated"
+    REVISION_REQUESTED = "revision_requested", "Revision Requested"
+
+
+class SpeakingVideoSubmission(models.Model):
+    """
+    Speaking Video Assignment Submission & Assessment (Section 11).
+    Preserves original video quality and supports multi-criteria rubric evaluation.
+    """
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="speaking_videos",
+    )
+    batch = models.ForeignKey(
+        "batches.Batch",
+        on_delete=models.CASCADE,
+        related_name="speaking_videos",
+    )
+    subject = models.ForeignKey(
+        "academic.Subject",
+        on_delete=models.CASCADE,
+        related_name="speaking_videos",
+    )
+    level = models.CharField(
+        max_length=20,
+        default="level_1",
+        choices=[("level_1", "SBMC Level 1"), ("level_2", "SBMC Level 2")],
+    )
+    title = models.CharField(max_length=255, help_text="Video or presentation topic title.")
+    topic = models.CharField(max_length=255, blank=True, default="", help_text="Syllabus module/topic.")
+    video_url = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Direct link or stream URL to submitted video file.",
+    )
+    video_file = models.FileField(
+        upload_to="speaking_videos/",
+        null=True,
+        blank=True,
+        help_text="Uploaded original speaking video file.",
+    )
+    file_size_mb = models.FloatField(default=0.0)
+    duration_seconds = models.PositiveIntegerField(default=0)
+    student_notes = models.TextField(blank=True, default="")
+    submitted_at = models.DateTimeField(default=timezone.now, db_index=True)
+    status = models.CharField(
+        max_length=25,
+        choices=SpeakingVideoStatus.choices,
+        default=SpeakingVideoStatus.SUBMITTED,
+        db_index=True,
+    )
+    evaluated_at = models.DateTimeField(null=True, blank=True)
+    evaluated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="evaluated_speaking_videos",
+    )
+
+    # Multi-criteria Rubric Scoring (Section 11) - 4 criteria x 25 points = 100 points
+    score_body_language = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(25)],
+        help_text="Body Language & Posture (out of 25)",
+    )
+    score_pronunciation_fluency = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(25)],
+        help_text="Pronunciation & Fluency (out of 25)",
+    )
+    score_content_vocabulary = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(25)],
+        help_text="Content Relevance & Business Vocabulary (out of 25)",
+    )
+    score_presentation_delivery = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(25)],
+        help_text="Presentation Delivery & Confidence (out of 25)",
+    )
+    total_score = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
+    grade = models.CharField(max_length=5, blank=True, default="")
+    teacher_feedback = models.TextField(blank=True, default="", help_text="Constructive remarks.")
+    revision_reason = models.TextField(blank=True, default="", help_text="Reason if revision requested.")
+
+    class Meta:
+        db_table = "speaking_video_submissions"
+        verbose_name = "Speaking Video Submission"
+        verbose_name_plural = "Speaking Video Submissions"
+        ordering = ["-submitted_at"]
+
+    def __str__(self):
+        return f"{self.student.student_id_number} - {self.title} ({self.status})"
+
+    def calculate_total_and_grade(self):
+        scores = [
+            self.score_body_language or 0,
+            self.score_pronunciation_fluency or 0,
+            self.score_content_vocabulary or 0,
+            self.score_presentation_delivery or 0,
+        ]
+        self.total_score = sum(scores)
+        if self.total_score >= 80:
+            self.grade = "A+"
+        elif self.total_score >= 70:
+            self.grade = "A"
+        elif self.total_score >= 60:
+            self.grade = "B"
+        elif self.total_score >= 50:
+            self.grade = "C"
+        else:
+            self.grade = "F"
+
+

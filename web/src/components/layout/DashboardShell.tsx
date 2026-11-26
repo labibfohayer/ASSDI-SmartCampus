@@ -37,6 +37,7 @@ import {
   Smartphone,
   Search,
   CreditCard,
+  Video,
 } from 'lucide-react';
 import { triggerPwaInstall } from '@/components/pwa/PwaInstaller';
 import { useAuth } from '@/contexts/AuthContext';
@@ -338,6 +339,12 @@ export default function DashboardShell({ children, role, noticeBanner }: Dashboa
                 labelBn: 'টপিক অনুধাবন অ্যানালিটিক্স',
                 labelEn: 'Topic Understanding Analytics',
                 icon: BarChart3,
+              },
+              {
+                href: '/teacher/speaking-videos',
+                labelBn: 'স্পিকিং ভিডিও মূল্যায়ন',
+                labelEn: 'Speaking Videos Assessment',
+                icon: Video,
               },
               {
                 href: '/announcements',

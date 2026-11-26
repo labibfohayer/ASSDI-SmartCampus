@@ -22,18 +22,33 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HelpRequest {
   id: number;
-  session: number;
+  session?: number;
   student: number;
   student_name?: string;
   student_id_number?: string;
   batch_name?: string;
   subject_name?: string;
   topic_title?: string;
-  student_comment: string;
-  status: 'pending' | 'in_progress' | 'resolved';
+  student_message?: string;
+  student_comment?: string;
+  unclear_part?: string;
+  reported_understanding_pct?: number;
+  status: 'pending' | 'in_progress' | 'resolved' | 'draft' | 'submitted' | 'awaiting_teacher' | 'answered' | 'follow_up_required' | 'reopened';
+  is_overdue?: boolean;
+  student_resolution_confirmed?: boolean;
+  teacher_note?: string;
   teacher_notes?: string;
   created_at: string;
   resolved_at?: string;
+  messages?: {
+    id: number;
+    sender_name: string;
+    message_text: string;
+    attached_resource_url?: string;
+    attached_resource_name?: string;
+    is_teacher_response: boolean;
+    created_at: string;
+  }[];
 }
 
 export default function TeacherHelpRequestsPage() {
@@ -45,9 +60,11 @@ export default function TeacherHelpRequestsPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'in_progress' | 'resolved'>('all');
   const [loading, setLoading] = useState(true);
 
-  // Resolve modal state
+  // Resolve & Threaded Reply modal state
   const [resolvingItem, setResolvingItem] = useState<HelpRequest | null>(null);
   const [teacherNotes, setTeacherNotes] = useState('');
+  const [attachedUrl, setAttachedUrl] = useState('');
+  const [attachedName, setAttachedName] = useState('');
   const [submittingResolution, setSubmittingResolution] = useState(false);
 
   const fetchHelpRequests = async () => {
@@ -86,9 +103,11 @@ export default function TeacherHelpRequestsPage() {
   const openResolveModal = (req: HelpRequest) => {
     setResolvingItem(req);
     setTeacherNotes('');
+    setAttachedUrl('');
+    setAttachedName('');
   };
 
-  // Action: Submit resolution with teacher notes
+  // Action: Submit resolution with teacher notes and attached resources
   const handleSubmitResolve = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resolvingItem) return;
@@ -100,10 +119,15 @@ export default function TeacherHelpRequestsPage() {
 
     setSubmittingResolution(true);
     try {
-      await api.post(`/api/v1/help-requests/${resolvingItem.id}/resolve/`, {
-        teacher_notes: teacherNotes.trim(),
+      await api.post(`/api/v1/help-requests/${resolvingItem.id}/reply/`, {
+        message_text: teacherNotes.trim(),
+        attached_resource_url: attachedUrl.trim(),
+        attached_resource_name: attachedName.trim(),
       });
-      toast.success(isBangla ? 'রিকোয়েস্ট সফলভাবে সমাধান হিসেবে চিহ্নিত হয়েছে!' : 'Resolved successfully!');
+      await api.post(`/api/v1/help-requests/${resolvingItem.id}/resolve/`, {
+        teacher_note: teacherNotes.trim(),
+      });
+      toast.success(isBangla ? 'প্রশ্নটির উত্তর ও রিসোর্স লিংক সফলভাবে পাঠানো হয়েছে!' : 'Response sent and resolved successfully!');
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('notification-refresh'));
       }
@@ -261,17 +285,32 @@ export default function TeacherHelpRequestsPage() {
                   </div>
 
                   {/* Subject & Topic Tag */}
-                  <div className="flex items-center gap-1.5 text-[11px] text-[#0F766E] bg-[#F0FDFA] px-2.5 py-1 rounded-lg border border-[#FCD34D]">
+                  <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-[#0F766E] bg-[#F0FDFA] px-2.5 py-1 rounded-lg border border-[#FCD34D]">
                     <BookOpen className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
                     <span className="font-semibold truncate">
                       {req.topic_title || req.subject_name || 'SBMC'}
                     </span>
+                    {req.unclear_part && (
+                      <span className="font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">
+                        {isBangla ? 'অস্পষ্ট:' : 'Concept:'} {req.unclear_part}
+                      </span>
+                    )}
+                    {req.reported_understanding_pct !== undefined && req.reported_understanding_pct !== null && (
+                      <span className="font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                        {req.reported_understanding_pct}%
+                      </span>
+                    )}
+                    {req.is_overdue && (
+                      <span className="font-black text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300">
+                        ২৪+ ঘণ্টা
+                      </span>
+                    )}
                   </div>
 
                   {/* Student Question / Comment Box */}
                   <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
                     <p className="text-xs text-[#334155] italic leading-relaxed">
-                      "{req.student_comment}"
+                      "{req.student_message || req.student_comment}"
                     </p>
                   </div>
 
@@ -368,6 +407,33 @@ export default function TeacherHelpRequestsPage() {
                     }
                     className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:bg-white focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block font-bold text-[#0F172A] mb-1">
+                      {isBangla ? 'সহায়ক রিসোর্সের নাম (ঐচ্ছিক):' : 'Resource Name (Optional):'}
+                    </label>
+                    <input
+                      type="text"
+                      value={attachedName}
+                      onChange={(e) => setAttachedName(e.target.value)}
+                      placeholder={isBangla ? 'যেমন: SBMC Accounting Guide PDF' : 'e.g. SBMC Accounting Guide PDF'}
+                      className="w-full p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:bg-white focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-[#0F172A] mb-1">
+                      {isBangla ? 'রিসোর্স লিংক / ড্রাইভ URL (ঐচ্ছিক):' : 'Resource URL (Optional):'}
+                    </label>
+                    <input
+                      type="url"
+                      value={attachedUrl}
+                      onChange={(e) => setAttachedUrl(e.target.value)}
+                      placeholder="https://drive.google.com/..."
+                      className="w-full p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:bg-white focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-end gap-2 pt-2">

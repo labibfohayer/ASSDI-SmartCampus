@@ -2,7 +2,13 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .constants import ALL_BANDS
-from .models import HelpRequest, LearningFeedback
+from .models import (
+    HelpRequest,
+    HelpRequestMessage,
+    LearningFeedback,
+    SubjectUnderstandingHistory,
+    SubjectUnderstandingProgress,
+)
 
 
 class LearningFeedbackCreateSerializer(serializers.ModelSerializer):
@@ -88,18 +94,41 @@ class LearningFeedbackStudentReadSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class HelpRequestMessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.CharField(source="sender_user.full_name", read_only=True)
+    sender_role = serializers.CharField(source="sender_user.role", read_only=True)
+
+    class Meta:
+        model = HelpRequestMessage
+        fields = [
+            "id",
+            "help_request",
+            "sender_user",
+            "sender_name",
+            "sender_role",
+            "message_text",
+            "attached_resource_url",
+            "attached_resource_name",
+            "is_teacher_response",
+            "created_at",
+        ]
+        read_only_fields = ["sender_user", "created_at"]
+
+
 class HelpRequestSerializer(serializers.ModelSerializer):
     student_id_number = serializers.CharField(source="student.student_id_number", read_only=True)
     student_name = serializers.CharField(source="student.user.full_name", read_only=True)
-    batch_id = serializers.IntegerField(source="session.batch.id", read_only=True)
-    batch_name = serializers.CharField(source="session.batch.name", read_only=True)
+    batch_id = serializers.SerializerMethodField()
+    batch_name = serializers.SerializerMethodField()
     session_date = serializers.DateField(source="session.session_date", read_only=True)
-    subject_id = serializers.IntegerField(source="session.subject.id", read_only=True)
-    subject_name = serializers.CharField(source="session.subject.name", read_only=True)
+    subject_id = serializers.SerializerMethodField()
+    subject_name = serializers.SerializerMethodField()
     topic_title = serializers.CharField(source="topic.title", read_only=True)
     teacher_name = serializers.CharField(source="teacher_user.full_name", read_only=True)
     resolved_by_name = serializers.CharField(source="resolved_by.full_name", read_only=True, allow_null=True)
     understanding_rating = serializers.SerializerMethodField()
+    is_overdue = serializers.BooleanField(read_only=True)
+    messages = HelpRequestMessageSerializer(many=True, read_only=True)
 
     class Meta:
         model = HelpRequest
@@ -113,6 +142,7 @@ class HelpRequestSerializer(serializers.ModelSerializer):
             "batch_name",
             "session",
             "session_date",
+            "subject",
             "subject_id",
             "subject_name",
             "topic",
@@ -120,20 +150,88 @@ class HelpRequestSerializer(serializers.ModelSerializer):
             "teacher_user",
             "teacher_name",
             "understanding_rating",
+            "unclear_part",
+            "reported_understanding_pct",
             "student_message",
             "teacher_note",
             "status",
+            "is_overdue",
+            "student_resolution_confirmed",
             "created_at",
             "in_progress_at",
+            "last_teacher_response_at",
             "resolved_at",
             "resolved_by",
             "resolved_by_name",
+            "messages",
         ]
         read_only_fields = fields
 
     @extend_schema_field(serializers.IntegerField(allow_null=True))
     def get_understanding_rating(self, obj):
         return obj.feedback.understanding_rating if obj.feedback else None
+
+    @extend_schema_field(serializers.IntegerField(allow_null=True))
+    def get_batch_id(self, obj):
+        if obj.session and obj.session.batch:
+            return obj.session.batch.id
+        enrollment = obj.student.enrollments.filter(status="active").first()
+        return enrollment.batch.id if enrollment and enrollment.batch else None
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_batch_name(self, obj):
+        if obj.session and obj.session.batch:
+            return obj.session.batch.name
+        enrollment = obj.student.enrollments.filter(status="active").first()
+        return enrollment.batch.name if enrollment and enrollment.batch else None
+
+    @extend_schema_field(serializers.IntegerField(allow_null=True))
+    def get_subject_id(self, obj):
+        if obj.subject:
+            return obj.subject.id
+        return obj.session.subject.id if obj.session and obj.session.subject else None
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_subject_name(self, obj):
+        if obj.subject:
+            return obj.subject.name
+        return obj.session.subject.name if obj.session and obj.session.subject else None
+
+
+class SubjectUnderstandingHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubjectUnderstandingHistory
+        fields = [
+            "id",
+            "percentage",
+            "notes",
+            "recorded_at",
+        ]
+
+
+class SubjectUnderstandingProgressSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source="student.user.full_name", read_only=True)
+    student_id_number = serializers.CharField(source="student.student_id_number", read_only=True)
+    subject_name = serializers.CharField(source="subject.name", read_only=True)
+    history = SubjectUnderstandingHistorySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = SubjectUnderstandingProgress
+        fields = [
+            "id",
+            "student",
+            "student_name",
+            "student_id_number",
+            "subject",
+            "subject_name",
+            "understanding_percentage",
+            "previous_percentage",
+            "student_notes",
+            "last_updated_at",
+            "history",
+        ]
+        read_only_fields = ["student", "last_updated_at"]
+
 
 
 class HelpRequestResolveSerializer(serializers.Serializer):

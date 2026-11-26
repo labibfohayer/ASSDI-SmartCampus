@@ -24,11 +24,11 @@ from apps.academic.views import (
     SubjectViewSet,
 )
 from apps.accounts.views import TeacherViewSet
-from apps.assignments.views import HomeworkViewSet, MicroQuizViewSet
+from apps.assignments.views import HomeworkViewSet, MicroQuizViewSet, SpeakingVideoSubmissionViewSet
 from apps.attendance.views import AttendanceViewSet
 from apps.batches.views import BatchViewSet, TeacherAssignmentViewSet
 from apps.class_sessions.views import ClassScheduleViewSet, ClassSessionViewSet, SessionMaterialViewSet
-from apps.feedback.views import HelpRequestViewSet, LearningFeedbackViewSet
+from apps.feedback.views import HelpRequestViewSet, LearningFeedbackViewSet, SubjectUnderstandingViewSet
 from apps.notifications.views import AnnouncementViewSet, NotificationViewSet
 from apps.students.views import StudentViewSet
 
@@ -49,9 +49,11 @@ router.register(r"class-sessions", ClassSessionViewSet, basename="class-session"
 router.register(r"session-materials", SessionMaterialViewSet, basename="session-material")
 router.register(r"feedback", LearningFeedbackViewSet, basename="feedback")
 router.register(r"help-requests", HelpRequestViewSet, basename="help-request")
+router.register(r"subject-understandings", SubjectUnderstandingViewSet, basename="subject-understanding")
 router.register(r"attendance", AttendanceViewSet, basename="attendance")
 router.register(r"quizzes", MicroQuizViewSet, basename="quiz")
 router.register(r"homeworks", HomeworkViewSet, basename="homework")
+router.register(r"speaking-videos", SpeakingVideoSubmissionViewSet, basename="speaking-video")
 router.register(r"notifications", NotificationViewSet, basename="notification")
 router.register(r"announcements", AnnouncementViewSet, basename="announcement")
 

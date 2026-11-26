@@ -38,6 +38,11 @@ import {
   Zap,
   Info,
   Trophy,
+  Video,
+  Sliders,
+  ExternalLink,
+  FileQuestion,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -120,16 +125,82 @@ interface FeedbackRecord {
   submitted_at: string;
 }
 
+interface HelpRequestMessageItem {
+  id: number;
+  sender_user: number;
+  sender_name: string;
+  sender_role: string;
+  message_text: string;
+  attached_resource_url?: string;
+  attached_resource_name?: string;
+  is_teacher_response: boolean;
+  created_at: string;
+}
+
 interface HelpRequestItem {
   id: number;
+  subject_id?: number;
   subject_name: string;
   topic_title: string;
   teacher_name: string;
   student_message: string;
   teacher_note?: string;
-  status: 'pending' | 'in_progress' | 'resolved';
+  unclear_part?: string;
+  reported_understanding_pct?: number;
+  status: 'pending' | 'in_progress' | 'resolved' | 'draft' | 'submitted' | 'awaiting_teacher' | 'answered' | 'follow_up_required' | 'reopened';
+  is_overdue?: boolean;
+  student_resolution_confirmed?: boolean;
   created_at: string;
+  last_teacher_response_at?: string;
   resolved_at?: string;
+  messages?: HelpRequestMessageItem[];
+}
+
+interface SubjectUnderstandingItem {
+  id: number;
+  subject: number;
+  subject_name: string;
+  understanding_percentage: number;
+  previous_percentage: number;
+  student_notes?: string;
+  last_updated_at: string;
+  history?: {
+    id: number;
+    percentage: number;
+    notes?: string;
+    recorded_at: string;
+  }[];
+}
+
+interface SpeakingVideoItem {
+  id: number;
+  student: number;
+  student_name: string;
+  student_id_number: string;
+  batch: number;
+  batch_name: string;
+  level: string;
+  subject: number;
+  subject_name: string;
+  title: string;
+  topic: string;
+  video_url: string;
+  original_video_url?: string;
+  file_size_mb: number;
+  duration_seconds: number;
+  student_notes: string;
+  submitted_at: string;
+  status: 'submitted' | 'under_review' | 'evaluated' | 'revision_requested';
+  score_body_language: number;
+  score_pronunciation_fluency: number;
+  score_content_vocabulary: number;
+  score_presentation_delivery: number;
+  total_score: number;
+  grade: string;
+  teacher_feedback?: string;
+  revision_reason?: string;
+  evaluated_by_name?: string;
+  evaluated_at?: string;
 }
 
 export default function StudentPortalPage() {
@@ -148,8 +219,39 @@ export default function StudentPortalPage() {
   const [loading, setLoading] = useState(true);
   const [isDashboardHome, setIsDashboardHome] = useState<boolean>(true);
   const [attendanceRange, setAttendanceRange] = useState<'month' | 'all'>('month');
-  const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help' | 'materials' | 'graduation' | 'results'>('today');
+  const [activeTab, setActiveTab] = useState<'today' | 'attendance' | 'help' | 'materials' | 'graduation' | 'results' | 'videos'>('today');
   const [studentExamResults, setStudentExamResults] = useState<any[]>([]);
+  const [subjectUnderstandings, setSubjectUnderstandings] = useState<SubjectUnderstandingItem[]>([]);
+  const [speakingVideos, setSpeakingVideos] = useState<SpeakingVideoItem[]>([]);
+  const [academicSubjects, setAcademicSubjects] = useState<any[]>([]);
+
+  // 10-Step Learning Problem Modal State (Section 9.2)
+  const [problemModalOpen, setProblemModalOpen] = useState(false);
+  const [newProblemSubject, setNewProblemSubject] = useState<string>('');
+  const [newProblemUnclearPart, setNewProblemUnclearPart] = useState('');
+  const [newProblemQuestion, setNewProblemQuestion] = useState('');
+  const [newProblemPct, setNewProblemPct] = useState<number>(50);
+  const [submittingProblem, setSubmittingProblem] = useState(false);
+
+  // Threaded Follow-up Reply State (Section 9.4)
+  const [replyingHelpId, setReplyingHelpId] = useState<number | null>(null);
+  const [replyMessageText, setReplyMessageText] = useState('');
+  const [submittingReply, setSubmittingReply] = useState(false);
+
+  // Speaking Video Submission Modal State (Section 11)
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [newVideoTitle, setNewVideoTitle] = useState('');
+  const [newVideoSubject, setNewVideoSubject] = useState<string>('');
+  const [newVideoUrl, setNewVideoUrl] = useState('');
+  const [newVideoNotes, setNewVideoNotes] = useState('');
+  const [submittingVideo, setSubmittingVideo] = useState(false);
+
+  // Subject Understanding Slider Modal / Edit State (Section 9.1)
+  const [editingSubjectUnderstanding, setEditingSubjectUnderstanding] = useState<SubjectUnderstandingItem | null>(null);
+  const [tempUnderstandingPct, setTempUnderstandingPct] = useState<number>(75);
+  const [tempUnderstandingNotes, setTempUnderstandingNotes] = useState('');
+  const [savingUnderstanding, setSavingUnderstanding] = useState(false);
+
   const [scannerOpen, setScannerOpen] = useState(false);
   const [idCardOpen, setIdCardOpen] = useState(false);
   const [certModalOpen, setCertModalOpen] = useState(false);
@@ -217,7 +319,7 @@ export default function StudentPortalPage() {
           : window.location.search;
         const params = new URLSearchParams(search);
         const tab = params.get('tab');
-        if (tab === 'attendance' || tab === 'help' || tab === 'today' || tab === 'materials' || tab === 'graduation' || tab === 'results') {
+        if (tab === 'attendance' || tab === 'help' || tab === 'today' || tab === 'materials' || tab === 'graduation' || tab === 'results' || tab === 'videos') {
           setActiveTab(tab as any);
           setIsDashboardHome(false);
         } else if (!tab && !params.get('scan')) {
@@ -250,7 +352,7 @@ export default function StudentPortalPage() {
 
     const onDirectTab = (e: any) => {
       const tab = e.detail;
-      if (['today', 'attendance', 'help', 'materials', 'graduation'].includes(tab)) {
+      if (['today', 'attendance', 'help', 'materials', 'graduation', 'results', 'videos'].includes(tab)) {
         setActiveTab(tab);
         setIsDashboardHome(false);
         if (window.scrollY > 40) {
@@ -313,7 +415,7 @@ export default function StudentPortalPage() {
     }
   };
 
-  const handleTabChange = (tab: 'today' | 'attendance' | 'help' | 'materials' | 'graduation' | 'results') => {
+  const handleTabChange = (tab: 'today' | 'attendance' | 'help' | 'materials' | 'graduation' | 'results' | 'videos') => {
     setActiveTab(tab);
     setIsDashboardHome(false);
     if (typeof window !== 'undefined') {
@@ -334,7 +436,7 @@ export default function StudentPortalPage() {
     setLoading(true);
     try {
       // Normal student loading with graceful individual error handling
-      const [profRes, attRes, sessRes, fbRes, helpRes, matRes, gradRes, quizRes, annRes, resultsRes] = await Promise.all([
+      const [profRes, attRes, sessRes, fbRes, helpRes, matRes, gradRes, quizRes, annRes, resultsRes, underRes, vidRes, subjRes] = await Promise.all([
         api.get('/api/v1/students/me/').catch(() => ({ data: null })),
         api.get('/api/v1/attendance/mine/').catch(() => ({ data: null })),
         api.get('/api/v1/class-sessions/?status=published').catch(() => ({ data: [] })),
@@ -345,7 +447,25 @@ export default function StudentPortalPage() {
         api.get('/api/v1/quizzes/').catch(() => ({ data: [] })),
         api.get('/api/v1/announcements/').catch(() => ({ data: [] })),
         api.get('/api/v1/exam-results/').catch(() => ({ data: [] })),
+        api.get('/api/v1/subject-understandings/').catch(() => ({ data: [] })),
+        api.get('/api/v1/speaking-videos/').catch(() => ({ data: [] })),
+        api.get('/api/v1/subjects/').catch(() => ({ data: [] })),
       ]);
+
+      if (underRes.data) {
+        const uList = Array.isArray(underRes.data) ? underRes.data : underRes.data?.results || [];
+        setSubjectUnderstandings(uList);
+      }
+
+      if (vidRes.data) {
+        const vList = Array.isArray(vidRes.data) ? vidRes.data : vidRes.data?.results || [];
+        setSpeakingVideos(vList);
+      }
+
+      if (subjRes.data) {
+        const sList = Array.isArray(subjRes.data) ? subjRes.data : subjRes.data?.results || [];
+        setAcademicSubjects(sList);
+      }
 
       if (resultsRes.data) {
         const resList = Array.isArray(resultsRes.data) ? resultsRes.data : resultsRes.data?.results || [];
@@ -484,6 +604,170 @@ export default function StudentPortalPage() {
       toast.error(isBangla ? 'স্ট্যাটাস আপডেট করা যায়নি' : 'Failed to update status');
     } finally {
       setResolvingHelpId(null);
+    }
+  };
+
+  const handleSaveSubjectUnderstanding = async (subjectId: number, pct: number, notes: string) => {
+    setSavingUnderstanding(true);
+    try {
+      await api.post('/api/v1/subject-understandings/', {
+        subject: subjectId,
+        understanding_percentage: pct,
+        student_notes: notes,
+      });
+      toast.success(
+        isBangla
+          ? 'আলহামদুলিল্লাহ! আপনার বিষয়ভিত্তিক ধারণা (Understanding %) সফলভাবে সংরক্ষিত হয়েছে।'
+          : 'Subject understanding percentage successfully updated!'
+      );
+      setEditingSubjectUnderstanding(null);
+      const res = await api.get('/api/v1/subject-understandings/');
+      setSubjectUnderstandings(Array.isArray(res.data) ? res.data : res.data?.results || []);
+    } catch (err: any) {
+      toast.error(isBangla ? 'আপডেট করা যায়নি' : 'Failed to update understanding');
+    } finally {
+      setSavingUnderstanding(false);
+    }
+  };
+
+  const handleSubmitProblem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProblemSubject) {
+      toast.error(isBangla ? 'অনুগ্রহ করে বিষয় নির্বাচন করুন' : 'Please select a subject');
+      return;
+    }
+    if (!newProblemUnclearPart.trim()) {
+      toast.error(isBangla ? 'যে বিষয়টি বুঝতে পারেননি তা লিখুন' : 'Please specify what was unclear');
+      return;
+    }
+    if (!newProblemQuestion.trim()) {
+      toast.error(isBangla ? 'আপনার বিস্তারিত প্রশ্ন লিখুন' : 'Please write your question');
+      return;
+    }
+
+    setSubmittingProblem(true);
+    try {
+      await api.post('/api/v1/help-requests/', {
+        subject: parseInt(newProblemSubject),
+        unclear_part: newProblemUnclearPart.trim(),
+        student_message: newProblemQuestion.trim(),
+        reported_understanding_pct: newProblemPct,
+      });
+      toast.success(
+        isBangla
+          ? 'আলহামদুলিল্লাহ! আপনার লার্নিং সমস্যা ও প্রশ্নটি শিক্ষকের কাছে সফলভাবে পাঠানো হয়েছে।'
+          : 'Learning question successfully submitted to teacher!'
+      );
+      setProblemModalOpen(false);
+      setNewProblemSubject('');
+      setNewProblemUnclearPart('');
+      setNewProblemQuestion('');
+      setNewProblemPct(50);
+      const helpRes = await api.get('/api/v1/help-requests/');
+      setHelpRequests(Array.isArray(helpRes.data) ? helpRes.data : helpRes.data?.results || []);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || (isBangla ? 'প্রশ্ন জমা দেওয়া যায়নি' : 'Failed to submit question'));
+    } finally {
+      setSubmittingProblem(false);
+    }
+  };
+
+  const handleReplyHelp = async (hrId: number) => {
+    if (!replyMessageText.trim()) return;
+    setSubmittingReply(true);
+    try {
+      await api.post(`/api/v1/help-requests/${hrId}/reply/`, {
+        message_text: replyMessageText.trim(),
+      });
+      toast.success(isBangla ? 'আপনার ফলো-আপ মেসেজ পাঠানো হয়েছে।' : 'Follow-up message sent.');
+      setReplyingHelpId(null);
+      setReplyMessageText('');
+      const helpRes = await api.get('/api/v1/help-requests/');
+      setHelpRequests(Array.isArray(helpRes.data) ? helpRes.data : helpRes.data?.results || []);
+    } catch (err: any) {
+      toast.error(isBangla ? 'মেসেজ পাঠানো যায়নি' : 'Failed to send message');
+    } finally {
+      setSubmittingReply(false);
+    }
+  };
+
+  const handleMarkHelpUnderstood = async (hrId: number) => {
+    setResolvingHelpId(hrId);
+    try {
+      await api.post(`/api/v1/help-requests/${hrId}/mark_understood/`);
+      toast.success(
+        isBangla
+          ? 'মাশাআল্লাহ! আপনি বিষয়টি বুঝেছেন হিসেবে কনফার্ম করা হয়েছে।'
+          : 'Confirmed understood and resolved!'
+      );
+      const helpRes = await api.get('/api/v1/help-requests/');
+      setHelpRequests(Array.isArray(helpRes.data) ? helpRes.data : helpRes.data?.results || []);
+    } catch (err: any) {
+      toast.error(isBangla ? 'আপডেট করা যায়নি' : 'Failed to update');
+    } finally {
+      setResolvingHelpId(null);
+    }
+  };
+
+  const handleMarkHelpUnclear = async (hrId: number) => {
+    setResolvingHelpId(hrId);
+    try {
+      await api.post(`/api/v1/help-requests/${hrId}/mark_unclear/`);
+      toast.success(
+        isBangla
+          ? 'শিক্ষককে জানানো হয়েছে যে বিষয়টি এখনও অস্পষ্ট এবং আরও ব্যাখ্যার প্রয়োজন।'
+          : 'Marked as still unclear; teacher notified for follow-up.'
+      );
+      const helpRes = await api.get('/api/v1/help-requests/');
+      setHelpRequests(Array.isArray(helpRes.data) ? helpRes.data : helpRes.data?.results || []);
+    } catch (err: any) {
+      toast.error(isBangla ? 'আপডেট করা যায়নি' : 'Failed to update');
+    } finally {
+      setResolvingHelpId(null);
+    }
+  };
+
+  const handleSubmitSpeakingVideo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newVideoTitle.trim()) {
+      toast.error(isBangla ? 'ভিডিও শিরোনাম লিখুন' : 'Please enter video title');
+      return;
+    }
+    if (!newVideoSubject) {
+      toast.error(isBangla ? 'বিষয় নির্বাচন করুন' : 'Please select a subject');
+      return;
+    }
+    if (!newVideoUrl.trim()) {
+      toast.error(isBangla ? 'ভিডিও লিংক দিন' : 'Please provide video link');
+      return;
+    }
+
+    setSubmittingVideo(true);
+    try {
+      await api.post('/api/v1/speaking-videos/', {
+        title: newVideoTitle.trim(),
+        subject: parseInt(newVideoSubject),
+        video_url: newVideoUrl.trim(),
+        student_notes: newVideoNotes.trim(),
+        batch: 1,
+        level: 'level_1',
+      });
+      toast.success(
+        isBangla
+          ? 'আলহামদুলিল্লাহ! আপনার স্পিকিং ভিডিও সফলভাবে মূল্যায়নের জন্য জমা হয়েছে।'
+          : 'Speaking video submitted successfully for teacher assessment!'
+      );
+      setVideoModalOpen(false);
+      setNewVideoTitle('');
+      setNewVideoSubject('');
+      setNewVideoUrl('');
+      setNewVideoNotes('');
+      const vidRes = await api.get('/api/v1/speaking-videos/');
+      setSpeakingVideos(Array.isArray(vidRes.data) ? vidRes.data : vidRes.data?.results || []);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || (isBangla ? 'ভিডিও জমা দেওয়া যায়নি' : 'Failed to submit video'));
+    } finally {
+      setSubmittingVideo(false);
     }
   };
 
@@ -1743,13 +2027,109 @@ export default function StudentPortalPage() {
             </span>
           )}
         </button>
+
+        <button
+          onClick={() => handleTabChange('videos')}
+          className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === 'videos'
+              ? 'bg-white text-[#0F766E] border border-[#CCFBF1] shadow-xs'
+              : 'text-slate-600 hover:text-[#0F766E] hover:bg-white/40'
+          }`}
+        >
+          <Video className="w-4 h-4 text-[#0F766E]" />
+          <span>{isBangla ? 'স্পিকিং ভিডিও' : 'Speaking Videos'}</span>
+          {speakingVideos.length > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-extrabold border border-emerald-300">
+              {speakingVideos.length}
+            </span>
+          )}
+        </button>
             </div>
           </div>
 
       <div key={activeTab} className="student-tab-enter">
       {/* TAB 1: Today's Classes & Feedback */}
       {activeTab === 'today' && (
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Section 9.1: Subject Understanding (0-100% Student-Reported Progress) */}
+          <div className="bg-white p-5 rounded-2xl border border-emerald-100 shadow-xs space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-emerald-600" />
+                  {isBangla ? 'আমার বিষয়ভিত্তিক বোধগম্যতা ও অগ্রগতি (Subject Understanding)' : 'My Subject Understanding'}
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {isBangla
+                    ? 'ক্লাসের পর প্রতিটি বিষয়ে আপনার বোধগম্যতা ০-১০০% স্লাইডার দিয়ে রেটিং করুন ও আপডেট রাখুন।'
+                    : 'Self-reported understanding percentage (0-100%) for each subject.'}
+                </p>
+              </div>
+              <span className="text-[11px] px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                {isBangla ? 'শিক্ষার্থী-মূল্যায়িত প্রগ্রেস' : 'Student-Reported'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {subjectUnderstandings.map((su) => (
+                <div key={su.id} className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-white transition flex flex-col justify-between gap-3 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-800">{su.subject_name}</span>
+                    <span className={`text-xs font-extrabold px-2 py-0.5 rounded-full ${
+                      su.understanding_percentage >= 80 ? 'bg-emerald-100 text-emerald-800' :
+                      su.understanding_percentage >= 60 ? 'bg-blue-100 text-blue-800' :
+                      'bg-amber-100 text-amber-800'
+                    }`}>
+                      {su.understanding_percentage}% {isBangla ? 'বোধগম্য' : 'Understood'}
+                    </span>
+                  </div>
+
+                  {/* Progress visual bar */}
+                  <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        su.understanding_percentage >= 80 ? 'bg-emerald-600' :
+                        su.understanding_percentage >= 60 ? 'bg-blue-600' :
+                        'bg-amber-500'
+                      }`}
+                      style={{ width: `${su.understanding_percentage}%` }}
+                    />
+                  </div>
+
+                  {su.student_notes && (
+                    <p className="text-[11px] text-gray-600 italic bg-white/80 p-2 rounded-lg border border-slate-100">
+                      "{su.student_notes}"
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[10px] text-gray-400">
+                      {isBangla ? 'পূর্ববর্তী:' : 'Prev:'} {su.previous_percentage}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingSubjectUnderstanding(su);
+                        setTempUnderstandingPct(su.understanding_percentage);
+                        setTempUnderstandingNotes(su.student_notes || '');
+                      }}
+                      className="text-xs font-bold text-[#0F766E] hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sliders className="w-3.5 h-3.5" />
+                      <span>{isBangla ? 'শতাংশ আপডেট করুন' : 'Update %'}</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {subjectUnderstandings.length === 0 && (
+                <div className="col-span-2 text-center p-6 text-gray-400 text-xs">
+                  {isBangla ? 'কোনো বিষয়ভিত্তিক রেটিং পাওয়া যায়নি।' : 'No subject understanding data yet.'}
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-gray-900">
               {isBangla ? 'আপনার কোর্স ক্লাস সমূহ' : 'Your Scheduled Sessions'}
@@ -1947,108 +2327,264 @@ export default function StudentPortalPage() {
         </div>
       )}
 
-      {/* TAB 3: Help Requests */}
+      {/* TAB 3: Help Requests & 10-Step Learning Problem Lifecycle (Section 9.2, 9.3) */}
       {activeTab === 'help' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-gray-900">
-              {isBangla ? 'আমার হেল্প রিকোয়েস্ট ও শিক্ষকের উত্তর' : 'Teacher Help Inquiries & Answers'}
-            </h2>
-            <span className="text-xs text-gray-500">
-              {isBangla ? 'শিক্ষক উত্তর দিলে এখানে দেখতে পাবেন' : 'Teacher answers will appear here'}
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-xs">
+            <div>
+              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-emerald-600" />
+                {isBangla ? 'লার্নিং সমস্যা ও শিক্ষককে প্রশ্ন' : 'Learning Problems & Teacher Questions'}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {isBangla
+                  ? 'কোনো বিষয় বুঝতে সমস্যা হলে সরাসরি সংশ্লিষ্ট শিক্ষককে প্রশ্ন করুন ও আলোচনা চালিয়ে যান।'
+                  : 'Report unclear concepts directly to assigned teachers and receive follow-up help.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setProblemModalOpen(true)}
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+            >
+              <FileQuestion className="w-4 h-4" />
+              <span>{isBangla ? '+ নতুন প্রশ্ন / সমস্যা জানান' : '+ Ask New Question'}</span>
+            </button>
           </div>
 
-          <div className="space-y-3">
-            {helpRequests.map((hr) => (
-              <div
-                key={hr.id}
-                className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col gap-3"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-100">
-                      {hr.subject_name}
-                    </span>
-                    <span className="text-xs text-gray-600 font-medium">
-                      {hr.topic_title}
-                    </span>
-                  </div>
+          <div className="space-y-4">
+            {helpRequests.map((hr) => {
+              const isResolved = hr.status === 'resolved';
+              const isAnswered = hr.status === 'answered';
+              const isAwaiting = hr.status === 'awaiting_teacher' || hr.status === 'pending' || hr.status === 'submitted';
+              const isFollowUp = hr.status === 'follow_up_required';
 
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                      hr.status === 'resolved'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : hr.status === 'in_progress'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-amber-100 text-amber-800'
-                    }`}
-                  >
-                    {hr.status === 'resolved'
-                      ? isBangla ? 'সমাধান হয়েছে' : 'Resolved'
-                      : hr.status === 'in_progress'
-                      ? isBangla ? 'শিক্ষক পর্যালোচনা করছেন' : 'In Progress'
-                      : isBangla ? 'অপেক্ষমান' : 'Pending'}
-                  </span>
-                </div>
-
-                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs">
-                  <p className="text-gray-500 font-medium mb-1">
-                    {isBangla ? 'আপনার প্রশ্ন / জিজ্ঞাসা:' : 'Your Question:'}
-                  </p>
-                  <p className="text-gray-800">{hr.student_message}</p>
-                </div>
-
-                {hr.teacher_note ? (
-                  <div className="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200 text-xs">
-                    <p className="text-emerald-800 font-bold flex items-center gap-1.5 mb-1">
-                      <UserCheck className="w-4 h-4 text-emerald-600" />
-                      {hr.teacher_name} {isBangla ? 'এর সমাধান ও নির্দেশনা:' : 'Teacher Reply:'}
-                    </p>
-                    <p className="text-emerald-950 font-medium pl-5">{hr.teacher_note}</p>
-                  </div>
-                ) : (
-                  <p className="text-[11px] text-gray-400 italic">
-                    {isBangla
-                      ? 'শিক্ষক শীঘ্রই আপনার প্রশ্নটির উত্তর প্রদান করবেন।'
-                      : 'Teacher will review and answer your request soon.'}
-                  </p>
-                )}
-
-                {hr.status !== 'resolved' && (
-                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-3">
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      {isBangla
-                        ? 'পাঠটি কি এখন বুঝে গেছেন?'
-                        : 'Do you now understand this topic?'}
-                    </p>
-                    <button
-                      onClick={() => handleMarkHelpResolved(hr.id)}
-                      disabled={resolvingHelpId === hr.id}
-                      className="px-3 py-1.5 rounded-xl bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] border border-[#FCD34D] text-xs font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>
-                        {resolvingHelpId === hr.id
-                          ? isBangla ? 'আপডেট হচ্ছে...' : 'Updating...'
-                          : isBangla ? 'আলহামদুলিল্লাহ, এখন বুঝে গেছি' : 'Mark as Understood'}
+              return (
+                <div
+                  key={hr.id}
+                  className={`bg-white p-5 rounded-2xl border transition-all flex flex-col gap-4 shadow-xs ${
+                    hr.is_overdue
+                      ? 'border-amber-300 ring-1 ring-amber-200'
+                      : isResolved
+                      ? 'border-emerald-100'
+                      : 'border-slate-200'
+                  }`}
+                >
+                  {/* Card Header */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-100">
+                        {hr.subject_name}
                       </span>
-                    </button>
+                      {hr.unclear_part && (
+                        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700">
+                          {isBangla ? 'অস্পষ্ট বিষয়:' : 'Topic:'} {hr.unclear_part}
+                        </span>
+                      )}
+                      {hr.reported_understanding_pct !== undefined && hr.reported_understanding_pct !== null && (
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100">
+                          {isBangla ? 'বোধগম্যতা:' : 'Understanding:'} {hr.reported_understanding_pct}%
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {hr.is_overdue && (
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3 text-amber-700" />
+                          {isBangla ? '২৪+ ঘণ্টা অপেক্ষমান' : '24h+ Overdue'}
+                        </span>
+                      )}
+
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-extrabold border ${
+                          isResolved
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : isAnswered
+                            ? 'bg-purple-50 text-purple-800 border-purple-200'
+                            : isFollowUp
+                            ? 'bg-blue-50 text-blue-800 border-blue-200'
+                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                        }`}
+                      >
+                        {isResolved
+                          ? isBangla ? '✓ সমাধান সম্পন্ন' : 'Resolved'
+                          : isAnswered
+                          ? isBangla ? '💬 উত্তর দেওয়া হয়েছে' : 'Answered'
+                          : isFollowUp
+                          ? isBangla ? '🔄 ফলো-আপ আলোচনা' : 'Follow-up'
+                          : isBangla ? '⏳ উত্তরের অপেক্ষায়' : 'Awaiting Response'}
+                      </span>
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {/* Primary Question Body */}
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs space-y-1.5">
+                    <div className="flex items-center justify-between text-gray-500 font-semibold text-[11px]">
+                      <span>{isBangla ? 'আপনার প্রশ্ন ও বিবরণ:' : 'Your Question:'}</span>
+                      <span className="font-mono">{new Date(hr.created_at).toLocaleString()}</span>
+                    </div>
+                    <p className="text-gray-900 font-medium whitespace-pre-wrap">{hr.student_message}</p>
+                  </div>
+
+                  {/* Threaded Discussion Messages (Section 9.4) */}
+                  {hr.messages && hr.messages.length > 0 && (
+                    <div className="space-y-3 pl-3 border-l-2 border-emerald-200 my-1">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">
+                        {isBangla ? 'প্রশ্নোত্তর ও ফলো-আপ বার্তালাপ:' : 'Discussion History:'}
+                      </p>
+                      {hr.messages.map((m) => (
+                        <div
+                          key={m.id}
+                          className={`p-3.5 rounded-xl text-xs space-y-1.5 ${
+                            m.is_teacher_response
+                              ? 'bg-emerald-50/80 border border-emerald-200 ml-2'
+                              : 'bg-white border border-slate-200'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold flex items-center gap-1.5 text-gray-800">
+                              {m.is_teacher_response ? (
+                                <>
+                                  <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span className="text-emerald-900">{m.sender_name} (শিক্ষক)</span>
+                                </>
+                              ) : (
+                                <>
+                                  <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
+                                  <span>{m.sender_name} (শিক্ষার্থী)</span>
+                                </>
+                              )}
+                            </span>
+                            <span className="text-[10px] text-gray-400 font-mono">
+                              {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+
+                          <p className="text-gray-800 whitespace-pre-wrap">{m.message_text}</p>
+
+                          {m.attached_resource_url && (
+                            <div className="pt-2">
+                              <a
+                                href={m.attached_resource_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-100/70 hover:bg-emerald-200 text-emerald-900 text-xs font-bold transition"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5 text-emerald-700" />
+                                <span>{m.attached_resource_name || (isBangla ? 'সংযুক্ত স্টাডি রিসোর্স' : 'Attached Resource')}</span>
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Single Teacher note fallback if messages empty */}
+                  {(!hr.messages || hr.messages.length === 0) && hr.teacher_note && (
+                    <div className="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200 text-xs">
+                      <p className="text-emerald-800 font-bold flex items-center gap-1.5 mb-1">
+                        <UserCheck className="w-4 h-4 text-emerald-600" />
+                        {hr.teacher_name} {isBangla ? 'এর সমাধান ও নির্দেশনা:' : 'Teacher Reply:'}
+                      </p>
+                      <p className="text-emerald-950 font-medium pl-5">{hr.teacher_note}</p>
+                    </div>
+                  )}
+
+                  {/* Step 9 & 10: Quick Reply / Follow-up Input + Understood Action Buttons */}
+                  <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      {!isResolved && (
+                        <button
+                          type="button"
+                          onClick={() => setReplyingHelpId(replyingHelpId === hr.id ? null : hr.id)}
+                          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          <span>{replyingHelpId === hr.id ? (isBangla ? 'বাতিল' : 'Cancel') : (isBangla ? 'ফলো-আপ উত্তর দিন' : 'Reply')}</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {!isResolved ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleMarkHelpUnderstood(hr.id)}
+                            disabled={resolvingHelpId === hr.id}
+                            className="px-3.5 py-1.5 rounded-xl bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] border border-[#FCD34D] text-xs font-extrabold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>
+                              {resolvingHelpId === hr.id
+                                ? isBangla ? 'আপডেট হচ্ছে...' : 'Updating...'
+                                : isBangla ? 'আলহামদুলিল্লাহ, এখন বুঝেছি (সমাধান)' : 'Mark as Understood'}
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleMarkHelpUnclear(hr.id)}
+                            disabled={resolvingHelpId === hr.id}
+                            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer"
+                          >
+                            <span>{isBangla ? 'এখনও অস্পষ্ট' : 'Still Unclear'}</span>
+                          </button>
+                        </>
+                      ) : (
+                        <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          {isBangla ? 'শিক্ষার্থী কর্তৃক বিষয়টি সমাধান হিসেবে নিশ্চিত করা হয়েছে।' : 'Confirmed understood.'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Inline Thread Reply Box */}
+                  {replyingHelpId === hr.id && (
+                    <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                      <textarea
+                        value={replyMessageText}
+                        onChange={(e) => setReplyMessageText(e.target.value)}
+                        placeholder={isBangla ? 'আপনার ফলো-আপ প্রশ্ন বা ব্যাখ্যা লিখুন...' : 'Type your follow-up message...'}
+                        className="w-full p-2.5 rounded-lg border border-gray-200 bg-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none h-20"
+                      />
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setReplyingHelpId(null)}
+                          className="px-3 py-1 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-200"
+                        >
+                          {isBangla ? 'বাতিল' : 'Cancel'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleReplyHelp(hr.id)}
+                          disabled={submittingReply || !replyMessageText.trim()}
+                          className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          <span>{submittingReply ? (isBangla ? 'পাঠানো হচ্ছে...' : 'Sending...') : (isBangla ? 'মেসেজ পাঠান' : 'Send Reply')}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
 
             {helpRequests.length === 0 && (
               <div className="p-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-100">
                 <HelpCircle className="w-8 h-8 mx-auto text-gray-300 mb-2" />
                 <p className="font-semibold text-gray-700">
-                  {isBangla ? 'কোনো সক্রিয় হেল্প রিকোয়েস্ট নেই' : 'No help requests found'}
+                  {isBangla ? 'কোনো সক্রিয় লার্নিং সমস্যা বা প্রশ্ন নেই' : 'No questions submitted yet'}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   {isBangla
-                    ? 'ক্লাসের কোনো বিষয়ে সাহায্য লাগলে ফিডব্যাক জমা দেওয়ার সময় "সহায়তা প্রয়োজন" সিলেক্ট করুন।'
-                    : 'Check "I need help" when rating a class if you need extra support.'}
+                    ? 'কোনো বিষয়ে সাহায্য লাগলে উপরের "+ নতুন প্রশ্ন / সমস্যা জানান" বাটনে ক্লিক করুন।'
+                    : 'Click "+ Ask New Question" above whenever you need academic assistance.'}
                 </p>
               </div>
             )}
@@ -2755,6 +3291,191 @@ export default function StudentPortalPage() {
           )}
         </div>
       )}
+
+      {/* TAB 7: Speaking Video Submissions & Rubrics (Section 11) */}
+      {activeTab === 'videos' && (
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-xs">
+            <div>
+              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <Video className="w-5 h-5 text-emerald-600" />
+                {isBangla ? 'স্পিকিং ভিডিও প্রেজেন্টেশন ও মূল্যায়ন' : 'Speaking Video Presentations'}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {isBangla
+                  ? 'আপনার নির্ধারিত স্পিকিং অ্যাসাইনমেন্ট ও উপস্থাপনার ভিডিও জমা দিন এবং শিক্ষকের ৪-স্তরের রুব্রিক মূল্যায়ন দেখুন।'
+                  : 'Submit speaking assignments and view teacher rubric assessment with original quality video.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setVideoModalOpen(true)}
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+            >
+              <Video className="w-4 h-4" />
+              <span>{isBangla ? '+ নতুন ভিডিও সাবমিট করুন' : '+ Submit Video'}</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {speakingVideos.map((vid) => {
+              const isEvaluated = vid.status === 'evaluated';
+              const isUnderReview = vid.status === 'under_review';
+
+              return (
+                <div
+                  key={vid.id}
+                  className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between gap-4 relative overflow-hidden"
+                >
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-100">
+                        {vid.subject_name || (isBangla ? 'ইংরেজি স্পিকিং' : 'Speaking')}
+                      </span>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                        {vid.level === 'level_2' ? 'SBMC Level 2' : 'SBMC Level 1'}
+                      </span>
+                    </div>
+
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-extrabold border ${
+                        isEvaluated
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : isUnderReview
+                          ? 'bg-blue-50 text-blue-800 border-blue-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}
+                    >
+                      {isEvaluated
+                        ? isBangla ? '✓ মূল্যায়িত' : 'Evaluated'
+                        : isUnderReview
+                        ? isBangla ? 'পর্যালোচনাধীন' : 'Under Review'
+                        : isBangla ? 'দাখিলকৃত' : 'Submitted'}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 mb-1">{vid.title}</h3>
+                    {vid.topic && (
+                      <p className="text-xs text-gray-500 font-medium">{vid.topic}</p>
+                    )}
+                    {vid.student_notes && (
+                      <p className="text-xs text-gray-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 mt-2 italic">
+                        "{vid.student_notes}"
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Video Player Preview or Link */}
+                  {vid.video_url && (
+                    <div className="rounded-xl overflow-hidden bg-black/90 aspect-video relative flex items-center justify-center border border-slate-200 shadow-inner">
+                      {vid.video_url.endsWith('.mp4') || vid.video_url.includes('sample') ? (
+                        <video
+                          src={vid.video_url}
+                          controls
+                          className="w-full h-full object-contain"
+                          preload="metadata"
+                        />
+                      ) : (
+                        <div className="text-center p-4 text-white">
+                          <Video className="w-10 h-10 mx-auto text-emerald-400 mb-2" />
+                          <a
+                            href={vid.video_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white transition"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            <span>{isBangla ? 'ভিডিও স্ট্রিম দেখুন' : 'Watch Video Stream'}</span>
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Rubric Breakdown Score Grid (Section 11) */}
+                  {isEvaluated && (
+                    <div className="bg-emerald-50/60 p-4 rounded-xl border border-emerald-200 space-y-3">
+                      <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2">
+                        <span className="text-xs font-bold text-emerald-900">
+                          {isBangla ? '৪-স্তরের রুব্রিক মূল্যায়ন স্কোর:' : 'Rubric Criteria Scores:'}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-black px-2 py-0.5 rounded-md bg-emerald-600 text-white">
+                            গ্রেড: {vid.grade}
+                          </span>
+                          <span className="text-xs font-black text-emerald-900">
+                            {vid.total_score}/১০০
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-[11px]">
+                        <div className="p-2 bg-white/90 rounded-lg border border-emerald-100">
+                          <span className="text-gray-500 block">শারীরিক ভঙ্গি ও আই-কন্টাক্ট:</span>
+                          <span className="font-extrabold text-emerald-800">{vid.score_body_language}/২৫</span>
+                        </div>
+                        <div className="p-2 bg-white/90 rounded-lg border border-emerald-100">
+                          <span className="text-gray-500 block">উচ্চারণ ও ফ্লুয়েন্সি:</span>
+                          <span className="font-extrabold text-emerald-800">{vid.score_pronunciation_fluency}/২৫</span>
+                        </div>
+                        <div className="p-2 bg-white/90 rounded-lg border border-emerald-100">
+                          <span className="text-gray-500 block">বিজনেস ভোকাবুলারি ও বিষয়:</span>
+                          <span className="font-extrabold text-emerald-800">{vid.score_content_vocabulary}/২৫</span>
+                        </div>
+                        <div className="p-2 bg-white/90 rounded-lg border border-emerald-100">
+                          <span className="text-gray-500 block">উপস্থাপনা ও আত্মবিশ্বাস:</span>
+                          <span className="font-extrabold text-emerald-800">{vid.score_presentation_delivery}/২৫</span>
+                        </div>
+                      </div>
+
+                      {vid.teacher_feedback && (
+                        <div className="pt-1 text-xs">
+                          <p className="text-emerald-950 font-medium">
+                            <span className="font-bold text-emerald-800">শিক্ষকের মূল্যায়ন মন্তব্য: </span>
+                            {vid.teacher_feedback}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Original Video Download Button (Section 11) */}
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[11px] text-gray-400 font-mono">
+                      {new Date(vid.submitted_at).toLocaleDateString('bn-BD')}
+                    </span>
+                    <a
+                      href={vid.original_video_url || vid.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 text-xs font-bold transition cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{isBangla ? 'মূল কোয়ালিটিতে ভিডিও ডাউনলোড' : 'Download Original Video'}</span>
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+
+            {speakingVideos.length === 0 && (
+              <div className="col-span-2 p-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-100">
+                <Video className="w-8 h-8 mx-auto text-gray-300 mb-2" />
+                <p className="font-semibold text-gray-700">
+                  {isBangla ? 'কোনো স্পিকিং ভিডিও জমা দেওয়া হয়নি' : 'No speaking videos submitted yet'}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {isBangla
+                    ? 'আপনার স্পিকিং প্রেজেন্টেশন জমা দিতে উপরের "+ নতুন ভিডিও সাবমিট করুন" বাটনে ক্লিক করুন।'
+                    : 'Click "+ Submit Video" above to submit your speaking assignment.'}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       </div>
         </div>
       )}
@@ -2997,6 +3718,322 @@ export default function StudentPortalPage() {
         }}
         session={selectedSessionForAssignments}
       />
+
+      {/* MODAL 1: Report a Learning Problem / Ask My Teacher (Section 9.2) */}
+      {problemModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-xs">
+                  <FileQuestion className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-sm">
+                    {isBangla ? 'লার্নিং সমস্যা ও শিক্ষককে প্রশ্ন' : 'Ask My Teacher / Report Problem'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    {isBangla ? '১০-ধাপের লার্নিং সাপোর্ট ফ্লো' : '10-Step Learning Resolution System'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setProblemModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitProblem} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {isBangla ? '১. প্রাসঙ্গিক কোর্স বিষয় নির্বাচন করুন *' : '1. Select Relevant Subject *'}
+                </label>
+                <select
+                  value={newProblemSubject}
+                  onChange={(e) => setNewProblemSubject(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  required
+                >
+                  <option value="">{isBangla ? '-- বিষয় বাছাই করুন --' : '-- Choose Subject --'}</option>
+                  {academicSubjects.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {isBangla ? '২. যে অংশ বা কনসেপ্টটি বুঝতে পারেননি *' : '2. Unclear Part / Concept *'}
+                </label>
+                <input
+                  type="text"
+                  value={newProblemUnclearPart}
+                  onChange={(e) => setNewProblemUnclearPart(e.target.value)}
+                  placeholder={isBangla ? 'যেমন: Meta Pixel CAPI Deduplication, বা ডেপ্রিসিয়েশন ফর্মুলা' : 'e.g. Meta Pixel Event Deduplication'}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {isBangla ? '৩. আপনার প্রশ্ন বিস্তারিত নিজের ভাষায় লিখুন *' : '3. Describe Question in Your Own Words *'}
+                </label>
+                <textarea
+                  value={newProblemQuestion}
+                  onChange={(e) => setNewProblemQuestion(e.target.value)}
+                  placeholder={isBangla ? 'কোথায় সমস্যা হচ্ছে এবং শিক্ষক থেকে কী ব্যাখ্যা প্রত্যাশা করছেন বিস্তারিত লিখুন...' : 'Describe where you got stuck...'}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none h-24"
+                  required
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-slate-700">
+                    {isBangla ? '৪. এই বিষয়ে আপনার বর্তমান বোধগম্যতা (ঐচ্ছিক)' : '4. Topic Understanding %'}
+                  </label>
+                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                    {newProblemPct}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={newProblemPct}
+                  onChange={(e) => setNewProblemPct(parseInt(e.target.value))}
+                  className="w-full accent-emerald-600 cursor-pointer"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setProblemModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
+                >
+                  {isBangla ? 'বাতিল' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingProblem}
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs disabled:opacity-50 cursor-pointer"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>{submittingProblem ? (isBangla ? 'জমা হচ্ছে...' : 'Submitting...') : (isBangla ? 'শিক্ষককে প্রশ্ন পাঠান' : 'Submit Question')}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: Subject Understanding Slider Update (Section 9.1) */}
+      {editingSubjectUnderstanding && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                  <Sliders className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-sm">
+                    {editingSubjectUnderstanding.subject_name}
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    {isBangla ? 'বোধগম্যতা শতাংশ (Understanding %) আপডেট' : 'Update Understanding %'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingSubjectUnderstanding(null)}
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-700">
+                    {isBangla ? 'বর্তমান বোধগম্যতা হার:' : 'Current Understanding:'}
+                  </span>
+                  <span className="text-sm font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+                    {tempUnderstandingPct}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={tempUnderstandingPct}
+                  onChange={(e) => setTempUnderstandingPct(parseInt(e.target.value))}
+                  className="w-full accent-emerald-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                />
+                <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                  <span>০% (কিছুই বুঝিনি)</span>
+                  <span>৫০% (অর্ধেক বুঝেছি)</span>
+                  <span>১০০% (সম্পূর্ণ ক্লিয়ার)</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {isBangla ? 'আপনার ব্যক্তিগত মন্তব্য বা অগ্রগতি নোট:' : 'Personal Reflection Note:'}
+                </label>
+                <textarea
+                  value={tempUnderstandingNotes}
+                  onChange={(e) => setTempUnderstandingNotes(e.target.value)}
+                  placeholder={isBangla ? 'কোন বিষয়টি ভালো বুঝতে পেরেছেন বা কোথায় আরও জোর দেওয়া দরকার...' : 'Notes on your progress...'}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none h-20"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingSubjectUnderstanding(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
+                >
+                  {isBangla ? 'বাতিল' : 'Cancel'}
+                </button>
+                <button
+                  type="button"
+                  disabled={savingUnderstanding}
+                  onClick={() => handleSaveSubjectUnderstanding(
+                    editingSubjectUnderstanding.subject,
+                    tempUnderstandingPct,
+                    tempUnderstandingNotes
+                  )}
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs disabled:opacity-50 cursor-pointer"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>{savingUnderstanding ? (isBangla ? 'সংরক্ষণ হচ্ছে...' : 'Saving...') : (isBangla ? 'আপডেট নিশ্চিত করুন' : 'Confirm Update')}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: Submit Speaking Video Presentation (Section 11) */}
+      {videoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-xs">
+                  <Video className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-sm">
+                    {isBangla ? 'স্পিকিং ভিডিও অ্যাসাইনমেন্ট দাখিল' : 'Submit Speaking Video Presentation'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    {isBangla ? '৪-স্তরের রুব্রিক ভিত্তিক মূল্যায়ন' : '4-Criteria Rubric Assessment'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setVideoModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitSpeakingVideo} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {isBangla ? 'ভিডিও প্রেজেন্টেশনের শিরোনাম *' : 'Video Title *'}
+                </label>
+                <input
+                  type="text"
+                  value={newVideoTitle}
+                  onChange={(e) => setNewVideoTitle(e.target.value)}
+                  placeholder={isBangla ? 'যেমন: Self-Introduction & Business Pitch in English' : 'e.g. Agro Venture Elevator Pitch'}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {isBangla ? 'কোর্স বিষয় নির্বাচন করুন *' : 'Course Subject *'}
+                </label>
+                <select
+                  value={newVideoSubject}
+                  onChange={(e) => setNewVideoSubject(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  required
+                >
+                  <option value="">{isBangla ? '-- বিষয় বাছাই করুন --' : '-- Choose Subject --'}</option>
+                  {academicSubjects.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {isBangla ? 'ভিডিও লিংক (YouTube / Google Drive / Direct MP4 URL) *' : 'Video Link (Stream/Drive/MP4) *'}
+                </label>
+                <input
+                  type="url"
+                  value={newVideoUrl}
+                  onChange={(e) => setNewVideoUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  required
+                />
+                <p className="text-[10px] text-gray-400 mt-1">
+                  {isBangla ? 'ভিডিওর অরিজিনাল কোয়ালিটি অপরিবর্তিত থাকবে।' : 'Original high-definition quality is preserved.'}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {isBangla ? 'আপনার প্রেজেন্টেশন নোট বা সারসংক্ষেপ:' : 'Presentation Summary / Notes:'}
+                </label>
+                <textarea
+                  value={newVideoNotes}
+                  onChange={(e) => setNewVideoNotes(e.target.value)}
+                  placeholder={isBangla ? 'ভিডিওর প্রধান পয়েন্টগুলো সংক্ষেপে লিখুন...' : 'Key points covered in this video...'}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none h-20"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setVideoModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
+                >
+                  {isBangla ? 'বাতিল' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingVideo}
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs disabled:opacity-50 cursor-pointer"
+                >
+                  <Video className="w-3.5 h-3.5" />
+                  <span>{submittingVideo ? (isBangla ? 'জমা হচ্ছে...' : 'Submitting...') : (isBangla ? 'ভিডিও জমা দিন' : 'Submit Video')}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

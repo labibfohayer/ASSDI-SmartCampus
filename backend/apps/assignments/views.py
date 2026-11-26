@@ -17,12 +17,16 @@ from .models import (
     HomeworkSubmissionStatus,
     MicroQuiz,
     QuizAttempt,
+    SpeakingVideoStatus,
+    SpeakingVideoSubmission,
 )
 from .serializers import (
     HomeworkSerializer,
     HomeworkSubmissionSerializer,
     MicroQuizSerializer,
     QuizAttemptSerializer,
+    SpeakingVideoEvaluationSerializer,
+    SpeakingVideoSubmissionSerializer,
 )
 
 
@@ -341,3 +345,113 @@ class HomeworkViewSet(viewsets.ModelViewSet):
         subs = homework.submissions.select_related("student", "student__user").all()
         serializer = HomeworkSubmissionSerializer(subs, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SpeakingVideoSubmissionViewSet(viewsets.ModelViewSet):
+    """
+    Speaking Video Assignment & Assessment (Section 11).
+    Supports video uploads, YouTube/drive stream links, multi-criteria rubric evaluation,
+    and original-quality video downloads.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = SpeakingVideoSubmissionSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = SpeakingVideoSubmission.objects.select_related(
+            "student", "student__user", "batch", "subject", "evaluated_by"
+        )
+
+        batch_id = self.request.query_params.get("batch")
+        if batch_id:
+            qs = qs.filter(batch_id=batch_id)
+
+        subject_id = self.request.query_params.get("subject")
+        if subject_id:
+            qs = qs.filter(subject_id=subject_id)
+
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            qs = qs.filter(status=status_param)
+
+        level_param = self.request.query_params.get("level")
+        if level_param:
+            qs = qs.filter(level=level_param)
+
+        if user.role == UserRole.STUDENT:
+            return qs.filter(student__user=user)
+
+        if user.role == UserRole.TEACHER:
+            assigned_batches = TeacherAssignment.objects.filter(teacher_user=user).values_list("batch_id", flat=True)
+            return qs.filter(Q(batch_id__in=assigned_batches) | Q(evaluated_by=user))
+
+        return qs
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role != UserRole.STUDENT:
+            raise PermissionDenied("Only students can submit speaking videos.")
+        student = Student.objects.filter(user=user).first()
+        if not student:
+            raise PermissionDenied("Active student record required.")
+        serializer.save(student=student)
+
+    @action(detail=True, methods=["post"], url_path="evaluate")
+    def evaluate(self, request, pk=None):
+        submission = self.get_object()
+        user = request.user
+        if user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR, UserRole.TEACHER]:
+            raise PermissionDenied("Only teachers or administrators can evaluate speaking videos.")
+
+        serializer = SpeakingVideoEvaluationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        submission.score_body_language = data["score_body_language"]
+        submission.score_pronunciation_fluency = data["score_pronunciation_fluency"]
+        submission.score_content_vocabulary = data["score_content_vocabulary"]
+        submission.score_presentation_delivery = data["score_presentation_delivery"]
+        submission.teacher_feedback = data.get("teacher_feedback", "")
+        submission.revision_reason = data.get("revision_reason", "")
+        submission.status = data.get("status", SpeakingVideoStatus.EVALUATED)
+        submission.evaluated_by = user
+        submission.evaluated_at = timezone.now()
+
+        # Calculate sum and letter grade
+        submission.calculate_total_and_grade()
+        submission.save()
+
+        res_serializer = SpeakingVideoSubmissionSerializer(submission, context={"request": request})
+        return Response(res_serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="download_original")
+    def download_original(self, request, pk=None):
+        submission = self.get_object()
+        if submission.video_file:
+            from django.http import FileResponse
+            response = FileResponse(submission.video_file.open("rb"), as_attachment=True)
+            response["Content-Disposition"] = f'attachment; filename="{submission.video_file.name.split("/")[-1]}"'
+            return response
+        elif submission.video_url:
+            from django.shortcuts import redirect
+            return redirect(submission.video_url)
+        return Response({"detail": "No video file or stream URL available."}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=["get"], url_path="stats")
+    def stats(self, request):
+        qs = self.get_queryset()
+        total = qs.count()
+        submitted = qs.filter(status=SpeakingVideoStatus.SUBMITTED).count()
+        under_review = qs.filter(status=SpeakingVideoStatus.UNDER_REVIEW).count()
+        evaluated = qs.filter(status=SpeakingVideoStatus.EVALUATED).count()
+        needs_revision = qs.filter(status=SpeakingVideoStatus.REVISION_REQUESTED).count()
+
+        return Response({
+            "total_videos": total,
+            "submitted": submitted,
+            "under_review": under_review,
+            "evaluated": evaluated,
+            "needs_revision": needs_revision,
+        }, status=status.HTTP_200_OK)
+
