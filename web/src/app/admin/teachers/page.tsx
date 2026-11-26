@@ -28,6 +28,7 @@ import {
   Calendar,
   Building,
   Check,
+  Zap,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -72,6 +73,17 @@ interface SubjectOption {
   course?: number;
 }
 
+// 7 Days of the Week Definition
+export const WEEK_DAYS = [
+  { id: 'sat', nameBn: 'শনিবার', shortBn: 'শনি', nameEn: 'Saturday' },
+  { id: 'sun', nameBn: 'রবিবার', shortBn: 'রবি', nameEn: 'Sunday' },
+  { id: 'mon', nameBn: 'সোমবার', shortBn: 'সোম', nameEn: 'Monday' },
+  { id: 'tue', nameBn: 'মঙ্গলবার', shortBn: 'মঙ্গল', nameEn: 'Tuesday' },
+  { id: 'wed', nameBn: 'বুধবার', shortBn: 'বুধ', nameEn: 'Wednesday' },
+  { id: 'thu', nameBn: 'বৃহস্পতিবার', shortBn: 'বৃহস্পতি', nameEn: 'Thursday' },
+  { id: 'fri', nameBn: 'শুক্রবার', shortBn: 'শুক্র', nameEn: 'Friday' },
+];
+
 const DEFAULT_BATCHES: BatchOption[] = [
   { id: 42, name: 'ব্যাচ ৪২ (SBMC - জেনারেল ও মাদ্রাসা)', course_name: 'Small Business Management Course' },
   { id: 41, name: 'ব্যাচ ৪১ (SBMC - মর্নিং শিফট)', course_name: 'Small Business Management Course' },
@@ -80,7 +92,7 @@ const DEFAULT_BATCHES: BatchOption[] = [
 
 const DEFAULT_SUBJECTS: SubjectOption[] = [
   { id: 1, name: 'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস', code: 'GD-101' },
-  { id: 2, name: 'ডিজিタル কনটেন্ট ও ভিডিও এডিটিং', code: 'VE-102' },
+  { id: 2, name: 'ডিজিটাল কনটেন্ট ও ভিডিও এডিটিং', code: 'VE-102' },
   { id: 3, name: 'ইউআই/ইউএক্স ও টাইপোগ্রাফি', code: 'UX-103' },
   { id: 4, name: 'ইসলামিক বেসিকস (মাদ্রাসা ব্যাকগ্রাউন্ড)', code: 'IS-104' },
   { id: 5, name: 'ফ্রিল্যান্সিং ও মার্কেটপ্লেস প্রজেক্ট', code: 'FL-105' },
@@ -105,7 +117,7 @@ const DEFAULT_TEACHERS: TeacherItem[] = [
         subject_id: 1,
         subject_name: 'গ্রাফিক ডিজাইন ও ব্র্যান্ড অ্যাসেটস',
         is_primary: true,
-        day_of_week: 'শনিবার ও বুধবার',
+        day_of_week: 'শনিবার ও বুধবার (২ দিন)',
         start_time: '09:00',
         end_time: '10:00',
         room: 'কম্পিউটার ল্যাব ০১',
@@ -117,7 +129,7 @@ const DEFAULT_TEACHERS: TeacherItem[] = [
         subject_id: 2,
         subject_name: 'ডিজিটাল কনটেন্ট ও ভিডিও এডিটিং',
         is_primary: true,
-        day_of_week: 'রবিবার ও মঙ্গলবার',
+        day_of_week: 'রবিবার, মঙ্গলবার ও বৃহস্পতিবার (৩ দিন)',
         start_time: '11:30',
         end_time: '12:30',
         room: 'মাল্টিমিডিয়া রুম ১০৩',
@@ -129,7 +141,7 @@ const DEFAULT_TEACHERS: TeacherItem[] = [
         subject_id: 3,
         subject_name: 'ইউআই/ইউএক্স ও টাইপোগ্রাফি',
         is_primary: false,
-        day_of_week: 'সোমবার',
+        day_of_week: 'শনিবার থেকে বৃহস্পতিবার (৬ দিন)',
         start_time: '14:30',
         end_time: '15:30',
         room: 'কম্পিউটার ল্যাব ০২',
@@ -153,7 +165,7 @@ const DEFAULT_TEACHERS: TeacherItem[] = [
         subject_id: 4,
         subject_name: 'ইসলামিক বেসিকস (মাদ্রাসা ব্যাকগ্রাউন্ড)',
         is_primary: true,
-        day_of_week: 'রবিবার ও বুধবার',
+        day_of_week: 'রবিবার ও বুধবার (২ দিন)',
         start_time: '10:30',
         end_time: '11:30',
         room: 'ক্লাসরুম ১০২',
@@ -165,7 +177,7 @@ const DEFAULT_TEACHERS: TeacherItem[] = [
         subject_id: 5,
         subject_name: 'ফ্রিল্যান্সিং ও মার্কেটপ্লেস প্রজেক্ট',
         is_primary: true,
-        day_of_week: 'বৃহস্পতিবার',
+        day_of_week: 'শনিবার, সোমবার, বুধবার ও বৃহস্পতিবার (৪ দিন)',
         start_time: '09:00',
         end_time: '10:30',
         room: 'কম্পিউটার ল্যাব ০১',
@@ -189,7 +201,7 @@ const DEFAULT_TEACHERS: TeacherItem[] = [
         subject_id: 6,
         subject_name: 'হিসাববিজ্ঞান ও ব্যবসায়িক অর্থায়ন',
         is_primary: true,
-        day_of_week: 'শনিবার ও মঙ্গলবার',
+        day_of_week: 'শনিবার ও মঙ্গলবার (২ দিন)',
         start_time: '12:00',
         end_time: '13:00',
         room: 'ক্লাসরুম ২০৪',
@@ -224,15 +236,18 @@ export default function AdminTeachersPage() {
     is_primary: true,
   });
 
-  // Assign Subject & Class Routine Modal (Supports Add and Edit Mode)
+  // Assign Subject & Class Routine Modal (Supports Add and Edit Mode with multi-day select)
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assigningSubject, setAssigningSubject] = useState(false);
   const [editingAssignmentId, setEditingAssignmentId] = useState<number | null>(null);
+
+  // Multi-day selection state
+  const [selectedDays, setSelectedDays] = useState<string[]>(['শনিবার', 'বুধবার']);
+
   const [assignForm, setAssignForm] = useState({
     teacher_id: '',
     batch_id: '',
     subject_id: '',
-    day_of_week: 'শনিবার ও বুধবার',
     start_time: '09:00',
     end_time: '10:00',
     room: 'কম্পিউটার ল্যাব ০১',
@@ -243,7 +258,6 @@ export default function AdminTeachersPage() {
   // Deactivate / Expel / Remove Teacher Modal
   const [teacherToDeactivate, setTeacherToDeactivate] = useState<TeacherItem | null>(null);
   const [deactivating, setDeactivating] = useState(false);
-  const [deactivateReason, setDeactivateReason] = useState('');
 
   const fetchTeachersAndMetadata = async () => {
     try {
@@ -277,6 +291,55 @@ export default function AdminTeachersPage() {
     fetchTeachersAndMetadata();
   }, []);
 
+  // Format days array to user-friendly string
+  const formatDaysSummary = (days: string[]): string => {
+    if (!days || days.length === 0) return 'দিন নির্ধারিত নেই';
+    if (days.length === 7) return 'সপ্তাহের প্রতিদিন (৭ দিন)';
+    if (days.length === 6 && !days.includes('শুক্রবার')) return 'শনিবার থেকে বৃহস্পতিবার (৬ দিন)';
+    if (days.length === 5 && !days.includes('শুক্রবার') && !days.includes('শনিবার')) return 'রবিবার থেকে বৃহস্পতিবার (৫ দিন)';
+    if (days.length === 2) return `${days[0]} ও ${days[1]} (২ দিন)`;
+    return `${days.join(', ')} (${days.length} দিন)`;
+  };
+
+  // Toggle individual day selection
+  const handleToggleDay = (dayName: string) => {
+    if (selectedDays.includes(dayName)) {
+      if (selectedDays.length === 1) {
+        toast.error(isBangla ? 'কমপক্ষে একটি দিন নির্বাচন করতে হবে।' : 'Select at least one day.');
+        return;
+      }
+      setSelectedDays(selectedDays.filter((d) => d !== dayName));
+    } else {
+      const order = WEEK_DAYS.map((w) => w.nameBn);
+      const updated = [...selectedDays, dayName].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+      setSelectedDays(updated);
+    }
+  };
+
+  // Quick preset day selection
+  const handleApplyPreset = (preset: 'all_workdays' | 'all_week' | 'sat_mon_wed' | 'sun_tue_thu' | 'sat_wed' | 'sun_tue') => {
+    switch (preset) {
+      case 'all_workdays':
+        setSelectedDays(['শনিবার', 'রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার']);
+        break;
+      case 'all_week':
+        setSelectedDays(['শনিবার', 'রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার']);
+        break;
+      case 'sat_mon_wed':
+        setSelectedDays(['শনিবার', 'সোমবার', 'বুধবার']);
+        break;
+      case 'sun_tue_thu':
+        setSelectedDays(['রবিবার', 'মঙ্গলবার', 'বৃহস্পতিবার']);
+        break;
+      case 'sat_wed':
+        setSelectedDays(['শনিবার', 'বুধবার']);
+        break;
+      case 'sun_tue':
+        setSelectedDays(['রবিবার', 'মঙ্গলবার']);
+        break;
+    }
+  };
+
   // Handle Add New Teacher
   const handleAddTeacher = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -305,7 +368,6 @@ export default function AdminTeachersPage() {
 
       await api.post('/api/v1/teachers/', payload).catch(() => null);
 
-      // Local state fallback update
       const selectedBatch = batches.find((b) => b.id === parseInt(teacherForm.initial_batch_id));
       const selectedSubject = subjects.find((s) => s.id === parseInt(teacherForm.initial_subject_id));
       const newTeacherObj: TeacherItem = {
@@ -325,7 +387,7 @@ export default function AdminTeachersPage() {
             subject_id: selectedSubject.id,
             subject_name: selectedSubject.name,
             is_primary: teacherForm.is_primary,
-            day_of_week: 'শনিবার ও বুধবার',
+            day_of_week: 'শনিবার ও বুধবার (২ দিন)',
             start_time: '09:00',
             end_time: '10:00',
             room: 'কম্পিউটার ল্যাব ০১',
@@ -357,11 +419,16 @@ export default function AdminTeachersPage() {
   const handleOpenAssignModal = (teacher: TeacherItem, assignmentToEdit?: TeacherAssignment) => {
     if (assignmentToEdit) {
       setEditingAssignmentId(assignmentToEdit.id);
+
+      // Parse existing days from string if available
+      const rawDays = assignmentToEdit.day_of_week || '';
+      const matchedDays = WEEK_DAYS.filter((w) => rawDays.includes(w.nameBn) || rawDays.includes(w.shortBn)).map((w) => w.nameBn);
+      setSelectedDays(matchedDays.length > 0 ? matchedDays : ['শনিবার', 'বুধবার']);
+
       setAssignForm({
         teacher_id: String(teacher.id),
         batch_id: String(assignmentToEdit.batch_id),
         subject_id: String(assignmentToEdit.subject_id),
-        day_of_week: assignmentToEdit.day_of_week || 'শনিবার ও বুধবার',
         start_time: assignmentToEdit.start_time || '09:00',
         end_time: assignmentToEdit.end_time || '10:00',
         room: assignmentToEdit.room || 'কম্পিউটার ল্যাব ০১',
@@ -370,11 +437,11 @@ export default function AdminTeachersPage() {
       });
     } else {
       setEditingAssignmentId(null);
+      setSelectedDays(['শনিবার', 'বুধবার']);
       setAssignForm({
         teacher_id: String(teacher.id),
         batch_id: batches[0]?.id ? String(batches[0].id) : '42',
         subject_id: subjects[0]?.id ? String(subjects[0].id) : '1',
-        day_of_week: 'শনিবার ও বুধবার',
         start_time: '09:00',
         end_time: '10:00',
         room: 'কম্পিউটার ল্যাব ০১',
@@ -393,26 +460,30 @@ export default function AdminTeachersPage() {
       return;
     }
 
+    if (selectedDays.length === 0) {
+      toast.error(isBangla ? 'কমপক্ষে একটি ক্লাসের দিন নির্বাচন করুন।' : 'Please select at least one class day.');
+      return;
+    }
+
     setAssigningSubject(true);
     try {
       const selectedBatch = batches.find((b) => b.id === parseInt(assignForm.batch_id));
       const selectedSubject = subjects.find((s) => s.id === parseInt(assignForm.subject_id));
       const teacherIdNum = parseInt(assignForm.teacher_id);
+      const daysSummary = formatDaysSummary(selectedDays);
 
-      // Attempt API call
       await api.post('/api/v1/teacher-assignments/', {
         teacher_user: teacherIdNum,
         batch: parseInt(assignForm.batch_id),
         subject: parseInt(assignForm.subject_id),
         is_primary: assignForm.is_primary,
-        day_of_week: assignForm.day_of_week,
+        day_of_week: daysSummary,
         start_time: assignForm.start_time,
         end_time: assignForm.end_time,
         room: assignForm.room,
         session_date: assignForm.session_date || null,
       }).catch(() => null);
 
-      // Local reactive update
       setTeachers((prev) =>
         prev.map((t) => {
           if (t.id === teacherIdNum) {
@@ -426,7 +497,7 @@ export default function AdminTeachersPage() {
                       batch_name: selectedBatch ? selectedBatch.name.split(' ')[0] : asg.batch_name,
                       subject_id: parseInt(assignForm.subject_id),
                       subject_name: selectedSubject ? selectedSubject.name : asg.subject_name,
-                      day_of_week: assignForm.day_of_week,
+                      day_of_week: daysSummary,
                       start_time: assignForm.start_time,
                       end_time: assignForm.end_time,
                       room: assignForm.room,
@@ -442,7 +513,7 @@ export default function AdminTeachersPage() {
                 batch_name: selectedBatch ? selectedBatch.name.split(' ')[0] : 'ব্যাচ ৪২',
                 subject_id: parseInt(assignForm.subject_id),
                 subject_name: selectedSubject ? selectedSubject.name : 'বিষয়',
-                day_of_week: assignForm.day_of_week,
+                day_of_week: daysSummary,
                 start_time: assignForm.start_time,
                 end_time: assignForm.end_time,
                 room: assignForm.room,
@@ -474,7 +545,6 @@ export default function AdminTeachersPage() {
     }
   };
 
-  // Delete an assignment from a teacher
   const handleDeleteAssignment = (teacherId: number, assignmentId: number) => {
     setTeachers((prev) =>
       prev.map((t) => {
@@ -492,7 +562,6 @@ export default function AdminTeachersPage() {
     toast.success(isBangla ? 'বিষয় ও শিডিউল বরাদ্দ প্রত্যাহার করা হয়েছে।' : 'Assignment removed.');
   };
 
-  // Handle Deactivate Teacher
   const handleDeactivateTeacher = async () => {
     if (!teacherToDeactivate) return;
     setDeactivating(true);
@@ -514,7 +583,6 @@ export default function AdminTeachersPage() {
     }
   };
 
-  // Handle Reactivate Teacher
   const handleReactivateTeacher = (teacher: TeacherItem) => {
     setTeachers((prev) =>
       prev.map((t) => (t.id === teacher.id ? { ...t, is_active: true } : t))
@@ -552,8 +620,8 @@ export default function AdminTeachersPage() {
           </h1>
           <p className="text-xs sm:text-[13px] text-[#78350F] mt-1 max-w-2xl font-medium">
             {isBangla
-              ? 'যেকোনো শিক্ষককে একাধিক বিষয় বরাদ্দ করুন, কোন বারে কয়টা থেকে কয়টা পর্যন্ত কোন ব্যাচে ক্লাস নিবেন তা নির্ধারণ ও এডিট করুন।'
-              : 'Assign multiple subjects to teachers, configure recurring weekly class times, batches, rooms and edit schedules.'}
+              ? 'সপ্তাহের যেকোনো দিন (২ দিন, ৩ দিন, ৪ দিন বা ৬ দিন) নির্বাচন করে কয়টা থেকে কয়টা পর্যন্ত কোন ব্যাচে ক্লাস নিবেন তা নির্ধারণ ও এডিট করুন।'
+              : 'Configure custom multi-day schedules (2, 3, 4, 5, or 6 days/week), time intervals, batches, and edit allocations.'}
           </p>
         </div>
 
@@ -672,7 +740,7 @@ export default function AdminTeachersPage() {
         </div>
       </div>
 
-      {/* 4. Teachers Table / Roster with Schedule Breakdown */}
+      {/* 4. Teachers Table / Roster with Sharp, Proportional Column Distribution */}
       <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
@@ -688,63 +756,71 @@ export default function AdminTeachersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
+            {/* Table with explicitly proportioned column widths: tight contact, wide routine center, crisp status & action right */}
             <table className="w-full text-left text-xs">
+              <colgroup>
+                <col className="w-[210px] min-w-[190px]" />
+                <col className="w-[160px] min-w-[140px]" />
+                <col className="w-auto min-w-[420px]" />
+                <col className="w-[100px] min-w-[90px]" />
+                <col className="w-[140px] min-w-[130px]" />
+              </colgroup>
               <thead className="bg-[#F8FAFC] text-slate-600 border-b border-slate-200 font-bold uppercase tracking-wider text-[11px]">
                 <tr>
-                  <th className="py-3 px-4">{isBangla ? 'শিক্ষকের নাম ও আইডি' : 'Teacher & Login ID'}</th>
-                  <th className="py-3 px-4">{isBangla ? 'যোগাযোগ' : 'Contact'}</th>
+                  <th className="py-3 px-3.5">{isBangla ? 'শিক্ষকের নাম ও আইডি' : 'Teacher & Login ID'}</th>
+                  <th className="py-3 px-3">{isBangla ? 'যোগাযোগ' : 'Contact'}</th>
                   <th className="py-3 px-4">{isBangla ? 'নির্ধারিত বিষয়, ক্লাস রুটিন ও সময়সূচী' : 'Assigned Subjects & Class Timetable'}</th>
-                  <th className="py-3 px-4">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
-                  <th className="py-3 px-4 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
+                  <th className="py-3 px-3 text-center">{isBangla ? 'স্ট্যাটাস' : 'Status'}</th>
+                  <th className="py-3 px-3.5 text-right">{isBangla ? 'অ্যাকশন' : 'Action'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredTeachers.map((teacher) => (
                   <tr key={teacher.id} className="hover:bg-slate-50/80 transition align-top">
-                    {/* Teacher Identity */}
-                    <td className="py-4 px-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 font-black flex items-center justify-center text-sm border border-emerald-200 shrink-0">
+                    {/* Teacher Identity - w-[210px] */}
+                    <td className="py-3.5 px-3.5 whitespace-nowrap">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-800 font-black flex items-center justify-center text-sm border border-emerald-200 shrink-0">
                           {teacher.full_name?.charAt(0) || 'T'}
                         </div>
-                        <div>
-                          <p className="font-bold text-slate-900 text-[13px]">{teacher.full_name}</p>
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-900 text-[13px] truncate">{teacher.full_name}</p>
                           <p className="text-[11px] font-mono text-slate-500 font-semibold">{teacher.login_id}</p>
                         </div>
                       </div>
                     </td>
 
-                    {/* Contact */}
-                    <td className="py-4 px-4 whitespace-nowrap">
+                    {/* Contact - w-[160px], shifted left immediately next to name */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
                       <div className="space-y-1">
                         <p className="flex items-center gap-1.5 text-slate-700 font-medium">
-                          <Phone className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{teacher.phone}</span>
+                          <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="font-mono text-[11px]">{teacher.phone}</span>
                         </p>
                         {teacher.email && (
-                          <p className="flex items-center gap-1.5 text-slate-500 text-[11px]">
-                            <Mail className="w-3.5 h-3.5 text-slate-400" />
-                            <span>{teacher.email}</span>
+                          <p className="flex items-center gap-1.5 text-slate-500 text-[10.5px]">
+                            <Mail className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span className="truncate max-w-[130px]" title={teacher.email}>{teacher.email}</span>
                           </p>
                         )}
                       </div>
                     </td>
 
-                    {/* Assigned Subjects & Class Schedules */}
-                    <td className="py-4 px-4">
+                    {/* Assigned Subjects & Class Schedules - WIDE CENTER COLUMN (w-auto) */}
+                    <td className="py-3.5 px-4">
                       {teacher.assignments && teacher.assignments.length > 0 ? (
-                        <div className="space-y-2 max-w-xl">
+                        <div className="space-y-2 w-full">
                           {teacher.assignments.map((asg) => (
                             <div
                               key={asg.id}
-                              className="p-2.5 rounded-xl bg-slate-50/90 border border-slate-200 hover:border-emerald-300 transition flex items-start justify-between gap-2"
+                              className="p-2.5 rounded-xl bg-slate-50/90 border border-slate-200 hover:border-emerald-300 transition flex items-center justify-between gap-3 w-full shadow-2xs"
                             >
-                              <div className="space-y-1">
+                              <div className="space-y-1 min-w-0 flex-1">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="font-black text-[#0F172A] text-xs">
                                     {asg.subject_name}
                                   </span>
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-white text-emerald-800 border border-emerald-200">
+                                  <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-white text-emerald-800 border border-emerald-200">
                                     {asg.batch_name}
                                   </span>
                                   {asg.is_primary && (
@@ -755,39 +831,37 @@ export default function AdminTeachersPage() {
                                 </div>
 
                                 <div className="flex items-center gap-2 text-[10.5px] text-slate-600 flex-wrap">
-                                  <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                                  <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
                                     <Calendar className="w-3 h-3 text-emerald-600" />
                                     {asg.day_of_week || 'শনিবার ও বুধবার'}
                                   </span>
-                                  <span>•</span>
-                                  <span className="inline-flex items-center gap-1 font-mono font-bold text-[#0F172A]">
+                                  <span className="inline-flex items-center gap-1 font-mono font-bold text-[#0F172A] bg-white px-2 py-0.5 rounded-md border border-slate-200">
                                     <Clock className="w-3 h-3 text-amber-600" />
                                     {asg.start_time || '09:00'} - {asg.end_time || '10:00'}
                                   </span>
-                                  <span>•</span>
-                                  <span className="inline-flex items-center gap-1 text-slate-500">
+                                  <span className="inline-flex items-center gap-1 text-slate-600">
                                     <Building className="w-3 h-3 text-slate-400" />
                                     {asg.room || 'কম্পিউটার ল্যাব ০১'}
                                   </span>
                                 </div>
                               </div>
 
-                              <div className="flex items-center gap-1 shrink-0 pt-0.5">
+                              <div className="flex items-center gap-1 shrink-0">
                                 <button
                                   type="button"
                                   onClick={() => handleOpenAssignModal(teacher, asg)}
-                                  className="p-1 text-slate-500 hover:text-emerald-700 hover:bg-white rounded-md border border-slate-200 transition cursor-pointer"
+                                  className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-white rounded-lg border border-slate-200 transition cursor-pointer shadow-2xs"
                                   title={isBangla ? 'শিডিউল ও সময় এডিট করুন' : 'Edit Schedule'}
                                 >
-                                  <Edit3 className="w-3 h-3" />
+                                  <Edit3 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteAssignment(teacher.id, asg.id)}
-                                  className="p-1 text-slate-400 hover:text-rose-600 hover:bg-white rounded-md border border-slate-200 transition cursor-pointer"
+                                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-lg border border-slate-200 transition cursor-pointer shadow-2xs"
                                   title={isBangla ? 'বিষয় শিডিউল বাদ দিন' : 'Remove Subject'}
                                 >
-                                  <Trash2 className="w-3 h-3" />
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </div>
@@ -800,42 +874,39 @@ export default function AdminTeachersPage() {
                       )}
                     </td>
 
-                    {/* Status */}
-                    <td className="py-4 px-4 whitespace-nowrap">
+                    {/* Status - w-[100px], tight & aligned toward the right */}
+                    <td className="py-3.5 px-3 whitespace-nowrap text-center">
                       {teacher.is_active ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                           <span>{isBangla ? 'সক্রিয়' : 'Active'}</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
                           <span>{isBangla ? 'স্থগিত' : 'Inactive'}</span>
                         </span>
                       )}
                     </td>
 
-                    {/* Actions */}
-                    <td className="py-4 px-4 text-right whitespace-nowrap">
+                    {/* Actions - w-[140px], clean right alignment */}
+                    <td className="py-3.5 px-3.5 text-right whitespace-nowrap">
                       <div className="inline-flex items-center gap-1.5">
-                        {/* Assign New Subject Button */}
                         <button
                           onClick={() => handleOpenAssignModal(teacher)}
-                          className="px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 text-[11px] font-bold border border-teal-200 transition cursor-pointer flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 text-[11px] font-bold border border-teal-200 transition cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
                           title={isBangla ? 'নতুন বিষয় ও ক্লাস শিডিউল যোগ করুন' : 'Assign Subject & Routine'}
                         >
                           <Plus className="w-3 h-3" />
                           <span>{isBangla ? 'বিষয় ও শিডিউল' : '+ Subject & Time'}</span>
                         </button>
 
-                        {/* Deactivate or Reactivate */}
                         {teacher.is_active ? (
                           <button
                             onClick={() => {
                               setTeacherToDeactivate(teacher);
-                              setDeactivateReason('');
                             }}
-                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold border border-rose-200 transition cursor-pointer"
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold border border-rose-200 transition cursor-pointer shadow-2xs"
                             title={isBangla ? 'শিক্ষককে অব্যাহতি দিন' : 'Deactivate Teacher'}
                           >
                             <UserX className="w-3.5 h-3.5" />
@@ -999,10 +1070,10 @@ export default function AdminTeachersPage() {
         </div>
       )}
 
-      {/* 6. ASSIGN / EDIT SUBJECT & CLASS ROUTINE MODAL */}
+      {/* 6. ASSIGN / EDIT SUBJECT & CLASS ROUTINE MODAL (WITH INTERACTIVE MULTI-DAY SELECTION) */}
       {showAssignModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center">
@@ -1015,7 +1086,7 @@ export default function AdminTeachersPage() {
                       : (isBangla ? 'শিক্ষককে বিষয় ও ক্লাস শিডিউল বরাদ্দ করুন' : 'Assign Subject & Class Routine')}
                   </h3>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    {isBangla ? 'সুপার অ্যাডমিন ও কো-অর্ডিনেটর নির্ধারণ ও এডিট করতে পারবেন' : 'Super Admin & Coordinator schedule control'}
+                    {isBangla ? 'সপ্তাহের যেকোনো দিন (১, ২, ৩, ৪ বা ৬ দিন) নির্বাচন ও সময় নির্ধারণ করুন' : 'Select custom days (2, 3, 4, 5, or 6 days), times & rooms'}
                   </p>
                 </div>
               </div>
@@ -1030,7 +1101,7 @@ export default function AdminTeachersPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAssignSubject} className="space-y-3.5 text-xs">
+            <form onSubmit={handleAssignSubject} className="space-y-4 text-xs">
               {/* Teacher Selection */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
@@ -1090,71 +1161,139 @@ export default function AdminTeachersPage() {
                 </div>
               </div>
 
-              {/* Day of Week & Classroom */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    {isBangla ? 'ক্লাসের দিন / বার নির্বাচন করুন *' : 'Day of Week *'}
+              {/* CUSTOM MULTI-DAY SELECTION CHIPS & PRESETS */}
+              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block font-black text-slate-800 text-[11.5px] flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>{isBangla ? 'সপ্তাহের ক্লাসের দিন / বার নির্বাচন করুন *' : 'Select Class Days *'}</span>
                   </label>
-                  <select
-                    value={assignForm.day_of_week}
-                    onChange={(e) => setAssignForm({ ...assignForm, day_of_week: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-semibold"
-                  >
-                    <option value="শনিবার ও বুধবার">শনিবার ও বুধবার</option>
-                    <option value="রবিবার ও মঙ্গলবার">রবিবার ও মঙ্গলবার</option>
-                    <option value="সোমবার ও বৃহস্পতিবার">সোমবার ও বৃহস্পতিবার</option>
-                    <option value="শনিবার">শনিবার</option>
-                    <option value="রবিবার">রবিবার</option>
-                    <option value="সোমবার">সোমবার</option>
-                    <option value="মঙ্গলবার">মঙ্গলবার</option>
-                    <option value="বুধবার">বুধবার</option>
-                    <option value="বৃহস্পতিবার">বৃহস্পতিবার</option>
-                  </select>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    {d(selectedDays.length)} {isBangla ? 'দিন নির্বাচিত' : 'Days Selected'}
+                  </span>
                 </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    {isBangla ? 'কক্ষ / ল্যাব নির্বাচন *' : 'Room / Lab *'}
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={assignForm.room}
-                    onChange={(e) => setAssignForm({ ...assignForm, room: e.target.value })}
-                    placeholder="যেমন: কম্পিউটার ল্যাব ০১"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white"
-                  />
+                <p className="text-[10.5px] text-slate-500">
+                  {isBangla
+                    ? 'যেকোনো দিন টগল করুন (যেমন: সপ্তাহে ২ দিন, ৩ দিন, ৪ দিন বা ৬ দিনই নির্ধারণ করা যাবে):'
+                    : 'Click any day to toggle on/off freely:'}
+                </p>
+
+                {/* Day of Week Toggle Chips */}
+                <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 pt-1">
+                  {WEEK_DAYS.map((day) => {
+                    const isSelected = selectedDays.includes(day.nameBn);
+                    return (
+                      <button
+                        type="button"
+                        key={day.id}
+                        onClick={() => handleToggleDay(day.nameBn)}
+                        className={`py-2 px-1.5 rounded-xl text-center text-xs font-bold transition flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-2xs ${
+                          isSelected
+                            ? 'bg-emerald-600 text-white border border-emerald-700 shadow-xs scale-102'
+                            : 'bg-white text-slate-700 border border-slate-200 hover:border-emerald-300'
+                        }`}
+                      >
+                        <span className="text-[11px] leading-none">{day.shortBn}</span>
+                        <span className="text-[9px] opacity-80 leading-none">
+                          {isSelected ? '✓' : '+'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Quick Presets Strip */}
+                <div className="pt-2 border-t border-slate-200/70 flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-bold text-slate-500 mr-1 flex items-center gap-0.5">
+                    <Zap className="w-3 h-3 text-amber-500" />
+                    {isBangla ? 'কুইক প্রিসেট:' : 'Presets:'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('all_workdays')}
+                    className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-[10px] font-bold text-slate-700 border border-slate-200 cursor-pointer shadow-2xs"
+                  >
+                    {isBangla ? '৬ দিন (শনি-বৃহস্পতি)' : '6 Days (Sat-Thu)'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('sat_mon_wed')}
+                    className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-[10px] font-bold text-slate-700 border border-slate-200 cursor-pointer shadow-2xs"
+                  >
+                    {isBangla ? '৩ দিন (শনি, সোম, বুধ)' : '3 Days (Sat, Mon, Wed)'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('sun_tue_thu')}
+                    className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-[10px] font-bold text-slate-700 border border-slate-200 cursor-pointer shadow-2xs"
+                  >
+                    {isBangla ? '৩ দিন (রবি, মঙ্গল, বৃহস্পতি)' : '3 Days (Sun, Tue, Thu)'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('sat_wed')}
+                    className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-[10px] font-bold text-slate-700 border border-slate-200 cursor-pointer shadow-2xs"
+                  >
+                    {isBangla ? '২ দিন (শনি ও বুধ)' : '2 Days (Sat & Wed)'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('all_week')}
+                    className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-[10px] font-bold text-slate-700 border border-slate-200 cursor-pointer shadow-2xs"
+                  >
+                    {isBangla ? '৭ দিনই' : 'All 7 Days'}
+                  </button>
+                </div>
+
+                <div className="text-[11px] text-emerald-800 font-bold bg-white p-2 rounded-xl border border-emerald-100 flex items-center justify-between">
+                  <span>{isBangla ? 'নির্বাচিত রুটিন সামারি:' : 'Selected Routine:'}</span>
+                  <span className="font-black">{formatDaysSummary(selectedDays)}</span>
                 </div>
               </div>
 
-              {/* Time Range (Start Time to End Time) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-emerald-50/50 rounded-xl border border-emerald-200/60">
+              {/* Time Range & Room Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-emerald-50/50 rounded-2xl border border-emerald-200/60">
                 <div>
                   <label className="block font-bold text-emerald-950 mb-1 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>{isBangla ? 'কয়টা থেকে (শুরুর সময়) *' : 'Start Time *'}</span>
+                    <span>{isBangla ? 'কয়টা থেকে *' : 'Start Time *'}</span>
                   </label>
                   <input
                     type="time"
                     required
                     value={assignForm.start_time}
                     onChange={(e) => setAssignForm({ ...assignForm, start_time: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono font-bold"
+                    className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white font-mono font-bold text-xs"
                   />
                 </div>
 
                 <div>
                   <label className="block font-bold text-emerald-950 mb-1 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>{isBangla ? 'কয়টা পর্যন্ত (শেষের সময়) *' : 'End Time *'}</span>
+                    <span>{isBangla ? 'কয়টা পর্যন্ত *' : 'End Time *'}</span>
                   </label>
                   <input
                     type="time"
                     required
                     value={assignForm.end_time}
                     onChange={(e) => setAssignForm({ ...assignForm, end_time: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono font-bold"
+                    className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white font-mono font-bold text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-emerald-950 mb-1 flex items-center gap-1">
+                    <Building className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>{isBangla ? 'কক্ষ / ল্যাব *' : 'Room / Lab *'}</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={assignForm.room}
+                    onChange={(e) => setAssignForm({ ...assignForm, room: e.target.value })}
+                    placeholder="উদাঃ ল্যাব ০১"
+                    className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold"
                   />
                 </div>
               </div>
@@ -1173,7 +1312,7 @@ export default function AdminTeachersPage() {
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-1">
+              <div className="flex items-center gap-2 pt-0.5">
                 <input
                   type="checkbox"
                   id="is_primary"
