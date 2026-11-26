@@ -75,6 +75,9 @@ urlpatterns = [
     # Analytics & Reports Endpoints
     path("api/v1/", include("apps.reports.urls")),
 
+    # Examinations & Result Management (Double Approval Workflow)
+    path("api/v1/", include("apps.examinations.urls")),
+
     # Core Academic & Student Endpoints
     path("api/v1/", include(router.urls)),
 ]

@@ -2,7 +2,26 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from apps.accounts.models import UserRole
 from .constants import DAY_OF_WEEK_CHOICES
-from .models import ClassSchedule, ClassSession, MaterialType, SessionAudience, SessionMaterial, SessionStatus
+from .models import ClassSchedule, ClassSession, MaterialType, RoutineApprovalStatus, RoutineVersion, SessionAudience, SessionMaterial, SessionStatus
+
+
+class RoutineVersionSerializer(serializers.ModelSerializer):
+    approved_by_name = serializers.CharField(source="approved_by.full_name", read_only=True)
+    published_by_name = serializers.CharField(source="published_by.full_name", read_only=True)
+
+    class Meta:
+        model = RoutineVersion
+        fields = [
+            "id",
+            "batch",
+            "version_number",
+            "change_summary",
+            "schedule_snapshot",
+            "approved_by_name",
+            "published_by_name",
+            "published_at",
+            "created_at",
+        ]
 
 
 class ClassScheduleSerializer(serializers.ModelSerializer):
@@ -49,6 +68,7 @@ class ClassSessionSerializer(serializers.ModelSerializer):
     teacher_name = serializers.CharField(source="teacher_user.full_name", read_only=True)
     topic_title = serializers.CharField(source="topic.title", read_only=True, allow_null=True)
     created_by_name = serializers.CharField(source="created_by.full_name", read_only=True, allow_null=True)
+    step1_approved_by_name = serializers.CharField(source="step1_approved_by.full_name", read_only=True, allow_null=True)
 
     class Meta:
         model = ClassSession
@@ -70,6 +90,11 @@ class ClassSessionSerializer(serializers.ModelSerializer):
             "learning_objectives",
             "audience",
             "status",
+            "approval_status",
+            "step1_approved_by",
+            "step1_approved_by_name",
+            "step1_approved_at",
+            "version_number",
             "published_at",
             "cancel_reason",
             "created_by",
@@ -77,7 +102,17 @@ class ClassSessionSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["created_at", "updated_at", "published_at", "created_by"]
+        read_only_fields = [
+            "created_at",
+            "updated_at",
+            "published_at",
+            "created_by",
+            "approval_status",
+            "step1_approved_by",
+            "step1_approved_by_name",
+            "step1_approved_at",
+            "version_number",
+        ]
 
     def validate(self, attrs):
         request = self.context.get("request")

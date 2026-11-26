@@ -10,6 +10,7 @@ class UserRole(models.TextChoices):
     TEACHER = "teacher", "Teacher"
     STUDENT = "student", "Student"
     SUPER_ADMIN = "super_admin", "Super Admin"
+    OBSERVER = "observer", "Observer (Deprecated)"
 
 
 class User(AbstractBaseUser, PermissionsMixin):

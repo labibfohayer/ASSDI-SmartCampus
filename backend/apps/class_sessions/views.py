@@ -33,12 +33,13 @@ from apps.feedback.serializers import FeedbackSummarySerializer, LearningFeedbac
 from apps.students.models import EducationBackground, EnrollmentStatus, Student, StudentStatus
 
 from .constants import date_to_day_of_week
-from .models import ClassSchedule, ClassSession, MaterialType, SessionAudience, SessionMaterial, SessionStatus
+from .models import ClassSchedule, ClassSession, MaterialType, RoutineApprovalStatus, RoutineVersion, SessionAudience, SessionMaterial, SessionStatus
 from .serializers import (
     CancelSessionSerializer,
     ClassScheduleSerializer,
     ClassSessionSerializer,
     GenerateSessionsSerializer,
+    RoutineVersionSerializer,
     SessionMaterialSerializer,
 )
 
@@ -438,6 +439,12 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
                 "teacher_user_id": str(updated_instance.teacher_user_id) if updated_instance.teacher_user_id else None,
             }
             if any(old_values[k] != new_values[k] for k in old_values):
+                # Any modification drops status back to draft, requiring re-approval (Section 3.3)
+                updated_instance.status = SessionStatus.DRAFT
+                updated_instance.approval_status = RoutineApprovalStatus.DRAFT
+                updated_instance.version_number += 1
+                updated_instance.save(update_fields=["status", "approval_status", "version_number", "updated_at"])
+
                 AuditLog.objects.create(
                     actor_user=user if user.is_authenticated else None,
                     action="UPDATE_PUBLISHED_SESSION",
@@ -485,11 +492,175 @@ class ClassSessionViewSet(viewsets.ModelViewSet):
 
         now = timezone.now()
         session.status = SessionStatus.PUBLISHED
+        session.approval_status = RoutineApprovalStatus.PUBLISHED
         if not session.published_at:
             session.published_at = now
-        session.save(update_fields=["status", "published_at", "updated_at"])
+        session.save(update_fields=["status", "approval_status", "published_at", "updated_at"])
 
         return Response(self.get_serializer(session).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"], url_path="step1-review")
+    def batch_step1_review(self, request):
+        """
+        Step 1 Routine Approval (Section 3.3):
+        Conflict detection across teacher schedules, rooms, and audience overlap.
+        Marks sessions as 'approved_for_publication'.
+        """
+        user = request.user
+        if user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR]:
+            return Response({"error": "শুধুমাত্র কোর্স কোঅর্ডিনেটর রুটিন রিভিউ ও অনুমোদন করতে পারেন।"}, status=status.HTTP_403_FORBIDDEN)
+
+        batch_id = request.data.get("batch_id")
+        session_ids = request.data.get("session_ids")
+
+        qs = ClassSession.objects.exclude(status=SessionStatus.CANCELLED)
+        if batch_id:
+            qs = qs.filter(batch_id=batch_id)
+        if session_ids:
+            qs = qs.filter(id__in=session_ids)
+
+        if not qs.exists():
+            return Response({"error": "কোনো ক্লাস সেশন পাওয়া যায়নি।"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Conflict check
+        conflicts = []
+        sessions_list = list(qs.select_related("batch", "subject", "teacher_user"))
+        for i, s1 in enumerate(sessions_list):
+            for s2 in sessions_list[i+1:]:
+                if s1.session_date == s2.session_date:
+                    # check time overlap
+                    if s1.start_time < s2.end_time and s2.start_time < s1.end_time:
+                        if s1.teacher_user_id == s2.teacher_user_id:
+                            conflicts.append({
+                                "type": "teacher_overlap",
+                                "message": f"শিক্ষক {s1.teacher_user.full_name} একই সময়ে একাধিক ক্লাসে নির্ধারিত: {s1.subject.name} ও {s2.subject.name} ({s1.start_time}-{s1.end_time})",
+                                "sessions": [s1.id, s2.id],
+                            })
+                        if s1.batch_id == s2.batch_id:
+                            # check audience overlap
+                            if (s1.audience == SessionAudience.ALL or s2.audience == SessionAudience.ALL or s1.audience == s2.audience):
+                                conflicts.append({
+                                    "type": "batch_overlap",
+                                    "message": f"ব্যাচ {s1.batch.name} এর একই সময়ে একাধিক ক্লাস রয়েছে: {s1.subject.name} ও {s2.subject.name}",
+                                    "sessions": [s1.id, s2.id],
+                                })
+
+        now = timezone.now()
+        with transaction.atomic():
+            updated_count = qs.update(
+                approval_status=RoutineApprovalStatus.APPROVED_FOR_PUBLICATION,
+                step1_approved_by=user,
+                step1_approved_at=now,
+            )
+
+        return Response({
+            "success": True,
+            "message": f"ধাপ ১ সম্পন্ন হয়েছে। মোট {updated_count} টি সেশন রিভিউ ও অডিট করা হয়েছে।",
+            "approval_status": "approved_for_publication",
+            "conflicts": conflicts,
+            "has_conflicts": len(conflicts) > 0,
+            "reviewed_count": updated_count,
+            "reviewed_by": user.full_name,
+            "reviewed_at": now.isoformat(),
+        })
+
+    @action(detail=False, methods=["post"], url_path="confirm-publish")
+    def batch_confirm_publish(self, request):
+        """
+        Step 2 Mandatory Routine Publication (Section 3.3):
+        Requires explicit separate payload: { "confirm_publication": true, "batch_id": int, "change_summary": str }
+        Validates Step 1 was completed, publishes routines to students, records RoutineVersion audit.
+        """
+        user = request.user
+        if user.role not in [UserRole.SUPER_ADMIN, UserRole.COORDINATOR]:
+            return Response({"error": "শুধুমাত্র কোর্স কোঅর্ডিনেটর চূড়ান্ত রুটিন প্রকাশ নিশ্চিত করতে পারেন।"}, status=status.HTTP_403_FORBIDDEN)
+
+        confirm = request.data.get("confirm_publication")
+        if not confirm:
+            return Response(
+                {"error": "চূড়ান্ত প্রকাশনা নিশ্চিতকরণের জন্য 'confirm_publication: true' প্রদান আবশ্যক।"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        batch_id = request.data.get("batch_id")
+        session_ids = request.data.get("session_ids")
+        change_summary = request.data.get("change_summary", "সাপ্তাহিক ক্লাস রুটিন প্রকাশনা")
+
+        qs = ClassSession.objects.exclude(status=SessionStatus.CANCELLED)
+        if batch_id:
+            qs = qs.filter(batch_id=batch_id)
+        if session_ids:
+            qs = qs.filter(id__in=session_ids)
+
+        if not qs.exists():
+            return Response({"error": "কোনো ক্লাস সেশন পাওয়া যায়নি।"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check step 1 completed
+        unapproved = qs.exclude(approval_status=RoutineApprovalStatus.APPROVED_FOR_PUBLICATION)
+        if unapproved.exists() and not qs.filter(approval_status=RoutineApprovalStatus.APPROVED_FOR_PUBLICATION).exists():
+            return Response(
+                {"error": "বাধ্যতামূলক ধাপ ১ (রিভিউ ও কনফ্লিক্ট যাচাই) সম্পন্ন না করে রুটিন সরাসরি প্রকাশ নিষিদ্ধ।"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        now = timezone.now()
+        with transaction.atomic():
+            # Build snapshot
+            first_session = qs.first()
+            target_batch = first_session.batch
+
+            snapshot = [
+                {
+                    "id": s.id,
+                    "subject": s.subject.name,
+                    "teacher": s.teacher_user.full_name,
+                    "date": str(s.session_date),
+                    "start": str(s.start_time),
+                    "end": str(s.end_time),
+                    "audience": s.audience,
+                }
+                for s in qs.select_related("subject", "teacher_user")
+            ]
+
+            last_version = RoutineVersion.objects.filter(batch=target_batch).order_by("-version_number").first()
+            next_ver = (last_version.version_number + 1) if last_version else 1
+
+            RoutineVersion.objects.create(
+                batch=target_batch,
+                version_number=next_ver,
+                change_summary=change_summary,
+                schedule_snapshot={"sessions": snapshot},
+                approved_by=user,
+                published_by=user,
+            )
+
+            published_count = qs.update(
+                status=SessionStatus.PUBLISHED,
+                approval_status=RoutineApprovalStatus.PUBLISHED,
+                published_at=now,
+                version_number=next_ver,
+            )
+
+        return Response({
+            "success": True,
+            "message": f"আলহামদুলিল্লাহ! {target_batch.name} এর ক্লাস রুটিন (সংস্করণ {next_ver}) চূড়ান্তভাবে অনুমোদিত হয়ে প্রকাশিত হয়েছে।",
+            "step": 2,
+            "approval_status": "published",
+            "version_number": next_ver,
+            "published_count": published_count,
+            "published_by": user.full_name,
+            "published_at": now.isoformat(),
+        })
+
+    @action(detail=False, methods=["get"], url_path="routine-versions")
+    def routine_versions(self, request):
+        batch_id = request.query_params.get("batch_id")
+        qs = RoutineVersion.objects.select_related("batch", "approved_by", "published_by").all()
+        if batch_id:
+            qs = qs.filter(batch_id=batch_id)
+        serializer = RoutineVersionSerializer(qs[:20], many=True)
+        return Response(serializer.data)
+
 
     @action(detail=True, methods=["post"], url_path="cancel")
     def cancel(self, request, pk=None):

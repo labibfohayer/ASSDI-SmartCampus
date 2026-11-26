@@ -90,6 +90,16 @@ const DEFAULT_ADMIN_MENUS: CustomNavItem[] = [
     isSystemDefault: true,
   },
   {
+    id: 'exams',
+    href: '/admin/exams',
+    labelBn: 'পরীক্ষা ও ফলাফল মূল্যায়ন',
+    labelEn: 'Exams & Results',
+    iconName: 'Award',
+    section: 'main',
+    isArchived: false,
+    isSystemDefault: true,
+  },
+  {
     id: 'reports_hub',
     href: '/reports',
     labelBn: '৯টি এসআরএস রিপোর্টস হাব',

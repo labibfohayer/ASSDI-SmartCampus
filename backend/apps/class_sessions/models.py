@@ -14,6 +14,12 @@ class SessionStatus(models.TextChoices):
     CANCELLED = "cancelled", "Cancelled"
 
 
+class RoutineApprovalStatus(models.TextChoices):
+    DRAFT = "draft", "Draft (খসড়া)"
+    APPROVED_FOR_PUBLICATION = "approved_for_publication", "Approved for Publication (ধাপ ১ অনুমোদিত)"
+    PUBLISHED = "published", "Published (ধাপ ২ চূড়ান্ত অনুমোদিত)"
+
+
 class ClassSchedule(models.Model):
     """
     Weekly timetable template slot for a batch and subject.
@@ -154,6 +160,22 @@ class ClassSession(models.Model):
         default="",
         help_text="Required explanation when session is cancelled.",
     )
+    approval_status = models.CharField(
+        max_length=30,
+        choices=RoutineApprovalStatus.choices,
+        default=RoutineApprovalStatus.DRAFT,
+        db_index=True,
+        help_text="Mandatory two-step approval state (Section 3.3).",
+    )
+    step1_approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_sessions",
+    )
+    step1_approved_at = models.DateTimeField(null=True, blank=True)
+    version_number = models.PositiveIntegerField(default=1)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -339,3 +361,43 @@ class SessionMaterial(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.get_material_type_display()}) - {self.subject.name}"
+
+
+class RoutineVersion(models.Model):
+    """
+    Audit and history snapshot of class routines per batch (Section 3.3).
+    Created whenever a routine passes Step 2 Final Publication Confirmation.
+    """
+
+    batch = models.ForeignKey(
+        Batch,
+        on_delete=models.CASCADE,
+        related_name="routine_versions",
+    )
+    version_number = models.PositiveIntegerField(default=1)
+    change_summary = models.TextField(blank=True, default="")
+    schedule_snapshot = models.JSONField(default=dict)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_routine_versions",
+    )
+    published_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="published_routine_versions",
+    )
+    published_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "routine_versions"
+        ordering = ["-version_number", "-published_at"]
+
+    def __str__(self):
+        return f"Batch {self.batch.name} - v{self.version_number} ({self.published_at})"
+
